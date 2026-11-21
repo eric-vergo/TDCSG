@@ -25,6 +25,10 @@ tdcsg-orbit arrangement -n N (--r2 SPEC | --r Q) --lo SPEC --hi SPEC [sampling o
 tdcsg-orbit certify -n N (--r2 SPEC | --r Q) [--out FILE] [--max-pieces P] [--max-circles C]
                        [--max-seconds S] [--progress K]
 tdcsg-orbit check-certificate FILE
+tdcsg-orbit critical-points -n N (--r2 SPEC | --r Q) [--window w0,w1,…]
+tdcsg-orbit certify-relative -n N (--r2 SPEC | --r Q) --window w0,w1,… [--out FILE]
+                       [--max-pieces P] [--max-circles C] [--max-seconds S] [--progress K]
+tdcsg-orbit check-relative-certificate FILE [--threads T]
 tdcsg-orbit info -n N
 tdcsg-orbit --selftest
 ```
@@ -113,6 +117,9 @@ def usage : String :=
   "  tdcsg-orbit certify -n N --r2 SPEC [--out FILE] [--max-pieces P] [--max-circles C]\n" ++
   "                    [--max-seconds S] [--progress K]\n" ++
   "  tdcsg-orbit check-certificate FILE\n" ++
+  "  tdcsg-orbit critical-points -n N --r2 SPEC [--window w0,w1,…]\n" ++
+  "  tdcsg-orbit certify-relative -n N --r2 SPEC --window w0,w1,… [--out FILE] [caps]\n" ++
+  "  tdcsg-orbit check-relative-certificate FILE\n" ++
   "  tdcsg-orbit info -n N\n" ++
   "  tdcsg-orbit --selftest\n" ++
   "SPEC: touch | closed | r1 | fund, optionally followed by +q or -q; re:b0,b1,...;\n" ++
@@ -671,6 +678,136 @@ def cmdCheck (a : Args) : IO UInt32 := do
     IO.println s!"certificate REJECTED: {e}"
     return 2
 
+/-- Parse a window shape vector `w0,w1,…` (power-basis coefficients). -/
+def parseWindow (F : CycField) (a : Args) : IO Elem := do
+  let some s := a.get? "--window" | throw <| IO.userError "--window w0,w1,… is required"
+  orThrow (parsePoint F s!"pow:{s}")
+
+/-- The `critical-points` command: the lattice points on the boundary circles, their symmetry
+classes, and (with `--window`) the window geometry. -/
+def cmdCritical (a : Args) : IO UInt32 := do
+  let F ← getField a
+  let r2 ← orThrow (parseRadiusSq F (a.get? "--r2") (a.get? "--r"))
+  let C := CircleCtx.make F r2
+  let crit ← orThrow (criticalPoints F r2)
+  let norms ← orThrow (latticeOfNorm F r2)
+  IO.println s!"n = {F.n}, r² = {showReal F r2}: {norms.size} lattice elements of norm r², \
+    {crit.size} critical points"
+  let classes := sortDedup (crit.map (symCanonical F))
+  IO.println s!"{classes.size} classes under z ↦ ±z, ±z̄"
+  for P in classes do
+    let members := crit.filter fun x ↦ symCanonical F x == P
+    let (x, y) := F.evalConjF 1 P
+    let onL := F.smul (r2.den : Int) (F.normSq (F.addInt P 1)) == r2.num
+    let onR := F.smul (r2.den : Int) (F.normSq (F.addInt P (-1))) == r2.num
+    let other := if onL && onR then "on both circles" else
+      let q : Int := if onL then -1 else 1
+      match C.S.sign (F.sub r2.num (F.smul (r2.den : Int) (F.normSq (F.addInt P (-q))))) with
+      | some v => if v > 0 then "inside the other disk" else "outside the other disk"
+      | none => "?"
+    IO.println s!"  class {elemToString P} ({fmtFloat x 5}, {fmtFloat y 5}): {members.size} \
+      points, {other}"
+  if (a.get? "--window").isSome then
+    let w ← parseWindow F a
+    let WS ← orThrow (WindowSet.make C w)
+    let corners ← orThrow (windowCorners C WS.shape)
+    let (disj, pairs) ← orThrow (windowsDisjoint C WS)
+    let rc := Float.sqrt ((F.evalConjF 1 r2.num).1 / r2.den.toFloat)
+    let (wx, wy) := F.evalConjF 1 w
+    let mut ρ : Float := 0
+    for (v, s) in corners do
+      let (vx, vy) := F.evalConjF 1 v
+      let (ex, ey) := F.evalConjF 1 s.e
+      let (dx, dy) := (ex - vx, ey - vy)
+      let nd := Float.sqrt (dx * dx + dy * dy)
+      let h := Float.sqrt (rc * rc - nd * nd / 4)
+      let sg : Float := if s.plus then 1 else -1
+      let px := vx + dx / 2 - sg * h * dy / nd
+      let py := vy + dy / 2 + sg * h * dx / nd
+      ρ := max ρ (Float.sqrt (px * px + py * py))
+    IO.println s!"window w = {elemToString w}: {WS.shape.size} disks, inradius \
+      {fmtFloat (rc - Float.sqrt (wx * wx + wy * wy)) 5}, circumradius {fmtFloat ρ 5} \
+      ({corners.size} corners); pairwise disjoint: {disj} ({pairs} pairs, exact)"
+  return 0
+
+/-- The `certify-relative` command. -/
+def cmdCertifyRelative (a : Args) : IO UInt32 := do
+  let F ← getField a
+  let spec := (a.get? "--r2").getD ""
+  let r2 ← orThrow (parseRadiusSq F (a.get? "--r2") (a.get? "--r"))
+  if !F.isReal r2.num then throw <| IO.userError "the squared radius is not real"
+  let w ← parseWindow F a
+  let opts : CloseOptions :=
+    { maxPieces := ← a.nat "--max-pieces" 2000000000,
+      maxCircles := ← a.nat "--max-circles" 200000000,
+      maxSeconds := ← a.nat "--max-seconds" 0, progress := ← a.nat "--progress" 0 }
+  let r2s := showReal F r2
+  let r2v := F.realToSci r2.num r2.den 17
+  let specS := if spec.isEmpty then "" else s!" ({spec})"
+  let comment := #[s!"relative certificate: n = {F.n}, r² = {r2s} ≈ {r2v}{specS}, \
+      window shape {elemToString w}",
+    "arcs run counterclockwise; symbol (e, ±) on the circle about c is the intersection point",
+    "c + (d/2)(1 ± i h), d = e - c, h = sqrt(4 r²/|d|² - 1); coefficients in 1, ζ, …, ζ^(φ(n)-1)"]
+  IO.println s!"certify-relative: n = {F.n}, r² = {r2s} ≈ {r2v}, window {elemToString w}"
+  let o ← certifyRelative F r2 w opts comment
+  IO.println s!"critical points (windows) {o.WS.crit.size}, window disks {o.WS.shape.size}"
+  if !o.reason.isEmpty && o.summary.isNone && o.result.millis == 0 then
+    IO.println s!"result NOT CERTIFIED: {o.reason}"
+    return 3
+  let res := o.result
+  let st := res.stats
+  IO.println s!"pieces {st.pieces}, image arcs {st.images}, circles {res.store.size}, \
+    clipped pieces on window-crossing circles {res.windowClips}"
+  IO.println s!"decisions made exactly: {st.exactHalves} halves, {st.exactCross} orders; \
+    {st.coincidences} equalities of points with different symbols"
+  IO.println s!"tangencies to a boundary circle: {res.tangencies.size} circles, \
+    {o.tangentAtCritical} with the point of contact at a critical point"
+  IO.println s!"time {fmtFloat (res.millis.toFloat / 1000) 4} s"
+  if let some K := o.coinc then
+    IO.println s!"coincidences: {K.records} distinct (circle, symbol, symbol) records, \
+      {K.latticePoints} distinct lattice points; at critical points {K.atCritical}, at other \
+      lattice points {K.atOtherLattice}, at non-lattice points {K.nonLattice}; in window \
+      interiors {K.inWindow}, on window boundaries {K.onWindowBoundary}, in the bulk {K.inBulk}"
+    for (c, x, y) in K.bulkExamples do
+      IO.println s!"  bulk coincidence on {elemToString c}: ({elemToString x.e}, {x.plus}) = \
+        ({elemToString y.e}, {y.plus})"
+  if let some S := o.summary then
+    IO.println s!"circles {S.circles} (full {S.fullCircles}), maximal arcs {S.arcs}; modulo \
+      ±z, ±z̄: circles {S.canonCircles}, arcs {S.canonArcs}"
+    let cs := S.maxConj.toList.map fun (k, m) ↦ s!"σ_{k}: {fmtFloat m 5}"
+    IO.println s!"max |σ_k(c)| over centres: {cs}"
+  match o.text with
+  | some text =>
+    match a.get? "--out" with
+    | some path =>
+      IO.FS.writeFile path text
+      IO.println s!"relative certificate written to {path} ({text.utf8ByteSize} bytes)"
+    | none => pure ()
+    IO.println "result CLOSED (generator); check with `check-relative-certificate`"
+    return 0
+  | none =>
+    IO.println s!"result NOT CERTIFIED: {o.reason}"
+    return 3
+
+/-- The `check-relative-certificate` command. -/
+def cmdCheckRelative (a : Args) : IO UInt32 := do
+  let some (path : String) := a.pos[1]? |
+    throw <| IO.userError "usage: check-relative-certificate FILE"
+  let t0 ← IO.monoNanosNow
+  let threads ← a.nat "--threads" 1
+  match (← parseRelativeFile path) >>= (checkRelative · threads) with
+  | .ok rep =>
+    IO.println s!"relative certificate VALID: circles {rep.circles} (full {rep.fullCircles}), \
+      maximal arcs {rep.arcs}; modulo ±z, ±z̄: circles {rep.canonCircles}, arcs \
+      {rep.canonArcs}; windows {rep.windows} ({rep.windowPairs} pairs disjoint), boundary \
+      arcs {rep.boundaryArcs}, (K3) image arcs {rep.images}, tangent circles \
+      {rep.tangentCircles}"
+    IO.println s!"time {fmtFloat (← secondsSince t0) 4} s"
+    return 0
+  | .error e =>
+    IO.println s!"relative certificate REJECTED: {e}"
+    return 2
+
 /-- The `info` command. -/
 def cmdInfo (a : Args) : IO Unit := do
   let F ← getField a
@@ -700,6 +837,9 @@ def main (argv : List String) : IO UInt32 := do
     | some "walk" => cmdWalk a
     | some "certify" => return (← cmdCertify a)
     | some "check-certificate" => return (← cmdCheck a)
+    | some "critical-points" => return (← cmdCritical a)
+    | some "certify-relative" => return (← cmdCertifyRelative a)
+    | some "check-relative-certificate" => return (← cmdCheckRelative a)
     | _ => IO.print usage
     return 0
   catch e =>

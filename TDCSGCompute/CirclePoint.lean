@@ -252,6 +252,43 @@ def cmpExact (p p' : ExactPt) : Except String Ordering := do
   let s ← C.crossSign p p'
   return (if s > 0 then .lt else if s == 0 then .eq else .gt)
 
+/-- The exact sign of `t - |x - z|²`, where `x` is the point named by the (valid) symbol `s` on
+the circle about `c`, `z ∈ ℤ[ζ_n]` and `t = t.num / t.den` is real: positive when `x` lies in the
+open disk of squared radius `t` about `z`, zero on its boundary.
+
+With `g = c - z`, `x - c = (X + iY) / (4 √S₄ qN)` (module docstring), `Re g = A(g) / 2` and
+`Im g = T(g) / (2 √S₄)`,
+
+`|x - z|² = |g|² + ρ + (A(g) √S₄ X + T(g) Y) / (4 S₄ qN)`.
+
+Multiplying `t - |x - z|²` by the positive number `t.den · q · 4 S₄ qN` and inserting
+`X = √S₄ qN A(d) - s T(d) √H`, `Y = qN T(d) + s A(d) √S₄ √H` gives `E₀ + E₃ √S₄ √H` with
+
+`E₀ = (t.num q - t.den q |g|² - t.den R) 4 S₄ qN - t.den q qN (A(g) A(d) S₄ + T(g) T(d))`,
+`E₃ = -t.den q s (T(g) A(d) - A(g) T(d))`,
+
+whose sign `Tower.sign` decides exactly. -/
+def diskSign (c : Elem) (s : Sym) (z : Elem) (t : RadiusSq) : Except String Int := do
+  let F := C.F
+  C.validSym c s
+  let d := F.sub s.e c
+  let g := F.sub c z
+  let q : Int := C.r2.den
+  let td : Int := t.den
+  let qN := F.smul q (F.normSq d)
+  let Ad := F.add d (F.conj d)
+  let Td := F.neg (F.mul (F.sub d (F.conj d)) C.omega)
+  let Ag := F.add g (F.conj g)
+  let Tg := F.neg (F.mul (F.sub g (F.conj g)) C.omega)
+  let k0 := F.sub (F.sub (F.smul q t.num) (F.smul (td * q) (F.normSq g))) (F.smul td C.r2.num)
+  let e0 := F.sub (F.mul (F.smul 4 (F.mul C.S4 qN)) k0)
+    (F.smul (td * q) (F.mul qN (F.add (F.mul (F.mul Ag Ad) C.S4) (F.mul Tg Td))))
+  let e3 := F.smul (-(td * q * s.side)) (F.sub (F.mul Tg Ad) (F.mul Ag Td))
+  let H := F.mul qN (F.sub C.R4 qN)
+  match Tower.sign C.S #[C.S4, H] #[e0, F.zero, F.zero, e3] with
+  | some v => return v
+  | none => throw "sign determination failed (precision bound exceeded)"
+
 end CircleCtx
 
 /-- An element as comma-separated coefficients. -/

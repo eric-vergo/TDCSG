@@ -5,6 +5,8 @@ Authors: Eric Vergo, Claude
 import TDCSGCompute.Group
 import TDCSGCompute.Closure
 import TDCSGCompute.CertCheck
+import TDCSGCompute.RelClosure
+import TDCSGCompute.RelCheck
 
 /-!
 # Self-tests of the orbit engine
@@ -661,6 +663,162 @@ def testCertificates (log : IO.Ref TestLog) : IO Unit := do
   check log "δ = 9/10 → 899/1000: same arcs as the generator's certificate there, accepted"
     (!(rejects moved).1 && (o899.text.map body) == some (body cert910))
 
+/-- Whether the relative checker rejects a certificate text; also returns its message. -/
+def rejectsRel (text : String) (threads : Nat := 1) : Bool × String :=
+  match parseRelative text >>= (checkRelative · threads) with
+  | .ok _ => (false, "accepted")
+  | .error e => (true, e)
+
+/-- Relative certificates: critical points, the window geometry, the exact disk test, the n = 5
+closure at `r_c` with the largest window of `sharp-lower-bound-combined.md`, and tamperings. -/
+def testRelative (log : IO.Ref TestLog) : IO Unit := do
+  -- critical points at r_c (Lemma 2.1 of the note for n = 5; 32 points in 8 classes for n = 8)
+  for (n, norms, crit, classes) in [(5, 20, 38, 10), (8, 16, 32, 8), (10, 20, 38, 10),
+      (12, 24, 48, 12)] do
+    let F := CycField.make n
+    let r2 ← specRadius F "closed"
+    let ws := (latticeOfNorm F r2).toOption.getD #[]
+    let cp := (criticalPoints F r2).toOption.getD #[]
+    let C := CircleCtx.make F r2
+    let cp' := (RelChecker.critPoints C).toOption.getD #[]
+    check log s!"n={n}: {norms} lattice elements of norm r_c², {crit} critical points in \
+      {classes} classes; the checker's enumeration agrees"
+      (ws.size == norms && cp.size == crit && (sortDedup (cp.map (symCanonical F))).size == classes
+        && sortDedup cp' == cp)
+  -- latticeOfNorm against a brute-force search
+  for (n, spec) in [(5, "closed"), (5, "5"), (8, "closed"), (12, "closed"), (4, "13")] do
+    let F := CycField.make n
+    let r2 ← specRadius F spec
+    let ws := (latticeOfNorm F r2).toOption.getD #[]
+    let mut brute := #[]
+    let B : Int := 7
+    let d := F.deg
+    let total := (2 * B.toNat + 1) ^ d
+    for t in [0:total] do
+      let mut x : Array Int := #[]
+      let mut rest := t
+      for _ in [0:d] do
+        x := x.push ((rest % (2 * B.toNat + 1) : Nat) - B)
+        rest := rest / (2 * B.toNat + 1)
+      if F.smul (r2.den : Int) (F.normSq x) == r2.num then brute := brute.push x
+    check log s!"n={n}, r² = {spec}: latticeOfNorm agrees with a search over [-7, 7]^{d} \
+      ({brute.size} elements)" (sortDedup ws == sortDedup brute)
+  -- the exact disk test against floating point
+  for n in [5, 8, 12] do
+    let F := CycField.make n
+    let r2 ← specRadius F "closed"
+    let C := CircleCtx.make F r2
+    let rho := (F.evalConjF 1 r2.num).1 / r2.den.toFloat
+    let mut ok := true
+    let mut tested := 0
+    for seed in [0:300] do
+      let c := pseudoElem F seed 3
+      let e := pseudoElem F (seed + 1000) 3
+      let z := pseudoElem F (seed + 2000) 3
+      let t := pseudoElem F (seed + 3000) 4
+      let tr : RadiusSq := { num := F.add t (F.conj t), den := 3 }
+      if c == e || (C.gapSign c e).toOption != some 1 then continue
+      for plus in [false, true] do
+        let s : Sym := ⟨e, plus⟩
+        let (cx, cy) := F.evalConjF 1 c
+        let a := floatAngle F rho c s
+        let (px, py) := (cx + Float.sqrt rho * Float.cos a, cy + Float.sqrt rho * Float.sin a)
+        let (zx, zy) := F.evalConjF 1 z
+        let tv := (F.evalConjF 1 tr.num).1 / 3
+        let fv := tv - ((px - zx) * (px - zx) + (py - zy) * (py - zy))
+        match C.diskSign c s z tr with
+        | .ok v =>
+          tested := tested + 1
+          if fv.abs > 1e-9 && v != (if fv > 0 then 1 else -1) then ok := false
+        | .error _ => ok := false
+    check log s!"n={n}: diskSign agrees with floating point ({tested} points)" (ok && tested > 100)
+  -- the window geometry: the shape (0,2,-1,0) of Table 5.1, and a shape that overlaps
+  let F5 := CycField.make 5
+  let C5 := CircleCtx.make F5 (← specRadius F5 "closed")
+  let w1 : Elem := #[0, 2, -1, 0]
+  match WindowSet.make C5 w1 >>= WindowSet.withBound C5 with
+  | .ok WS =>
+    let corners := (windowCorners C5 WS.shape).toOption.getD #[]
+    check log "n=5, w = (0,2,-1,0): 4 disks, 8 corners, 38 disjoint windows, ρ̄ ∈ (0.2924, 0.2925)"
+      (WS.shape.size == 4 && corners.size == 8 &&
+        (windowsDisjoint C5 WS).toOption == some (true, 703) &&
+        WS.rhoNum * 10000 > 2924 * 65536 && WS.rhoNum * 10000 < 2925 * 65536)
+  | .error _ => check log "n=5, w = (0,2,-1,0): window set" false
+  check log "n=5, w = (0,1,0,0): overlapping windows are detected"
+    (match WindowSet.make C5 #[0, 1, 0, 0] >>= fun WS ↦ windowsDisjoint C5 WS with
+      | .ok (false, _) => true
+      | _ => false)
+  check log "a zero window shape and |w| ≥ r are refused"
+    ((WindowSet.make C5 F5.zero).toOption.isNone &&
+      (WindowSet.make C5 #[3, 0, 0, 0]).toOption.isNone)
+  -- n = 5 at r_c with the window (0,2,-1,0): Table 5.1 of sharp-lower-bound-combined.md
+  let o ← certifyRelative F5 C5.r2 w1 {}
+  let S := o.summary
+  let K := o.coinc
+  check log "n=5, r_c, w = (0,2,-1,0): closes with 3 442 circles and 5 614 maximal arcs modulo \
+    ±z, ±z̄ (plus one full boundary circle), 13 692 and 22 230 in all"
+    (o.text.isSome && (S.map (·.canonCircles)) == some 3442 && (S.map (·.canonArcs)) == some 5615
+      && (S.map (·.circles)) == some 13692 && (S.map (·.arcs)) == some 22230)
+  check log "n=5, r_c, w = (0,2,-1,0): 8 tangencies to ∂D_p, all at critical points"
+    (o.result.tangencies.size == 8 && o.tangentAtCritical == 8)
+  check log "n=5, r_c, w = (0,2,-1,0): exact coincidences found, none in the bulk"
+    (match K with
+      | some K => K.records > 0 && K.inBulk == 0 && K.nonLattice == 0
+      | none => false)
+  let cert5 := o.text.getD ""
+  match parseRelative cert5 >>= (checkRelative · 8) with
+  | .ok rep =>
+    check log "n=5, r_c, w = (0,2,-1,0): the checker accepts, with 51 828 image arcs (as chk.py)"
+      (rep.images == 51828 && rep.canonCircles == 3442 && rep.arcs == 22230)
+  | .error e => check log s!"n=5, r_c, w = (0,2,-1,0): the checker accepts ({e})" false
+  -- shrinking the window: the boundary of the smaller windows is not in K'
+  let shrunk := cert5.replace "window 0,2,-1,0" "window 5,-1,4,0"
+  let (rejS, msgS) := rejectsRel shrunk 8
+  check log s!"tampered relative certificate rejected: a smaller window ({msgS})" rejS
+  -- a small case for tamperings: n = 6, r² = 13, w = (2, 2)
+  let F6 := CycField.make 6
+  let o6 ← certifyRelative F6 (← specRadius F6 "13") #[2, 2] {}
+  let cert6 := o6.text.getD ""
+  check log "n=6, r² = 13, w = (2,2): 22 windows, closes with 215 circles and 536 arcs, accepted"
+    ((o6.summary.map (·.arcs)) == some 536 && o6.WS.crit.size == 22 && !(rejectsRel cert6).1)
+  let ls := (cert6.splitOn "\n").toArray
+  let idx (pre : String) := (Array.range ls.size).filter fun i ↦ ls[i]!.startsWith pre
+  let arcIdx := idx "arc "
+  let critIdx := idx "critical "
+  let fullIdx := idx "full "
+  let r2Idx := idx "r2 "
+  let words (i : Nat) : Array String := ((ls[i]!.splitOn " ").filter (!·.isEmpty)).toArray
+  let flip (x : String) : String := if x == "+" then "-" else "+"
+  let mid := arcIdx[arcIdx.size / 2]!
+  let w := words mid
+  -- an arc on a window circle (its centre is P + v for a critical point P)
+  let winArc := arcIdx.find? fun i ↦
+    let c := (parseVec 2 (words i)[1]!).toOption.getD #[]
+    o6.WS.centres.any (·.contains c)
+  let tampered : List (String × String) := [
+    ("delete an arc", editLine cert6 mid none),
+    ("delete an arc on a window circle", editLine cert6 (winArc.getD mid) none),
+    ("delete a boundary circle", editLine cert6 fullIdx[0]! none),
+    ("flip the side of an endpoint",
+      editLine cert6 mid (some (" ".intercalate (w.set! 5 (flip w[5]!)).toList))),
+    ("move an endpoint to another intersection point",
+      editLine cert6 mid (some (" ".intercalate (w.set! 4 w[2]! |>.set! 5 (flip w[3]!)).toList))),
+    ("replace an endpoint by that of another arc",
+      let w' := words arcIdx[arcIdx.size / 2 + 1]!
+      editLine cert6 mid (some (" ".intercalate (w.set! 4 w'[4]! |>.set! 5 w'[5]!).toList))),
+    ("drop a critical point", editLine cert6 critIdx[3]! none),
+    ("add a point that is not critical", editLine cert6 critIdx[0]! (some "critical 0,0")),
+    ("list a critical point twice", editLine cert6 critIdx[0]! (some (ls[critIdx[0]!]! ++ "\n" ++
+      ls[critIdx[0]!]!))),
+    ("an overlapping window", cert6.replace "window 2,2" "window 0,1"),
+    ("a zero window", cert6.replace "window 2,2" "window 0,0"),
+    ("change the radius", editLine cert6 r2Idx[0]! (some "r2 14,0 / 1")),
+    ("change the summary", cert6.replace "arcs 536" "arcs 537"),
+    ("truncate the file", editLine cert6 (ls.size - 2) none)]
+  for (what, t) in tampered do
+    let (rej, msg) := rejectsRel t
+    check log s!"tampered relative certificate rejected: {what} ({msg})" rej
+
 /-- Run all self-tests; returns the process exit code. -/
 def runSelfTests : IO UInt32 := do
   let log ← IO.mkRef ({} : TestLog)
@@ -671,6 +829,7 @@ def runSelfTests : IO UInt32 := do
   testKnownResults log
   testGroups log
   testCertificates log
+  testRelative log
   let l ← log.get
   let t1 ← IO.monoMsNow
   IO.println s!"self-test: {l.passed} passed, {l.failed.size} failed ({t1 - t0} ms)"

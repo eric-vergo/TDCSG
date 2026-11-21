@@ -82,6 +82,8 @@ structure CircSt where
   meetL : Int := 0
   /-- Sign of `4ρ - |c - 1|²`. -/
   meetR : Int := 0
+  /-- Windows whose bounding circles all cross this circle (relative closures only). -/
+  wins : Array Nat := #[]
   deriving Inhabited
 
 /-- Counters of a run. -/
@@ -96,7 +98,13 @@ structure Stats where
   pieces : Nat := 0
   /-- Image arcs inserted. -/
   images : Nat := 0
+  /-- The first `coincLogCap` equalities of points named by different symbols, as
+  `(centre, symbol, symbol)`. -/
+  coincLog : Array (Elem × Sym × Sym) := #[]
   deriving Inhabited
+
+/-- How many coincidences `Stats.coincLog` keeps. -/
+def coincLogCap : Nat := 100000
 
 /-- The generator's context. -/
 structure Gen where
@@ -139,7 +147,9 @@ def cmp (c : Elem) (x y : GPt) : IO Ordering := do
     let o ← liftE (G.C.cmpExact ex ey)
     G.stats.modify fun st ↦
       { st with exactCross := st.exactCross + 1,
-                coincidences := st.coincidences + (if o == .eq then 1 else 0) }
+                coincidences := st.coincidences + (if o == .eq then 1 else 0),
+                coincLog := if o == .eq && st.coincLog.size < coincLogCap
+                  then st.coincLog.push (c, x.sym, y.sym) else st.coincLog }
     return o
 
 end Gen
