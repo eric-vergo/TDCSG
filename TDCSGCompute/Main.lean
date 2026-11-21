@@ -25,7 +25,7 @@ tdcsg-orbit arrangement -n N (--r2 SPEC | --r Q) --lo SPEC --hi SPEC [sampling o
 tdcsg-orbit certify -n N (--r2 SPEC | --r Q) [--out FILE] [--max-pieces P] [--max-circles C]
                        [--max-seconds S] [--progress K]
 tdcsg-orbit check-certificate FILE
-tdcsg-orbit critical-points -n N (--r2 SPEC | --r Q) [--window w0,w1,…]
+tdcsg-orbit critical-points -n N (--r2 SPEC | --r Q) [--window w0,w1,…] [--search B]
 tdcsg-orbit certify-relative -n N (--r2 SPEC | --r Q) --window w0,w1,… [--symmetric] [--out FILE]
                        [--max-pieces P] [--max-circles C] [--max-seconds S] [--progress K]
 tdcsg-orbit check-relative-certificate FILE [--threads T]
@@ -120,7 +120,7 @@ def usage : String :=
   "  tdcsg-orbit certify -n N --r2 SPEC [--out FILE] [--max-pieces P] [--max-circles C]\n" ++
   "                    [--max-seconds S] [--progress K]\n" ++
   "  tdcsg-orbit check-certificate FILE\n" ++
-  "  tdcsg-orbit critical-points -n N --r2 SPEC [--window w0,w1,…]\n" ++
+  "  tdcsg-orbit critical-points -n N --r2 SPEC [--window w0,w1,…] [--search B]\n" ++
   "  tdcsg-orbit certify-relative -n N --r2 SPEC --window w0,w1,… [--symmetric]\n" ++
   "                    [--out FILE] [caps]\n" ++
   "  tdcsg-orbit check-relative-certificate FILE [--threads T]\n" ++
@@ -713,6 +713,30 @@ def cmdCritical (a : Args) : IO UInt32 := do
       | none => "?"
     IO.println s!"  class {elemToString P} ({fmtFloat x 5}, {fmtFloat y 5}): {members.size} \
       points, {other}"
+  if let some bs := a.get? "--search" then
+    -- window shapes with coefficients in [-B, B], one per symmetry orbit, whose windows are
+    -- disjoint (decided exactly), with their circumradius bound ρ̄
+    let B : Nat := bs.toNat?.getD 3
+    let d := F.deg
+    let m := 2 * B + 1
+    let mut found : Array (Float × Elem) := #[]
+    for t in [0:m ^ d] do
+      let mut x : Array Int := #[]
+      let mut rest := t
+      for _ in [0:d] do
+        x := x.push ((rest % m : Nat) - (B : Int))
+        rest := rest / m
+      if F.isZero x || symCanonical F x != x then continue
+      match WindowSet.make C x >>= WindowSet.withBound C with
+      | .error _ => pure ()
+      | .ok WS =>
+        match windowsDisjoint C WS with
+        | .ok (true, _) => found := found.push (WS.rhoNum.toFloat / 65536, x)
+        | _ => pure ()
+    let sorted := found.qsort fun u v ↦ u.1 > v.1
+    IO.println s!"{sorted.size} window shapes with disjoint windows (coefficients in [-{B}, {B}])"
+    for (ρ, x) in sorted do
+      IO.println s!"  ρ̄ = {fmtFloat ρ 5}  w = {elemToString x}"
   if (a.get? "--window").isSome then
     let w ← parseWindow F a
     let WS ← orThrow (WindowSet.make C w)
@@ -778,6 +802,10 @@ def cmdCertifyRelative (a : Args) : IO UInt32 := do
     for (c, x, y) in K.bulkExamples do
       IO.println s!"  bulk coincidence on {elemToString c}: ({elemToString x.e}, {x.plus}) = \
         ({elemToString y.e}, {y.plus})"
+  if !o.WS.active && o.summary.isSome then
+    let ok := res.tangencies.isEmpty && o.c4.2 == 0
+    IO.println s!"no windows: (C3) tangencies {res.tangencies.size}, (C4) endpoints {o.c4.1}, \
+      failures {o.c4.2}{if ok then "; (C1)–(C4) hold (an ordinary cut-set certificate)" else ""}"
   if let some S := o.summary then
     IO.println s!"circles {S.circles} (full {S.fullCircles}), maximal arcs {S.arcs}; modulo \
       ±z, ±z̄: circles {S.canonCircles}, arcs {S.canonArcs}"
@@ -806,6 +834,11 @@ def cmdCheckRelative (a : Args) : IO UInt32 := do
       {rep.canonArcs}; windows {rep.windows} ({rep.windowPairs} pairs disjoint), boundary \
       arcs {rep.boundaryArcs}, (K3) image arcs {rep.images}, tangent circles \
       {rep.tangentCircles}"
+    if rep.windows == 0 || rep.windowPairs == 0 then
+      let ok := rep.tangentCircles == 0 && rep.c4Failures == 0
+      IO.println s!"no windows: (C3) tangent circles {rep.tangentCircles}, (C4) endpoints \
+        {rep.c4Endpoints}, failures {rep.c4Failures}{if ok then
+          "; (C1)–(C4) hold: an ordinary cut-set certificate" else ""}"
     IO.println s!"time {fmtFloat (← secondsSince t0) 4} s"
     return 0
   | .error e =>

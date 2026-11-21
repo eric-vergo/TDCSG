@@ -188,6 +188,10 @@ structure RelReport where
   tangentCircles : Nat
   /-- Pairs of windows shown disjoint. -/
   windowPairs : Nat
+  /-- Listed arc endpoints equal to a clip point `(p, ±)` of their circle. -/
+  c4Endpoints : Nat
+  /-- Those that violate (C4) (an arc leaving `D_p` at its endpoint on `∂D_p`). -/
+  c4Failures : Nat
 
 namespace RelChecker
 
@@ -434,28 +438,31 @@ def checkRelative (P : ParsedRel) (threads : Nat := 1) : Except String RelReport
   for x in crit do
     if !P.crit.contains x then throw s!"the critical point {elemToString x} is not listed"
   if P.crit.size != crit.size then throw "a critical point is listed twice"
-  -- the window shape
-  if F.isZero P.w then throw "the window shape is zero"
-  match C.S.sign (F.sub C.r2.num (F.smul (C.r2.den : Int) (F.normSq P.w))) with
-  | some s => if s ≤ 0 then throw "the window shape needs |w| < r"
-  | none => throw "sign determination failed"
-  let wc := F.conj P.w
+  -- the window shape (`w = 0`: no windows, `W = ∅`)
+  let active := !F.isZero P.w
   let mut shape : Array Elem := #[]
-  for v in [P.w, F.neg P.w, wc, F.neg wc] do
-    if !shape.contains v then shape := shape.push v
-  let corners ← RelChecker.cornersOf C shape
-  if corners.isEmpty then throw "the window has no corners"
   let mut pairs := 0
-  for i in [0:crit.size] do
-    for j in [i + 1:crit.size] do
-      pairs := pairs + 1
-      let t : RadiusSq := { num := F.normSq (F.sub crit[i]! crit[j]!), den := 4 }
-      for (v, s) in corners do
-        if (← C.diskSign v s F.zero t) ≤ 0 then
-          throw s!"the windows about {elemToString crit[i]!} and {elemToString crit[j]!} are \
-            not shown to be disjoint"
-  let centres : Array (Array Elem) := crit.map fun Q ↦ shape.map (F.add Q ·)
-  let rhoNum ← RelChecker.radiusBound C corners
+  let mut rhoNum := 0
+  if active then
+    match C.S.sign (F.sub C.r2.num (F.smul (C.r2.den : Int) (F.normSq P.w))) with
+    | some s => if s ≤ 0 then throw "the window shape needs |w| < r"
+    | none => throw "sign determination failed"
+    let wc := F.conj P.w
+    for v in [P.w, F.neg P.w, wc, F.neg wc] do
+      if !shape.contains v then shape := shape.push v
+    let corners ← RelChecker.cornersOf C shape
+    if corners.isEmpty then throw "the window has no corners"
+    for i in [0:crit.size] do
+      for j in [i + 1:crit.size] do
+        pairs := pairs + 1
+        let t : RadiusSq := { num := F.normSq (F.sub crit[i]! crit[j]!), den := 4 }
+        for (v, s) in corners do
+          if (← C.diskSign v s F.zero t) ≤ 0 then
+            throw s!"the windows about {elemToString crit[i]!} and {elemToString crit[j]!} \
+              are not shown to be disjoint"
+    rhoNum ← RelChecker.radiusBound C corners
+  let centres : Array (Array Elem) := if active then crit.map fun Q ↦ shape.map (F.add Q ·)
+    else #[]
   -- group the records by circle
   let mut raw : Std.HashMap Elem (Bool × Array CertArcRec) := {}
   for c in P.full do
@@ -478,6 +485,8 @@ def checkRelative (P : ParsedRel) (threads : Nat := 1) : Except String RelReport
   -- symbols, sorting, disjointness
   let mut circles : Std.HashMap Elem CheckCircle := {}
   let mut nArcs := 0
+  let mut nC4 := 0
+  let mut nC4bad := 0
   let mut nCirc := 0
   let mut nListedArcs := 0
   let mut nTan := 0
@@ -515,6 +524,16 @@ def checkRelative (P : ParsedRel) (threads : Nat := 1) : Except String RelReport
         if (← CertChecker.posCmp C s e s') != .lt then
           throw s!"arcs overlap or touch on the circle about {elemToString c}"
     circles := circles.insert c { full := false, arcs := sorted, meet := (mL, mR) }
+    -- (C4) counts: an endpoint equal to `(p, -)` must start its arc, one equal to `(p, +)` end it
+    for (p, meet) in [(C.left, mL), (C.right, mR)] do
+      if c == p || meet ≤ 0 then continue
+      let wm ← CertChecker.mkPt C c ⟨p, false⟩
+      let wp ← CertChecker.mkPt C c ⟨p, true⟩
+      for (a, b) in sorted do
+        if (← CertChecker.cmp C a wm) == .eq then nC4 := nC4 + 1
+        if (← CertChecker.cmp C b wp) == .eq then nC4 := nC4 + 1
+        if (← CertChecker.cmp C a wp) == .eq then nC4bad := nC4bad + 1
+        if (← CertChecker.cmp C b wm) == .eq then nC4bad := nC4bad + 1
     nArcs := nArcs + orbit * sorted.size
     nListedArcs := nListedArcs + sorted.size
     if canon then
@@ -565,7 +584,7 @@ def checkRelative (P : ParsedRel) (threads : Nat := 1) : Except String RelReport
   let rep : RelReport :=
     { circles := nCirc, fullCircles := P.full.size, arcs := nArcs, canonCircles := cc,
       canonArcs := ca, windows := crit.size, boundaryArcs := nBd, images := nImg,
-      tangentCircles := nTan, windowPairs := pairs }
+      tangentCircles := nTan, windowPairs := pairs, c4Endpoints := nC4, c4Failures := nC4bad }
   match P.summary with
   | none => throw "missing summary line"
   | some (cs, as, ws) =>

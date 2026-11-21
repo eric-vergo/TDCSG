@@ -215,7 +215,7 @@ structure WindowSet where
 /-- The window set at `r² = r2` for the shape `w`: checks `w ≠ 0` and `|w| < r` exactly. -/
 def WindowSet.make (C : CircleCtx) (w : Elem) : Except String WindowSet := do
   let F := C.F
-  if F.isZero w then throw "the window shape vector must be non-zero"
+  if F.isZero w then throw "the window shape vector must be non-zero (use `WindowSet.none`)"
   -- |w| < r  ⟺  R - q |w|² > 0
   match C.S.sign (F.sub C.r2.num (F.smul (C.r2.den : Int) (F.normSq w))) with
   | some s => if s ≤ 0 then throw "the window shape needs |w| < r"
@@ -224,6 +224,14 @@ def WindowSet.make (C : CircleCtx) (w : Elem) : Except String WindowSet := do
   let crit ← criticalPoints F C.r2
   let centres := crit.map fun P ↦ shape.map fun v ↦ F.add P v
   return { w, shape, crit, centres }
+
+/-- No windows (`W = ∅`): the critical points are still listed. With `W = ∅` a restricted
+closure is a cut set closed under the strict dynamics. -/
+def WindowSet.none (C : CircleCtx) : Except String WindowSet := do
+  return { w := C.F.zero, shape := #[], crit := ← criticalPoints C.F C.r2, centres := #[] }
+
+/-- Whether there are windows. -/
+def WindowSet.active (WS : WindowSet) : Bool := !WS.centres.isEmpty
 
 /-- The corners of `W₀`: points named by `(v', ±)` on `C(v)`, `v ≠ v'` in the shape, lying in
 every closed disk `D(v'', r)`. -/
@@ -279,6 +287,7 @@ def windowsDisjoint (C : CircleCtx) (WS : WindowSet) : Except String (Bool × Na
 
 /-- The window set with its circumradius bound computed. -/
 def WindowSet.withBound (C : CircleCtx) (WS : WindowSet) : Except String WindowSet := do
+  if !WS.active then return WS
   let corners ← windowCorners C WS.shape
   if corners.isEmpty then throw "the window has no corners"
   return { WS with rhoNum := ← circumBound C corners }
@@ -633,6 +642,27 @@ def relSummarize (F : CycField) (store : Std.HashMap Elem CircSt) (sym : Bool) :
   return { circles, fullCircles := full, arcs, canonCircles := cc, canonArcs := ca,
            maxConj := ks.zip mx }
 
+/-- Condition (C4) of the cut-set certificate theorem on the stored maximal arcs: every endpoint
+equal to `(p, -)` must start its arc and every endpoint equal to `(p, +)` must end it. Returns
+`(endpoints on boundary circles, failures)`. Relevant without windows. -/
+def relC4 (G : Gen) (store : Std.HashMap Elem CircSt) : IO (Nat × Nat) := do
+  let C := G.C
+  let mut onb := 0
+  let mut bad := 0
+  for (c, st) in store.toList do
+    if st.full then continue
+    for (p, meet) in [(C.left, st.meetL), (C.right, st.meetR)] do
+      if c == p || meet ≤ 0 then continue
+      let wm ← G.mkPt c ⟨p, false⟩
+      let wp ← G.mkPt c ⟨p, true⟩
+      for A in st.arcs do
+        for (isStart, x) in [(true, A.a), (false, A.b)] do
+          for (w, wantStart) in [(wm, true), (wp, false)] do
+            if (← G.cmp c x w) == .eq then
+              onb := onb + 1
+              if isStart != wantStart then bad := bad + 1
+  return (onb, bad)
+
 /-- Write the relative certificate (format in `notes/relative-certificates.md`) line by line
 through `emit`. In the symmetric mode the arcs are those of the stored canonical circles, and the
 line `symmetric` says that `K'` is their union under `z ↦ ±z, ±z̄`. -/
@@ -678,6 +708,8 @@ structure RelOutcome where
   coinc : Option CoincidenceClass
   /-- Tangency points that are critical points. -/
   tangentAtCritical : Nat
+  /-- Condition (C4) on the stored arcs: `(endpoints on boundary circles, failures)`. -/
+  c4 : Nat × Nat := (0, 0)
   /-- The certificate text (if closed; empty if it was written to a file). -/
   text : Option String
   /-- Why there is no certificate (empty if there is one). -/
@@ -690,8 +722,9 @@ def certifyRelative (F : CycField) (r2 : RadiusSq) (w : Elem) (opts : CloseOptio
     IO RelOutcome := do
   let G : Gen := { FC := FilterCtx.make (CircleCtx.make F r2), stats := ← IO.mkRef {} }
   let C := G.C
-  let WS ← Gen.liftE (WindowSet.make C w >>= WindowSet.withBound C)
-  let (disj, _) ← Gen.liftE (windowsDisjoint C WS)
+  let WS ← Gen.liftE (if F.isZero w then WindowSet.none C
+    else WindowSet.make C w >>= WindowSet.withBound C)
+  let (disj, _) ← if WS.active then Gen.liftE (windowsDisjoint C WS) else pure (true, 0)
   let empty : RelResult := { status := .cap "none", store := {}, stats := {}, tangencies := #[],
                              windowClips := 0, millis := 0 }
   if !disj then
@@ -710,6 +743,7 @@ def certifyRelative (F : CycField) (r2 : RadiusSq) (w : Elem) (opts : CloseOptio
              text := none, reason := s!"cap reached ({what}); nothing is claimed" }
   | .closed =>
     let S := relSummarize F res.store sym
+    let c4 ← relC4 G res.store
     let K ← Gen.liftE (classifyCoincidences C WS res.stats.coincLog)
     let text ← match out with
       | some path =>
@@ -721,6 +755,6 @@ def certifyRelative (F : CycField) (r2 : RadiusSq) (w : Elem) (opts : CloseOptio
         relWriteCertificate G WS res.store sym S comment fun t ↦ buf.modify (· ++ t)
         buf.get
     return { WS, result := res, summary := some S, coinc := some K, tangentAtCritical := tc,
-             text := some text, reason := "" }
+             c4, text := some text, reason := "" }
 
 end TDCSGCompute

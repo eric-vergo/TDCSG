@@ -821,7 +821,7 @@ def testRelative (log : IO.Ref TestLog) : IO Unit := do
     ("list a critical point twice", editLine cert6 critIdx[0]! (some (ls[critIdx[0]!]! ++ "\n" ++
       ls[critIdx[0]!]!))),
     ("an overlapping window", cert6.replace "window 2,2" "window 0,1"),
-    ("a zero window", cert6.replace "window 2,2" "window 0,0"),
+    ("the windows removed", cert6.replace "window 2,2" "window 0,0"),
     ("change the radius", editLine cert6 r2Idx[0]! (some "r2 14,0 / 1")),
     ("change the summary", cert6.replace "arcs 536" "arcs 537"),
     ("truncate the file", editLine cert6 (ls.size - 2) none)]
@@ -857,6 +857,19 @@ def testRelative (log : IO.Ref TestLog) : IO Unit := do
   | none => check log "n=6 symmetric: an arc on a circle with trivial stabiliser" false
   let (rejD, msgD) := rejectsRel (editLine cert6s arc6[arc6.size / 2]! none)
   check log s!"tampered symmetric certificate rejected: delete an arc ({msgD})" rejD
+  -- no windows: the symmetric closure is the cut set K(r); at δ = 1/10 it has the counts of the
+  -- ordinary engine (and 12 715 circles, 49 838 arcs modulo ±z, ±z̄, as in rcut.c), and
+  -- (C1)–(C4) hold
+  let o10 ← certifyRelative F5 (← specRadius F5 "closed-1/10") F5.zero {} (sym := true)
+  check log "n=5, δ = 1/10, no windows, symmetric: 50 714 circles, 198 470 arcs (12 715 and \
+    49 839 canonical), no tangency, (C4) holds"
+    ((o10.summary.map fun S ↦ (S.circles, S.arcs, S.canonCircles, S.canonArcs)) ==
+      some (50714, 198470, 12715, 49839) && o10.result.tangencies.isEmpty && o10.c4.2 == 0)
+  check log "n=5, δ = 1/10, no windows, symmetric: the relative checker accepts, (C3), (C4) hold"
+    (match parseRelative (o10.text.getD "") >>= (checkRelative · 4) with
+      | .ok rep => rep.circles == 50714 && rep.arcs == 198470 && rep.tangentCircles == 0 &&
+          rep.c4Failures == 0 && rep.c4Endpoints > 0
+      | .error _ => false)
   -- the interval of validity of the δ = 9/10 certificate of n = 5: the first event is the
   -- tangency of the circle about -3 + 2ζ to ∂D_R at ρ₁ = 7 - 2φ; the same arcs are accepted just
   -- below ρ₁ and rejected just above
