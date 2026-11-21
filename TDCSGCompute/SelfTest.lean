@@ -30,7 +30,7 @@ def check (log : IO.Ref TestLog) (name : String) (ok : Bool) : IO Unit := do
 /-- A deterministic pseudo-random element with coefficients in `[-B, B]`. -/
 def pseudoElem (F : CycField) (seed B : Nat) : Elem :=
   (Array.range F.deg).map fun i ↦
-    let h := (PointSet.hashElem #[Int.ofNat seed, Int.ofNat i]).toNat
+    let h := ((PointSet.hashElem #[Int.ofNat seed, Int.ofNat i]) &&& 0xFFFFFFF).toNat
     ((h % (2 * B + 1) : Nat) : Int) - B
 
 /-- Arithmetic identities in `ℤ[ζ_n]`. -/

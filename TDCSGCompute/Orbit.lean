@@ -19,9 +19,9 @@ The search stops either when no new point appears (the orbit is finite and its e
 reported) or when the number of points reaches the cap (reported as "cap reached"; nothing is
 claimed about finiteness).
 
-`orbitParallel` expands each generation in parallel `Task`s: each task computes, for a slice of the
-frontier, the disk decisions and the images not already in the set (read-only lookups), and the
-main thread then inserts those candidates in slice order. The result is identical to the serial
+`orbitParallel` expands each generation in parallel `Task`s: the main thread decodes the frontier,
+each task computes the disk decisions and the images for a slice of it, and the main thread then
+inserts the images in slice order. The result is identical to the serial
 search.
 -/
 
@@ -177,7 +177,7 @@ def orbitSerial (T : DiskTest) (start : Elem) (opts : OrbitOptions) : IO OrbitRe
 
 /-- Work done by one task on a slice of the frontier. -/
 structure SliceResult where
-  /-- Images not in the set at the start of the generation, in order. -/
+  /-- Images of the slice's points, in order (duplicates are removed on insertion). -/
   candidates : Array Elem
   /-- Decision counters. -/
   stats : DecisionStats
@@ -186,22 +186,22 @@ structure SliceResult where
   /-- A point whose membership could not be certified, if any. -/
   failure : Option Elem
 
-/-- Expand the frontier points with indices in `[lo, hi)` against a read-only snapshot. -/
-def expandSlice (T : DiskTest) (set : PointSet) (ks : Array Nat) (conj : Bool) (lo hi : Nat) :
+/-- Expand the frontier points `pts[lo:hi]`. -/
+def expandSlice (T : DiskTest) (pts : Array Elem) (ks : Array Nat) (conj : Bool) (lo hi : Nat) :
     SliceResult := Id.run do
   let F := T.F
   let mut cands : Array Elem := #[]
   let mut stats : DecisionStats := {}
   let mut mx : Array Float := Array.replicate ks.size 0
   for i in [lo:hi] do
-    let z := set.get i
+    let z := pts[i]!
     if conj then mx := updateConj F ks mx z
     let (dl, dr, imgs) := expandPoint T z
     if dl == .failure || dr == .failure then
       return { candidates := cands, stats, maxConj := mx, failure := some z }
     stats := (stats.record dl).record dr
     for w in imgs do
-      if !set.contains w then cands := cands.push w
+      cands := cands.push w
   return { candidates := cands, stats, maxConj := mx, failure := none }
 
 /-- Breadth-first search with each generation expanded by `opts.threads` parallel tasks. Small
@@ -221,16 +221,16 @@ def orbitParallel (T : DiskTest) (start : Elem) (opts : OrbitOptions) : IO Orbit
   while lo < set.size && !capped do
     let hi := set.size
     let len := hi - lo
-    let nt := if len < 4096 then 1 else opts.threads
+    let nt := min opts.threads (max 1 (len / 512))
     let chunk := (len + nt - 1) / nt
     let results : Array SliceResult ← do
       if nt == 1 then
-        pure #[expandSlice T set ks opts.conj lo hi]
+        pure #[expandSlice T ((Array.range len).map fun i ↦ set.get (lo + i)) ks opts.conj 0 len]
       else
-        let snapshot := set
+        let pts := (Array.range len).map fun i ↦ set.get (lo + i)
         let tasks := (Array.range nt).map fun t ↦
-          Task.spawn (prio := .dedicated) fun _ ↦
-            expandSlice T snapshot ks opts.conj (lo + t * chunk) (min hi (lo + (t + 1) * chunk))
+          Task.spawn fun _ ↦
+            expandSlice T pts ks opts.conj (t * chunk) (min len ((t + 1) * chunk))
         pure (tasks.map Task.get)
     for r in results do
       if let some z := r.failure then

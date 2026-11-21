@@ -23,11 +23,10 @@ to the caller.
 
 namespace TDCSGCompute
 
-/-- Whether `c` fits in `width` bytes in two's complement, i.e. `-2 ^ k ≤ c < 2 ^ k` with
-`k = 8 * width - 1`: the arithmetic shift `c >>> k` is then `0` or `-1`. -/
+/-- Whether `|c| < 2 ^ (8 * width - 1)`, which guarantees that `c` fits in `width` bytes in two's
+complement (the value `-2 ^ (8 * width - 1)` is conservatively excluded). -/
 @[inline] def fitsWidth (width : Nat) (c : Int) : Bool :=
-  let s := c >>> (8 * width - 1)
-  s == 0 || s == -1
+  c.natAbs >>> (8 * width - 1) == 0
 
 /-- The smallest width in `{1, 2, 4, 8}` at least `w0` that holds every coefficient of `z`, or
 `none` if a coefficient needs more than 8 bytes. -/
@@ -162,16 +161,24 @@ def empty (deg width : Nat) (logCap : Nat := 10) : PointSet :=
   let h := h * murmur2
   h ^^^ (h >>> 33)
 
+/-- The loop of `hashElem`, with an unboxed accumulator. -/
+def hashLoop (z : Elem) (i : Nat) (h : UInt64) : UInt64 :=
+  if hi : i < z.size then hashLoop z (i + 1) (mixWord h (Int64.ofInt z[i]).toUInt64) else h
+termination_by z.size - i
+
 /-- Hash of a point from its coefficients (independent of the storage width). -/
-@[inline] def hashElem (z : Elem) : UInt64 :=
-  finalizeHash (z.foldl (fun h c ↦ mixWord h (Int64.ofInt c).toUInt64) fnvOffset)
+@[inline] def hashElem (z : Elem) : UInt64 := finalizeHash (hashLoop z 0 fnvOffset)
+
+/-- The loop of `hashStored`, with an unboxed accumulator. -/
+def hashStoredLoop (width d : Nat) (data : ByteArray) (off i : Nat) (h : UInt64) : UInt64 :=
+  if i < d then
+    hashStoredLoop width d data off (i + 1) (mixWord h (readCoeff width data off i).toUInt64)
+  else h
+termination_by d - i
 
 /-- Hash of the point stored at byte offset `off`; equal to `hashElem` of the decoded point. -/
-@[inline] def hashStored (width d : Nat) (data : ByteArray) (off : Nat) : UInt64 := Id.run do
-  let mut h := fnvOffset
-  for i in [0:d] do
-    h := mixWord h (readCoeff width data off i).toUInt64
-  return finalizeHash h
+@[inline] def hashStored (width d : Nat) (data : ByteArray) (off : Nat) : UInt64 :=
+  finalizeHash (hashStoredLoop width d data off 0 fnvOffset)
 
 /-- Whether the point stored at byte offset `off` equals `z` (whose coefficients fit). -/
 @[inline] def storedEq (width : Nat) (data : ByteArray) (off : Nat) (z : Elem) : Bool := Id.run do
@@ -185,7 +192,7 @@ def rebuild (s : PointSet) (logCap : Nat) : PointSet := Id.run do
   let mut slots := zeroBytesPow2 (logCap + 2)
   let st := s.stride
   for i in [0:s.size] do
-    let mut pos := (hashStored s.width s.deg s.data (i * st)).toNat &&& mask
+    let mut pos := ((hashStored s.width s.deg s.data (i * st)) &&& mask.toUInt64).toNat
     while readSlot slots pos != 0 do
       pos := (pos + 1) &&& mask
     slots := writeSlot slots pos (i + 1)
@@ -211,7 +218,7 @@ inductive InsertResult where
 /-- Find the slot of `z` (whose coefficients fit the width): `(slot, index + 1 or 0)`. -/
 @[inline] def probe (s : PointSet) (z : Elem) : Nat × Nat := Id.run do
   let st := s.stride
-  let mut pos := (hashElem z).toNat &&& s.mask
+  let mut pos := ((hashElem z) &&& s.mask.toUInt64).toNat
   while true do
     let v := readSlot s.slots pos
     if v == 0 then return (pos, 0)

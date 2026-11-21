@@ -98,28 +98,25 @@ structure FilterData where
   /-- Whether some coefficient is too large for the filter. -/
   big : Bool
 
+/-- The loop of `filterData`, written as a recursion with unboxed accumulators. -/
+def filterLoop (cosF sinF : FloatArray) (z : Elem) (i : Nat) (x y ax ay s1 : Float)
+    (big : Bool) : FilterData :=
+  if h : i < z.size then
+    let c := z[i]
+    if c == 0 then filterLoop cosF sinF z (i + 1) x y ax ay s1 big else
+    let big := big || (c.natAbs >>> 53) != 0
+    let cf := (Int64.ofInt c).toFloat
+    let t := cosF[i]!
+    let s := sinF[i]!
+    let ca := cf.abs
+    filterLoop cosF sinF z (i + 1) (x + cf * t) (y + cf * s) (ax + ca * t.abs) (ay + ca * s.abs)
+      (s1 + ca) big
+  else { x, y, ax, ay, s1, big }
+termination_by z.size - i
+
 /-- Compute the float data of the filter for a point `z`. -/
-@[inline] def filterData (F : CycField) (z : Elem) : FilterData := Id.run do
-  let mut x : Float := fl0
-  let mut y : Float := fl0
-  let mut ax : Float := fl0
-  let mut ay : Float := fl0
-  let mut s1 : Float := fl0
-  let mut big := false
-  for i in [0:z.size] do
-    let c := z[i]!
-    if c != 0 then
-      if (c.natAbs >>> 53) != 0 then big := true
-      let cf := (Int64.ofInt c).toFloat
-      let t := F.cosF[i]!
-      let s := F.sinF[i]!
-      x := x + cf * t
-      y := y + cf * s
-      let ca := cf.abs
-      ax := ax + ca * t.abs
-      ay := ay + ca * s.abs
-      s1 := s1 + ca
-  return { x, y, ax, ay, s1, big }
+@[inline] def filterData (F : CycField) (z : Elem) : FilterData :=
+  filterLoop F.cosF F.sinF z 0 fl0 fl0 fl0 fl0 fl0 false
 
 /-- Float approximation `Q̂` of `|z + side|²` (`side = 1` for the left disk, `-1` for the right
 disk) with a certified error bound `E_Q`, as in the module docstring. -/
