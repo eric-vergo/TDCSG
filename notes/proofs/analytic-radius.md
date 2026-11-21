@@ -18,7 +18,8 @@ cite three classical results: the Behnke–Stein theorem, Jordan's theorem on pr
 Steinitz lemma. The note has been independently refereed; the report is
 [`referee-report-thread6.md`](referee-report-thread6.md), and §11 records its verdicts and what it
 did not check. For $n=5$, $r_A<r_c$ is proved modulo the certified finiteness computation of
-`critical-radius-n5.md`, a note that is still in progress (§8). For the other $n$ it rests on the
+`critical-radius-n5.md` (refereed), and likewise for $n=8,10,12$ by the certificates of
+[`../certificates.md`](../certificates.md) (§8). For the other $n$ it rests on the
 paper's computed table of $r_c(n)$ and is **[computed]**. Small floating-point
 computations confirm the proved statements (§10).
 
@@ -569,15 +570,15 @@ That is the precise form of "the group is finite although the germs it contains 
 analytic continuation, a dense group".
 
 **Whether the interval is non-empty.** This is the statement $r_A<r_c$.
-- For $n=5$ it is **proved modulo a certified computation**. `critical-radius-n5.md` is still in
-  progress.
-  - Its Theorem B proves $GG_5(r)$ finite on an initial range $r\le r_\ast$, from an exact cut-set
-    computation combined with group monotonicity. The final value of $r_\ast$ is not yet filled in
-    there.
-  - Its reported completed run at $\delta=3/10$, i.e. $r=\sqrt{3+\varphi-3/10}\approx2.078$, already
-    gives finiteness at a radius above $r_A(5)=1.236$. Hence $r_c(5)>r_A(5)$.
+- For $n=5$ it is **proved modulo a certified computation**.
+  - Theorem B of `critical-radius-n5.md` (refereed) proves $GG_5(r)$ finite for
+    $r\le r_\ast\approx2.12557$, from an exact cut-set computation combined with group monotonicity.
+    This is a radius above $r_A(5)=1.236$. Hence $r_c(5)>r_A(5)$.
   - Theorem A of that note shows $GG_5(r)$ infinite for $r\ge\sqrt{3+\varphi}$. Finiteness just
     below $\sqrt{3+\varphi}$ is open there.
+- For $n=8,10,12$ it is likewise **proved modulo certified computations**: the certificates recorded
+  in [`../certificates.md`](../certificates.md) give finiteness at radii $1.70$, $1.53$, $1.37$, above
+  $r_A=1.082$, $1.051$, $1.035$.
 - For the other $n$ it rests on the paper's Appendix A table [computed]. The table records the radii
   at which very large or infinite orbits were found. Whether those are true critical radii is the
   large-$n$ question of `../overview.md` §5.
@@ -786,7 +787,8 @@ main theorem, was found.
    - The holomorphic threshold for them (when, if ever, $Q$ becomes compact) is not treated here.
 7. **The interval $(r_A,r_c)$.** Corollary 8.3 holds at every $r$ in it, by group monotonicity.
    - That the interval is non-empty, i.e. $r_A<r_c$ for the true $r_c$, is proved for $n=5$ (via
-     `critical-radius-n5.md`, still in progress, modulo its certified cut-set computation).
+     `critical-radius-n5.md`, modulo its certified cut-set computation), and for $n=8,10,12$
+     modulo the certificates of `../certificates.md`.
    - For the other $n$ it rests on the paper's computed table.
    - Proposition 9.1 gives $r_c\ge r_A$ for all $n\ge5$.
 8. **Untested.** Behaviour of fullness for large $r$ (above $r_c$) was not examined.

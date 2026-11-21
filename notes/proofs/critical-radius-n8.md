@@ -7,8 +7,12 @@ Authors: Eric Vergo, Claude
 > (A) $GG_8(r)$ is infinite for every $r\ge r_c$; and (B) $GG_8(r)$ is finite for every $r<r_c$.
 
 **Status.**
-- **(A) is proved, modulo an exact finite computation that was carried out.** The infinite orbit is the orbit of the lattice point $p^\ast=1-2\zeta+\zeta^2-\zeta^3=-1+(2+i)(1-\zeta)$. It lies exactly on $\partial D_1$ when $r=r_c$, since $|p^\ast+1|^2=5|1-\zeta|^2=10-5\sqrt2$. For every $r\ge r_c$ the orbit of $p^\ast$ contains the points $p^\ast+i(4\sqrt2-4)\varepsilon^k$ for all $k\ge0$ (Theorem A, §2.5). These points accumulate at $p^\ast$ along a straight vertical line, at ratio $\varepsilon$. This is consistent with the limit point and the scale of the paper's "path from the centre to the boundary"; whether it is that path is not shown (§2.6). The mechanism is a one-dimensional self-similar structure on a chord through $p^\ast$: 31 partial isometries of the chord, each realized by an explicit group word, form a family that is closed under rescaling by $\varepsilon$ about $p^\ast$. Every disk test, domain endpoint and composition behind this closure was checked in exact arithmetic. The data are listed in full in Appendix A, so they can be re-checked independently.
-- **(B) is open.** It is proved only on an initial range $r\le r_\ast$, with $r_\ast^2=r_c^2-\delta_\ast$, by an exact finite computation (§3) combined with the already-refereed group monotonicity. The best exact certificate is at $\delta_\ast=1/14$, which gives $r_\ast\approx1.690415$ and an open window of length $r_c-r_\ast\approx0.0210$ (Table 3.1). Certificates beyond $\delta=1/7$ ($r\approx1.669154$) are newer than the referee report and not yet refereed. The window $r_\ast<r<r_c$ is not proved.
+- **(A) is proved, in writing and in Lean.** The Lean theorems are `TDCSG.CriticalRadius.mem_orbit_pStar_eight_pow`, `infinite_orbit_pStar_eight` and `infinite_GG_eight` (statements in `TDCSG/CriticalRadius/Statements.lean`; the finite closure data of Appendix A are checked by kernel reduction, `decide +kernel`, in `TDCSG/CriticalRadius/Eight.lean`), which give `1 ≤ criticalRadius 8 ≤ √(10 - 5√2)`. The written proof follows. The infinite orbit is the orbit of the lattice point $p^\ast=1-2\zeta+\zeta^2-\zeta^3=-1+(2+i)(1-\zeta)$. It lies exactly on $\partial D_1$ when $r=r_c$, since $|p^\ast+1|^2=5|1-\zeta|^2=10-5\sqrt2$. For every $r\ge r_c$ the orbit of $p^\ast$ contains the points $p^\ast+i(4\sqrt2-4)\varepsilon^k$ for all $k\ge0$ (Theorem A, §2.5). These points accumulate at $p^\ast$ along a straight vertical line, at ratio $\varepsilon$. This is consistent with the limit point and the scale of the paper's "path from the centre to the boundary"; whether it is that path is not shown (§2.6). The mechanism is a one-dimensional self-similar structure on a chord through $p^\ast$: 31 partial isometries of the chord, each realized by an explicit group word, form a family that is closed under rescaling by $\varepsilon$ about $p^\ast$. Every disk test, domain endpoint and composition behind this closure was checked in exact arithmetic. The data are listed in full in Appendix A, so they can be re-checked independently.
+- **(B) is open.** It is proved only on an initial range $r\le r_\ast$, with $r_\ast^2=r_c^2-\delta_\ast$, by an exact finite computation (§3) combined with the already-refereed group monotonicity.
+  - The refereed certificate is at $\delta=1/7$ ($r\approx1.669154$); this is also the range of the Lean proposition `TDCSG.CriticalRadius.FiniteBelowEight` (stated, not proved, in Lean).
+  - This note's own exact certificates reach $\delta_\ast=1/14$ ($r_\ast\approx1.690415$, Table 3.1); those beyond $\delta=1/7$ are not refereed.
+  - The deepest certified range is recorded in [`../certificates.md`](../certificates.md): the repository's Lean engine generates and independently checks a certificate at $\delta=1/36$, giving finiteness for $r\le1.703278$, an open window of length $r_c-r\approx0.008135$, modulo that computation.
+  - The window between the certified radius and $r_c$ is not proved.
 - **Refereeing.** This note was independently refereed; see `referee-report-critical-radius-n8-n12.md` in this directory. The referee reproduced Part A fully and exactly, from Appendix A and the definitions, including end-to-end checks that expand the induction into explicit group words for $k\le7$ and apply them letter by letter with the true generators. It reproduced the Theorem B certificates at every table radius up to $\delta=1/7$ with its own closure program, which used floating-point comparisons; all canonical invariants agree.
 - **Is $r_c$ the exact threshold?** What is proved is $r_\ast\le\inf\{r: GG_8(r)\text{ infinite}\}\le r_c$. The closed form is confirmed as an *upper bound* for the critical radius, and as the exact radius at which this particular mechanism switches on: $p^\ast$ enters $D_1$ exactly at $r_c$. Whether some other point already has an infinite orbit at a radius in $(r_\ast,r_c)$ is not excluded. The numerical evidence (§5) says no.
 
@@ -93,7 +97,7 @@ Then for every $k\ge0$, every $f\in\mathcal F$ and every $t\in\varepsilon^kD_f$,
 
 ### 2.4 The certificate
 
-Appendix A lists a family $\mathcal F$ of **31 words**. For each word it gives its type $t\mapsto\pm t+c$, with $c\in\mathbb Z[\sqrt2]$, its exact domain $D_f$, and, for the closure, the decomposition of $\varepsilon D_f$ into pieces with the sequence of family members used on each piece. There are 46 pieces and 172 composition steps in total; every sequence has length at most 4. (Appendix A also lists 3 redundant one-point pieces, in rows 10, 13 and 15. Each consists only of the right endpoint of $\varepsilon D_f$, which the previous piece already reaches. They are valid but play no role, and are ignored in the counts and in Lemma 2.3.) The words have length at most 12.
+Appendix A lists a family $\mathcal F$ of **31 words**. For each word it gives its type $t\mapsto\pm t+c$, with $c\in\mathbb Z[\sqrt2]$, its exact domain $D_f$, and, for the closure, the decomposition of $\varepsilon D_f$ into pieces with the sequence of family members used on each piece. There are 46 pieces and 172 composition steps in total; every sequence has length at most 4. (Appendix A also lists 3 redundant one-point pieces, in rows 10, 13 and 15. Each consists only of the right endpoint of $\varepsilon D_f$, which the previous piece already reaches. They are valid but play no role, and are ignored in the counts and in Lemma 2.3. The Lean data `TDCSG.Eight.pieces` include them: 49 pieces and 184 steps, the 3 one-point pieces having sequences of length 4.) The words have length at most 12.
 
 **Lemma 2.3 (exact check).** At $r=r_c$:
 1. For each of the 31 words, the word is valid at both endpoints of the listed interval $D_w$, hence on all of it. (The listed intervals are in fact the maximal domains, but the proof uses only validity on them.) The endpoints are computed as roots of the binding quadratic constraints and compared exactly. Validity at an endpoint $u+v\sqrt d$ is the sign of an element of $\mathbb Q(\sqrt2)(\sqrt d)$.
@@ -232,17 +236,19 @@ Then $GG_8(r)$ is finite.
 | $1/14$ | 1.6904 | 0.0210 | 36 024 | 291 418 | 691 684 | 13 320 | 138.1 | **valid** (not yet refereed) |
 | $1/16$ | 1.6931 | 0.0184 | not finished: stopped at the run's cap with 124 752 circles and 3.5 GB in use | | | | 262.5 | — |
 
+The "(C2) image arcs checked" column counts the four images of the two boundary circles about their own centres, which the repository engine's checker skips; its counts are 4 lower. The engine closes $\delta=1/16$ and deeper radii, down to $\delta=1/36$ ([`../certificates.md`](../certificates.md) §5).
+
 $\delta=1$ and $\delta=1/2$ have $4\delta\in\mathbb Z$, so tangency was possible in principle; the run would have aborted on one, and none occurred.
 
 **Growth of the computation.** With the storage above, closure time / peak memory / exact-verification time were: $\delta=1/10$: 201 s / 1.1 GB / 795 s; $1/12$: 250 s / 1.25 GB / 856 s; $1/13$: 262 s / 1.5 GB / 977 s; $1/14$: 329 s / 1.7 GB / 1084 s. Between $1/7$ and $1/14$ the cut set grows slowly (circles $\times1.5$); between $1/14$ and $1/16$ it jumps by more than a factor of 3 in circles and in internal extent. The growth is in steps rather than smooth; the two observed jumps (between $1/6$ and $1/7$, and between $1/14$ and $1/16$) are a factor of about $2.3$ apart in $\delta$, consistent with one step per factor $1+\sqrt2$, i.e. one per level of §4.
 
-**Theorem B (proved modulo the computation of Table 3.1).** $GG_8(r)$ is finite for every $r\le r_\ast$, where $r_\ast^2=10-5\sqrt2-\delta_\ast$ with $\delta_\ast=1/14$, i.e. $r_\ast\approx1.690415$. The certificates at $\delta\le1/10$ were produced after the referee's pass and are not yet refereed; the refereed certificate is $\delta=1/7$ ($r\approx1.669154$). The open window is $(r_\ast,r_c)$, of length about $0.0210$.
+**Theorem B (proved modulo the computation of Table 3.1).** $GG_8(r)$ is finite for every $r\le r_\ast$, where $r_\ast^2=10-5\sqrt2-\delta_\ast$ with $\delta_\ast=1/14$, i.e. $r_\ast\approx1.690415$. The certificates at $\delta\le1/10$ were produced after the referee's pass and are not yet refereed; the refereed certificate is $\delta=1/7$ ($r\approx1.669154$). The open window left by this table is $(r_\ast,r_c)$, of length about $0.0210$; the engine certificates of `../certificates.md` narrow it to about $0.008135$.
 
 *Proof.* The certificate for $\delta_\ast$ satisfies (C1)–(C4), checked exactly. Theorem 3.1 gives finiteness at $r_\ast$, and group monotonicity extends it to all $r\le r_\ast$. $\square$
 
 ### 3.5 Why the computation does not reach $r_c$
 
-- The size of $K(r)$ grows in steps, one per level, with an overall rate like a power of $\delta^{-1}$ (Table 3.1 and the growth paragraph). The limit reached here ($\delta=1/16$ did not finish) is a resource limit of this implementation, not an intrinsic one; each further level costs roughly a constant factor more.
+- The size of $K(r)$ grows in steps, one per level, with an overall rate like a power of $\delta^{-1}$ (Table 3.1 and the growth paragraph). The limit reached here ($\delta=1/16$ did not finish) is a resource limit of this implementation, not an intrinsic one; the repository engine reaches $\delta=1/36$, and each further level costs roughly a constant factor more.
 - The internal extent of the circle centres grows like $\delta^{-1}$, matching the orbit data: $R\cdot\delta$ stays bounded (`arithmetic.md` §3.2).
 - So no single computation reaches $r_c$. A proof of (B) on all of $(r_\ast,r_c)$ needs an induction along the renormalization, discussed in §4.
 
@@ -269,13 +275,13 @@ Conjecture R₈ alone does **not** imply (B). It describes $K(r)$ only in shrink
 
 ## 5. Is the closed form exactly the critical radius?
 
-- **Proved:** $\inf\{r:GG_8(r)\text{ infinite}\}\in[r_\ast,r_c]$ with $r_\ast^2=r_c^2-1/14$ (refereed part: $r_c^2-1/7$).
+- **Proved:** $\inf\{r:GG_8(r)\text{ infinite}\}\in[r_\ast,r_c]$ with $r_\ast^2=r_c^2-1/14$ (refereed part: $r_c^2-1/7$), modulo the computation of §3; and with $r_\ast^2=r_c^2-1/36$ modulo the certificate of `../certificates.md`. The upper bound is proved in Lean.
 - **Proved:** $r_c$ is exactly the radius at which the point $p^\ast$ starts to be moved by $a$. Above it, the orbit of $p^\ast$ is infinite.
 - **Not proved:** that no point has an infinite orbit for $r\in(r_\ast,r_c)$. Possible failure modes would be another critical lattice point entering a disk at a smaller radius, or an infinite orbit at some radius in this window with no lattice point on a boundary circle.
 - **Evidence against such failure:**
   - the exact threshold sweep of the orbit of $0$ (331 thresholds up to the cap) has gaps that decrease geometrically to $0$ at ratio $\to1+\sqrt2$, with $r_c$ as the only accumulation point;
   - exact orbit searches at $r^2=r_c^2-\delta$ terminate. For example, the orbit of $0$ has 468 071 points at $\delta=1/100$, and the orbit of $p^\ast$ has 290 810 points at $\delta=1/100$;
-  - the cut-set closure terminates at every $\delta\ge1/14$ tried; at $\delta=1/16$ it was stopped by the resource cap, not found to diverge.
+  - the cut-set closure terminates at every $\delta\ge1/14$ tried here, and in the repository engine at every $\delta\ge1/36$ tried.
   - This is evidence, not proof.
 
 ---
@@ -288,15 +294,16 @@ Verdicts are those of the independent referee report (`referee-report-critical-r
 |---|---|
 | Convexity lemma, renormalization Lemma 2.1, Corollary 2.2 | proved; refereed: correct |
 | Lemma 2.3 (31-word family closed under $\varepsilon$) | proved by exact computation; refereed: correct, independently reproduced in full in exact arithmetic |
-| Theorem A: $GG_8(r)$ infinite for all $r\ge r_c$; explicit infinite orbit of $p^\ast$ | **proved**; refereed: correct |
+| Theorem A: $GG_8(r)$ infinite for all $r\ge r_c$; explicit infinite orbit of $p^\ast$ | **proved**; refereed: correct. **Proved in Lean** (`TDCSG.CriticalRadius.infinite_GG_eight`) |
 | Theorem 3.1 (cut-set certificate) | proved; refereed: correct (re-proved by the referee) |
 | Theorem B at $\delta=1/7$ | **proved modulo the computation of §3**, all decisions exact; refereed: correct as stated, certificate reproduced in floating point with matching invariants |
 | Theorem B at $\delta_\ast=1/14$ (and $1/10$, $1/12$, $1/13$) | **proved modulo the computation of §3**, all decisions exact; **not yet refereed** |
+| Finiteness for $r^2\le r_c^2-1/36$ | **proved modulo the engine certificate** of `../certificates.md` (generator and independent checker; not refereed) |
 | finite for $r_\ast<r<r_c$ (Conjecture F₈) | **open**; numerical evidence in §5 |
 | Conjecture R₈ | conjecture; it would reduce (B) to further statements (§4), not prove it |
 
 **Gaps and caveats.**
-1. *Independent checks.* Part A has been re-implemented and re-checked exactly by the referee. The exact cut-set verification behind Theorem B (`cut/verify.py`) is single-author: the referee did not read or run it, and its own reproduction of the certificates used floating-point comparisons (with margins far above rounding error). The certificates at $\delta\le1/10$ were produced after the referee's pass and have no independent reproduction yet.
+1. *Independent checks.* Part A has been re-implemented and re-checked exactly by the referee. The exact cut-set verification behind Theorem B (`cut/verify.py`) is single-author: the referee did not read or run it, and its own reproduction of the certificates used floating-point comparisons (with margins far above rounding error). The certificates at $\delta\le1/10$ were produced after the referee's pass; the repository engine, a separate exact implementation with its own checker, reproduces them with the same invariants (`../certificates.md` §§4–5).
 2. Lemma 2.3 uses exact arithmetic throughout. The only inputs taken from the search are the words, the piece decompositions and the composition sequences. Each is re-checked, never trusted.
 3. In `verify.py` the merging of stored pieces into maximal arcs uses exact endpoint equality. Overlapping (not just touching) pieces would not be merged. That can only make (C2) and (C4) harder to satisfy, never easier, so it is safe.
 4. Theorem A proves an infinite orbit of one explicit point. It does not prove that the orbit of $0$ is infinite at $r_c$; §2.5 Remark 3 is computational evidence only.
@@ -306,24 +313,18 @@ Verdicts are those of the independent referee report (`referee-report-critical-r
 
 ---
 
-## 7. What a Lean formalization would need
+## 7. Lean formalization: what is done and what is not
 
-1. **Arithmetic.** $\mathbb Z[\zeta_8]$ as $\mathbb Z^4$ with the map to $\mathbb C$, and exact sign decision in $\mathbb Q(\sqrt2)$ and in quadratic extensions $\mathbb Q(\sqrt2)(\sqrt H)$. A `norm_num` extension, or `decide` on a verified sign procedure, would serve.
-2. **Generators and words.** Generators as `Equiv.Perm ℂ` defined piecewise from closed disks. Words act left to right. Lemma 1.1 comes from `Convex.segment_subset` and `convex_closedBall`.
-3. **Part A.**
-   - The 31 words of Appendix A with their domains, endpoints given in closed form.
-   - Validity at both endpoints of each domain, by exact sign checks.
-   - The 49 closure pieces, each with its composition sequence and exact interval containments.
-   - Lemma 2.1, a short induction on $k$ over real intervals.
-   - Corollary 2.2: injectivity of $k\mapsto\varepsilon^k c$ from $0<\varepsilon<1$.
-   - "Infinite orbit $\Rightarrow$ infinite group".
-   - The whole of Part A is a finite list of algebraic inequalities plus one induction. It is the most formalizable part of this note.
-4. **Part B, initial range.**
-   - Theorem 3.1. Its main cost is the cell decomposition of a finite arc arrangement.
-   - The certificate data from §3, about $2.9\cdot10^5$ maximal arcs at $\delta=1/14$.
-   - A verified checker for (C1)–(C4), using exact two-radical sign tests in $\mathbb Q(\sqrt2)(\sqrt{H_1},\sqrt{H_2})$.
-   - Group monotonicity from `boundary-contact.md`.
-5. **Part B, full.** Conjecture R₈ and the additional statements (i)–(iii) of §4 first, then an induction on the level $m$.
+**Formalized** (`TDCSG/CriticalRadius/`; statements in `Statements.lean`):
+1. **Arithmetic.** $\mathbb Z[\zeta_8]$ as integer vectors with the map to $\mathbb C$ (`CyclotomicModel.lean`, with `TDCSG.Eight.isRoot_zeta` for the actual $e^{2\pi i/8}$), and exact sign decisions in $\mathbb Q(\sqrt2)$ and its quadratic extensions (`QuadraticSigns.lean`).
+2. **Generators and words.** The generators as `Equiv.Perm ℂ` (`TDCSG.permA`, `TDCSG.permB`), words acting on segments, and the convexity lemma (`CriticalRadius/Basic.lean`).
+3. **Part A in full.** The 31 words of Appendix A with their domains, validity at both endpoints, and the closure data (`TDCSG.Eight.family`, `TDCSG.Eight.pieces`), checked by `decide +kernel` (`realizeOK_family`, `closureOK_family` in `Eight.lean`) and linked to the real generators by proved soundness lemmas; Lemma 2.1 as `TDCSG.Renormalization.renormalize` (`Renormalization.lean`); Theorem A as `TDCSG.CriticalRadius.mem_orbit_pStar_eight_pow`, `infinite_orbit_pStar_eight` and `infinite_GG_eight`, hence `criticalRadius_eight_le`.
+4. The certificate definitions and the reduction `TDCSG.finite_GG_of_certificate` (`Certificate.lean`), with `finiteBelowEight_of_certificate` and `le_criticalRadius_eight_of_finiteBelow`.
+
+**Not formalized:**
+1. Theorem 3.1: it is the unproved proposition `TDCSG.CutSetCertificate 8`. Its main cost is the cell decomposition of a finite arc arrangement.
+2. The link between a certificate file and `TDCSG.ExistsCertificate 8 r`: the engine's checker is a tested program, not a kernel-checked proof (see [`../certificates.md`](../certificates.md) §7 for what a verified checker would need). Hence `TDCSG.CriticalRadius.FiniteBelowEight` is stated but not proved.
+3. **Part B, full.** Conjecture R₈ and the additional statements (i)–(iii) of §4 first, then an induction on the level $m$; the reduction of `sharp-lower-bound-n8.md` (Conjecture S) is an alternative route.
 
 ---
 

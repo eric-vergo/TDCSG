@@ -12,9 +12,11 @@ Together these would give $r_{\rm crit}(5)=r_c$, the value conjectured in the pa
 - **Proved: (A).** $GG_5(r)$ is infinite for every $r\ge r_c$, so $r_{\rm crit}(5)\le r_c$.
   - At $r=r_c$ this is the paper's Theorem 2. Here every point, word and disk test of its proof is checked in exact arithmetic in $\mathbb Z[\zeta_5]$ (§3).
   - The extension to $r>r_c$ is direct: the disks only grow, so every disk test still passes and the same words act in the same way.
+  - **Proved in Lean** as `TDCSG.CriticalRadius.infinite_GG_five` and `infinite_orbit_zero_five` (`TDCSG/CriticalRadius/Five.lean`, stated in `TDCSG/CriticalRadius/Statements.lean`), which give `1 ≤ criticalRadius 5 ≤ √(3 + φ)`. The written proof below is kept.
 - **Proved modulo an exact computation, which was reproduced independently: finiteness on an initial range.** $GG_5(r)$ is a finite group for every $r\le r_\ast$, where $r_\ast^2=3+\varphi-1/10$, $r_\ast\approx2.12557$ and $r_c-r_\ast\approx0.0234$. Hence $r_\ast\le r_{\rm crit}(5)$.
   - This is the full group statement, which is stronger than "every orbit is finite".
   - It follows from a cut-set certificate (Theorem 4.2), verified by computer at $r_\ast$ (§5), together with the already-proved group monotonicity.
+  - This is the refereed range, and the range of the Lean proposition `TDCSG.CriticalRadius.FiniteBelowFive` (stated, not proved, in Lean). The deepest certified range is recorded in [`../certificates.md`](../certificates.md): the repository's Lean engine generates and independently checks a certificate at $\delta=1/55$, giving finiteness for $r\le2.144727$ ($r_c-r\approx0.004235$), modulo that computation.
 - **Open: (B) on $r_\ast<r<r_c$,** and hence the equality $r_{\rm crit}(5)=r_c$.
   - §6 records the renormalization data (the scale unit $\varphi^3$, the exact self-similarity of the critical chord, threshold ratios).
   - It states the missing step as a precise conjecture (Conjecture R$^\ast$), which implies (B), and a structural Conjecture R describing the expected mechanism.
@@ -23,7 +25,7 @@ Together these would give $r_{\rm crit}(5)=r_c$, the value conjectured in the pa
 
 Throughout, "verified exactly" means:
 - equalities and the signs of elements of $\mathbb Q(\sqrt5)$ are decided by integer and rational arithmetic;
-- the only non-exact ingredient is in §5: strict inequalities between angles of distinct circle-intersection points, decided by outward-rounded interval arithmetic. Equality of such points is always decided exactly.
+- the only non-exact ingredient is in §5: strict inequalities between angles of distinct circle-intersection points, decided by outward-rounded interval arithmetic. Equality of such points is always decided exactly. The repository engine's reproduction of these certificates ([`../certificates.md`](../certificates.md)) decides the order exactly as well.
 
 ---
 
@@ -231,7 +233,7 @@ Then $\mathcal T(r)$ and $GG_5(r)$ are finite. Consequently, by §2, $GG_5(r')$ 
 - this section describes the algorithm and data formats fully enough to re-implement it;
 - the referee wrote an independent second implementation from the theorem statements alone (`referee-report-critical-radius-n5.md`, "Independent computations"). It produced byte-identical sets of maximal arcs at $\delta=13/5,\ 1/2,\ 9/10,\ 9/20,\ 3/10,\ 1/5$ and $1/10$, and matching counts at $3/20$. At $\delta=1/10$ the shared output is 50,714 circles, 1,437,580 pieces and 198,470 maximal arcs. The referee's separate checker of (C1)–(C4) also passes on the author's merged output.
 
-A port to the repository's Lean engine is planned. It should export the certificate as the list of **maximal arcs**, not only the circle centres, and verify it with a checker of (C1)–(C4) that is separate from the program producing it.
+The computation is also implemented in the repository's Lean engine (`tdcsg-orbit certify` and `tdcsg-orbit check-certificate`, see [`../certificates.md`](../certificates.md)). It exports the certificate as the list of maximal arcs and verifies it with a separate, float-free checker of (C1)–(C4). It reproduces every row of Table 5.1 with identical arc sets, and certifies further rows down to $\delta=1/55$.
 
 **Algorithm.** Input: a rational $\delta$, with $r^2=\rho:=3+\varphi-\delta$. The program computes $K(r)$ by closure:
 1. Start from the two full circles $\partial D_{1}$ and $\partial D_2$.
@@ -307,7 +309,7 @@ When the closure terminates, $K(r)$ is the finite union of the stored arcs. Ever
 
 ### 5.3 Why the computation cannot reach $r_c$
 
-The size of $K(r)$ grows like a power of $\delta^{-1}$ (Table 5.1). The internal extent of the circle centres grows like $\delta^{-1}$, consistent with the orbit-of-$0$ data in `twodisk_arith.md` §3.2, where $R\cdot\delta$ stays bounded. Each factor $\varphi^3$ in $\delta$ multiplies the work by a roughly constant factor. So no single finite computation reaches $r_c$. A proof of (B) on all of $(r_\ast,r_c)$ needs an induction along the renormalization (§6).
+The size of $K(r)$ grows like a power of $\delta^{-1}$ (Table 5.1). The internal extent of the circle centres grows like $\delta^{-1}$, consistent with the orbit-of-$0$ data in [`../arithmetic.md`](../arithmetic.md) §3.2, where $R\cdot\delta$ stays bounded. Each factor $\varphi^3$ in $\delta$ multiplies the work by a roughly constant factor. So no single finite computation reaches $r_c$. A proof of (B) on all of $(r_\ast,r_c)$ needs an induction along the renormalization (§6).
 
 ---
 
@@ -323,12 +325,12 @@ These are the precise objects a renormalization proof would use, recorded so tha
   - the internal extent of orbits grows by $4.23$–$4.28$ per generation;
   - the orbit size grows by a factor of about $12$–$13$ per generation.
 
-  Sources: `twodisk_experiments.md` E3, `twodisk_arith.md` §3.2, and the exact thresholds in `twodisk_exp/exact5.json`. The first orbit-of-$0$ threshold is $\delta_1=0.8541=4.618-3.764$, i.e. $r_1^2=7-2\varphi=|2-\zeta|^2$.
+  Sources: [`../experiments.md`](../experiments.md) E3, [`../arithmetic.md`](../arithmetic.md) §3.2, and the exact threshold sweep of [`../engine.md`](../engine.md). The first orbit-of-$0$ threshold is $\delta_1=0.8541=4.618-3.764$, i.e. $r_1^2=7-2\varphi=|2-\zeta|^2$.
 
 **6.2 Critical interval exchange.**
 - The induced dynamics on the chord $E'E$ is the rotation by $2\varphi^{-1}$ on a circle of length $2$ (§3.3). Its rotation number $\varphi^{-1}$ is a fixed point of the Gauss map.
 - So its first-return map to a sub-interval of relative length $\varphi^{-1}$ is again a rotation with the same rotation number: the standard golden renormalization, with period one and scale $\varphi$.
-- Three steps of this 1-D renormalization give $\varphi^3$, the scale of the 2-D pattern. In the measured threshold sequence there are 2–3 jump types per factor $\varphi^3$ (`twodisk_experiments.md` E3).
+- Three steps of this 1-D renormalization give $\varphi^3$, the scale of the 2-D pattern. In the measured threshold sequence there are 2–3 jump types per factor $\varphi^3$ ([`../experiments.md`](../experiments.md) E3).
 - That the 2-D minimal period is three 1-D steps is an observation, not a proved statement.
 
 **6.3 Geometry of the critical configuration (proved).**
@@ -375,15 +377,15 @@ Here combinatorial type means:
 | 10 | $\mathbb Q(\sqrt5)$ | $\varphi^3$ | $4-\varphi$ |
 | 12 | $\mathbb Q(\sqrt3)$ | $2+\sqrt3$ | $40-22\sqrt3$ |
 
-The values of $r_c^2$ are the paper's (Table 1 and its section on geometric constructions), as are the scale factors $\sqrt2-1$ and $2-\sqrt3$. The scale units are also measured in `twodisk_experiments.md` E3.
+The values of $r_c^2$ are the paper's (Table 1 and its section on geometric constructions), as are the scale factors $\sqrt2-1$ and $2-\sqrt3$. The scale units are also measured in [`../experiments.md`](../experiments.md) E3.
 
-Theorem 4.2 holds for any $n$ with the same proof. The algorithm of §5 generalizes routinely: replace $\mathbb Z[\zeta_5]$ by $\mathbb Z[\zeta_n]$ (reduction modulo $\Phi_n$) and $\mathbb Q(\sqrt5)$ by the real quadratic field, and replace $\zeta_5-\zeta_5^{-1}$ in the exact sign test for $\operatorname{Im}$ by $\zeta_n-\zeta_n^{-1}$. The author's program hard-codes $n=5$; the referee's field code shows that the generalization is routine. For $n=8$ and $12$ the paper's infinite-orbit constructions are limit-point arguments, not finite interval exchanges. Part A for those $n$ therefore needs a new exact construction, for example an invariant segment found at $r_c$ in the computed cut set.
+Theorem 4.2 holds for any $n$ with the same proof. The algorithm of §5 generalizes routinely: replace $\mathbb Z[\zeta_5]$ by $\mathbb Z[\zeta_n]$ (reduction modulo $\Phi_n$) and $\mathbb Q(\sqrt5)$ by the real quadratic field, and replace $\zeta_5-\zeta_5^{-1}$ in the exact sign test for $\operatorname{Im}$ by $\zeta_n-\zeta_n^{-1}$. The author's program hard-codes $n=5$; the referee's field code shows that the generalization is routine. For $n=8$ and $12$ the paper's infinite-orbit constructions are limit-point arguments, not finite interval exchanges. Part A for those $n$ needed a new exact construction; it is given in `critical-radius-n8.md` and `critical-radius-n12.md` (a self-similar family of partial isometries of a chord through a critical lattice point), and for $n=10$ in `critical-radius-n10.md`.
 
 ---
 
 ## 7. Attempted routes that did not close
 
-1. **A simple window (approach (i)).** The internal-space images of orbits below $r_c$ are not filled by a fixed polygon or union of disks scaled with $\delta^{-1}$. The filling fraction of orbit points in the natural window decreases as $r\uparrow r_c$ (from $0.029$ to $0.012$ for $n=5$; `twodisk_experiments.md` E4). The invariant set is fractal, so no describable window $W(r)$ was found. Lemma 4.1 still reduces (B) to the existence of *some* compact invariant window, and $K(r)$ is the finite combinatorial substitute used in §5.
+1. **A simple window (approach (i)).** The internal-space images of orbits below $r_c$ are not filled by a fixed polygon or union of disks scaled with $\delta^{-1}$. The filling fraction of orbit points in the natural window decreases as $r\uparrow r_c$ (from $0.029$ to $0.012$ for $n=5$; [`../experiments.md`](../experiments.md) E4). The invariant set is fractal, so no describable window $W(r)$ was found. Lemma 4.1 still reduces (B) to the existence of *some* compact invariant window, and $K(r)$ is the finite combinatorial substitute used in §5.
 2. **Exact periodic renormalization (approach (ii)).** Only the 1-D chord map renormalizes exactly, and only at $r_c$. The 2-D cut set admits no exact similarity renormalization at any $r$, including $r_c$ (§6.4). And at $r_c$ the group is infinite, so a renormalization there would not by itself control $r<r_c$.
 3. **Direct certification along $r_k\uparrow r_c$ (approach (iii)).** It is carried out for finitely many $k$ (Table 5.1). It cannot be continued indefinitely without a uniform pattern such as Conjecture R$^\ast$, because the computation grows like a power of $\delta^{-1}$.
 4. **Literature (approach (iv)).** Cited from memory, except that the referee confirmed the bibliographic data and statement of Akiyama–Brunotte–Pethő–Steiner.
@@ -406,11 +408,11 @@ The referee's verdicts are in `referee-report-critical-radius-n5.md`. The table 
 | claim | status |
 |---|---|
 | Lemma 1.1, 1.2; §2 monotonicity | proved (§2 cites refereed notes) |
-| Theorem A: infinite for all $r\ge r_c$, so $r_{\rm crit}(5)\le r_c$ | **proved**; refereed correct after minor fixes. Every arithmetic step verified exactly, and re-verified independently by the referee |
+| Theorem A: infinite for all $r\ge r_c$, so $r_{\rm crit}(5)\le r_c$ | **proved**; refereed correct after minor fixes. Every arithmetic step verified exactly, and re-verified independently by the referee. **Proved in Lean** (`TDCSG.CriticalRadius.infinite_GG_five`) |
 | Side fact: $r_c$ is where the lens corners are $\pm(\zeta-\zeta^{-1})$ (also $n=10$; not $n=8,12$) | proved; refereed correct |
 | Lemma 4.1 and Theorem 4.2 (cut-set certificate, a sufficient test) | proved; refereed correct after minor fixes |
-| Theorem B: finite for $r\le r_\ast$, so $r_\ast\le r_{\rm crit}(5)$ | **proved modulo the computation of §5**, refereed correct given the computation. The computation was reproduced by an independent implementation with identical arc sets. The program and certificate files are not archived in the repository (§5.1); a Lean port with an independent checker is planned |
-| finite for $r_\ast<r<r_c$; $r_{\rm crit}(5)=r_c$ | **open**; strongly supported numerically by orbit scans up to $\delta\approx4\cdot10^{-3}$ (`twodisk_arith.md` §3.2) and the paper's searches |
+| Theorem B: finite for $r\le r_\ast$, so $r_\ast\le r_{\rm crit}(5)$ | **proved modulo the computation of §5**, refereed correct given the computation. The computation was reproduced by an independent implementation with identical arc sets. The original program and files are not archived in the repository (§5.1); the repository's Lean engine reproduces the certificate with an independent checker and certifies deeper ranges, down to $\delta=1/55$ ([`../certificates.md`](../certificates.md)) |
+| finite for $r_\ast<r<r_c$; $r_{\rm crit}(5)=r_c$ | **open** (beyond the certified range of `../certificates.md`); strongly supported numerically by orbit scans up to $\delta\approx4\cdot10^{-3}$ ([`../arithmetic.md`](../arithmetic.md) §3.2) and the paper's searches. Reductions: `sharp-lower-bound-n5.md`, `sharp-lower-bound-combined.md` |
 | Conjecture R$^\ast$ (implies (B)) and Conjecture R (structural) | conjectures, with the evidence of §6 |
 | infinite at $r_c=\sqrt{3+\varphi}$ | proved (this is the paper's Theorem 2). The paper's footnote 4, that the group is infinite at the critical radius, would follow for $n=5$ from (B); it is not proved here |
 | The sufficient-condition argument for the window (§4.1) and Conjecture R$^\ast$ with its remarks (§6) | written after refereeing; **not yet refereed** |
@@ -421,13 +423,13 @@ The referee's verdicts are in `referee-report-critical-radius-n5.md`. The table 
 - run times;
 - group orders at known radii;
 - the literature beyond Akiyama–Brunotte–Pethő–Steiner;
-- the Lean outline in §9;
+- §9 (Lean);
 - the correctness of `mpmath.iv` beyond a spot check.
 
 The referee's own orderings rest on a stated double-precision error bound rather than interval arithmetic. The two implementations agree exactly, so they cross-check each other.
 
 **Remaining caveats.**
-1. Durability: the computation behind Theorem B lives outside the repository. The mathematical claim rests on two independent implementations that agree exactly, and on the algorithm and certificate format described in §5.1.
+1. Durability: the author's program behind Theorem B lives outside the repository. The mathematical claim rests on two independent implementations that agree exactly, on the algorithm and certificate format described in §5.1, and on the repository engine's reproduction ([`../certificates.md`](../certificates.md)), whose small certificates are committed in `certificates/` and whose larger ones are recorded by SHA-256.
 2. Strict angle comparisons in the author's program rely on `mpmath.iv` being correctly outward-rounded for `sqrt` and `atan2`. That is standard, but it is trust in a library.
 3. (C4) is checked on endpoints of maximal arcs. The author's program checks a stricter version on pieces.
 4. Theorem A's statement "the group is infinite" uses only one orbit. It does not need, and does not prove, anything about the structure of $GG_5(r)$ beyond infinitude.
@@ -435,18 +437,16 @@ The referee's own orderings rest on a stated double-precision error bound rather
 
 ---
 
-## 9. What a Lean formalization would need
+## 9. Lean formalization: what is done and what is not
 
-1. **$\mathbb Z[\zeta_5]$ as $\mathbb Z^4$** with the reduced multiplication, conjugation, and the map to $\mathbb C$. Also a decision procedure for the sign of $\alpha+\beta\varphi$ (`Real.sqrt 5` facts plus `norm_num`/`decide` on rationals).
-2. **The generators** as `Equiv.Perm ℂ`, defined piecewise from closed disks, and the left-to-right word action.
-3. **Part A:**
-   - Lemma 1.2 (convexity, `Convex.segment_subset`);
-   - the three words as explicit lists, checked letter by letter by `decide` on the integer data;
-   - the irrational rotation: injectivity of $k\mapsto 2k\varphi^{-1}\bmod 2$ from `irrational_sqrt_five` or `Irrational` lemmas;
-   - "infinite orbit $\Rightarrow$ infinite group" (`Set.Infinite.of_image` style).
-4. **Part B, finite range:**
-   - the cell-decomposition argument of Theorem 4.2. This is the main formalization cost: finite unions of arcs, regular points, components of complements. A cheaper route for Lean is Lemma 4.1(3) with an explicit finite $\mathcal T(r)$ and a certificate that $\mathcal T(r)$ is closed. That needs region-emptiness proofs for intersections of disks and disk complements, which may be harder;
-   - the certificate data from §5, exported in the format of §5.1 (maximal arcs with symbolic endpoints), produced by the planned port to the repository's Lean engine;
-   - a verified checker for (C1)–(C4), with exact arithmetic for equalities and verified interval arithmetic (or exact nested-square-root sign tests in the tower $\mathbb Q(\sqrt5,\sin72^\circ,h_1,h_2)$) for orderings;
-   - group monotonicity from `boundary-contact.md`.
-5. **Part B, full:** Conjecture R$^\ast$ would have to be proved first, presumably through Conjecture R plus items (i)–(iii) of §6. A Lean proof would then be an induction on the level $k$ with explicit error bounds for the curvature correction.
+**Formalized** (`TDCSG/CriticalRadius/`; statements in `Statements.lean`):
+1. $\mathbb Z[\zeta_5]$ as integer vectors with the reduced multiplication, conjugation and the map to $\mathbb C$, with soundness lemmas linking the computable checks to $\mathbb C$ (`Five.lean`).
+2. The generators as `Equiv.Perm ℂ` (`TDCSG.permA`, `TDCSG.permB`), words acting on segments, and the convexity lemma (`CriticalRadius/Basic.lean`).
+3. **Part A in full**: `TDCSG.CriticalRadius.infinite_orbit_zero_five` and `infinite_GG_five`, hence `criticalRadius_five_le` and `one_le_criticalRadius_five`. The word checks are plain `decide` on integer data, linked to the real generators by proved lemmas.
+4. The definitions of the certificate (`TDCSG.Certificate`, `Certificate.lean`) and the reduction `TDCSG.finite_GG_of_certificate`, with `finiteBelowFive_of_certificate` and `le_criticalRadius_five_of_finiteBelow`.
+
+**Not formalized:**
+1. Theorem 4.2 itself: it is the unproved proposition `TDCSG.CutSetCertificate 5`. Its cost is the cell-decomposition argument (finite unions of arcs, regular points, components of complements). A cheaper route may be Lemma 4.1(3) with an explicit finite $\mathcal T(r)$ and a certificate that $\mathcal T(r)$ is closed, which needs region-emptiness proofs for intersections of disks and disk complements.
+2. The link between a certificate file and `TDCSG.ExistsCertificate 5 r`. The engine's checker (`tdcsg-orbit check-certificate`) is a compiled, tested Lean program, not a kernel-checked proof; a verified checker would be a Lean function with a soundness theorem against `TDCSG.Certificate` ([`../certificates.md`](../certificates.md) §7).
+3. Hence `TDCSG.CriticalRadius.FiniteBelowFive` is stated but not proved.
+4. **Part B, full:** Conjecture R$^\ast$ would have to be proved first, presumably through Conjecture R plus items (i)–(iii) of §6. A Lean proof would then be an induction on the level $k$ with explicit error bounds for the curvature correction.

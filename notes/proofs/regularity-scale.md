@@ -28,11 +28,15 @@ in $\mathcal C$ is constant. Then:
      $r_c(n)\le\max(2,d_n)$.
    - For $n=5$ this is proved, since `critical-radius-n5.md` (Theorem A) proves
      $r_c(5)\le\sqrt{3+\varphi}=2.149<d_5$.
-   - For $n\ne5$ it rests on the paper's computed table of $r_c$.
+   - For $n=8,10,12$ it is also proved: `critical-radius-n8.md`, `critical-radius-n10.md` and
+     `critical-radius-n12.md` (Theorem A, also proved in Lean as
+     `TDCSG.CriticalRadius.criticalRadius_eight_le` and its analogues) give $r_c(n)<2$.
+   - For the other $n$ it rests on the paper's computed table of $r_c$.
 4. **For $n=5$ the window is narrow.** All bump-class thresholds lie in
    $[\,2\sqrt{4-\sqrt5},\ 3.662\,]=[2.656,\,3.662]$, while $r_A=1.236$ and $r_c(5)\le2.149$.
-   - The lower bound on $r_c(5)$, $r_c(5)\ge r_\ast\approx2.1138$, is proved in
-     `critical-radius-n5.md` only modulo its computation (Theorem B).
+   - Lower bounds on $r_c(5)$ are proved only modulo computations: $r_c(5)\ge2.12557$ by the
+     refereed Theorem B of `critical-radius-n5.md`, and $r_c(5)\ge2.144727$ by the certificate
+     recorded in [`../certificates.md`](../certificates.md).
    - Finiteness of $GG_5(r)$ on $(r_\ast,\sqrt{3+\varphi})$ is open there.
    - Nothing below uses the lower bound.
 
@@ -52,7 +56,7 @@ being the analytic threshold, is the radius where the orbit space stops being Ha
   $3.662$ of item 4. The certificate is a finite orbit computation in $\mathbb Z[\zeta_5]$, with every
   disk test decided exactly in $\mathbb Q(\sqrt5)$; it is described in §5.3.
 - **[computed]** (floating point): the upper bounds for $n=7,8,10,12$ (§5.3), and the comparison with
-  $r_c$ for $n\ne5$.
+  $r_c$ for $n\notin\{5,8,10,12\}$.
 - **[conjecture]**: all bump classes have the same threshold, equal to $\max(2,d_n)$, the radius where
   the last explicit island dies (§6).
 - **Refereeing.** The note has been independently refereed; the report is
@@ -845,10 +849,11 @@ referee. The computation is specified in §5.3; it is not in the repository.
 **Computed only.**
 - The bounds for $n=7,8,10,12$ in §5.3.
 - All island searches and coverage tests in §6, and the $n=12$ corner orbit of §4.
-- $d_n>r_c(n)$ for $n\ne5$, which rests on the paper's table.
-- For $n=5$, $r_c(5)\le\sqrt{3+\varphi}$ is proved (Theorem A of `critical-radius-n5.md`). The lower
-  bound $r_c(5)\ge r_\ast\approx2.1138$ is proved there modulo a computation, and finiteness on
-  $(r_\ast,\sqrt{3+\varphi})$ is open. Only the upper bound is used here.
+- $d_n>r_c(n)$ for $n\notin\{5,8,10,12\}$, which rests on the paper's table. For $n=5,8,10,12$ the
+  upper bound on $r_c(n)$ is proved (Theorem A of the four critical-radius notes, and in Lean).
+- For $n=5$, the lower bound $r_c(5)\ge2.12557$ is proved in `critical-radius-n5.md` modulo a
+  computation, and $r_c(5)\ge2.144727$ modulo the certificate of `../certificates.md`; finiteness
+  on the remaining window below $\sqrt{3+\varphi}$ is open. Only the upper bound is used here.
 
 **Classical results used.**
 - Denjoy–Carleman, both directions, in Rudin's normalization: **[classical, confirmed]** in the
@@ -866,8 +871,8 @@ referee. The computation is specified in §5.3; it is not in the repository.
 3. **$r_{\rm sep}=r_c$?** Do infinite orbits have positive measure just above $r_c$?
 4. The piece-counting scale $\kappa(r)$ of §7(a).
 5. Whether $H^{(1)}_r$ has infinite orbits just above $r_A$ for $5\le n<63$.
-6. Remove the dependence on the table for $n\ge7$ by proving $GG_n(r)$ infinite for some $r\le2$
-   (§4).
+6. Remove the dependence on the table for the remaining $n\ge7$ (all but $8,10,12$) by proving
+   $GG_n(r)$ infinite for some $r\le2$ (§4).
 7. **Self-check.**
    - In Theorem 5.2 the descent radius $K$ must be strictly below $r$ and strictly above $r_A$. That
      holds, since $K'<r-r'<r$.

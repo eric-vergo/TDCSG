@@ -7,9 +7,12 @@ Authors: Eric Vergo, Claude
 > (A) $GG_{12}(r)$ is infinite for every $r\ge r_c$; and (B) $GG_{12}(r)$ is finite for every $r<r_c$.
 
 **Status.**
-- **(A) is proved, modulo an exact finite computation that was carried out.** The infinite orbit is the orbit of the lattice point $p^\ast=(2-\sqrt3)(1-2i)=-2\zeta+4\zeta^2-3\zeta^3$, which lies exactly on $\partial D_1$ when $r=r_c$. For every $r\ge r_c$ that orbit contains $p^\ast+2\varepsilon^{k+2}V$ for all $k\ge0$, where $V=\zeta^5+\zeta^6$ (Theorem A, §2.4).
+- **(A) is proved, in writing and in Lean.** The Lean theorems are `TDCSG.CriticalRadius.mem_orbit_pStar_twelve_pow`, `infinite_orbit_pStar_twelve` and `infinite_GG_twelve` (statements in `TDCSG/CriticalRadius/Statements.lean`; the closure data of Appendix A are checked by kernel reduction, `decide +kernel`, in `TDCSG/CriticalRadius/Twelve.lean`), which give `1 ≤ criticalRadius 12 ≤ √(40 - 22√3)`. The written proof follows. The infinite orbit is the orbit of the lattice point $p^\ast=(2-\sqrt3)(1-2i)=-2\zeta+4\zeta^2-3\zeta^3$, which lies exactly on $\partial D_1$ when $r=r_c$. For every $r\ge r_c$ that orbit contains $p^\ast+2\varepsilon^{k+2}V$ for all $k\ge0$, where $V=\zeta^5+\zeta^6$ (Theorem A, §2.4).
 - The method is the one of `critical-radius-n8.md`, which transfers. A chord through $p^\ast$ carries 30 partial isometries, each realized by an explicit group word of length at most 28. The family is closed under rescaling by $\varepsilon$ about $p^\ast$. Every disk test, domain endpoint and composition was checked in exact arithmetic, and the data are listed in Appendix A.
-- **(B) is open.** It is proved only for $r\le r_\ast$ by an exact finite computation (§3) together with the refereed group monotonicity. The best exact certificate is at $\delta_\ast=1/50$, which gives $r_\ast^2=r_c^2-\delta_\ast$, $r_\ast\approx1.369263$ and an open window of length $r_c-r_\ast\approx0.0073$ (Table 3.1). Certificates beyond $\delta=1/20$ ($r\approx1.358264$) are newer than the referee report and not yet refereed.
+- **(B) is open.** It is proved only for $r\le r_\ast$ by an exact finite computation (§3) together with the refereed group monotonicity.
+  - The refereed certificate is at $\delta=1/20$ ($r\approx1.358264$); this is also the range of the Lean proposition `TDCSG.CriticalRadius.FiniteBelowTwelve` (stated, not proved, in Lean).
+  - This note's own exact certificates reach $\delta_\ast=1/50$ ($r_\ast^2=r_c^2-\delta_\ast$, $r_\ast\approx1.369263$, Table 3.1); those beyond $\delta=1/20$ are not refereed.
+  - The deepest certified range is recorded in [`../certificates.md`](../certificates.md): the repository's Lean engine generates and independently checks a certificate at $\delta=1/180$, giving finiteness for $r\le1.374528$, an open window of length $r_c-r\approx0.002019$, modulo that computation.
 - **Refereeing.** This note was independently refereed; see `referee-report-critical-radius-n8-n12.md` in this directory. The referee reproduced Part A fully and exactly, including end-to-end word checks for $k\le6$ with the true generators, and reproduced the Theorem B certificates up to $\delta=1/20$ in floating point with matching invariants.
 - **Is $r_c$ the exact threshold?** What is proved is $r_\ast\le\inf\{r:GG_{12}(r)\text{ infinite}\}\le r_c$. The closed form is confirmed as an upper bound, and as the exact radius at which this mechanism switches on. Whether a smaller radius already gives an infinite orbit is not excluded; the evidence (§5) says no.
 
@@ -62,7 +65,7 @@ Lemma 2.1 and Corollary 2.2 of the $n=8$ note hold verbatim on this $\ell$, with
 2. it is valid at both endpoints of the listed interval, hence on all of it (the listed intervals are the maximal domains, but only validity is used);
 3. for each family member $f$, the interval $\varepsilon D_f$ is covered by the listed consecutive pieces. On each piece the listed sequence of at most 4 family members is defined, with every intermediate image interval inside the next domain, and composes exactly to $u\mapsto\varepsilon f(u/\varepsilon)$.
 
-There are 37 pieces and 147 composition steps. Appendix A also lists 8 redundant one-point pieces (in rows 3, 5, 8, 21, 22, 24, 26 and 28), each consisting only of the right endpoint of $\varepsilon D_f$, which the previous piece already reaches. They are valid, play no role, and are ignored in the counts and in Lemma 2.3.
+There are 37 pieces and 147 composition steps. (The Lean data `TDCSG.Twelve.pieces` also include the 8 redundant one-point pieces described next: 45 pieces and 179 steps, each one-point piece having a sequence of length 4.) Appendix A also lists 8 redundant one-point pieces (in rows 3, 5, 8, 21, 22, 24, 26 and 28), each consisting only of the right endpoint of $\varepsilon D_f$, which the previous piece already reaches. They are valid, play no role, and are ignored in the counts and in Lemma 2.3.
 
 *Proof.* Exact computation: `python3 -I verify_closure_n.py 12 cl12_S28d.pkl`, in the scratch directory `t4_8/`. Output:
 ```
@@ -130,13 +133,15 @@ The facts used are the same as for $n=8$: orbit and group monotonicity (`boundar
 | $1/50$ | 1.3693 | 0.0073 | 83 674 | 335 412 | 754 420 | 9 444 | 266.8 | **valid** (not yet refereed) |
 | $1/60$ | 1.3705 | 0.0061 | not finished: stopped by me at more than $3.2\cdot10^5$ circles and 2.9 GB, to stay within the resource budget | | | | | — |
 
+The "(C2) image arcs" column counts the four images of the two boundary circles about their own centres, which the repository engine's checker skips; its counts are 4 lower. The engine closes $\delta=1/60$ and deeper radii, down to $\delta=1/180$ ([`../certificates.md`](../certificates.md) §5).
+
 **Growth of the computation.** Closure time / peak memory / exact-verification time: $\delta=1/30$: 107 s / 0.8 GB / 586 s; $1/40$: 147 s / 1.0 GB / 602 s; $1/50$: 307 s / 1.9 GB / 1263 s. The growth is in steps: almost none from $1/20$ to $1/40$ (circles $\times1.02$), then a factor $2.2$ by $1/50$ and more than $8$ by $1/60$. These steps are consistent with one per level of §4 (a factor $2+\sqrt3$ in $\delta$).
 
-**Theorem B (proved modulo the computation of Table 3.1).** $GG_{12}(r)$ is finite for every $r\le r_\ast$, where $r_\ast^2=40-22\sqrt3-\delta_\ast$ and $\delta_\ast=1/50$, i.e. $r_\ast\approx1.369263$. The open window $(r_\ast,r_c)$ has length about $0.0073$. The certificates at $\delta\le1/30$ were produced after the referee's pass and are not yet refereed; the refereed certificate is $\delta=1/20$ ($r\approx1.358264$).
+**Theorem B (proved modulo the computation of Table 3.1).** $GG_{12}(r)$ is finite for every $r\le r_\ast$, where $r_\ast^2=40-22\sqrt3-\delta_\ast$ and $\delta_\ast=1/50$, i.e. $r_\ast\approx1.369263$. The open window left by this table, $(r_\ast,r_c)$, has length about $0.0073$; the engine certificates of `../certificates.md` narrow it to about $0.002019$. The certificates at $\delta\le1/30$ were produced after the referee's pass and are not yet refereed; the refereed certificate is $\delta=1/20$ ($r\approx1.358264$).
 
 *Proof.* The certificate at $\delta_\ast$ satisfies (C1)–(C4), checked exactly. Apply the certificate theorem and group monotonicity. $\square$
 
-The internal extent grows like $\delta^{-1}$ on average. As for $n=8$, no single computation reaches $r_c$; the stopping point here is a resource limit of this implementation.
+The internal extent grows like $\delta^{-1}$ on average. As for $n=8$, no single computation reaches $r_c$; the stopping point here is a resource limit of this implementation, and the repository engine reaches $\delta=1/180$.
 
 ---
 
@@ -161,13 +166,13 @@ As for $n=8$, Conjecture R₁₂ alone does not imply (B). It would reduce (B) t
 
 ## 5. Is the closed form exactly the critical radius?
 
-- **Proved:** $\inf\{r:GG_{12}(r)\text{ infinite}\}\in[r_\ast,r_c]$.
+- **Proved:** $\inf\{r:GG_{12}(r)\text{ infinite}\}\in[r_\ast,r_c]$, modulo the computation of §3; and with $r_\ast^2=r_c^2-1/180$ modulo the certificate of `../certificates.md`. The upper bound is proved in Lean.
 - **Not proved:** that no point has an infinite orbit in $(r_\ast,r_c)$.
 - **Evidence:**
   - the exact threshold sweep of the orbit of $0$ accumulates only at $r_c$, with gap ratios tending to $2+\sqrt3$;
   - the orbit of $0$ is finite at $\delta=9.34\cdot10^{-4}$, with 1 945 733 points (`notes/engine.md`);
   - the orbit of $p^\ast$ is finite at $\delta=10^{-3}$, with 321 120 points;
-  - every cut-set closure attempted at $\delta\ge1/50$ terminated; at $\delta=1/60$ the run was stopped to respect the resource budget, not found to diverge.
+  - every cut-set closure attempted here at $\delta\ge1/50$ terminated, and in the repository engine every one attempted at $\delta\ge1/180$.
 
 ---
 
@@ -178,14 +183,15 @@ Verdicts are those of the referee report (`referee-report-critical-radius-n8-n12
 | claim | status |
 |---|---|
 | Lemma 2.3 (30-word family closed under $\varepsilon$) | proved by exact computation; refereed: correct, independently reproduced in full in exact arithmetic |
-| Theorem A: $GG_{12}(r)$ infinite for all $r\ge r_c$, explicit orbit of $p^\ast$ | **proved**; refereed: correct |
+| Theorem A: $GG_{12}(r)$ infinite for all $r\ge r_c$, explicit orbit of $p^\ast$ | **proved**; refereed: correct. **Proved in Lean** (`TDCSG.CriticalRadius.infinite_GG_twelve`) |
 | Theorem B at $\delta=1/20$ | **proved modulo the computation of §3**, all decisions exact; refereed: correct as stated, certificate reproduced in floating point with matching invariants |
 | Theorem B at $\delta_\ast=1/50$ | **proved modulo the computation of §3**, all decisions exact; **not yet refereed** |
+| Finiteness for $r^2\le r_c^2-1/180$ | **proved modulo the engine certificate** of `../certificates.md` (generator and independent checker; not refereed) |
 | finite for $r_\ast<r<r_c$ (Conjecture F₁₂); $r_c$ is exactly the infimum | **open** |
 | Conjecture R₁₂ | conjecture; it would reduce (B) to further statements (§4), not prove it |
 
 **Caveats.**
-1. *Independent checks.* Part A has been re-implemented and re-checked exactly by the referee. The exact cut-set verifier behind Theorem B is single-author: the referee did not read or run it, and its own reproduction used floating-point comparisons. The certificates at $\delta\le1/30$ were produced after the referee's pass and have no independent reproduction yet.
+1. *Independent checks.* Part A has been re-implemented and re-checked exactly by the referee. The exact cut-set verifier behind Theorem B is single-author: the referee did not read or run it, and its own reproduction used floating-point comparisons. The certificates at $\delta\le1/30$ were produced after the referee's pass; the repository engine, a separate exact implementation with its own checker, reproduces them with the same invariants (`../certificates.md` §§4–5).
 2. The window $W$ and the restriction "start and end in $D_2$" only shrink domains, so they cannot create false validity.
 3. Theorem A is about the orbit of $p^\ast$. Whether the orbit of $0$ is infinite at $r_c$ is not proved here.
 
@@ -193,13 +199,13 @@ Verdicts are those of the referee report (`referee-report-critical-radius-n8-n12
 
 ---
 
-## 7. What a Lean formalization would need
+## 7. Lean formalization: what is done and what is not
 
-The same ingredients as for $n=8$ (§7 of `critical-radius-n8.md`), with:
-- $\mathbb Z[\zeta_{12}]$ as $\mathbb Z^4$ modulo $\zeta^4=\zeta^2-1$;
-- sign decisions in $\mathbb Q(\sqrt3)$;
-- the 30 words and 37 pieces of Appendix A;
-- the certificate data of §3, about $3.4\cdot10^5$ maximal arcs at $\delta=1/50$, for the initial range of (B).
+As for $n=8$ (§7 of `critical-radius-n8.md`), with $\mathbb Z[\zeta_{12}]$ modulo $\zeta^4=\zeta^2-1$ and sign decisions in $\mathbb Q(\sqrt3)$.
+
+**Formalized:** Part A in full. The 30 words of Appendix A and the closure data (`TDCSG.Twelve.family`, `TDCSG.Twelve.pieces`) are checked by `decide +kernel` (`realizeOK_family`, `closureOK_family` in `TDCSG/CriticalRadius/Twelve.lean`), with `TDCSG.Twelve.isRoot_zeta` for the actual $e^{2\pi i/12}$; Theorem A is `TDCSG.CriticalRadius.mem_orbit_pStar_twelve_pow`, `infinite_orbit_pStar_twelve` and `infinite_GG_twelve`, hence `criticalRadius_twelve_le`. Also the reduction `finiteBelowTwelve_of_certificate` and `le_criticalRadius_twelve_of_finiteBelow`.
+
+**Not formalized:** the certificate theorem (the unproved proposition `TDCSG.CutSetCertificate 12`), the link between a certificate file and `TDCSG.ExistsCertificate 12 r` (the engine's checker is a tested program, not a kernel-checked proof), hence `TDCSG.CriticalRadius.FiniteBelowTwelve`; and Part B in full.
 
 ---
 
