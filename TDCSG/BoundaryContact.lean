@@ -9,6 +9,7 @@ public import Mathlib.Order.ConditionallyCompleteLattice.Basic
 public import Mathlib.Topology.MetricSpace.ProperSpace
 public import Mathlib.Topology.Sequences
 public import TDCSG.Monotonicity
+public import TDCSG.SmallRadii
 
 /-!
 # Stability of finite orbits and boundary contact
@@ -25,7 +26,9 @@ of a point, the orbit touches a boundary circle or accumulates at one from insid
 * `TDCSG.orbit_eq_of_agree`: two radius pairs give the same orbit of `p` if every point of one of
   the orbits lies in the same disks for both pairs.
 * `TDCSG.exists_orbit_eq_of_finite`: right stability of finite orbits (Theorem 4.1).
-* `TDCSG.infinite_orbit_radii`: the per-point critical radius is attained (Corollary 4.2).
+* `TDCSG.infinite_orbit_radii`: the per-point critical radius is attained, and it is greater
+  than `1` (Corollary 4.2).
+* `TDCSG.one_lt_of_infinite`: an infinite orbit needs a radius greater than `1`.
 * `TDCSG.boundary_depth`, `TDCSG.touchesBoundary_or_accumulatesInside`,
   `TDCSG.of_not_touchesBoundary`: Theorem 5.1, parts 1–3.
 
@@ -76,7 +79,7 @@ theorem orbit_eq_of_agree {n₁ n₂ : ℕ} {r₁ r₂ s₁ s₂ : ℝ} {p : ℂ
     (fun y hy ↦ (h₂ y (hsub hy)).symm))
 
 /-- Equal-radius form of `TDCSG.orbit_eq_of_agree`. -/
-theorem orbit_eq_of_agree' {n₁ n₂ : ℕ} {r s : ℝ} {p : ℂ}
+theorem orbit_eq_of_agree_of_eq_radii {n₁ n₂ : ℕ} {r s : ℝ} {p : ℂ}
     (h : ∀ y ∈ orbit n₁ n₂ r r p, ∀ c ∈ ({leftCenter, rightCenter} : Set ℂ),
       dist y c ≤ s ↔ dist y c ≤ r) :
     orbit n₁ n₂ s s p = orbit n₁ n₂ r r p :=
@@ -98,10 +101,18 @@ theorem orbit_of_nonpos (n₁ n₂ : ℕ) {r : ℝ} (hr : r ≤ 0) (p : ℂ) :
     (diskRotation_of_nonpos hr w)) (mem_preserving_of_forall_eq_or h1 fun w ↦ .inl
     (diskRotation_of_nonpos hr w))
 
+/-- An infinite orbit needs a positive radius. -/
 theorem pos_of_infinite {n₁ n₂ : ℕ} {r : ℝ} {p : ℂ} (h : (orbit n₁ n₂ r r p).Infinite) :
     0 < r := by
   by_contra hr
   exact h ((finite_singleton p).subset (orbit_of_nonpos n₁ n₂ (not_lt.1 hr) p))
+
+/-- For a common radius at most `1` every orbit is finite, so an infinite orbit needs a radius
+greater than `1`. -/
+theorem one_lt_of_infinite {n₁ n₂ : ℕ} {r : ℝ} {p : ℂ} (h : (orbit n₁ n₂ r r p).Infinite) :
+    1 < r := by
+  by_contra hr
+  exact h (finite_orbit_of_le_one n₁ n₂ (not_lt.1 hr) (not_lt.1 hr) p)
 
 private theorem exists_pos_forall_le {α : Type*} {T : Set α} (hT : T.Finite) {f : α → ℝ}
     (hf : ∀ x ∈ T, 0 < f x) : ∃ δ > 0, ∀ x ∈ T, δ ≤ f x := by
@@ -122,7 +133,7 @@ theorem exists_orbit_eq_of_finite (n₁ n₂ : ℕ) {r₀ : ℝ} {p : ℂ}
   have hT : T.Finite := (h.prod (toFinite _)).subset inter_subset_left
   obtain ⟨δ, hδ, hle⟩ := exists_pos_forall_le hT (f := fun x ↦ dist x.1 x.2 - r₀)
     fun x hx ↦ sub_pos.2 hx.2
-  refine ⟨δ, hδ, fun r hr₁ hr₂ ↦ orbit_eq_of_agree' fun y hy c hc ↦ ⟨fun hyc ↦ ?_,
+  refine ⟨δ, hδ, fun r hr₁ hr₂ ↦ orbit_eq_of_agree_of_eq_radii fun y hy c hc ↦ ⟨fun hyc ↦ ?_,
     fun hyc ↦ hyc.trans hr₁⟩⟩
   by_contra hlt
   have := hle (y, c) ⟨⟨hy, hc⟩, not_le.1 hlt⟩
@@ -130,10 +141,10 @@ theorem exists_orbit_eq_of_finite (n₁ n₂ : ℕ) {r₀ : ℝ} {p : ℂ}
   linarith
 
 /-- The radii at which the orbit of `p` is infinite form the empty set or a closed half-line
-`[r₀, ∞)` with `r₀ > 0`. -/
+`[r₀, ∞)` with `r₀ > 1`. -/
 theorem infinite_orbit_radii (n₁ n₂ : ℕ) (p : ℂ) :
     {r : ℝ | (orbit n₁ n₂ r r p).Infinite} = ∅ ∨
-      ∃ r₀ > 0, {r : ℝ | (orbit n₁ n₂ r r p).Infinite} = Ici r₀ := by
+      ∃ r₀ > 1, {r : ℝ | (orbit n₁ n₂ r r p).Infinite} = Ici r₀ := by
   set I := {r : ℝ | (orbit n₁ n₂ r r p).Infinite}
   rcases I.eq_empty_or_nonempty with hI | hI
   · exact .inl hI
@@ -151,7 +162,7 @@ theorem infinite_orbit_radii (n₁ n₂ : ℕ) (p : ℂ) :
       rw [← heq r (csInf_le hbdd hr) (not_le.1 hlt)]
       exact hr
     linarith
-  refine ⟨sInf I, pos_of_infinite hmem, ?_⟩
+  refine ⟨sInf I, one_lt_of_infinite hmem, ?_⟩
   ext r
   exact ⟨fun hr ↦ csInf_le hbdd hr, fun hr ↦ hup _ hmem r hr⟩
 
@@ -166,7 +177,7 @@ theorem boundary_depth (n₁ n₂ : ℕ) {r₀ : ℝ} {p : ℂ} (hO : (orbit n�
   intro ε hε
   by_contra! h
   apply hO
-  rw [← orbit_eq_of_agree' (s := r₀ - ε / 2) fun y hy c hc ↦
+  rw [← orbit_eq_of_agree_of_eq_radii (s := r₀ - ε / 2) fun y hy c hc ↦
     ⟨fun hyc ↦ hyc.trans (by linarith), fun hyc ↦ by
       by_contra hlt
       linarith [h y hy c hc (by linarith)]⟩]
