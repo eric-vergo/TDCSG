@@ -39,10 +39,12 @@ open Complex Metric Equiv Filter Topology
 
 namespace TDCSG
 
+/-- For `n = 0` the rotation angle is `0`, so the rotation is the identity. -/
 @[simp]
 theorem rotation_zero (c z : ℂ) : rotation 0 c z = z := by
   simp [rotation]
 
+/-- For `n = 0` the disk rotation is the identity. -/
 theorem diskRotation_zero (c : ℂ) (r : ℝ) : diskRotation 0 c r = id := by
   ext1 z
   by_cases hz : z ∈ closedBall c r <;> simp [diskRotation, hz]
@@ -113,12 +115,6 @@ def preserving (S : Set ℂ) : Subgroup (Perm ℂ) where
     intro y hy
     simpa [and_comm] using hg y hy
 
-private theorem apply_inv_apply' (f : Perm ℂ) (x : ℂ) : f (f⁻¹ x) = x :=
-  (Perm.inv_eq_iff_eq.mp rfl).symm
-
-private theorem inv_apply_apply' (f : Perm ℂ) (x : ℂ) : f⁻¹ (f x) = x :=
-  Perm.inv_eq_iff_eq.mpr rfl
-
 theorem mem_preserving {S : Set ℂ} {g : Perm ℂ} :
     g ∈ preserving S ↔ ∀ y ∈ S, g y ∈ S ∧ g⁻¹ y ∈ S :=
   Iff.rfl
@@ -162,9 +158,9 @@ theorem mem_preserving_of_eqOn {S : Set ℂ} {σ τ : Perm ℂ} (hτ : τ ∈ pr
     (h : Set.EqOn σ τ S) : σ ∈ preserving S := by
   intro y hy
   refine ⟨by rw [h hy]; exact (hτ y hy).1, ?_⟩
-  have hw : σ (τ⁻¹ y) = y := by rw [h (hτ y hy).2, apply_inv_apply']
-  rw [← hw, inv_apply_apply']
-  exact (hτ y hy).2
+  have hw : σ (τ⁻¹ y) = y := by rw [h (hτ y hy).2]; simp
+  rw [← hw]
+  simpa using (hτ y hy).2
 
 /-- If at every point `σ` either fixes the point or acts as a permutation `τ` that maps `S` onto
 itself, then `σ` maps `S` onto itself. -/
@@ -174,7 +170,7 @@ theorem mem_preserving_of_forall_eq_or {S : Set ℂ} {σ τ : Perm ℂ} (hτ : �
   refine ⟨?_, ?_⟩
   · rcases h y with e | e <;> rw [e]
     exacts [hy, (hτ y hy).1]
-  · rcases h (σ⁻¹ y) with e | e <;> rw [apply_inv_apply'] at e
+  · rcases h (σ⁻¹ y) with e | e <;> rw [show σ (σ⁻¹ y) = y by simp] at e
     · rw [← e]
       exact hy
     · rw [(Perm.inv_eq_iff_eq.2 e).symm]

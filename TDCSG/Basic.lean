@@ -70,18 +70,22 @@ noncomputable def genA (n : ℕ) (r : ℝ) : ℂ → ℂ := diskRotation n leftC
 /-- The right generator: rotation by `-2π / n` of the right disk of radius `r`. -/
 noncomputable def genB (n : ℕ) (r : ℝ) : ℂ → ℂ := diskRotation n rightCenter r
 
+/-- The rotation factor `exp (-2πi / n)` has norm `1`. -/
 theorem norm_exp_rotationAngle (n : ℕ) : ‖exp (-(2 * π * I / n))‖ = 1 := by
   rw [show -(2 * π * I / n) = ((-(2 * π / n) : ℝ) : ℂ) * I by push_cast; ring]
   exact norm_exp_ofReal_mul_I _
 
+/-- The rotation factor `exp (-2πi / n)` is an `n`-th root of unity. -/
 theorem exp_rotationAngle_pow_self {n : ℕ} (hn : n ≠ 0) : exp (-(2 * π * I / n)) ^ n = 1 := by
   rw [← exp_nat_mul, show (n : ℂ) * -(2 * π * I / n) = -(2 * π * I) by field_simp, exp_neg,
     exp_two_pi_mul_I, inv_one]
 
+/-- A rotation about `c` preserves the distance to `c`. -/
 @[simp]
 theorem dist_rotation (n : ℕ) (c z : ℂ) : dist (rotation n c z) c = dist z c := by
   simp [rotation, dist_eq_norm, norm_exp_rotationAngle]
 
+/-- Iterates of a rotation about `c` multiply `z - c` by powers of the rotation factor. -/
 theorem iterate_rotation (n : ℕ) (c z : ℂ) (k : ℕ) :
     (rotation n c)^[k] z = c + exp (-(2 * π * I / n)) ^ k * (z - c) := by
   induction k with
@@ -92,10 +96,12 @@ theorem iterate_rotation_self {n : ℕ} (hn : n ≠ 0) (c : ℂ) : (rotation n c
   ext1 z
   simp [iterate_rotation, exp_rotationAngle_pow_self hn]
 
+/-- On its disk, a disk rotation acts as the rotation. -/
 theorem diskRotation_of_mem {n : ℕ} {c z : ℂ} {r : ℝ} (hz : z ∈ closedBall c r) :
     diskRotation n c r z = rotation n c z := by
   simp [diskRotation, hz]
 
+/-- Off its disk, a disk rotation is the identity. -/
 theorem diskRotation_of_notMem {n : ℕ} {c z : ℂ} {r : ℝ} (hz : z ∉ closedBall c r) :
     diskRotation n c r z = z := by
   simp [diskRotation, hz]
@@ -107,6 +113,7 @@ theorem mapsTo_diskRotation (n : ℕ) (c : ℂ) (r : ℝ) :
   rw [diskRotation_of_mem hz, mem_closedBall, dist_rotation]
   exact hz
 
+/-- On its disk, iterates of a disk rotation are iterates of the rotation. -/
 theorem iterate_diskRotation_of_mem {n : ℕ} {c z : ℂ} {r : ℝ} (hz : z ∈ closedBall c r)
     (k : ℕ) : (diskRotation n c r)^[k] z = (rotation n c)^[k] z := by
   induction k with
@@ -117,6 +124,7 @@ theorem iterate_diskRotation_of_mem {n : ℕ} {c z : ℂ} {r : ℝ} (hz : z ∈ 
       exact (mapsTo_diskRotation n c r).iterate k hz
     rw [Function.iterate_succ_apply', ih, diskRotation_of_mem hk, Function.iterate_succ_apply']
 
+/-- Off its disk, iterates of a disk rotation are the identity. -/
 theorem iterate_diskRotation_of_notMem {n : ℕ} {c z : ℂ} {r : ℝ} (hz : z ∉ closedBall c r)
     (k : ℕ) : (diskRotation n c r)^[k] z = z :=
   Function.iterate_fixed (diskRotation_of_notMem hz) k

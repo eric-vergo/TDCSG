@@ -38,6 +38,7 @@ namespace TDCSG
 instance (n₁ n₂ : ℕ) (r₁ r₂ : ℝ) : Group.FG (GG n₁ n₂ r₁ r₂) :=
   Group.closure_finite_fg _
 
+/-- `TDCSG.orbit` is the orbit of the action of the subgroup `TDCSG.GG` on `ℂ`. -/
 theorem mulAction_orbit_eq (n₁ n₂ : ℕ) (r₁ r₂ : ℝ) (p : ℂ) :
     MulAction.orbit (GG n₁ n₂ r₁ r₂) p = orbit n₁ n₂ r₁ r₂ p := by
   ext y
@@ -50,6 +51,7 @@ theorem finite_of_encard_orbit_le {n₁ n₂ : ℕ} {r₁ r₂ : ℝ} (N : ℕ)
     rw [mulAction_orbit_eq]
     exact h p
 
+/-- A finite group has orbits of size at most its order. -/
 theorem encard_orbit_le_card (n₁ n₂ : ℕ) (r₁ r₂ : ℝ) [Finite (GG n₁ n₂ r₁ r₂)] (p : ℂ) :
     (orbit n₁ n₂ r₁ r₂ p).encard ≤ Nat.card (GG n₁ n₂ r₁ r₂) := by
   have : orbit n₁ n₂ r₁ r₂ p = (fun g : GG n₁ n₂ r₁ r₂ ↦ (g : Perm ℂ) p) '' Set.univ := by
@@ -58,6 +60,8 @@ theorem encard_orbit_le_card (n₁ n₂ : ℕ) (r₁ r₂ : ℝ) [Finite (GG n�
   rw [this, ← ENat.card_eq_coe_natCard, ← Set.encard_univ]
   exact Set.encard_image_le _ _
 
+/-- At each point, a disk rotation either fixes the point or agrees with the rotation of any
+larger concentric disk. -/
 theorem diskRotation_eq_or_of_le {n : ℕ} {c : ℂ} {r r' : ℝ} (h : r ≤ r') (z : ℂ) :
     diskRotation n c r z = z ∨ diskRotation n c r z = diskRotation n c r' z := by
   by_cases hz : z ∈ closedBall c r
