@@ -11,6 +11,7 @@ public import TDCSG.CriticalRadius.Five
 public import TDCSG.CriticalRadius.QuadraticSigns
 public import TDCSG.CriticalRadius.Renormalization
 public import TDCSG.CriticalRadius.Statements
+public import TDCSG.CriticalRadius.Ten
 public import TDCSG.CriticalRadius.Twelve
 public import TDCSG.Disjoint
 public import TDCSG.Finiteness
