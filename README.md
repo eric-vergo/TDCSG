@@ -31,7 +31,8 @@ This repository has two parts: a Lean 4 / Mathlib formalization, and research no
 | Path | Contents |
 |---|---|
 | `TDCSG/` | Lean sources (`TDCSG.lean` is the root module) |
-| `notes/` | Research notes in Markdown: [`overview.md`](notes/overview.md), [`arithmetic.md`](notes/arithmetic.md), [`analytic-continuation.md`](notes/analytic-continuation.md), [`experiments.md`](notes/experiments.md) |
+| `TDCSGCompute/` | The exact orbit engine and the `tdcsg-orbit` executable (core Lean, no Mathlib); see [`notes/engine.md`](notes/engine.md) |
+| `notes/` | Research notes in Markdown: [`overview.md`](notes/overview.md), [`arithmetic.md`](notes/arithmetic.md), [`analytic-continuation.md`](notes/analytic-continuation.md), [`experiments.md`](notes/experiments.md), [`engine.md`](notes/engine.md) |
 | `notes/proofs/` | Written proofs of results intended for formalization |
 | `2302.12950v1.pdf` | The paper |
 
@@ -44,6 +45,8 @@ The project uses Lean `v4.35.0` (see `lean-toolchain`) and Mathlib at revision
 ```sh
 lake exe cache get   # download the prebuilt Mathlib (large; skip if .lake/packages is already populated)
 lake build
+lake test            # self-test of the orbit engine
+.lake/build/bin/tdcsg-orbit orbit -n 5 --r2 closed-1/100   # an exact orbit computation
 ```
 
 ## Status of results
@@ -63,10 +66,12 @@ The notes label every claim [proved], [computed], [classical], [conjecture] or [
 - **Conjectures**: the rank conjecture (self-similarity group = cyclotomic units), r_c(n)² ∈ ℚ(ζ_n)⁺
   for all n, complex dimensions of the critical fractal, and r_A < r_c.
 
-**The computed numbers are preliminary.** They come from exploratory Python scripts, not part of this
-repository, that stored orbit points exactly in ℤ[ζ_n] but tested membership in the closed disks in
-floating point (tolerance 1e-12). Results at exact thresholds depend on that test. They are to be
-re-checked with an exact engine.
+**Exact re-checks.** The orbit numbers in the notes first came from exploratory Python scripts (not
+part of this repository) that tested disk membership in floating point. The exact engine in
+`TDCSGCompute/` decides membership exactly; [`notes/engine.md`](notes/engine.md) lists the numbers it
+has reproduced (the §3.2 orbit table, the n ≡ 4 (mod 8) count n² − 3n + 1 and threshold r₁, the
+unit ratios, the n = 33 plateau) and the one remark it corrected. Numbers not listed there remain
+preliminary.
 
 ## Licence and authors
 

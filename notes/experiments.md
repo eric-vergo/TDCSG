@@ -85,6 +85,9 @@ These runs sit at an exact threshold, where the floating-point membership test m
 - For every n ≡ 4 mod 8 with 12 ≤ n ≤ 100 (12 values), the origin's orbit at r = g has exactly
   **n² − 3n + 1** points.
 - It stays that size until a second threshold r₁(n). For n ≥ 44 it then jumps straight past 6·10⁴.
+  **Contradicted by the exact engine:** at r = r₁ the orbit is finite for every n ≡ 4 (mod 8) up to
+  100 except n = 84 (cap 2·10⁶ reached), and for n = 60 it has only 38 821 points. The count
+  n² − 3n + 1 and the threshold r₁ are confirmed exactly; see [`engine.md`](engine.md) (ii).
 - The point that triggers r₁ has a periodic coefficient pattern (1, −2, 2, 0, −2, 0, 2, …, 2, −1).
 - PSLQ on the 30-digit value of r₁² for n = 44 gives a relation that holds for **all** n = 20, …, 100
   in this class to 1e-30:
