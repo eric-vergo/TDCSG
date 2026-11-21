@@ -40,6 +40,14 @@ satisfies `|c_i| < 2⁵³`, so each `c_i` converts to a double exactly.
 Fused multiply-adds, if the C compiler introduces them, only remove roundings, and the bounds
 above still hold. Non-finite intermediate values send the point to the exact path.
 
+## Scaled disks
+
+Points with a denominator, `z = w / M` with `w ∈ ℤ[ζ_n]` and an integer `M ≥ 1`, are handled in
+the coordinate `w`: `|z ± 1| ≤ r` exactly when `|w ± M|² ≤ M² r²`. So `DiskTest.make F (M² r²)`
+with `side = ±M` decides membership of `z`. The filter bound above holds with `|side|` in place of
+`1` in `e_X` (the term `± side` is one more exactly representable summand), and is used only when
+`|M| < 2⁵³`.
+
 ## Exact path
 
 When the filter does not decide, `D = num - den * |w|²` is computed exactly in `ℤ[ζ_n]` (`normSq`),
@@ -83,6 +91,11 @@ def DiskTest.make (F : CycField) (r2 : RadiusSq) : DiskTest :=
   let (f, e) := Ball.toFloatCert F.basePrec b
   { F, r2, r2F := f, r2E := e, gam := filterGamma F }
 
+/-- Membership tests for points `w / M` at squared radius `r²`: the disks of radius `M r` about
+`∓M` in the coordinate `w` (use `side = ±M`). -/
+def DiskTest.makeScaled (F : CycField) (r2 : RadiusSq) (M : Nat) : DiskTest :=
+  DiskTest.make F { num := F.smul ((M * M : Nat) : Int) r2.num, den := r2.den }
+
 /-- The float approximations shared by both disks for one point. -/
 structure FilterData where
   /-- `fl(∑ c_i t_i)`. -/
@@ -119,13 +132,14 @@ termination_by z.size - i
   filterLoop F.cosF F.sinF z 0 fl0 fl0 fl0 fl0 fl0 false
 
 /-- Float approximation `Q̂` of `|z + side|²` (`side = 1` for the left disk, `-1` for the right
-disk) with a certified error bound `E_Q`, as in the module docstring. -/
+disk; `±M` for the scaled disks below) with a certified error bound `E_Q`, as in the module
+docstring (with `|side|` in place of `1` in `e_X`). -/
 @[inline] def filterNormSq (F : CycField) (gam : Float) (fd : FilterData) (side : Float) :
     Float × Float :=
   let u := unitRoundoff
   let δ := F.trigErr
   let xw := fd.x + side
-  let ex := fl2 * (gam * (fd.ax + fl1) + δ * fd.s1)
+  let ex := fl2 * (gam * (fd.ax + side.abs) + δ * fd.s1)
   let ey := fl2 * (gam * fd.ay + δ * fd.s1)
   let q := xw * xw + fd.y * fd.y
   let eq := fl2 * (fl3 * u * q + ex * (fl2 * xw.abs + ex) + ey * (fl2 * fd.y.abs + ey))
@@ -163,8 +177,8 @@ def DiskTest.exactDecide (T : DiskTest) (z : Elem) (side : Int) : Decision :=
 /-- Decide `|z + side| ≤ r` from precomputed filter data. -/
 @[inline] def DiskTest.decideWith (T : DiskTest) (fd : FilterData) (z : Elem) (side : Int) :
     Decision :=
-  if fd.big then T.exactDecide z side else
-  let (q, eq) := filterNormSq T.F T.gam fd (if side > 0 then fl1 else flm1)
+  if fd.big || (side.natAbs >>> 53) != 0 then T.exactDecide z side else
+  let (q, eq) := filterNormSq T.F T.gam fd (Float.ofInt side)
   let dlt := T.r2F - q
   let bnd := fl2 * (T.r2E + eq)
   if dlt.isFinite && bnd.isFinite && dlt.abs > bnd then .filter (dlt > fl0)

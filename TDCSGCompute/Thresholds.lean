@@ -22,6 +22,9 @@ exact comparison in `ℤ[ζ_n]⁺` (`CycField.compareReal`) whenever the enclosu
 detected exactly.
 
 The orbit size reported for a threshold `t_k` is `|O(r)|` for `t_k ≤ r² < t_{k+1}`.
+
+With `scale = M > 1` the points are `w / M` (see `TDCSGCompute.Orbit`); keys are `|w ± M|²` and a
+threshold is `t = key / M²`.
 -/
 
 namespace TDCSGCompute
@@ -34,14 +37,16 @@ structure HeapEntry where
   e : Float
   /-- Index of the point in the orbit's `PointSet`. -/
   idx : Nat
-  /-- `1` for the left disk, `-1` for the right disk. -/
+  /-- `M` for the left disk, `-M` for the right disk (`M` the scale). -/
   side : Int
   deriving Inhabited
 
 /-- One threshold of the sweep. -/
 structure Threshold where
-  /-- The exact value `t = r²` at which the orbit grows. -/
+  /-- The numerator of the exact value `t = r² = value / den` at which the orbit grows. -/
   value : Elem
+  /-- The denominator `M²` (`1` for integral points). -/
+  den : Nat := 1
   /-- Number of (point, disk) pairs that enter at `t`. -/
   entering : Nat
   /-- Orbit size for `t ≤ r² < next threshold` (or the cap, if reached during this step). -/
@@ -108,15 +113,16 @@ def heapPop (F : CycField) (set : PointSet) (heap : Array HeapEntry) :
 def mkEntry (F : CycField) (z : Elem) (idx : Nat) (side : Int) : HeapEntry :=
   let fd := filterData F z
   if fd.big then { q := 0, e := (1.0 : Float) / 0.0, idx, side } else
-  let (q, e) := filterNormSq F (filterGamma F) fd (if side > 0 then 1.0 else -1.0)
+  let (q, e) := filterNormSq F (filterGamma F) fd (Float.ofInt side)
   { q, e := 2 * e + 8 * unitRoundoff * q.abs + (1.0 : Float).scaleB (-1000), idx, side }
 
 /-- Continue the breadth-first search from the points with indices in `queue` at the squared
 radius of `T`: points inside a disk are moved, the others are queued in the heap. Stops adding
 points at the cap. -/
-def sweepExpand (T : DiskTest) (st : SweepState) (queue : Array Nat) (cap : Nat) :
-    IO SweepState := do
+def sweepExpand (T : DiskTest) (st : SweepState) (queue : Array Nat) (cap : Nat)
+    (scale : Nat := 1) : IO SweepState := do
   let F := T.F
+  let m : Int := scale
   let mut st := st
   let mut q := queue
   let mut head := 0
@@ -125,12 +131,12 @@ def sweepExpand (T : DiskTest) (st : SweepState) (queue : Array Nat) (cap : Nat)
     head := head + 1
     let z := st.set.get idx
     let fd := filterData F z
-    for side in [(1 : Int), -1] do
+    for side in [m, -m] do
       let dcs := T.decideWith fd z side
       if dcs == .failure then throw <| IO.userError s!"membership could not be certified for {z}"
       st := { st with stats := st.stats.record dcs }
       if dcs.inside then
-        let imgs := if side > 0 then #[F.genA z, F.genAInv z] else #[F.genB z, F.genBInv z]
+        let imgs := #[F.rotCW z side, F.rotCCW z side]
         for w in imgs do
           if st.set.size < cap then
             match st.set.insert w with
@@ -154,6 +160,8 @@ structure SweepOptions where
   start2 : Option RadiusSq := none
   /-- Stop after this many thresholds. -/
   maxSteps : Nat := 1000000000
+  /-- Denominator `M` of the points. -/
+  scale : Nat := 1
 
 /-- Result of a sweep. -/
 structure SweepResult where
@@ -173,9 +181,11 @@ def sweep (F : CycField) (start : Elem) (opts : SweepOptions) (width : Nat := 2)
   match set.insert start with
   | .added s => set := s
   | _ => throw <| IO.userError "starting point does not fit in 64-bit coefficients"
+  let M := opts.scale
+  let M2 := M * M
   let r0 : RadiusSq := opts.start2.getD { num := F.ofInt (-1), den := 1 }
   let mut st : SweepState := { set, heap := #[] }
-  st ← sweepExpand (DiskTest.make F r0) st #[0] opts.cap
+  st ← sweepExpand (DiskTest.makeScaled F r0 M) st #[0] opts.cap M
   let initialSize := st.set.size
   let mut ths : Array Threshold := #[]
   let mut reason := "heap empty"
@@ -187,7 +197,7 @@ def sweep (F : CycField) (start : Elem) (opts : SweepOptions) (width : Nat := 2)
     st := { st with heap := h }
     let t := entryValue F st.set top
     if let some u := opts.upto then
-      match RealQ.compare F (RealQ.ofElem t) u with
+      match RealQ.compare F { num := t, den := M2 } u with
       | some .lt => pure ()
       | some _ => reason := "reached upto"; break
       | none => throw <| IO.userError "exact comparison with upto failed"
@@ -207,7 +217,7 @@ def sweep (F : CycField) (start : Elem) (opts : SweepOptions) (width : Nat := 2)
     let mut queue : Array Nat := #[]
     for e in entering do
       let z := st.set.get e.idx
-      let imgs := if e.side > 0 then #[F.genA z, F.genAInv z] else #[F.genB z, F.genBInv z]
+      let imgs := #[F.rotCW z e.side, F.rotCCW z e.side]
       for w in imgs do
         if st.set.size < opts.cap then
           match st.set.insert w with
@@ -216,8 +226,8 @@ def sweep (F : CycField) (start : Elem) (opts : SweepOptions) (width : Nat := 2)
             st := { st with set := s }
           | .present s => st := { st with set := s }
           | .overflow _ => throw <| IO.userError s!"coefficient overflow at {w}"
-    st ← sweepExpand T st queue opts.cap
-    let th : Threshold := { value := t, entering := entering.size, size := st.set.size }
+    st ← sweepExpand T st queue opts.cap M
+    let th : Threshold := { value := t, den := M2, entering := entering.size, size := st.set.size }
     report th
     ths := ths.push th
   return { initialSize, thresholds := ths, stopReason := reason, stats := st.stats }

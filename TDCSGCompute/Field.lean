@@ -281,6 +281,16 @@ def normSq (a : Elem) : Elem := Id.run do
         r := r.modify j (· + ak * v[j]!)
   return r
 
+/-- The adjugate and norm of `a ≠ 0`: `adj = ∏_{σ ≠ 1} σ a` over the Galois automorphisms
+`σ_k`, `k` coprime to `n`, `1 < k < n`, and `N = a · adj ∈ ℤ`, so that `a⁻¹ = adj / N`. Returns
+`none` if `a · adj` is not an integer (impossible for `a ≠ 0`; a consistency check). -/
+def normAdj (a : Elem) : Option (Elem × Int) := Id.run do
+  let mut adj := F.one
+  for k in [2:F.n] do
+    if Nat.gcd k F.n == 1 then adj := F.mul adj (F.galois k a)
+  let N := F.mul a adj
+  if (N.extract 1 N.size).all (· == 0) then return some (adj, N[0]!) else return none
+
 /-- Whether `a` is real, i.e. fixed by complex conjugation. -/
 def isReal (a : Elem) : Bool := F.conj a == a
 

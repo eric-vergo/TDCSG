@@ -18,6 +18,8 @@ this engine; none of it relies on a floating-point decision.
 | `TDCSGCompute/Store.lean` | Compact point set: fixed-width coefficients in one byte array, open-addressing hash table of 32-bit indices, automatic widening |
 | `TDCSGCompute/Orbit.lean` | Breadth-first orbit search (serial, and a Task-parallel variant) |
 | `TDCSGCompute/Thresholds.lean` | Exact threshold sweep: the sorted radii at which an orbit grows |
+| `TDCSGCompute/Perm.lean` | Permutations, deterministic Schreier–Sims, equivalence of transitive actions, and the order of a group with large alternating constituents (Jordan witnesses, kernel witnesses, quotient by Schreier–Sims) |
+| `TDCSGCompute/Group.lean` | GG_n(r) as a permutation group on orbits of generic points; samples (grid, clouds, rim-vertex fixpoint); germs and candidate events of the arrangement; merged thresholds of a lattice family; scans of many starting points |
 | `TDCSGCompute/Spec.lean` | Parsing of radii, points and real elements |
 | `TDCSGCompute/SelfTest.lean`, `Main.lean` | Self-tests and the command line |
 
@@ -54,6 +56,10 @@ that value, pops the smallest key together with every key exactly equal to it, a
 search at r² = t. Keys are compared with certified float enclosures, and exactly whenever the
 enclosures overlap.
 
+**Points with a denominator.** With `--scale M` a point is `w / M`, `w ∈ ℤ[ζ_n]`, stored as `w`;
+the generators become `a w = ζ⁻¹(w + M) − M` and so on, and membership is decided for the disks of
+radius `M r` about `∓M` (see the scaled disks below). Thresholds then have denominator `M²`.
+
 ## Correctness of disk membership
 
 A squared radius is an exact element r² = N/q, N ∈ ℤ[ζ_n]⁺, q a positive integer. For w = z ± 1,
@@ -74,6 +80,9 @@ of two certified ways (full argument in the docstrings of `Disk.lean`, `Field.le
    terminates: D is a nonzero algebraic integer of ℚ(ζ_n)⁺, so |N(D)| ≥ 1, while its other m − 1
    conjugates are at most B = Σ|D_i|; hence |D| ≥ B^{−(m−1)}, and a precision of m(log₂B + 3) + 64
    bits always decides. Exceeding that bound would be reported as an error; it has never happened.
+
+For a point `w / M` the test is the sign of `M² r² − |w ± M|²`, decided in the same two ways; in
+the filter the term `± M` replaces `± 1` (exact for `M < 2⁵³`, larger `M` go to the exact path).
 
 The balls rest on π from Machin's formula and on Taylor series of cos and sin for |x| ≤ 4, where
 the alternating tail is bounded by the last summed term. Every ball operation is an enclosure.
@@ -107,9 +116,74 @@ lake test                       # runs `tdcsg-orbit --selftest`
 - `--format lines` prints tab-separated records: `param`, `gen`, `conj`, `stat`, `threshold`,
   `result`.
 
+## The group as a permutation group
+
+`group`, `gap`, `walk` and `arrangement` compute GG_n(r) itself, as permutations of orbits of
+*generic* points. The full argument is in the docstrings of `Group.lean` and `Perm.lean`; in short:
+
+1. **Generic points.** A point `w / p` with `p` a prime not dividing `n` (or `w / (pD)` with `p ∤ D`)
+   and `w ∉ pℤ[ζ_n]` is fixed by no non-trivial motion `z ↦ ζ^j z + t`, `t ∈ ℤ[ζ_n]`; neither is any
+   point of its orbit. An orbit is used only if none of its points lies on a boundary circle
+   (decided exactly).
+2. **Faithfulness.** The elements of a finite GG_n(r) are motions on the *atoms* (the components of
+   the complement of all discontinuity arcs), and the group permutes the atoms. An element fixing a
+   generic point is the identity on its atom. So if the samples meet every orbit of atoms, the action
+   on their orbits is faithful for the group of these maps up to the arcs (null sets). Every
+   computed order is in any case a lower bound for |GG_n(r)|.
+3. **Order.** Equivalent constituents (an explicit commuting bijection) are dropped. A constituent of
+   degree d ≥ 9 with an element having a cycle of prime length p, d/2 < p ≤ d − 3, contains the
+   alternating group (Jordan). If every such constituent also has a *kernel witness* (an element
+   trivial on the other constituents, after a power, and non-trivial on it), then
+   |G| = |Q| · ∏ d!/2, where Q is the image of G on the remaining constituents together with the
+   signs on the alternating ones, computed by deterministic Schreier–Sims. The result says
+   `certified` only when every step succeeded.
+4. **Sampling.** Every orbit of atoms contains an atom adjacent to a boundary circle along an arc.
+   *Rim-vertex sampling* (`--fix`) places one sample at depth δ (default 10⁻¹¹) on each side of
+   `∂D_L` and `∂D_R` between consecutive crossing points of the circles of radius r about the
+   *centres* `ζ^{-j}(∓1 − t)` of the germs `z ↦ ζ^j z + t` seen so far, and repeats until no new
+   crossing point appears. At the fixpoint each gap is one atom on each side, so every orbit of
+   atoms is sampled, provided δ is smaller than the atoms' thickness at the sampled points.
+5. **Events.** The arrangement of arcs changes only where two circles about centres become tangent
+   or three pass through one point; one of them may be taken to be `∂D_L` or `∂D_R`. `arrangement`
+   and `walk` list these candidate radii exactly (elements of ℚ(ζ_n)⁺, with the vertex in ℚ(ζ_n));
+   the group can change only at them.
+
+Faithfulness up to null sets is all that is claimed: elements that differ only on boundary arcs are
+not separated. The sampling step is a computation, not a proof: its two assumptions (complete
+crossing points at the fixpoint, depth below the atoms' thickness) are checked only in the sense
+that the result does not change under refinement.
+
+### Commands
+
+```sh
+tdcsg-orbit group -n 7 --r2 ra+1e-9 --grid 11 --center necklace --fix     # the group at one radius
+tdcsg-orbit walk -n 5 --lo ra --hi closed --grid 11 --center necklace      # events and orders
+tdcsg-orbit arrangement -n 5 --r2 1.4 --lo 1.01 --hi ra+1e-3 --grid 23     # candidate events
+tdcsg-orbit events -n 5 --lens-B 2 --lo 1 --upto closed --cap 100000      # merged lattice thresholds
+tdcsg-orbit scan -n 33 --r2 touch --terms 4 --cap 3000000                  # many starting points
+```
+
+- Samples: `--grid P` (the points (α + βζ)/P in the disks), `--center P;Q;…` with `--center-p`,
+  `--center-k` (clouds around points of ℚ(ζ_n): `P`, `P/Q` or `necklace`, the triple point
+  (1 − ζ)/(1 + ζ) at r_A, with their mirror images), `--lens-B`, `--cloud-p`, `--cloud-k` (clouds
+  around the lens lattice family), `--rim K` (uniform rim samples), `--fix` (rim-vertex fixpoint;
+  `--fix-delta`, `--fix-p`, `--fix-iter`).
+- Limits: `--orbit-cap` (per orbit, default 2·10⁵), `--total-cap` (all orbits, default 5·10⁶;
+  memory grows with it, measured at up to about 0.8 kB per stored point including the permutation
+  and hash tables, so 5·10⁶ points need about 4 GB), `--tries`.
+- `ra` names r_A² = sec²(π/n) in every `SPEC`.
+- `walk` prints, per candidate event t: the group just above t (`+ --eps`), whether it changed, the
+  group at a rational inside the interval up to the next candidate (`consistent` or
+  `INCONSISTENT`), the fixpoint status, and the next candidate with its vertex.
+- `events` merges the exact thresholds of the origin and of the lattice points (1 − ζ)x,
+  x ∈ [−B, B]^φ(n), in the lens, and reports up to which value the merged list is complete.
+- `scan` computes the orbits of all signed sums of at most K roots of unity in the lens (one per
+  symmetry class), or of clouds of generic points near given points (`--near P;xy:x,y;… --scale M
+  --spread k`), skipping points already seen, and prints the size histogram and the largest orbits.
+
 ## Tests
 
-`lake test` (or `tdcsg-orbit --selftest`) runs about 4,500 checks in a few seconds: ring identities
+`lake test` (or `tdcsg-orbit --selftest`) runs about 4,540 checks in a few seconds: ring identities
 (commutativity, associativity, distributivity, ζ^n = 1, Σζ^k = 0, conjugation and σ_kσ_l = σ_{kl},
 multiplicativity of |·|², real-basis round trips) for 20 values of n up to 100; π, cos 72°, cos 45°
 enclosures; the certified table error; exact signs of ±(√2 − 1)^k, k ≤ 80; membership of points
@@ -118,7 +192,13 @@ orbits for n ∈ {3, 4, 6} at r ∈ {1, 3/2, 2, 5/2, 3, g} from three starting p
 3 + φ and the cap at 3 + φ for n = 5; 2n − 1 points just below g; agreement of the serial and
 parallel searches and of the sweep with direct searches; widening and loud overflow of the
 storage; and the exact results below (n ≡ 4 mod 8 counts and r₁, n = 33 at g, rows of the
-preliminary table).
+preliminary table). For the group computations: Schreier–Sims on S_8, A_9, the Frobenius group of
+order 21, M_11, M_12 and against brute-force closure for 24 random groups; the structural order
+against Schreier–Sims on the same constituents; |GG_n(r)| = n²(2n − 1)!/2 below r_A for n = 5, 7, 8
+(grid and rim-vertex sampling); the orders just above r_A for n = 5, 7, 8; the triple point on the
+three circles at r_A; the circumradius of −1, 1, a(1) equal to r_A and r_A² among the event
+candidates; scaled orbits and sweeps equal to unscaled ones; rationals strictly between
+thresholds.
 
 ## Performance
 
@@ -251,6 +331,15 @@ r² = g² + 7.936·10⁻⁵ and an orbit of at least 8·10⁷ at r² = g² + 7.9
 table's r_c(33) is a true critical radius, remains open; the exact data now show that very large
 orbits appear within about 4·10⁻⁵ of g for n = 33, from points other than the origin.
 
+### (iv) Group computations and deep sweeps
+
+- The order of GG_n(r) across (r_A, r_c), its change at r_A and at g(5), and the events found by
+  `walk`: [`gap-structure.md`](gap-structure.md).
+- Threshold sequences to 10⁸ points for n = 7 (origin), 9, 11, 13 (origin and generic seeds), with
+  conjugate spreads and the unit analysis: [`rank-conjecture.md`](rank-conjecture.md).
+- Scans of about 8 000 starting points for n = 33 at and just above g, and the comparison with
+  n = 31, 35, 40, 41, 80, 81: [`large-n-table.md`](large-n-table.md).
+
 ### Agreement with the preliminary numbers
 
 Every preliminary orbit count that was re-checked agrees exactly: the §3.2 table of
@@ -261,9 +350,10 @@ one statement corrected is the remark in E1c that the orbit at r₁ jumps past 6
 
 ## Possible next steps
 
-1. Deep sweeps for n = 7, 9, 11, 13 to 2–5·10⁸ points (the rank-2 and higher unit lattices).
-2. Pack the threshold heap (floats and indices in flat arrays) and store hash bits in the table, to
-   reach about 10⁹ points within 32 GB.
-3. Search the n = 33 lens systematically (all short sums of roots of unity) at r = g + 10⁻⁵ to
-   locate the smallest radius with an orbit beyond 10⁸.
+1. Pack the threshold heap (floats and indices in flat arrays) and store hash bits in the table, to
+   reach about 10⁹ points within 32 GB; one more period of the n = 7 pattern needs about 2·10⁹.
+2. A seed search at the table radius for n = 31, 35, 40, 41, to find the orbits that blow up there
+   and test the n = 33 entry with the same family of points.
+3. Speed up the group computation at larger radii (orbits of 10⁴–10⁵ points per sample), to follow
+   the events of GG_n(r) toward r_c.
 4. Prove the membership argument in Lean against Mathlib's definitions of the disks.

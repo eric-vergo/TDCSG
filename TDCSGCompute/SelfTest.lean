@@ -2,7 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo, Claude
 -/
-import TDCSGCompute.Thresholds
+import TDCSGCompute.Group
 
 /-!
 # Self-tests of the orbit engine
@@ -277,6 +277,191 @@ def testKnownResults (log : IO.Ref TestLog) : IO Unit := do
     let res ← orbit (DiskTest.make F (← parse F s!"closed-{δ}")) F.zero { cap := 1000000, conj := false }
     check log s!"n={n}, δ={δ}: {size} points ({res.size})" (res.complete && res.size == size)
 
+/-- Permutation groups, the group computation and the scaled points. -/
+def testGroups (log : IO.Ref TestLog) : IO Unit := do
+  let parse (F : CycField) (s : String) : IO RadiusSq := match parseReal F s with
+    | .ok x => pure x
+    | .error e => throw <| IO.userError e
+  -- Schreier–Sims on known groups
+  let cyc (D : Nat) (cs : List (List Nat)) : Perm := Perm.ofCycles D cs
+  let known : List (String × Nat × Array Perm × Nat) := [
+    ("S_8", 8, #[cyc 8 [[0, 1]], cyc 8 [[0, 1, 2, 3, 4, 5, 6, 7]]], 40320),
+    ("A_9", 9, #[cyc 9 [[0, 1, 2]], cyc 9 [[0, 1, 2, 3, 4, 5, 6, 7, 8]]], 181440),
+    ("Frobenius F_21", 7, #[cyc 7 [[0, 1, 2, 3, 4, 5, 6]], cyc 7 [[1, 2, 4], [3, 6, 5]]], 21),
+    ("M_11", 11, #[cyc 11 [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]], cyc 11 [[2, 6, 10, 7], [3, 9, 4, 5]]],
+      7920),
+    ("M_12", 12, #[cyc 12 [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]], cyc 12 [[2, 6, 10, 7], [3, 9, 4, 5]],
+      cyc 12 [[0, 11], [1, 10], [2, 5], [3, 7], [4, 8], [6, 9]]], 95040),
+    ("C_4 x C_6", 10, #[cyc 10 [[0, 1, 2, 3]], cyc 10 [[4, 5, 6, 7, 8, 9]]], 24),
+    ("trivial", 5, #[Perm.one 5], 1)]
+  for (name, D, gens, ord) in known do
+    check log s!"Schreier–Sims: |{name}| = {ord}" (schreierSimsOrder D gens == some ord)
+  -- Schreier–Sims against brute-force closure for pseudo-random pairs on 6 to 8 points
+  let mut rng : Rng := ⟨12345⟩
+  let mut agreeBF := true
+  for t in [0:24] do
+    let D := 6 + t % 3
+    let mut gs : Array Perm := #[]
+    for _ in [0:2] do
+      let mut p := Perm.one D
+      for i in [0:D] do
+        let (j, r') := rng.below (D - i)
+        rng := r'
+        let (x, y) := (p[i]!, p[i + j]!)
+        p := (p.set! i y).set! (i + j) x
+      gs := gs.push p
+    -- closure by breadth-first search over group elements
+    let mut seenG : Std.HashSet Perm := ({} : Std.HashSet Perm).insert (Perm.one D)
+    let mut queue : Array Perm := #[Perm.one D]
+    let mut head := 0
+    while head < queue.size do
+      let g := queue[head]!
+      head := head + 1
+      for s in gs do
+        let h := Perm.mul s g
+        if !seenG.contains h then
+          seenG := seenG.insert h
+          queue := queue.push h
+    if schreierSimsOrder D gs != some queue.size then agreeBF := false
+  check log "Schreier–Sims agrees with brute-force closure (24 groups)" agreeBF
+  -- the structural order agrees with Schreier–Sims: two independent alternating groups, a
+  -- diagonal copy (equivalent constituent, dropped), and a cyclic constituent
+  let a1 := cyc 9 [[0, 1, 2]]
+  let b1 := cyc 9 [[0, 1, 2, 3, 4, 5, 6, 7, 8]]
+  let a2 := cyc 10 [[0, 1]]
+  let b2 := cyc 10 [[1, 2, 3, 4, 5, 6, 7, 8, 9]]
+  let relabel (p : Perm) : Perm := (Array.range 9).map fun x ↦ (p[(x + 4) % 9]! + 5) % 9
+  let cs := #[Constituent.make #[a1, b1], Constituent.make #[a2.map id, b2],
+    Constituent.make #[relabel a1, relabel b1],
+    Constituent.make #[cyc 4 [[0, 1, 2, 3]], Perm.one 4]]
+  check log "relabelled copy is equivalent" (cs[0]!.equivalent cs[2]!)
+  check log "different actions are not equivalent" (!cs[0]!.equivalent cs[1]!)
+  let R := structuralOrder cs
+  check log s!"structural order of A_9 × (S_10 ⊗ C_4) ({R.order})"
+    (R.certified && R.duplicates == 1 && R.order == some (181440 * 3628800 * 2))
+  -- the group below r_A: n² (2n - 1)! / 2, for n = 5, 7, 8
+  for (n, r) in [(5, "1.02"), (7, "1.02"), (8, "1.06")] do
+    let F := CycField.make n
+    let r2 := RealQ.ofRat F ((parseRat r).get! ^ 2)
+    let rep ← groupOn F r2 (gridSamples F 23 1.2) {}
+    let expect := n * n * factorial (2 * n - 1) / 2
+    check log s!"n={n}, r={r}: |GG_n(r)| = n²(2n-1)!/2 ({rep.result.order})"
+      (rep.result.certified && rep.result.order == some expect)
+  -- just above r_A: the structural order equals Schreier–Sims on all constituents, and exceeds
+  -- n² (2n - 1)! / 2
+  for (n, expect) in [(5, 7144200000000000), (7, 72248994832675942827786240000),
+      (8, 122407445020162057231033958400000)] do
+    let F := CycField.make n
+    let r2 ← parse F "ra+1e-6"
+    let (u, D) ← match parsePointQ F "necklace" with
+      | .ok x => pure x
+      | .error e => throw <| IO.userError e
+    let samples := gridSamples F 11 1.6 ++ cloudAround F 100000007 2 u D ++
+      cloudAround F 100000007 2 (F.conj u) D
+    let rep ← groupOn F r2 samples {}
+    check log s!"n={n}, r² = r_A² + 1e-6: order {expect} ({rep.result.order})"
+      (rep.result.certified && rep.result.order == some expect)
+    -- direct Schreier–Sims on the same constituents
+    let mut tests : Std.HashMap Nat DiskTest := {}
+    let mut S : ConstituentSet := {}
+    for (M, w) in samples do
+      let T := match tests[M]? with
+        | some T => T
+        | none => DiskTest.makeScaled F r2 M
+      tests := tests.insert M T
+      let o ← actionOrbit T M w 100000
+      if o.complete && o.generic && o.pts.size > 1 then
+        S := (S.insert (Constituent.make #[o.a, o.b])).1
+    let offs := S.items.foldl (fun a C ↦ a.push (a.back! + C.deg)) #[0]
+    let gens := (Array.range 2).map fun k ↦ Id.run do
+      let mut p : Perm := #[]
+      for i in [0:S.items.size] do
+        for x in S.items[i]!.gens[k]! do
+          p := p.push (x + offs[i]!)
+      return p
+    check log s!"n={n}: structural order = Schreier–Sims order"
+      (schreierSimsOrder offs.back! gens == some expect)
+  -- points with denominators: the triple point lies on the three circles at r = r_A
+  for n in [5, 7, 8, 12] do
+    let F := CycField.make n
+    let ra ← parse F "ra"
+    match parsePointQ F "necklace" with
+    | .ok (u, D) =>
+      let T := DiskTest.makeScaled F ra D
+      check log s!"n={n}: the triple point is on both circles at r_A"
+        (T.decide u (D : Int) == .boundary && T.decide u (-(D : Int)) == .boundary)
+      let aOne := F.addInt (F.smul 2 (F.zetaPow (-1))) (-1)
+      let w := F.sub u (F.smul D aOne)
+      check log s!"n={n}: the triple point is at distance r_A from a(1)"
+        (F.normSq w == F.smul (D * D) ra.num || F.smul ra.den (F.normSq w) == F.smul (D * D) ra.num)
+    | .error e => check log e false
+    let x := pseudoElem F 5 9
+    match F.normAdj x with
+    | some (adj, N) => check log s!"n={n}: x · adj x = N(x)" (F.mul x adj == F.ofInt N)
+    | none => check log s!"n={n}: normAdj" false
+  -- scaled orbits and sweeps agree with integral ones
+  for n in [5, 8, 12] do
+    let F := CycField.make n
+    let r2 ← parse F "touch+1/100"
+    let o1 ← orbit (DiskTest.make F r2) F.zero { cap := 100000, conj := false }
+    let o7 ← orbit (DiskTest.makeScaled F r2 7) F.zero { cap := 100000, conj := false, scale := 7 }
+    let zb := F.addInt (F.neg (F.zetaPow (-1))) 1
+    let p1 ← orbit (DiskTest.make F r2) zb { cap := 100000, conj := false }
+    let p7 ← orbit (DiskTest.makeScaled F r2 7) (F.smul 7 zb)
+      { cap := 100000, conj := false, scale := 7 }
+    check log s!"n={n}: scaled orbits have the same sizes ({o1.size}, {p1.size})"
+      (o1.size == o7.size && p1.size == p7.size && o1.complete)
+    let s1 ← sweep F F.zero { cap := 5000 }
+    let s7 ← sweep F F.zero { cap := 5000, scale := 7 }
+    check log s!"n={n}: scaled sweep has the same thresholds"
+      (s1.thresholds.size == s7.thresholds.size && s1.thresholds.size > 3 &&
+        (s1.thresholds.zip s7.thresholds).all fun (x, y) ↦
+          F.smul 49 x.value == y.value && y.den == 49 && x.size == y.size)
+  -- the circumradius of -1, 1, a(1) is r_A = sec (π/n), and r_A² is an event candidate
+  for n in [5, 7, 8, 12] do
+    let F := CycField.make n
+    let ra ← parse F "ra"
+    let aOne := F.addInt (F.smul 2 (F.zetaPow (-1))) (-1)
+    let okCirc := match circumcircle F (F.ofInt (-1)) (F.ofInt 1) aOne with
+      | some (_, _, rr) => RealQ.compare F rr ra == some .eq
+      | none => false
+    check log s!"n={n}: circumradius² of -1, 1, a(1) = r_A²" okCirc
+    let st0 := GroupState.init F (← parse F "ra-1/100") {} (track := true)
+    let st ← st0.add (gridSamples F 11 1.3)
+    let cs := (st.centres.toArray.push (F.ofInt 1)).push (F.ofInt (-1))
+    let cands ← eventCandidatesOfCentres F cs
+      (← parse F "1") (← parse F "ra+1/1000")
+    check log s!"n={n}: r_A² is among the event candidates below r_A + 1e-3"
+      (cands.any fun c ↦ RealQ.compare F c.r2 ra == some .eq)
+  -- rim-vertex sampling: n² (2n - 1)! / 2 just below r_A, and the regression values just above
+  for (n, below, above) in [(5, 4536000, "1.7029510e2"), (7, 152562009600, "5.8370846e2"),
+      (8, 41845579776000, "2.2174292e2")] do
+    let F := CycField.make n
+    let (u, D) ← match parsePointQ F "necklace" with
+      | .ok x => pure x
+      | .error e => throw <| IO.userError e
+    let smp := gridSamples F 11 1.6 ++ cloudAround F 100000007 2 u D ++
+      cloudAround F 100000007 2 (F.conj u) D ++ cloudAround F 100000007 2 (F.neg u) D
+    let (r1, _, c1, _) ← groupFixpoint F (← parse F "ra-1e-6") smp {} 1e-11 10000000000037
+    check log s!"n={n}: rim-vertex fixpoint below r_A gives n²(2n-1)!/2 ({r1.result.order})"
+      (c1 && r1.result.order == some below)
+    let (r2, _, c2, _) ← groupFixpoint F (← parse F "ra+1e-6") smp {} 1e-11 10000000000037
+    let lg := (r2.result.log10Order.map (fmtFloat · 8)).getD "-"
+    check log s!"n={n}: rim-vertex fixpoint above r_A, log10 |G| = {above} ({lg})"
+      (c2 && r2.result.certified && lg == above)
+  -- a rational strictly between two thresholds
+  let F5 := CycField.make 5
+  let sw ← sweep F5 F5.zero { cap := 2000 }
+  let mut okBetween := true
+  for i in [1:min 30 sw.thresholds.size] do
+    let x := RealQ.ofElem sw.thresholds[i - 1]!.value
+    let y := RealQ.ofElem sw.thresholds[i]!.value
+    match rationalBetween F5 x y with
+    | some q => if !(RealQ.compare F5 x (RealQ.ofRat F5 q) == some .lt &&
+        RealQ.compare F5 (RealQ.ofRat F5 q) y == some .lt) then okBetween := false
+    | none => okBetween := false
+  check log "rationals strictly between consecutive thresholds" okBetween
+
 /-- Run all self-tests; returns the process exit code. -/
 def runSelfTests : IO UInt32 := do
   let log ← IO.mkRef ({} : TestLog)
@@ -285,6 +470,7 @@ def runSelfTests : IO UInt32 := do
   testMembership log
   testOrbits log
   testKnownResults log
+  testGroups log
   let l ← log.get
   let t1 ← IO.monoMsNow
   IO.println s!"self-test: {l.passed} passed, {l.failed.size} failed ({t1 - t0} ms)"

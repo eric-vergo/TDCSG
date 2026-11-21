@@ -15,6 +15,10 @@ its disk. Since each generator maps its disk to itself, `a⁻¹` and `b⁻¹` ar
 tests. The orbit of a starting point is explored breadth first, with the frontier stored implicitly
 as a range of insertion indices of the `PointSet`.
 
+With `scale = M > 1` the points are `z = w / M`, stored as `w ∈ ℤ[ζ_n]`: the generators become
+`a w = ζ⁻¹ (w + M) - M` and so on, and membership uses the scaled disks of `TDCSGCompute.Disk`
+(`DiskTest.makeScaled`). This reaches points of `ℚ(ζ_n)` with denominator `M`.
+
 The search stops either when no new point appears (the orbit is finite and its exact size is
 reported) or when the number of points reaches the cap (reported as "cap reached"; nothing is
 claimed about finiteness).
@@ -98,6 +102,8 @@ structure OrbitOptions where
   threads : Nat := 1
   /-- Initial bytes per stored coefficient. -/
   width : Nat := 2
+  /-- Denominator `M` of the points (the disk test must be built with `DiskTest.makeScaled`). -/
+  scale : Nat := 1
 
 /-- Result of an orbit search. -/
 structure OrbitResult where
@@ -126,15 +132,18 @@ structure OrbitResult where
     if v > m[i]! then m := m.set! i v
   return m
 
-/-- The images of `z` under the generators that move it, with the two disk decisions. -/
-@[inline] def expandPoint (T : DiskTest) (z : Elem) : Decision × Decision × Array Elem :=
+/-- The images of `z` (a point `z / M`, `M = scale`) under the generators that move it, with the
+two disk decisions. -/
+@[inline] def expandPoint (T : DiskTest) (z : Elem) (scale : Nat := 1) :
+    Decision × Decision × Array Elem :=
   let F := T.F
+  let m : Int := scale
   let fd := filterData F z
-  let dl := T.decideWith fd z 1
-  let dr := T.decideWith fd z (-1)
+  let dl := T.decideWith fd z m
+  let dr := T.decideWith fd z (-m)
   let imgs : Array Elem := Array.emptyWithCapacity 4
-  let imgs := if dl.inside then (imgs.push (F.genA z)).push (F.genAInv z) else imgs
-  let imgs := if dr.inside then (imgs.push (F.genB z)).push (F.genBInv z) else imgs
+  let imgs := if dl.inside then (imgs.push (F.rotCW z m)).push (F.rotCCW z m) else imgs
+  let imgs := if dr.inside then (imgs.push (F.rotCW z (-m))).push (F.rotCCW z (-m)) else imgs
   (dl, dr, imgs)
 
 /-- Serial breadth-first search of the orbit of `start` at the squared radius of `T`. -/
@@ -154,7 +163,7 @@ def orbitSerial (T : DiskTest) (start : Elem) (opts : OrbitOptions) : IO OrbitRe
   while head < set.size && !capped do
     let z := set.get head
     if opts.conj then mx := updateConj F ks mx z
-    let (dl, dr, imgs) := expandPoint T z
+    let (dl, dr, imgs) := expandPoint T z opts.scale
     if dl == .failure || dr == .failure then
       throw <| IO.userError s!"membership could not be certified for {z}"
     stats := (stats.record dl).record dr
@@ -187,8 +196,8 @@ structure SliceResult where
   failure : Option Elem
 
 /-- Expand the frontier points `pts[lo:hi]`. -/
-def expandSlice (T : DiskTest) (pts : Array Elem) (ks : Array Nat) (conj : Bool) (lo hi : Nat) :
-    SliceResult := Id.run do
+def expandSlice (T : DiskTest) (pts : Array Elem) (ks : Array Nat) (conj : Bool) (lo hi : Nat)
+    (scale : Nat := 1) : SliceResult := Id.run do
   let F := T.F
   let mut cands : Array Elem := #[]
   let mut stats : DecisionStats := {}
@@ -196,7 +205,7 @@ def expandSlice (T : DiskTest) (pts : Array Elem) (ks : Array Nat) (conj : Bool)
   for i in [lo:hi] do
     let z := pts[i]!
     if conj then mx := updateConj F ks mx z
-    let (dl, dr, imgs) := expandPoint T z
+    let (dl, dr, imgs) := expandPoint T z scale
     if dl == .failure || dr == .failure then
       return { candidates := cands, stats, maxConj := mx, failure := some z }
     stats := (stats.record dl).record dr
@@ -225,12 +234,13 @@ def orbitParallel (T : DiskTest) (start : Elem) (opts : OrbitOptions) : IO Orbit
     let chunk := (len + nt - 1) / nt
     let results : Array SliceResult ← do
       if nt == 1 then
-        pure #[expandSlice T ((Array.range len).map fun i ↦ set.get (lo + i)) ks opts.conj 0 len]
+        pure #[expandSlice T ((Array.range len).map fun i ↦ set.get (lo + i)) ks opts.conj 0 len
+          opts.scale]
       else
         let pts := (Array.range len).map fun i ↦ set.get (lo + i)
         let tasks := (Array.range nt).map fun t ↦
           Task.spawn fun _ ↦
-            expandSlice T pts ks opts.conj (t * chunk) (min len ((t + 1) * chunk))
+            expandSlice T pts ks opts.conj (t * chunk) (min len ((t + 1) * chunk)) opts.scale
         pure (tasks.map Task.get)
     for r in results do
       if let some z := r.failure then

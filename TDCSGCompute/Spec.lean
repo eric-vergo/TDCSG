@@ -15,6 +15,7 @@ Squared radii and other real elements of `ℚ(ζ_n)⁺` are written as a base, o
   `40 - 22√3`;
 * `r1`: the second threshold `25 - 20 cos θ - 16 cos 2θ + 16 cos 3θ - 4 cos 4θ` (`θ = 2π/n`) of the
   `n ≡ 4 (mod 8)` family;
+* `ra`: the analytic radius `r_A² = sec² (π/n) = 4 / (2 + 2 cos (2π/n))`;
 * `fund`: the fundamental unit `φ`, `1 + √2`, `φ`, `2 + √3` of `ℚ(ζ_n)⁺` for `n = 5, 8, 10, 12`;
 * `re:b0,b1,…`: `b0 + ∑_{k ≥ 1} b_k (ζ ^ k + ζ ^ (-k))` with rational `b_k`;
 * `pow:c0,c1,…`: `∑ c_i ζ ^ i` with rational `c_i` (it must be real);
@@ -108,6 +109,13 @@ def namedReal (F : CycField) (name : String) : Except String RealQ :=
     | 12 => .ok (.ofElem (realOf F [40, -22]))    -- 40 - 22√3, √3 = ζ + ζ⁻¹
     | _ => .error s!"no closed form of r_c² is known for n = {n}"
   | "r1" => .ok (.ofElem (realOf F [25, -10, -8, 8, -2]))
+  | "ra" =>
+    -- r_A² = sec² (π/n) = 4 / (2 + θ_1)
+    match F.normAdj (realOf F [2, 1]) with
+    | some (adj, N) =>
+      let num := F.smul (if N < 0 then -4 else 4) adj
+      .ok (RealQ.normalize { num, den := N.natAbs })
+    | none => .error "norm computation failed"
   | "fund" =>
     match n with
     | 5 => .ok (.ofElem (realOf F [0, 0, -1]))    -- φ = -(ζ² + ζ³)
@@ -138,7 +146,7 @@ def parseReal (F : CycField) (spec : String) : Except String RealQ := do
     let num := F.reducePoly c
     if !F.isReal num then throw "the element is not real"
     return RealQ.normalize { num, den }
-  for name in ["touch", "closed", "r1", "fund"] do
+  for name in ["touch", "closed", "r1", "fund", "ra"] do
     if spec.startsWith name then
       let base ← namedReal F name
       let rest := (spec.drop name.length).toString
@@ -178,6 +186,28 @@ def parsePoint (F : CycField) (spec : String) : Except String Elem := do
       | none => Except.error s!"cannot parse the integer {t}"
     return F.reducePoly cs
   throw s!"cannot parse the point {spec}"
+
+/-- Parse a point of `ℚ(ζ_n)`: an integral point `P` (see `parsePoint`), `P/Q` with integral
+points `P`, `Q ≠ 0`, or `necklace` (the triple point `(1 - ζ) / (1 + ζ) = -i tan (π/n)` of the
+disks about `-1`, `1` and `a(1)` at `r = sec (π/n)`). Returns `(u, D)` with the point `u / D`,
+`D ≥ 1`. -/
+def parsePointQ (F : CycField) (spec : String) : Except String (Elem × Nat) := do
+  let spec := spec.trimAscii.toString
+  let spec := if spec == "necklace" then "pow:1,-1/pow:1,1" else spec
+  match spec.splitOn "/" with
+  | [p] => return (← parsePoint F p, 1)
+  | [p, q] =>
+    let u ← parsePoint F p
+    let v ← parsePoint F q
+    if F.isZero v then throw "division by zero"
+    match F.normAdj v with
+    | none => throw "norm computation failed"
+    | some (adj, N) =>
+      let num := F.mul u adj
+      let num := if N < 0 then F.neg num else num
+      let g := num.foldl (fun g c ↦ Nat.gcd g c.natAbs) N.natAbs
+      return (num.map (· / (g : Int)), N.natAbs / g)
+  | _ => throw s!"cannot parse the point {spec}"
 
 /-- The real element `x` in the basis `1, θ_1, …` as text, with a readable form for the quadratic
 real subfields (`n = 5, 8, 10, 12`). -/
