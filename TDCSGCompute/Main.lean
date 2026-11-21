@@ -22,6 +22,9 @@ tdcsg-orbit scan -n N (--r2 SPEC | --r Q) [--terms K] [--cap C] [--top T] [--tot
 tdcsg-orbit walk -n N --lo SPEC --hi SPEC [sampling options] [--eps Q] [--max-steps K]
 tdcsg-orbit arrangement -n N (--r2 SPEC | --r Q) --lo SPEC --hi SPEC [sampling options]
                        [--confirm --eps Q]
+tdcsg-orbit certify -n N (--r2 SPEC | --r Q) [--out FILE] [--max-pieces P] [--max-circles C]
+                       [--max-seconds S] [--progress K]
+tdcsg-orbit check-certificate FILE
 tdcsg-orbit info -n N
 tdcsg-orbit --selftest
 ```
@@ -107,6 +110,9 @@ def usage : String :=
   "                    [--total-cap T] [--near P --scale M --spread k]\n" ++
   "  tdcsg-orbit walk -n N --lo SPEC --hi SPEC [sampling options] [--eps Q]\n" ++
   "  tdcsg-orbit arrangement -n N --r2 SPEC --lo SPEC --hi SPEC [sampling options]\n" ++
+  "  tdcsg-orbit certify -n N --r2 SPEC [--out FILE] [--max-pieces P] [--max-circles C]\n" ++
+  "                    [--max-seconds S] [--progress K]\n" ++
+  "  tdcsg-orbit check-certificate FILE\n" ++
   "  tdcsg-orbit info -n N\n" ++
   "  tdcsg-orbit --selftest\n" ++
   "SPEC: touch | closed | r1 | fund, optionally followed by +q or -q; re:b0,b1,...;\n" ++
@@ -610,6 +616,62 @@ def cmdWalk (a : Args) : IO Unit := do
     if kind == "hi" then break
     cur := next
 
+/-- The `certify` command: compute the cut set and write the certificate. -/
+def cmdCertify (a : Args) : IO UInt32 := do
+  let F ← getField a
+  let spec := (a.get? "--r2").getD ""
+  let r2 ← orThrow (parseRadiusSq F (a.get? "--r2") (a.get? "--r"))
+  if !F.isReal r2.num then throw <| IO.userError "the squared radius is not real"
+  let opts : CloseOptions :=
+    { maxPieces := ← a.nat "--max-pieces" 10000000, maxCircles := ← a.nat "--max-circles" 5000000,
+      maxSeconds := ← a.nat "--max-seconds" 0, progress := ← a.nat "--progress" 0 }
+  let r2s := showReal F r2
+  let r2v := F.realToSci r2.num r2.den 17
+  let specS := if spec.isEmpty then "" else s!" ({spec})"
+  let comment := #[s!"n = {F.n}, r² = {r2s} ≈ {r2v}{specS}",
+    "arcs run counterclockwise; symbol (e, ±) on the circle about c is the intersection point",
+    "c + (d/2)(1 ± i h), d = e - c, h = sqrt(4 r²/|d|² - 1); coefficients in 1, ζ, …, ζ^(φ(n)-1)"]
+  IO.println s!"certify: n = {F.n}, r² = {r2s} ≈ {r2v}"
+  let o ← certify F r2 opts comment
+  let res := o.result
+  let st := res.stats
+  IO.println s!"pieces {st.pieces}, image arcs {st.images}, circles {res.store.size}"
+  IO.println s!"decisions made exactly: {st.exactHalves} halves, {st.exactCross} orders; \
+    {st.coincidences} equalities of points with different symbols"
+  IO.println s!"time {fmtFloat (res.millis.toFloat / 1000) 4} s"
+  if let some S := o.summary then
+    IO.println s!"circles {S.circles} (full {S.fullCircles}), maximal arcs {S.arcs}"
+    IO.println s!"(C4) endpoints on boundary circles {S.c4Endpoints}, failures {S.c4Failures}"
+    let cs := S.maxConj.toList.map fun (k, m) ↦ s!"σ_{k}: {fmtFloat m 5}"
+    IO.println s!"max |σ_k(c)| over centres: {cs}"
+  match o.text with
+  | some text =>
+    match a.get? "--out" with
+    | some path =>
+      IO.FS.writeFile path text
+      IO.println s!"certificate written to {path} ({text.utf8ByteSize} bytes)"
+    | none => pure ()
+    IO.println "result CERTIFIED (generator); check with `check-certificate`"
+    return 0
+  | none =>
+    IO.println s!"result NOT CERTIFIED: {o.reason}"
+    return 3
+
+/-- The `check-certificate` command. -/
+def cmdCheck (a : Args) : IO UInt32 := do
+  let some (path : String) := a.pos[1]? | throw <| IO.userError "usage: check-certificate FILE"
+  let t0 ← IO.monoNanosNow
+  let text ← IO.FS.readFile path
+  match parseCertificate text >>= checkCertificate with
+  | .ok rep =>
+    IO.println s!"certificate VALID: circles {rep.circles} (full {rep.fullCircles}), \
+      maximal arcs {rep.arcs}, (C2) image arcs {rep.c2Images}, (C4) endpoints {rep.c4Endpoints}"
+    IO.println s!"time {fmtFloat (← secondsSince t0) 4} s"
+    return 0
+  | .error e =>
+    IO.println s!"certificate REJECTED: {e}"
+    return 2
+
 /-- The `info` command. -/
 def cmdInfo (a : Args) : IO Unit := do
   let F ← getField a
@@ -637,6 +699,8 @@ def main (argv : List String) : IO UInt32 := do
     | some "scan" => cmdScan a
     | some "arrangement" => cmdArrangement a
     | some "walk" => cmdWalk a
+    | some "certify" => return (← cmdCertify a)
+    | some "check-certificate" => return (← cmdCheck a)
     | _ => IO.print usage
     return 0
   catch e =>

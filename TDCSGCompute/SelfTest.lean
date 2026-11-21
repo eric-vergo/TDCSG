@@ -3,6 +3,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo, Claude
 -/
 import TDCSGCompute.Group
+import TDCSGCompute.Closure
+import TDCSGCompute.CertCheck
 
 /-!
 # Self-tests of the orbit engine
@@ -462,6 +464,203 @@ def testGroups (log : IO.Ref TestLog) : IO Unit := do
     | none => okBetween := false
   check log "rationals strictly between consecutive thresholds" okBetween
 
+/-- A squared radius from a `SPEC` string. -/
+def specRadius (F : CycField) (s : String) : IO RadiusSq :=
+  match parseReal F s with
+  | .ok x => pure x
+  | .error e => throw <| IO.userError e
+
+/-- The angle in `[0, 2π)` of the point named by `s` on the circle of radius `√ρ` about `c`,
+computed in floating point (an independent numerical reference for the tests). -/
+def floatAngle (F : CycField) (rho : Float) (c : Elem) (s : Sym) : Float :=
+  let (dx, dy) := F.evalConjF 1 (F.sub s.e c)
+  let N := dx * dx + dy * dy
+  let h := Float.sqrt (4 * rho / N - 1)
+  let sg : Float := if s.plus then 1 else -1
+  let x := (dx - sg * h * dy) / 2
+  let y := (dy + sg * h * dx) / 2
+  let t := Float.atan2 y x
+  if t < 0 then t + 2 * 3.141592653589793 else t
+
+/-- The lines of a certificate with one line replaced (`none`: deleted). -/
+def editLine (text : String) (i : Nat) (new : Option String) : String :=
+  let ls := (text.splitOn "\n").toArray
+  let ls := match new with
+    | some l => ls.set! i l
+    | none => ls.eraseIdxIfInBounds i
+  "\n".intercalate ls.toList
+
+/-- Whether the checker rejects a certificate text; also returns its message. -/
+def rejects (text : String) : Bool × String :=
+  match parseCertificate text >>= checkCertificate with
+  | .ok _ => (false, "accepted")
+  | .error e => (true, e)
+
+/-- The certificate generator (`TDCSGCompute.Closure`), its exact layer, and the independent
+checker (`TDCSGCompute.CertCheck`). -/
+def testCertificates (log : IO.Ref TestLog) : IO Unit := do
+  -- towers: exact zeros and agreement with floating-point values
+  let F8 := CycField.make 8
+  let S8 := RealSign.make F8
+  check log "tower: √2 √2 - 2 = 0"
+    (Tower.sign S8 #[F8.ofInt 2, F8.ofInt 2] #[F8.ofInt (-2), F8.zero, F8.zero, F8.one] == some 0)
+  check log "tower: √4 - 2 = 0" (Tower.sign S8 #[F8.ofInt 4] #[F8.ofInt (-2), F8.one] == some 0)
+  for n in [3, 4, 5, 6, 7, 8, 10, 12] do
+    let F := CycField.make n
+    let S := RealSign.make F
+    let val (x : Elem) : Float := (F.evalConjF 1 x).1
+    let mut agreeReal := true
+    let mut agreeTower := true
+    let mut decided := 0
+    for seed in [0:200] do
+      let x := F.sub (F.normSq (pseudoElem F seed 6)) (F.normSq (pseudoElem F (seed + 999) 6))
+      if S.sign x != F.signReal x then agreeReal := false
+      -- a tower element over two positive radicands
+      let r1 := F.addInt (F.normSq (pseudoElem F (seed + 7) 3)) 1
+      let r2 := F.addInt (F.normSq (pseudoElem F (seed + 8) 3)) 1
+      let cs := (Array.range 4).map fun j ↦
+        F.sub (F.normSq (pseudoElem F (seed * 4 + j + 50) 3))
+          (F.normSq (pseudoElem F (seed * 4 + j + 90) 3))
+      let v := val cs[0]! + val cs[1]! * (val r1).sqrt + val cs[2]! * (val r2).sqrt +
+        val cs[3]! * (val r1 * val r2).sqrt
+      if v.abs > 1e-6 then
+        decided := decided + 1
+        if Tower.sign S #[r1, r2] cs != some (if v > 0 then 1 else -1) then agreeTower := false
+    check log s!"n={n}: integer sign test agrees with signReal" agreeReal
+    check log s!"n={n}: tower signs agree with floating point ({decided})"
+      (agreeTower && decided > 100)
+  -- the order of points on a circle: filter, exact comparison and float angles agree
+  for (n, spec) in [(5, "closed-1/10"), (8, "closed-1/7"), (12, "closed-1/20"), (7, "2.3")] do
+    let F := CycField.make n
+    let r2 ← specRadius F spec
+    let C := CircleCtx.make F r2
+    let G : Gen := { FC := FilterCtx.make C, stats := ← IO.mkRef {} }
+    let rho := (F.evalConjF 1 r2.num).1 / r2.den.toFloat
+    let mut ok := true
+    let mut pairs := 0
+    for seed in [0:40] do
+      let c := pseudoElem F (seed + 300) 4
+      let mut pts : Array (Sym × GPt × CircleCtx.ExactPt) := #[]
+      for j in [0:30] do
+        let s : Sym := ⟨F.add c (pseudoElem F (seed * 100 + j) 2), j % 2 == 0⟩
+        if (C.validSym c s).toOption.isSome then
+          let gp ← G.mkPt c s
+          match C.exactPt c s with
+          | .ok ep => pts := pts.push (s, gp, ep)
+          | .error _ => ok := false
+      for i in [0:pts.size] do
+        for j in [0:pts.size] do
+          let (si, gi, ei) := pts[i]!
+          let (sj, gj, ej) := pts[j]!
+          let o ← G.cmp c gi gj
+          match C.cmpExact ei ej, C.cmpExact ej ei with
+          | .ok o1, .ok o2 =>
+            pairs := pairs + 1
+            if o != o1 || o2 != o1.swap then ok := false
+            let ai := floatAngle F rho c si
+            let aj := floatAngle F rho c sj
+            if (ai - aj).abs > 1e-9 && o1 != (if ai < aj then .lt else .gt) then ok := false
+            if si == sj && o1 != .eq then ok := false
+          | _, _ => ok := false
+    check log s!"n={n}: filtered, exact and float orders of circle points agree ({pairs} pairs)"
+      (ok && pairs > 1000)
+  -- known finite cases: n = 3, 4, 6 at several radii
+  for (n, spec, circles) in [(3, "2.1", 6), (3, "3.7", 14), (3, "6.1", 16), (4, "2.1", 12),
+      (4, "3.7", 12), (4, "6.1", 26), (6, "2.1", 10), (6, "3.7", 18), (6, "6.1", 24)] do
+    let F := CycField.make n
+    let o ← certify F (← specRadius F spec) {}
+    let valid := match o.text with
+      | some t => (parseCertificate t >>= checkCertificate).toOption.isSome
+      | none => false
+    check log s!"n={n}, r² = {spec}: certified with {circles} circles, checker accepts"
+      (o.certified && valid && (o.summary.map (·.circles)) == some circles)
+  -- n = 5: rows of Table 5.1 of critical-radius-n5.md, and the radius below sec (π/5)
+  let F5 := CycField.make 5
+  let mut cert910 := ""
+  for (spec, circles, arcs, pieces, c4) in [("closed-31/10", 10, 10, 10, 16),
+      ("closed-13/5", 54, 64, 112, 60), ("closed-9/10", 466, 952, 2040, 316)] do
+    let o ← certify F5 (← specRadius F5 spec) {}
+    let rep := match o.text with
+      | some t => (parseCertificate t >>= checkCertificate).toOption
+      | none => none
+    if spec == "closed-9/10" then cert910 := o.text.getD ""
+    let S := o.summary
+    check log s!"n=5, r² = {spec}: {circles} circles, {arcs} maximal arcs, {pieces} pieces"
+      (o.certified && (S.map (·.circles)) == some circles && (S.map (·.arcs)) == some arcs &&
+        o.result.stats.pieces == pieces && (S.map (·.c4Endpoints)) == some c4)
+    check log s!"n=5, r² = {spec}: the checker accepts with the same counts"
+      ((rep.map fun r ↦ (r.circles, r.arcs, r.c4Endpoints)) == some (circles, arcs, c4))
+  -- tangencies, a radius above r_c, and r ≤ 1
+  for spec in ["closed", "closed-1"] do
+    let o ← certify F5 (← specRadius F5 spec) {}
+    let isTangent := match o.result.status with | .tangency _ _ => true | _ => false
+    check log s!"n=5, r² = {spec}: stops on an exact tangency, not certified"
+      (isTangent && !o.certified)
+  let oAbove ← certify F5 (← specRadius F5 "closed+1/10") { maxPieces := 20000 }
+  let isCap := match oAbove.result.status with | .cap _ => true | _ => false
+  check log "n=5, r² = 3 + φ + 1/10 (above r_c): cap reached, not certified"
+    (isCap && !oAbove.certified)
+  let oSmall ← certify F5 (← specRadius F5 "1/2") {}
+  check log "r² = 1/2: refused (the theorem needs r > 1)" (!oSmall.certified)
+  -- a triple point: at r = sec (π/n) the circles about -1, 1 and a(1) pass through one point
+  for n in [5, 7] do
+    let F := CycField.make n
+    let r2 ← specRadius F "ra"
+    let G : Gen := { FC := FilterCtx.make (CircleCtx.make F r2), stats := ← IO.mkRef {} }
+    let res ← closure G {}
+    let closed := match res.status with | .closed => true | _ => false
+    let S ← summarize G res.store
+    check log s!"n={n}, r = sec (π/n): closes; triple-point equalities found exactly \
+      ({res.stats.coincidences}); (C4) fails ({S.c4Failures})"
+      (closed && res.stats.coincidences > 0 && S.c4Failures > 0)
+    let forged ← certificateText G res.store S
+    let (rej, msg) := rejects forged
+    check log s!"n={n}, r = sec (π/n): the checker rejects the arcs ({msg})"
+      (rej && msg.startsWith "(C4)")
+  -- tampering with the certificate at δ = 9/10
+  let ls := (cert910.splitOn "\n").toArray
+  let arcIdx := (Array.range ls.size).filter fun i ↦ ls[i]!.startsWith "arc "
+  let fullIdx := (Array.range ls.size).filter fun i ↦ ls[i]!.startsWith "full "
+  let r2Idx := (Array.range ls.size).filter fun i ↦ ls[i]!.startsWith "r2 "
+  check log "the δ = 9/10 certificate is accepted untouched" (!(rejects cert910).1)
+  let mid := arcIdx[arcIdx.size / 2]!
+  let words (i : Nat) : Array String := ((ls[i]!.splitOn " ").filter (!·.isEmpty)).toArray
+  let w := words mid
+  let flip (s : String) : String := if s == "+" then "-" else "+"
+  let tampered : List (String × String) := [
+    ("delete an arc", editLine cert910 mid none),
+    ("delete another arc", editLine cert910 arcIdx[3]! none),
+    ("delete a boundary circle", editLine cert910 fullIdx[0]! none),
+    ("flip the side of an endpoint",
+      editLine cert910 mid (some (" ".intercalate (w.set! 5 (flip w[5]!)).toList))),
+    ("move an endpoint to another intersection point",
+      editLine cert910 mid (some (" ".intercalate (w.set! 4 w[2]! |>.set! 5 (flip w[3]!)).toList))),
+    ("replace an endpoint by that of another arc",
+      let w' := words arcIdx[arcIdx.size / 2 + 1]!
+      editLine cert910 mid (some (" ".intercalate (w.set! 4 w'[4]! |>.set! 5 w'[5]!).toList))),
+    ("duplicate an arc", editLine cert910 mid (some (ls[mid]! ++ "\n" ++ ls[mid]!))),
+    ("change the radius (δ = 9/10 to 4/5)",
+      let rw := words r2Idx[0]!
+      let num := (rw[1]!.splitOn ",").toArray
+      let num := num.set! 0 (toString ((num[0]!.toInt?.getD 0) + 1))
+      editLine cert910 r2Idx[0]! (some s!"r2 {",".intercalate num.toList} / {rw[3]!}")),
+    ("change the summary", cert910.replace "c4-endpoints 316" "c4-endpoints 317"),
+    ("truncate the file", editLine cert910 (ls.size - 2) none)]
+  for (what, t) in tampered do
+    let (rej, msg) := rejects t
+    check log s!"tampered certificate rejected: {what} ({msg})" rej
+  -- a small change of the radius keeps the combinatorics: the same arcs are the certificate at
+  -- δ = 899/1000, as the generator confirms there
+  let rw := words r2Idx[0]!
+  let num := (rw[1]!.splitOn ",").toArray.map fun t ↦ toString ((t.toInt?.getD 0) * 100)
+  let num := num.set! 0 (toString ((num[0]!.toInt?.getD 0) + 1))
+  let moved := editLine cert910 r2Idx[0]! (some s!"r2 {",".intercalate num.toList} / 1000")
+  let o899 ← certify F5 (← specRadius F5 "closed-899/1000") {}
+  let body (t : String) : List String :=
+    (t.splitOn "\n").filter fun l ↦ l.startsWith "arc " || l.startsWith "full "
+  check log "δ = 9/10 → 899/1000: same arcs as the generator's certificate there, accepted"
+    (!(rejects moved).1 && (o899.text.map body) == some (body cert910))
+
 /-- Run all self-tests; returns the process exit code. -/
 def runSelfTests : IO UInt32 := do
   let log ← IO.mkRef ({} : TestLog)
@@ -471,6 +670,7 @@ def runSelfTests : IO UInt32 := do
   testOrbits log
   testKnownResults log
   testGroups log
+  testCertificates log
   let l ← log.get
   let t1 ← IO.monoMsNow
   IO.println s!"self-test: {l.passed} passed, {l.failed.size} failed ({t1 - t0} ms)"

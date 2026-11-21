@@ -22,6 +22,9 @@ Write `S = 2 ^ p` and let `x = (A + α) / S`, `y = (B + β) / S` with `|α| ≤ 
 * `divNat k` (for `k > 0`): the midpoint `A / k` (integer division) is off by less than `1`, and
   `ra / k ≤ ⌊ra / k⌋ + 1`, so the radius `⌊ra / k⌋ + 2` suffices.
 * `rescale`: dropping `s` bits is a division by `2 ^ s`, as for `divNat`.
+* `sqrt?` (for a ball in `[0, ∞)`): `√((A ± ra) / S) = √((A ± ra) S) / S`, and
+  `⌊√((A - ra) S)⌋ ≤ √((A - ra) S)`, `√((A + ra) S) < ⌊√((A + ra) S)⌋ + 1` (`Nat.sqrt` is the
+  integer square root), so the ball spanning these two integers encloses the square root.
 
 ## Series
 
@@ -74,6 +77,14 @@ def divNat (a : Ball) (k : Nat) : Ball := ⟨a.mid / (k : Int), a.rad / k + 2⟩
 
 /-- The same ball at precision `p - s`, obtained by dropping `s` bits. -/
 def rescale (a : Ball) (s : Nat) : Ball := ⟨a.mid >>> s, (a.rad >>> s) + 2⟩
+
+/-- Enclosure of the square root, at precision `p`, of a ball contained in `[0, ∞)`; `none` if
+the ball reaches below `0`. -/
+def sqrt? (p : Nat) (a : Ball) : Option Ball :=
+  if a.mid < (a.rad : Int) then none else
+  let lo := Nat.sqrt ((a.mid - a.rad).toNat * 2 ^ p)
+  let hi := Nat.sqrt ((a.mid + a.rad).toNat * 2 ^ p) + 1
+  some ⟨((lo + hi) / 2 : Nat), (hi - lo) / 2 + 1⟩
 
 /-- An upper bound for the absolute value of every point of the ball, scaled by `2 ^ p`. -/
 def bound (a : Ball) : Nat := a.mid.natAbs + a.rad
