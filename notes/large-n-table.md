@@ -10,17 +10,25 @@ tested are finite and moderate in size, and that the first orbits reaching its c
 or just above g(33), and compares with other n. The table is the work of the repository owner and
 coauthors; the aim is to record what the exact computation does and does not see.
 
-All numbers are **[computed]** with exact membership. "Finite" means an exhausted search; "cap"
-means the cap was reached and nothing is claimed about finiteness. The paper imaged points with at
-least 10¹⁰ images; the caps here are 2·10⁶ to 10⁸.
+**Status.** All numbers are **[computed]** with exact membership (commands at the end). "Finite"
+means an exhausted search; "cap" means the cap was reached and nothing is claimed about finiteness.
+The paper imaged points with at least 10¹⁰ images; the caps here are 2·10⁶ to 10⁸. The conclusion
+is "undetermined". This note was independently refereed; the report, with its verdicts,
+reproductions and the list of what the referee did not check, is
+[`referee-report-engine-campaign.md`](referee-report-engine-campaign.md). The referee reproduced the
+n = 33 origin, the four- and five-root scans, the sweep of the earliest-capping point and the
+n = 80, 81 rows; it did not check the n = 31, 35, 40, 41 rows, the near-point clouds, the axis grid
+or the odd-n table of r₁.
 
 ## Summary
 
-1. **n = 33, at g and just above.** About 8 000 starting points were tested at r² = g², g² + 10⁻⁷,
-   g² + 10⁻⁶ and g² + 10⁻⁵ (r − g up to 4.8·10⁻⁶): every signed sum of up to five 33rd roots of unity
-   in the lens (one per symmetry class), generic points near the touching points a(0), b(0) and near
-   the lens corners, and a grid of generic points along the lens axis. **Every orbit is finite.** The
-   largest has 65 089 points at g (the origin's) and 78 529 at g² + 10⁻⁵.
+1. **n = 33, at g and just above.** About 6 260 distinct starting points were tested, not all at
+   every radius (see the table below): every signed sum of up to five 33rd roots of unity in the lens
+   (one per symmetry class; at r² = g² and g² + 10⁻⁵, the four-root sums also at g² + 10⁻⁷ and
+   g² + 10⁻⁶), generic points near the touching points a(0), b(0) and near the lens corners (at all
+   four radii), and a grid of generic points along the lens axis (at g² and g² + 10⁻⁵); r − g is at
+   most 4.8·10⁻⁶. **Every tested orbit, at the tested radii, is finite.** The largest has 65 089
+   points at g (the origin's) and 78 529 at g² + 10⁻⁵.
 2. **The first caps for n = 33.** Sweeping the seven largest lens orbits upward from g, the
    earliest reaches the cap of 6·10⁷ at r² − g² = 2.843·10⁻⁵ (r − g = 1.37·10⁻⁵), right after a finite
    orbit of 18 057 213 points; the others reach it between 4.0·10⁻⁵ and 1.5·10⁻⁴. All of this is far
@@ -48,9 +56,14 @@ least 10¹⁰ images; the caps here are 2·10⁶ to 10⁸.
 | starting points | count | r² = g² | g² + 10⁻⁷ | g² + 10⁻⁶ | g² + 10⁻⁵ |
 |---|---|---|---|---|---|
 | signed sums of ≤ 4 roots of unity in the lens | 279 (265 orbits) | max 65 089 | 65 089 | 65 089 | 65 089 |
-| signed sums of ≤ 5 roots of unity in the lens | 1 943 (1 720 orbits) | max 65 089 | – | – | 78 529 (1 944 points) |
+| signed sums of ≤ 5 roots of unity in the lens | 1 943 at g² (1 720 orbits), 1 944 at g² + 10⁻⁵ (1 721 orbits) | max 65 089 | – | – | 78 529 |
 | generic points within 3·10⁻⁷ of a(0), b(0), the lens corners | 288 | max 32 577 | 65 089 | 65 089 | 65 089 |
 | generic grid along the lens axis (spacing 1/1009) | 4 032 | max 46 465 | – | – | 77 889 |
+
+The four-root sums are among the five-root sums, so the rows contain about 6 260 distinct starts.
+The number of orbits depends on `--total-cap`, which limits how many computed points are recorded
+for skipping later starts: with `--total-cap 5000000` the referee obtained 1 796 orbits from the
+same 1 944 candidates at g² + 10⁻⁵, with the same maximum.
 
 All are finite. At g the five-root sums give orbits of 129 to 65 089 points, with the sizes 2 112,
 4 224, 8 448 and 10 560 the most frequent; the next largest after the origin's are 46 465, 34 241 and
@@ -115,6 +128,31 @@ For n = 31, 35, 40, 41 the table value lies strictly between g and the radius at
 orbit reaches the cap, and at the table value no tested orbit is large. The paper's computation must
 therefore have used other seeds, or another criterion, for these n as well. For n = 80 and 81 the
 origin's orbit itself reaches the cap within 1.3·10⁻⁷ of g, which is the table's value to rounding.
+
+## Commands
+
+All runs used the engine at commit 4dd9017, `B=.lake/build/bin/tdcsg-orbit`, one heavy run at a
+time with `gtimeout` limits of 30 to 50 minutes (none was reached).
+
+```sh
+# lens sums at g² and above (OFF = "", +1e-7, +1e-6, +1e-5)
+$B scan -n 33 --r2 touch$OFF --terms 4 --cap 3000000 --total-cap 25000000 --top 40
+$B scan -n 33 --r2 touch$OFF --terms 5 --cap 3000000 --total-cap 20000000 --top 30   # OFF = "", +1e-5
+# clouds near a(0), b(0) and the lens corners
+$B scan -n 33 --r2 touch$OFF --near "b0;a0;xy:0,0.268859091;xy:0,-0.268859091;xy:0,0.2688;xy:0,0.268" \
+   --scale 10000019 --spread 3 --cap 3000000 --total-cap 20000000 --top 30
+# lens axis: 14 centres xy:0,y for y = ±0.02, ±0.06, …, ±0.26
+$B scan -n 33 --r2 touch$OFF --near "xy:0,-0.26;xy:0,-0.22;…;xy:0,0.26" --scale 1009 --spread 8 \
+   --cap 3000000 --total-cap 20000000 --top 30
+# sweeps upward from g (the seven largest five-root orbits at g² + 10⁻⁵), peak 9 GB
+$B thresholds -n 33 --start pow:… --from touch --cap 60000000 --rc touch --format lines
+# other n: origin through g, and three-root lens sums at g and at the table value t²
+$B thresholds -n N --from touch-1e-12 --cap 20000000 --rc touch --format lines
+$B scan -n N --r2 touch --terms 3 --cap 3000000 --total-cap 15000000 --top 10
+$B scan -n N --r2 t² --terms 3 --cap 3000000 --total-cap 15000000 --top 10
+# first threshold above g for odd n = 25, …, 45
+$B thresholds -n N --from touch-1e-12 --max-steps 2 --cap 3000000 --rc touch --format lines
+```
 
 ## What would settle it
 
