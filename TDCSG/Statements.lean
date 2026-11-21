@@ -4,8 +4,7 @@ Authors: Eric Vergo, Claude
 -/
 module
 
-public import Mathlib.GroupTheory.Finiteness
-public import TDCSG.Group
+public import TDCSG.Finiteness
 
 /-!
 # Main statements
@@ -52,34 +51,34 @@ namespace TDCSG.Statements
 is finite. -/
 theorem finite_of_encard_orbit_le {G X : Type*} [Group G] [Group.FG G] [MulAction G X]
     [FaithfulSMul G X] (N : ℕ) (h : ∀ x : X, (MulAction.orbit G x).encard ≤ N) : Finite G :=
-  sorry
+  MulAction.finite_of_encard_orbit_le N h
 
 /-- Orbit monotonicity: enlarging the radii can only enlarge the orbit of a point. -/
 theorem orbit_mono (n₁ n₂ : ℕ) {r₁ r₂ r₁' r₂' : ℝ} (h₁ : r₁ ≤ r₁') (h₂ : r₂ ≤ r₂') (p : ℂ) :
     orbit n₁ n₂ r₁ r₂ p ⊆ orbit n₁ n₂ r₁' r₂' p :=
-  sorry
+  TDCSG.orbit_mono n₁ n₂ h₁ h₂ p
 
 /-- Group monotonicity: if the group is finite for some radii, it is finite for all smaller
 radii. -/
 theorem finite_GG_of_le (n₁ n₂ : ℕ) {r₁ r₂ r₁' r₂' : ℝ} (h₁ : r₁ ≤ r₁') (h₂ : r₂ ≤ r₂')
     (h : Finite (GG n₁ n₂ r₁' r₂')) : Finite (GG n₁ n₂ r₁ r₂) :=
-  sorry
+  TDCSG.finite_GG_of_le n₁ n₂ h₁ h₂ h
 
 /-- The arithmetic hypothesis of the finiteness theorem, restated without `lcm`. -/
 theorem lcm_mem_iff (n₁ n₂ : ℕ) :
     Nat.lcm n₁ n₂ ∈ ({1, 2, 3, 4, 6} : Finset ℕ) ↔ n₁ ∣ 4 ∧ n₂ ∣ 4 ∨ n₁ ∣ 6 ∧ n₂ ∣ 6 :=
-  sorry
+  TDCSG.lcm_mem_iff n₁ n₂
 
 /-- If `lcm n₁ n₂ ∈ {1, 2, 3, 4, 6}`, then for all radii the orbits are uniformly bounded. -/
 theorem exists_encard_orbit_le {n₁ n₂ : ℕ} (h : Nat.lcm n₁ n₂ ∈ ({1, 2, 3, 4, 6} : Finset ℕ))
     (r₁ r₂ : ℝ) : ∃ N : ℕ, ∀ p : ℂ, (orbit n₁ n₂ r₁ r₂ p).encard ≤ N :=
-  sorry
+  TDCSG.exists_encard_orbit_le h r₁ r₂
 
 /-- The converse direction of Theorem 1 of arXiv:2302.12950: if `lcm n₁ n₂ ∈ {1, 2, 3, 4, 6}`,
 then the two-disk compound symmetry group is finite for all radii. -/
 theorem finite_GG {n₁ n₂ : ℕ} (h : Nat.lcm n₁ n₂ ∈ ({1, 2, 3, 4, 6} : Finset ℕ)) (r₁ r₂ : ℝ) :
     Finite (GG n₁ n₂ r₁ r₂) :=
-  sorry
+  TDCSG.finite_GG h r₁ r₂
 
 /-- Right stability of finite orbits (equal radii, closed disks). -/
 theorem exists_orbit_eq_of_finite (n₁ n₂ : ℕ) {r₀ : ℝ} {p : ℂ}
