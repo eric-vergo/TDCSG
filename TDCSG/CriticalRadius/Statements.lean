@@ -20,30 +20,34 @@ written sources are `notes/proofs/critical-radius-n5.md`, `critical-radius-n8.md
 Statements come in two kinds, kept strictly apart.
 
 * **Theorems** are proved in Lean, from the definitions of `TDCSG.Basic` and `TDCSG.Group`.
-* **Propositions** `def … : Prop` record claims that are **not proved in Lean**: the infinite
-  orbits for `n = 8, 12` (which rest on exact computations over families of about thirty words),
-  the case `n = 10` (no written proof yet), the finiteness on an initial range of radii (which
-  rests on the cut-set certificate theorem and on large external computations), and the
-  conjectured exact values of the critical radii. Nothing in this file asserts them.
+* **Propositions** `def … : Prop` record claims that are **not proved in Lean**: the case
+  `n = 10` (no written proof yet), the finiteness on an initial range of radii (which rests on
+  the cut-set certificate theorem and on large external computations), and the conjectured exact
+  values of the critical radii. Nothing in this file asserts them.
 
 ## Proved
 
 * `criticalRadius_five_le`, `infinite_GG_five`, `infinite_orbit_zero_five`: `GG₅(r)` is
   infinite for every `r ≥ √(3 + φ)`, through an infinite orbit of `0`; hence
   `1 ≤ criticalRadius 5 ≤ √(3 + φ)`.
+* `mem_orbit_pStar_eight_pow`, `infinite_orbit_pStar_eight`, `infinite_GG_eight`,
+  `criticalRadius_eight_le`: for every `r ≥ √(10 - 5√2)` the orbit of `p*` under `GG₈(r)`
+  contains `p* + 4 i (√2 - 1)^(k+1)` for all `k`, so `GG₈(r)` is infinite and
+  `1 ≤ criticalRadius 8 ≤ √(10 - 5√2)`.
+* `mem_orbit_pStar_twelve_pow`, `infinite_orbit_pStar_twelve`, `infinite_GG_twelve`,
+  `criticalRadius_twelve_le`: for every `r ≥ √(40 - 22√3)` the orbit of `p*` under `GG₁₂(r)`
+  contains `p* + 2 (2 - √3)^(k+2) V` for all `k`, so `GG₁₂(r)` is infinite and
+  `1 ≤ criticalRadius 12 ≤ √(40 - 22√3)`.
 * `pStar_eight_mem_sphere`, `mem_orbit_pStar_eight`; `pStar_twelve_mem_sphere`,
   `mem_orbit_pStar_twelve`: the critical points for `n = 8, 12` lie on the boundary circle at
-  the conjectured critical radius, and the first point of their infinite orbit is reached.
-* `infiniteAboveEight_of_infiniteOrbitEight`, `infiniteAboveTwelve_of_infiniteOrbitTwelve`:
-  the orbit statements imply infinitude of the group.
+  the conjectured critical radius, and the seed words reach the first point of their orbits.
 * `finiteBelowFive_of_certificate` and its analogues, `le_criticalRadius_five_of_finiteBelow`
   and its analogues: the certificate theorem and the computed certificates give the lower
   bounds.
 
 ## Not proved (propositions)
 
-* `InfiniteOrbitEight`, `InfiniteAboveEight`, `InfiniteOrbitTwelve`, `InfiniteAboveTwelve`,
-  `InfiniteAboveTen`.
+* `InfiniteAboveTen`.
 * `CutSetCertificate n`, `ExistsCertificate n r` (in `TDCSG.CriticalRadius.Certificate`).
 * `FiniteBelowFive`, `FiniteBelowEight`, `FiniteBelowTwelve`.
 * `CriticalRadiusEqFive`, `CriticalRadiusEqEight`, `CriticalRadiusEqTen`,
@@ -93,7 +97,7 @@ theorem criticalRadius_five_le : criticalRadius 5 ≤ √(3 + φ) :=
 theorem one_le_criticalRadius_five : 1 ≤ criticalRadius 5 :=
   TDCSG.one_le_criticalRadius ⟨_, Five.infinite_GG le_rfl⟩
 
-/-! ### `n = 8` and `n = 12`: base facts -/
+/-! ### `n = 8` and `n = 12`: the critical points -/
 
 /-- The critical point `p* = 1 - 2ζ + ζ² - ζ³` for `n = 8` lies on the boundary circle of the
 left disk of radius `√(10 - 5√2)`. -/
@@ -120,34 +124,20 @@ theorem mem_orbit_pStar_twelve {r : ℝ} (hr : √(40 - 22 * √3) ≤ r) :
   have : √3 ^ 2 = 3 := Real.sq_sqrt (by norm_num)
   linear_combination 2 * this
 
-/-! ### `n = 8`, `10`, `12`: infinitude (not proved) -/
+/-! ### `n = 8` and `n = 12`: infinitude -/
 
-/-- **Not proved.** `critical-radius-n8.md`, Theorem A, orbit form: for `r ≥ √(10 - 5√2)` the
-orbit of `p*` contains `p* + 4 i (√2 - 1)^(k+1)` for every `k`. The written proof rests on an
-exact check of a family of 31 words (Appendix A of the note). -/
-def InfiniteOrbitEight : Prop :=
-  ∀ r : ℝ, √(10 - 5 * √2) ≤ r → ∀ k : ℕ,
-    Eight.pStar + ((4 * (√2 - 1) ^ (k + 1) : ℝ) : ℂ) * I ∈ orbit 8 8 r r Eight.pStar
+/-- `critical-radius-n8.md`, Theorem A, orbit form: for `r ≥ √(10 - 5√2)` the orbit of `p*`
+under `GG₈(r)` contains `p* + 4 i (√2 - 1)^(k+1)` for every `k`. -/
+theorem mem_orbit_pStar_eight_pow {r : ℝ} (hr : √(10 - 5 * √2) ≤ r) (k : ℕ) :
+    Eight.pStar + ((4 * (√2 - 1) ^ (k + 1) : ℝ) : ℂ) * I ∈ orbit 8 8 r r Eight.pStar :=
+  Eight.mem_orbit_pStar_pow hr k
 
-/-- **Not proved.** `GG₈(r)` is infinite for every `r ≥ √(10 - 5√2)`. -/
-def InfiniteAboveEight : Prop :=
-  ∀ r : ℝ, √(10 - 5 * √2) ≤ r → Infinite (GG 8 8 r r)
-
-/-- **Not proved.** `critical-radius-n12.md`, Theorem A, orbit form: for `r ≥ √(40 - 22√3)`
-the orbit of `p*` contains `p* + 2 (2 - √3)^(k+2) V` for every `k`. The written proof rests on
-an exact check of a family of 30 words (Appendix A of the note). -/
-def InfiniteOrbitTwelve : Prop :=
-  ∀ r : ℝ, √(40 - 22 * √3) ≤ r → ∀ k : ℕ,
+/-- `critical-radius-n12.md`, Theorem A, orbit form: for `r ≥ √(40 - 22√3)` the orbit of `p*`
+under `GG₁₂(r)` contains `p* + 2 (2 - √3)^(k+2) V` for every `k`. -/
+theorem mem_orbit_pStar_twelve_pow {r : ℝ} (hr : √(40 - 22 * √3) ≤ r) (k : ℕ) :
     Twelve.pStar + ((2 * (2 - √3) ^ (k + 2) : ℝ) : ℂ) * Twelve.chordDir ∈
-      orbit 12 12 r r Twelve.pStar
-
-/-- **Not proved.** `GG₁₂(r)` is infinite for every `r ≥ √(40 - 22√3)`. -/
-def InfiniteAboveTwelve : Prop :=
-  ∀ r : ℝ, √(40 - 22 * √3) ≤ r → Infinite (GG 12 12 r r)
-
-/-- **Not proved.** `GG₁₀(r)` is infinite for every `r ≥ √(4 - φ)`. -/
-def InfiniteAboveTen : Prop :=
-  ∀ r : ℝ, √(4 - φ) ≤ r → Infinite (GG 10 10 r r)
+      orbit 12 12 r r Twelve.pStar :=
+  Twelve.mem_orbit_pStar_pow hr k
 
 /-- Points `p + c ε^k V` with `c V ≠ 0` and `0 < ε < 1` are pairwise distinct. -/
 theorem injective_add_pow_mul {p V : ℂ} {c ε : ℝ} (hc : c ≠ 0) (hV : V ≠ 0) (h0 : 0 < ε)
@@ -159,30 +149,52 @@ theorem injective_add_pow_mul {p V : ℂ} {c ε : ℝ} (hc : c ≠ 0) (hV : V �
     exact this
   exact Nat.add_right_cancel ((pow_right_strictAnti₀ h0 h1).injective h')
 
-/-- The orbit form of Theorem A for `n = 8` implies infinitude of `GG₈(r)`. -/
-theorem infiniteAboveEight_of_infiniteOrbitEight (h : InfiniteOrbitEight) :
-    InfiniteAboveEight := by
-  intro r hr
+/-- For every `r ≥ √(10 - 5√2)` the orbit of `p*` under `GG₈(r)` is infinite. -/
+theorem infinite_orbit_pStar_eight {r : ℝ} (hr : √(10 - 5 * √2) ≤ r) :
+    (orbit 8 8 r r Eight.pStar).Infinite := by
   have hs : 1 < √2 := by rw [Real.lt_sqrt (by norm_num)]; norm_num
   have hs' : √2 < 2 := by rw [Real.sqrt_lt' (by norm_num)]; norm_num
-  refine infinite_GG_of_infinite_orbit (p := Eight.pStar)
-    (Set.infinite_of_injective_forall_mem (injective_add_pow_mul (p := Eight.pStar) (c := 4)
-      (ε := √2 - 1) (by norm_num) I_ne_zero (by linarith) (by linarith) 1) fun k ↦ ?_)
-  simpa using h r hr k
+  refine Set.infinite_of_injective_forall_mem (injective_add_pow_mul (p := Eight.pStar) (c := 4)
+    (ε := √2 - 1) (by norm_num) I_ne_zero (by linarith) (by linarith) 1) fun k ↦ ?_
+  simpa using mem_orbit_pStar_eight_pow hr k
 
-/-- The orbit form of Theorem A for `n = 12` implies infinitude of `GG₁₂(r)`. -/
-theorem infiniteAboveTwelve_of_infiniteOrbitTwelve (h : InfiniteOrbitTwelve) :
-    InfiniteAboveTwelve := by
-  intro r hr
+/-- `GG₈(r)` is infinite for every `r ≥ √(10 - 5√2)` (`critical-radius-n8.md`, Theorem A). -/
+theorem infinite_GG_eight {r : ℝ} (hr : √(10 - 5 * √2) ≤ r) : Infinite (GG 8 8 r r) :=
+  infinite_GG_of_infinite_orbit (infinite_orbit_pStar_eight hr)
+
+theorem criticalRadius_eight_le : criticalRadius 8 ≤ √(10 - 5 * √2) :=
+  TDCSG.criticalRadius_le (infinite_GG_eight le_rfl)
+
+theorem one_le_criticalRadius_eight : 1 ≤ criticalRadius 8 :=
+  TDCSG.one_le_criticalRadius ⟨_, infinite_GG_eight le_rfl⟩
+
+/-- For every `r ≥ √(40 - 22√3)` the orbit of `p*` under `GG₁₂(r)` is infinite. -/
+theorem infinite_orbit_pStar_twelve {r : ℝ} (hr : √(40 - 22 * √3) ≤ r) :
+    (orbit 12 12 r r Twelve.pStar).Infinite := by
   have hs : 1 < √3 := by rw [Real.lt_sqrt (by norm_num)]; norm_num
   have hs' : √3 < 2 := by rw [Real.sqrt_lt' (by norm_num)]; norm_num
   have hV : Twelve.chordDir ≠ 0 := fun h ↦ by
     have := congrArg Complex.im h
     simp [Twelve.chordDir] at this
-  refine infinite_GG_of_infinite_orbit (p := Twelve.pStar)
-    (Set.infinite_of_injective_forall_mem (injective_add_pow_mul (p := Twelve.pStar) (c := 2)
-      (ε := 2 - √3) (by norm_num) hV (by linarith) (by linarith) 2) fun k ↦ ?_)
-  simpa using h r hr k
+  refine Set.infinite_of_injective_forall_mem (injective_add_pow_mul (p := Twelve.pStar) (c := 2)
+    (ε := 2 - √3) (by norm_num) hV (by linarith) (by linarith) 2) fun k ↦ ?_
+  simpa using mem_orbit_pStar_twelve_pow hr k
+
+/-- `GG₁₂(r)` is infinite for every `r ≥ √(40 - 22√3)` (`critical-radius-n12.md`, Theorem A). -/
+theorem infinite_GG_twelve {r : ℝ} (hr : √(40 - 22 * √3) ≤ r) : Infinite (GG 12 12 r r) :=
+  infinite_GG_of_infinite_orbit (infinite_orbit_pStar_twelve hr)
+
+theorem criticalRadius_twelve_le : criticalRadius 12 ≤ √(40 - 22 * √3) :=
+  TDCSG.criticalRadius_le (infinite_GG_twelve le_rfl)
+
+theorem one_le_criticalRadius_twelve : 1 ≤ criticalRadius 12 :=
+  TDCSG.one_le_criticalRadius ⟨_, infinite_GG_twelve le_rfl⟩
+
+/-! ### `n = 10`: infinitude (not proved) -/
+
+/-- **Not proved.** `GG₁₀(r)` is infinite for every `r ≥ √(4 - φ)`. -/
+def InfiniteAboveTen : Prop :=
+  ∀ r : ℝ, √(4 - φ) ≤ r → Infinite (GG 10 10 r r)
 
 /-! ### Finiteness on an initial range (not proved) -/
 
@@ -232,15 +244,15 @@ theorem le_criticalRadius_five_of_finiteBelow (h : FiniteBelowFive) :
     √(3 + φ - 1 / 10) ≤ criticalRadius 5 :=
   le_criticalRadius_of_forall_finite ⟨_, Five.infinite_GG le_rfl⟩ h
 
-/-- Theorem B for `n = 8`, with Theorem A, gives `√(10 - 5√2 - 1/7) ≤ criticalRadius 8`. -/
-theorem le_criticalRadius_eight_of_finiteBelow (hA : InfiniteAboveEight) (h : FiniteBelowEight) :
+/-- Theorem B for `n = 8` gives the lower bound `√(10 - 5√2 - 1/7) ≤ criticalRadius 8`. -/
+theorem le_criticalRadius_eight_of_finiteBelow (h : FiniteBelowEight) :
     √(10 - 5 * √2 - 1 / 7) ≤ criticalRadius 8 :=
-  le_criticalRadius_of_forall_finite ⟨_, hA _ le_rfl⟩ h
+  le_criticalRadius_of_forall_finite ⟨_, infinite_GG_eight le_rfl⟩ h
 
-/-- Theorem B for `n = 12`, with Theorem A, gives `√(40 - 22√3 - 1/20) ≤ criticalRadius 12`. -/
-theorem le_criticalRadius_twelve_of_finiteBelow (hA : InfiniteAboveTwelve)
-    (h : FiniteBelowTwelve) : √(40 - 22 * √3 - 1 / 20) ≤ criticalRadius 12 :=
-  le_criticalRadius_of_forall_finite ⟨_, hA _ le_rfl⟩ h
+/-- Theorem B for `n = 12` gives the lower bound `√(40 - 22√3 - 1/20) ≤ criticalRadius 12`. -/
+theorem le_criticalRadius_twelve_of_finiteBelow (h : FiniteBelowTwelve) :
+    √(40 - 22 * √3 - 1 / 20) ≤ criticalRadius 12 :=
+  le_criticalRadius_of_forall_finite ⟨_, infinite_GG_twelve le_rfl⟩ h
 
 /-! ### The conjectured exact values (open) -/
 
