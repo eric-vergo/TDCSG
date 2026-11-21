@@ -4,6 +4,7 @@ Authors: Eric Vergo, Claude
 -/
 module
 
+public import TDCSG.BoundaryContact
 public import TDCSG.Finiteness
 
 /-!
@@ -84,13 +85,13 @@ theorem finite_GG {n₁ n₂ : ℕ} (h : Nat.lcm n₁ n₂ ∈ ({1, 2, 3, 4, 6} 
 theorem exists_orbit_eq_of_finite (n₁ n₂ : ℕ) {r₀ : ℝ} {p : ℂ}
     (h : (orbit n₁ n₂ r₀ r₀ p).Finite) :
     ∃ δ > 0, ∀ r, r₀ ≤ r → r < r₀ + δ → orbit n₁ n₂ r r p = orbit n₁ n₂ r₀ r₀ p :=
-  sorry
+  TDCSG.exists_orbit_eq_of_finite n₁ n₂ h
 
 /-- The radii at which the orbit of `p` is infinite form the empty set or a closed half-line. -/
 theorem infinite_orbit_radii (n₁ n₂ : ℕ) (p : ℂ) :
     {r : ℝ | (orbit n₁ n₂ r r p).Infinite} = ∅ ∨
       ∃ r₀ > 0, {r : ℝ | (orbit n₁ n₂ r r p).Infinite} = Set.Ici r₀ :=
-  sorry
+  TDCSG.infinite_orbit_radii n₁ n₂ p
 
 /-- Boundary contact, part 1: at the critical radius `r₀` of `p`, orbit points come arbitrarily
 close to a boundary circle from inside (or lie on it). -/
@@ -98,14 +99,14 @@ theorem boundary_depth (n₁ n₂ : ℕ) {r₀ : ℝ} {p : ℂ} (hO : (orbit n�
     (hfin : ∀ r < r₀, (orbit n₁ n₂ r r p).Finite) :
     ∀ ε > 0, ∃ y ∈ orbit n₁ n₂ r₀ r₀ p, ∃ c ∈ ({leftCenter, rightCenter} : Set ℂ),
       r₀ - ε < dist y c ∧ dist y c ≤ r₀ :=
-  sorry
+  TDCSG.boundary_depth n₁ n₂ hO hfin
 
 /-- Boundary contact, part 2: at the critical radius of `p`, the orbit touches a boundary circle
 or accumulates at one from inside. -/
 theorem touchesBoundary_or_accumulatesInside (n₁ n₂ : ℕ) {r₀ : ℝ} {p : ℂ}
     (hO : (orbit n₁ n₂ r₀ r₀ p).Infinite) (hfin : ∀ r < r₀, (orbit n₁ n₂ r r p).Finite) :
     TouchesBoundary (orbit n₁ n₂ r₀ r₀ p) r₀ ∨ AccumulatesInside (orbit n₁ n₂ r₀ r₀ p) r₀ :=
-  sorry
+  TDCSG.touchesBoundary_or_accumulatesInside n₁ n₂ hO hfin
 
 /-- Boundary contact, part 3: if the orbit at the critical radius touches no boundary circle,
 then it accumulates at one from inside, it is the union of the orbits at smaller radii, and the
@@ -116,7 +117,7 @@ theorem of_not_touchesBoundary (n₁ n₂ : ℕ) {r₀ : ℝ} {p : ℂ}
     AccumulatesInside (orbit n₁ n₂ r₀ r₀ p) r₀ ∧
       orbit n₁ n₂ r₀ r₀ p = ⋃ r ∈ Set.Iio r₀, orbit n₁ n₂ r r p ∧
       ∀ N : ℕ, ∃ r₁ < r₀, ∀ r ∈ Set.Ico r₁ r₀, (N : ℕ∞) < (orbit n₁ n₂ r r p).encard :=
-  sorry
+  TDCSG.of_not_touchesBoundary n₁ n₂ hO hfin hB
 
 /-- Sanity check of the definitions: for disjoint closed disks of positive radii the group is
 `C_{n₁} × C_{n₂}`, of order `n₁ * n₂`. -/

@@ -1,6 +1,7 @@
 module
 
 public import TDCSG.Basic
+public import TDCSG.BoundaryContact
 public import TDCSG.BoundedOrbits
 public import TDCSG.Finiteness
 public import TDCSG.Group
