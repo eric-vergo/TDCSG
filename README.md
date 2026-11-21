@@ -31,7 +31,8 @@ This repository has two parts: a Lean 4 / Mathlib formalization, and research no
 | Path | Contents |
 |---|---|
 | `TDCSG/` | Lean sources (`TDCSG.lean` is the root module) |
-| `TDCSGCompute/` | The exact orbit engine and the `tdcsg-orbit` executable (core Lean, no Mathlib): orbits, threshold sweeps, and GG_n(r) as a permutation group; see [`notes/engine.md`](notes/engine.md) |
+| `TDCSGCompute/` | The exact orbit engine and the `tdcsg-orbit` executable (core Lean, no Mathlib): orbits, threshold sweeps, GG_n(r) as a permutation group, and cut-set finiteness certificates with an independent checker; see [`notes/engine.md`](notes/engine.md) |
+| `certificates/` | Small finiteness certificates in the format of [`notes/certificates.md`](notes/certificates.md) |
 | `notes/` | Research notes in Markdown: [`overview.md`](notes/overview.md), [`arithmetic.md`](notes/arithmetic.md), [`analytic-continuation.md`](notes/analytic-continuation.md), [`experiments.md`](notes/experiments.md), [`engine.md`](notes/engine.md) |
 | `notes/proofs/` | Written proofs of results intended for formalization |
 | `2302.12950v1.pdf` | The paper |
@@ -75,7 +76,10 @@ preliminary. The engine also computes the order of GG_n(r) itself (certified low
 generic-point orbits); results from it are in [`notes/gap-structure.md`](notes/gap-structure.md)
 (the group changes at r_A), [`notes/rank-conjecture.md`](notes/rank-conjecture.md) (exact threshold
 sequences for n = 7, 9, 11, 13) and [`notes/large-n-table.md`](notes/large-n-table.md) (n = 33 and
-other large n at the touching radius).
+other large n at the touching radius). It computes cut-set certificates of finiteness exactly and
+checks them with a separate program; [`notes/certificates.md`](notes/certificates.md) records the
+runs, their agreement with the earlier Python computations, and what a passed check does and does
+not establish.
 
 ## Licence and authors
 

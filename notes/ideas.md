@@ -29,3 +29,20 @@ not imposed. The interval $(r_A, r_c)$ measures that freedom.
    elementary geometry?
 5. **Laplace eigenfunctions.** Do invariant eigenfunctions survive at or below $r_A$? Relation to the
    Euclidean Hecke-group picture in [`analytic-continuation.md`](analytic-continuation.md).
+
+## Cut-set certificates
+
+Depends on: [`certificates.md`](certificates.md) (the exact generator and checker).
+
+1. **Interval of validity.** The symbolic arc set of K(r) is the same on a whole interval of radii:
+   the δ = 9/10 certificate for n = 5 is also the certificate at δ = 899/1000, 0.88 and 0.95. Its
+   validity ends only at an event (a tangency to ∂D_p, a triple point, or two endpoints changing
+   order), whose radius is an exact algebraic number. Computing the upper end of that interval for
+   the deepest certificate would certify finiteness up to the next event without a larger closure.
+2. **Renormalization of cut sets.** Compare K(r) at δ and at δ/u (u = φ³, 1 + √2, 2 + √3) exactly:
+   does the scaling z ↦ p* + u⁻¹(z − p*) map the arcs near the critical point of one onto those of
+   the other? This is the combinatorial content of Conjectures R₈, R₁₂ and R*.
+3. **Verified checker.** The checker as a Lean function with a soundness theorem against
+   `TDCSG.Certificate`, as outlined in `certificates.md` §7.
+4. **Memory.** A packed arc store (fixed-width coefficients, as in `Store.lean`) would roughly
+   halve the generator's memory, which limits n = 5 below the jump at δ ≈ 0.0181.

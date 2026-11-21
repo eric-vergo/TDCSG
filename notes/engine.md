@@ -21,6 +21,11 @@ this engine; none of it relies on a floating-point decision.
 | `TDCSGCompute/Perm.lean` | Permutations, deterministic Schreier–Sims, equivalence of transitive actions, and the order of a group with large alternating constituents (Jordan witnesses, kernel witnesses, quotient by Schreier–Sims) |
 | `TDCSGCompute/Group.lean` | GG_n(r) as a permutation group on orbits of generic points; samples (grid, clouds, rim-vertex fixpoint); germs and candidate events of the arrangement; merged thresholds of a lattice family; scans of many starting points |
 | `TDCSGCompute/Spec.lean` | Parsing of radii, points and real elements |
+| `TDCSGCompute/Tower.lean` | Exact signs in ℤ[ζ_n]⁺ (integer-only for real subfields of degree ≤ 2) and in multi-quadratic towers ℚ(ζ_n)⁺(√r_1, …, √r_k) by recursive squaring |
+| `TDCSGCompute/CirclePoint.lean` | Intersection points of equal circles as symbols; their exact order around a circle (ball enclosure first, exact tower sign otherwise); tangency signs; the rotations |
+| `TDCSGCompute/CircleFilter.lean` | Floating-point filter with running error bounds for that order (generator only) |
+| `TDCSGCompute/Closure.lean` | The cut set K(r) by closure, (C4), and the certificate file (`certify`) |
+| `TDCSGCompute/CertCheck.lean` | The independent certificate checker (`check-certificate`) |
 | `TDCSGCompute/SelfTest.lean`, `Main.lean` | Self-tests and the command line |
 
 **Arithmetic.** An element of ℤ[ζ_n] is its integer coefficient vector in the power basis
@@ -181,9 +186,58 @@ tdcsg-orbit scan -n 33 --r2 touch --terms 4 --cap 3000000                  # man
   symmetry class), or of clouds of generic points near given points (`--near P;xy:x,y;… --scale M
   --spread k`), skipping points already seen, and prints the size histogram and the largest orbits.
 
+## Cut-set certificates of finiteness
+
+`certify` computes the cut set K(r), the closure of the two boundary circles under a^{±1}, b^{±1},
+as a finite union of circular arcs, and exports it as a certificate for the theorem that
+(C1)–(C4) imply finiteness of GG_n(r) (Theorem 4.2 of
+[`proofs/critical-radius-n5.md`](proofs/critical-radius-n5.md); stated, not proved, as
+`TDCSG.CutSetCertificate` in `TDCSG/CriticalRadius/Certificate.lean`). `check-certificate` reads
+such a file and verifies (C1)–(C4) from scratch. The format, all runs, and what they establish
+are in [`certificates.md`](certificates.md).
+
+- **Representation.** All circles have radius r; a circle is its centre c ∈ ℤ[ζ_n]. An arc endpoint
+  is a symbol (e, ±): the intersection point of the circle about c with the circle about e on side
+  ±. Rotations about ±1 act on symbols, so every endpoint stays exact. Clipping by D_p gives the
+  window from (p, −) to (p, +).
+- **Exact order of endpoints on a circle.** The point (e, s) on the circle about c has the direction
+  U = d(qN + is√H), d = e − c, N = |d|², r² = R/q, H = qN(4R − qN) > 0. With S₄ = 4sin²(2π/n),
+  2√S₄·U has coordinates X, Y in the tower ℚ(ζ_n)⁺(√S₄, √H) with integral coefficients. A point's
+  half (angle in [0, π) or [π, 2π)) is the sign of Y (then X), and two points in the same half are
+  ordered by the sign of the cross product X₁Y₂ − Y₁X₂ ∈ ℚ(ζ_n)⁺(√S₄, √H₁, √H₂). These signs are
+  decided exactly by recursive squaring (sign(P + Q√r) from the signs of P, Q and P² − rQ²), down
+  to signs in ℚ(ζ_n)⁺, which are integer comparisons for n = 5, 8, 10, 12 (and n = 3, 4, 6) and
+  certified ball evaluations otherwise. Equality of two endpoints is "cross product 0 in the same
+  half", so equal points with different symbols (triple points) are recognised exactly. Ball
+  enclosures of X and Y (integer fixed-point, no floating point) are tried first; the generator
+  also tries a double-precision filter with running error bounds (IEEE 754 correct rounding of
+  +, −, ×, /, √ assumed). Both only skip work: every decision is the exact sign. The full argument
+  is in the docstrings of `CirclePoint.lean`, `Tower.lean` and `CircleFilter.lean`.
+- **Degenerate cases.** Tangency of a carrying circle to ∂D_p is decided exactly and stops the run
+  as *not certified*; r ≤ 1 is refused; a run that reaches its cap claims nothing. A triple point
+  is handled as an ordinary exact equality; at r = sec(π/n) it makes (C4) fail, which is reported.
+- **Independence.** The checker shares with the generator only the exact layer (`Field`, `Ball`,
+  `Tower`, `CirclePoint`); clipping, containment, maximality and (C1)–(C4) are written separately,
+  and it uses no floating point.
+
+```sh
+tdcsg-orbit certify -n 5 --r2 closed-1/10 --out n5.cert   # 50 714 circles, 198 470 arcs, about 10 s
+tdcsg-orbit check-certificate n5.cert                     # VALID, about 1 minute
+```
+
+Options of `certify`: `--max-pieces`, `--max-circles`, `--max-seconds` (caps; reaching one means
+nothing is claimed), `--progress K`, `--out FILE`. The exit code is 0 when certified, 3 when not;
+`check-certificate` exits 0 for a valid certificate and 2 for a rejected one.
+
+**What is established.** A certificate that passes `check-certificate` satisfies (C1)–(C4) as
+checked by a compiled, tested Lean program; it is not a kernel-checked proof. Its link to the Lean
+proposition `TDCSG.Certificate` is by correspondence of definitions (explained in the docstring of
+`CertCheck.lean`), not by a proof that the checker is sound; and the certificate theorem itself
+(`TDCSG.CutSetCertificate`) is proved on paper and refereed, not in Lean.
+
 ## Tests
 
-`lake test` (or `tdcsg-orbit --selftest`) runs about 4,540 checks in a few seconds: ring identities
+`lake test` (or `tdcsg-orbit --selftest`) runs about 4,600 checks in about 7 seconds: ring identities
 (commutativity, associativity, distributivity, ζ^n = 1, Σζ^k = 0, conjugation and σ_kσ_l = σ_{kl},
 multiplicativity of |·|², real-basis round trips) for 20 values of n up to 100; π, cos 72°, cos 45°
 enclosures; the certified table error; exact signs of ±(√2 − 1)^k, k ≤ 80; membership of points
@@ -198,7 +252,18 @@ against Schreier–Sims on the same constituents; |GG_n(r)| = n²(2n − 1)!/2 b
 (grid and rim-vertex sampling); the orders just above r_A for n = 5, 7, 8; the triple point on the
 three circles at r_A; the circumradius of −1, 1, a(1) equal to r_A and r_A² among the event
 candidates; scaled orbits and sweeps equal to unscaled ones; rationals strictly between
-thresholds.
+thresholds. For the certificates: exact zeros in towers (√2·√2 − 2, √4 − 2) and tower signs
+against floating point; the integer sign test against `signReal` for n ∈ {3, …, 12}; filtered,
+exact and floating-point orders of random circle points agreeing for n = 5, 7, 8, 12; certificates
+for n = 3, 4, 6 at r² = 2.1, 3.7, 6.1 accepted by the checker; for n = 5 the 10 circles below
+sec(π/5) and the rows δ = 13/5, 9/10 of Table 5.1 of `critical-radius-n5.md`; exact tangency at
+r² = 3 + φ and 3 + φ − 1; the cap above r_c; r ≤ 1 refused; the triple point at r = sec(π/n),
+n = 5, 7 (found exactly, (C4) fails, the checker rejects the arcs); and eleven tamperings of the
+δ = 9/10 certificate, each rejected: two deleted arcs, a deleted boundary circle, an endpoint with
+its side flipped, moved to another intersection point or replaced by another arc's, a duplicated
+arc, two changes of the radius header, a wrong summary, a truncated file. A change of δ from 9/10
+to 899/1000 leaves the combinatorics unchanged; the test confirms that the same arcs are then the
+generator's certificate at the new radius, and are accepted.
 
 ## Performance
 
@@ -357,3 +422,5 @@ one statement corrected is the remark in E1c that the orbit at r₁ jumps past 6
 3. Speed up the group computation at larger radii (orbits of 10⁴–10⁵ points per sample), to follow
    the events of GG_n(r) toward r_c.
 4. Prove the membership argument in Lean against Mathlib's definitions of the disks.
+5. A verified certificate checker: the checker written as a Lean function with a proof that
+   acceptance implies `TDCSG.Certificate n r arcs` (see [`certificates.md`](certificates.md)).
