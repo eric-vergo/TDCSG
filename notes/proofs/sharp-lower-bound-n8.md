@@ -2,9 +2,9 @@
 
 Authors: Eric Vergo, Claude
 
-**Statement and status.** Let $r_c=\sqrt{10-5\sqrt2}\approx1.711412$. `critical-radius-n8.md` (Theorem A; refereed and Lean-checked) proves that $GG_8(r)$ is infinite for every $r\ge r_c$. This note is about the converse, Conjecture F₈: $GG_8(r)$ is finite for every $r<r_c$. **F₈ is still open: this note does not prove it, and so does not prove that $r_c$ is exactly the critical radius.** What it adds:
+**Statement and status.** Let $r_c=\sqrt{10-5\sqrt2}\approx1.711412$. `critical-radius-n8.md` (Theorem A; refereed and Lean-checked) proves that $GG_8(r)$ is infinite for every $r\ge r_c$. This note is about the converse, Conjecture F₈: $GG_8(r)$ is finite for every $r<r_c$. **F₈ is still open: this note does not prove it, and so does not prove that $r_c$ is exactly the critical radius.** The note has been independently refereed; see `referee-report-sharp-lower-bounds.md` in this directory, whose verdicts §7 follows. What it contains:
 
-1. **Finiteness on a larger initial range**, proved modulo an exact finite computation that was carried out. $GG_8(r)$ is finite for every $r\le r_\ast$ with $r_\ast^2=r_c^2-1/35$, i.e. $r_\ast\approx1.703045$, leaving an open window $r_c-r_\ast\approx0.00837$. The certificate at $\delta=1/35$ lies past the level-4 jump and just before $\delta_5\approx0.0272$. The earlier note reached $\delta=1/14$, window $0.02100$.
+1. **The certified initial range.** The best checked certificate for $n=8$ is the one recorded in `../certificates.md`: $\delta=1/36$, generated and checked by the repository's Lean engine. So $GG_8(r)$ is finite for every $r\le r_\ast$ with $r_\ast^2=r_c^2-1/36$, i.e. $r_\ast\approx1.703278$, leaving an open window $r_c-r_\ast\approx0.008135$. This is proved modulo that exact computation. The certificates of §3 ($\delta=1/16$, $1/20$, $1/35$) are consistent with it and implied by it through monotonicity. $\delta=1/16$ is the one also checked by a second, unrelated exact verifier. All of them lie past the level-4 jump and before $\delta_5\approx0.0272$.
 2. **A reduction theorem (proved).** By Theorem 5.3 and Theorem 5.5:
    - bound the orbits by a product of restricted-orbit counts, taken over nested windows about the 32 critical lattice points;
    - by monotonicity, every factor except the innermost is bounded by its value **at $r_c$ itself**.
@@ -15,10 +15,10 @@ Authors: Eric Vergo, Claude
    - On the radius families used here, no two circles are ever tangent and no lattice point lies on a circle.
    - The levels have a closed form, and the natural scaling is $\delta\asymp\varepsilon^m$ with zoom $\varepsilon^{-m}$.
    - There are exactly 32 critical lattice points, in 8 classes under the symmetries, and the circle normals there take 16 directions.
-   - No affine lattice map renormalizes the centre set.
+   - No affine lattice map that is a physical isometry expands internal space. So no such map gives an exact global recursion of the centre set. Nothing is proved about other maps (Proposition 2.5).
 4. **The proposed "stable limiting pattern" strategy fails for the cut set itself.** Near $p^\ast$, $K(r)$ has no locally finite scaling limit (evidence, §4). It refines everywhere, and $p^\ast$ is a typical point of it.
 5. **Evidence (sampled floating-point orbits, not proof) that the induced pseudogroup does renormalize.**
-   - Its germs recur **exactly** with period two: translation parts multiply by $\varepsilon^2=3-2\sqrt2$.
+   - Under $\tau\mapsto\varepsilon^2\tau$ ($\varepsilon^2=3-2\sqrt2$), the sampled germ sets agree exactly for levels $2\to4$ (27 of 27 germs) and in 20 of 23 germs for $3\to5$. These are sets of sampled germs from floating-point orbits, not complete germ sets.
    - Its zoomed partitions converge: identical patterns at identical zoomed points in 83%, 90% and 95% of samples for $m\to m+2$, $m=2,3,4$.
    - Its boundaries lie on lines in only 8 directions.
    - Its orbit counts in the innermost window stay at 188, 224, 223 for $m=2,4,6$.
@@ -85,7 +85,7 @@ The $\sqrt2$-coefficient of $|q_m+1|^2$ ($-2,-30,-44,-488,-2202,\dots$) is never
 1. The lattice points on $\partial D_1(r_c)\cup\partial D_2(r_c)$ are exactly the 32 points $\mp1+u(2\pm i)(1-\zeta)$, $u\in\mu_8$. Under the symmetry group $\{z,-z,\bar z,-\bar z\}$ they form **8 classes** (Table 2.1). The rotation $A$, which permutes the 16 points on $\partial D_1$, is not a symmetry of the system, so distinct classes are genuinely inequivalent for $r<r_c$.
 2. The circles of radius $r_c$ through $p^\ast$ with centre in $1+2\mathbb Z[\zeta]$ are exactly the four with centres $(-1,0,0,0)$, $(3,-4,0,0)$, $(3,-4,2,-2)$ and $(-1,0,2,-2)$.
 3. At $r_c$, the circle about $\mp1+2v$, with $v=u(2\pm i)(1-\zeta)$, is tangent to $\partial D_{1,2}$ at the critical point $\mp1+v$. All 32 of these centres lie in $1+2\mathbb Z[\zeta]$. At $r=r_c$ the engine stops at once on one of them: the circle about $(-3,-2,2,-4)$ is tangent to $\partial D_2$.
-4. The normals of the radius-$r_c$ lattice circles through the critical points take exactly the 16 directions $u(2\pm i)(1-\zeta)$. Modulo $\pi/4$ these are $0.0709$ and $0.7145$ radians.
+4. The normals of the radius-$r_c$ lattice circles through the critical points take exactly the 16 directions $u(2\pm i)(1-\zeta)$. Modulo $\pi/4$ these are $0.0709$ and $0.7144$ radians.
 
 *Proof.*
 1. $\mathbb Z[\zeta_8]$ is a principal ideal domain. $w\bar w=5(2-\sqrt2)$ forces $w=\mu(2\pm i)(1-\zeta)$ with $|\mu|^2=1$. Every conjugate of $|\mu|^2$ is then 1, so $\mu$ is a root of unity by Kronecker's theorem.
@@ -107,15 +107,21 @@ Everything was checked exactly by `exactlemmas.py`. $\square$
 | $(3,-1,1,2)$ | $0.8787+1.7071i$ | $\partial D_2$ | outside ($22-11\sqrt2$) |
 | $(2,-1,2,-2)$ | $2.7071-0.1213i$ | $\partial D_2$ | outside ($18-3\sqrt2$) |
 
-**Proposition 2.5 (no exact affine renormalization of the centre set).** No map $c\mapsto\alpha c+\beta$ or $c\mapsto\alpha\bar c+\beta$ with $\alpha\in\mathbb Q(\zeta)^\times$ is an isometry in physical space and expanding in internal space. These are the $\mathbb Q$-affine maps of $\mathbb Q(\zeta)$ that respect the splitting into physical and internal space.
+**Proposition 2.5 (physical isometries do not expand internally).** Let $\alpha\in\mathbb Q(\zeta)^\times$ and $\beta\in\mathbb Q(\zeta)$. If $c\mapsto\alpha c+\beta$ or $c\mapsto\alpha\bar c+\beta$ is an isometry in physical space, then it is also an isometry in internal space. Among the $\mathbb Q$-affine maps respecting the physical/internal splitting (the maps $x\mapsto\alpha x+\beta' \bar x+\gamma$ with $\alpha,\beta'\in\mathbb Q(\zeta)$), these two forms are exactly the physical isometries.
 
 *Proof.* Physical isometry means $|\alpha|^2=1$. Since $|\alpha|^2\in\mathbb Q(\sqrt2)$ is then rational, its Galois conjugate $|\sigma\alpha|^2$ is also 1. $\square$
 
-So there is no exact recursion $C(r_{m+1})=F(C(r_m))$ on circle centres by a lattice map. §6 shows what does recur exactly: the germs of the induced pseudogroup.
+So no lattice affine map that is a physical isometry can give an exact recursion $C(r_{m+1})=F(C(r_m))$ of the circle centres, since such a recursion would need the internal window to grow. The proposition says nothing about maps that are not physical isometries, about piecewise or local maps, or about the window itself. §6 reports what was observed to recur: the sampled germs of the induced pseudogroup.
 
 ---
 
-## 3. Finiteness on a larger initial range (proved modulo an exact computation)
+## 3. The certified initial range (proved modulo an exact computation)
+
+**The certified range is that of `../certificates.md`.** It records exact engine certificates for $n=8$ up to $\delta=1/36$ ($r\approx1.703278$, $r_c-r\approx0.008135$; 582 886 circles, 6 474 082 maximal arcs, 82 624 (C4) endpoints). Each was generated and checked by the repository's Lean engine. With group monotonicity this gives:
+
+**Theorem 3.1 (proved modulo the exact computation recorded in `../certificates.md`).** $GG_8(r)$ is finite for every $r\le r_\ast$, where $r_\ast^2=r_c^2-1/36$ and $r_\ast\approx1.703278$.
+
+The certificates produced for this note, listed below, are consistent with that record and implied by it. They are kept because the $1/16$ one has also been checked by a second, unrelated exact verifier, and because the step structure below comes from the same runs.
 
 **Programs.** The certificates were produced by the repository's compiled engine, run read-only:
 ```
@@ -130,7 +136,7 @@ As a second, unrelated check, the exact Python verifier of the earlier note (`ve
 - `verify.py` declares the engine's $1/7$ file VALID: 290 660 image arcs, 465 s.
 - At $\delta=1/14$ the engine gives 36 024 circles and 291 418 arcs, again as tabulated.
 
-**Table 3.1.** New certificates at $r^2=r_c^2-\delta$.
+**Table 3.1.** Certificates produced for this note, at $r^2=r_c^2-\delta$.
 
 | $\delta$ | $r$ | $r_c-r$ | circles | maximal arcs | (C4) endpoints | max $\lvert\sigma(c)\rvert$ | generator | `check-certificate` | `verify.py` |
 |---|---|---|---|---|---|---|---|---|---|
@@ -142,11 +148,9 @@ As a second, unrelated check, the exact Python verifier of the earlier note (`ve
 
 † The $1/20$ certificate and its check log were produced by another session, in the scratch directory `cert/deep/`, by the same engine. For this note, its SHA-256 (`7e0e16ee…aa8aa0f728`) was recomputed and found to match the recorded value, and the check log was read. The check was rerun here with the same checker: **VALID**, 638 s.
 
-**Theorem 3.2 (proved modulo the exact computation of Table 3.1).** $GG_8(r)$ is finite for every $r\le r_\ast$, where $r_\ast^2=r_c^2-1/35$ and $r_\ast\approx1.703045$.
+These certificates give, independently of the record, finiteness for $r^2\le r_c^2-1/35$ ($r\approx1.703045$), which Theorem 3.1 contains. Finiteness for $r^2\le r_c^2-1/16$ is the best-supported part, since it was checked by two unrelated exact implementations.
 
-*Proof.* The exact checker verifies (C1)–(C4) for the $\delta=1/35$ certificate. Then apply `critical-radius-n8.md` Theorem 3.1 and group monotonicity. $\square$
-
-The $1/16$ certificate is the one checked twice, by two unrelated exact implementations. On that basis alone, finiteness for $r^2\le r_c^2-1/16$ is on the firmest footing.
+The referee re-ran `check-certificate` on the $1/35$ and $1/16$ files: both VALID, with all counts as in Table 3.1. The SHA-256 of the $1/35$ file is `d08fa0d01e118e941c32c3e7105596cf15ec9980a93fa556d32f4ffad54a26df`.
 
 **The step structure (evidence; generator output only).** Every run below closed, with no (C4) failure and no exact coincidence.
 
@@ -189,7 +193,7 @@ The strategy: zoom $K(r)$ by $\varepsilon^{-m}$ about $p^\ast$ at $\delta\asymp\
 - At $\delta=1/14$, every $c\in1+2\mathbb Z[\zeta]$ whose circle meets $D_1\cup D_2$ and has $|\sigma(c)|\le40$ is a centre of $K(r)$.
 - The filled fraction is at least $0.986$ up to $|\sigma(c)|=100$, then falls through $0.95,0.78,0.43,0.11,0$.
 - The window's angular profile is flat to 3%, and its radius $R_W$ satisfies $R_W\delta\in[7.8,14.4]$ for $\delta\in[1/14,1/2]$.
-- By Proposition 2.5 this window cannot be renormalized by a lattice map.
+- By Proposition 2.5, no lattice affine map that is a physical isometry can carry this growing window to itself.
 
 **What survives.** The scaling of Lemma 2.3 and the line limit of single circles are correct. The object that has a limit is the pseudogroup *induced* on windows about the critical points. Its partition is much coarser than $K(r)\cap U$: most arcs of $K$ in $U$ are discontinuities of excursions that never return to $U$ at that scale.
 
@@ -224,7 +228,7 @@ The theorem holds for any finitely generated group of bijections. Its content is
 
 **Lemma 5.4.** For $r\le r'$ and every $W$, $R^{(r)}_W(x)\subseteq R^{(r')}_W(x)$. Hence $\beta^{(r)}(W)\le\beta^{(r')}(W)$ and $\beta^{(r)}(V;W)\le\beta^{(r')}(V;W)$.
 
-*Proof.* Take an $r$-chain witnessing $y\in R^{(r)}_W(x)$ and delete its trivial steps. The remaining points are a subset of the original ones, so they still avoid $W$. Each remaining step applies $A^{\pm1}$ or $B^{\pm1}$ at a point of the closed disk of radius $r\le r'$, so it is also an $r'$-step (`boundary-contact.md` Lemmas 2.1, 2.3). $\square$
+*Proof.* Take an $r$-chain witnessing $y\in R^{(r)}_W(x)$ and delete its trivial steps. The remaining points are a subset of the original ones, so they still avoid $W$. Each remaining step applies $A^{\pm1}$ or $B^{\pm1}$ at a point of the closed disk of radius $r\le r'$, so it is also an $r'$-step (`boundary-contact.md` Lemmas 2.1, 2.3). For inverse letters this uses $a^{-1}=A^{-1}$ on $D_1$, which holds because $A(D_1)=D_1$, and likewise for $b^{-1}$. $\square$
 
 **Theorem 5.5 (reduction to the critical radius).** For $r<r_c$ and $W_0\supseteq\dots\supseteq W_n$,
 $$|O_r(z)|\le\beta^{(r_c)}(W_0)\prod_{i=1}^n\beta^{(r_c)}(W_i;W_{i-1})\cdot\max\big(1,\sup_x|O_r(x)\cap W_n|\big).$$
@@ -235,13 +239,15 @@ So **all dependence on $r$ is in the innermost (core) factor**. The bulk and ann
 
 ### 5.3 Windows, zoom and the induction identity
 
-Let $\Xi$ be the 32 critical points of Lemma 2.4, $Q=[-\kappa,\kappa]^2$, and $U_k=\bigcup_{\xi\in\Xi}(\xi+\varepsilon^kQ)$, a disjoint union for $k\ge1$ and $\kappa\le1$. Zoom each component by $Z_k:x\mapsto\xi+\varepsilon^kx$, and let
+Let $\Xi$ be the 32 critical points of Lemma 2.4, $Q=[-\kappa,\kappa]^2$, and $U_k=\bigcup_{\xi\in\Xi}(\xi+\varepsilon^kQ)$. The smallest sup-norm distance between two critical points is exactly $\varepsilon^2=3-2\sqrt2$, so the squares are pairwise disjoint if and only if $2\kappa\varepsilon^k<\varepsilon^2$. For $\kappa=1$ that means $k\ge3$; at $k=1,2$ they overlap.
+
+Theorems 5.3 and 5.5 need only that the windows are nested, which holds for every $k$. The zoomed pseudogroups below need one window per critical point, so they are defined only for $k$ with $2\kappa\varepsilon^k<\varepsilon^2$; this is assumed from here on. For such $k$, zoom each component by $Z_k:x\mapsto\xi+\varepsilon^kx$, and let
 $$\mathcal P_k(\theta)=Z_k^{-1}P(r,U_k)Z_k,\qquad\theta=\delta/\varepsilon^k,$$
 where $P(r,U)$ is the induced pseudogroup on $U$.
 
 A germ of $\mathcal P_k(\theta)$ from the window of $\xi$ to that of $\xi'$ is $x\mapsto\zeta^jx+\tau$ with $\varepsilon^k\tau=\zeta^j\xi+t-\xi'\in\mathbb Z[\zeta]$.
 
-**Lemma 5.6 (induction identity; exact).** Let $\mathcal R$ restrict a pseudogroup on $Q$ to $\varepsilon^2Q$ (composites whose intermediate points stay in $Q$) and then zoom by $\varepsilon^{-2}$. Then $\mathcal R(\mathcal P_k(\theta))=\mathcal P_{k+2}(\theta/\varepsilon^2)$ for every $r$ and $k$.
+**Lemma 5.6 (induction identity; exact).** Let $\mathcal R$ restrict a pseudogroup on $Q$ to $\varepsilon^2Q$ (composites whose intermediate points stay in $Q$) and then zoom by $\varepsilon^{-2}$. Then $\mathcal R(\mathcal P_k(\theta))=\mathcal P_{k+2}(\theta/\varepsilon^2)$ for every $r$ and every $k$ with $2\kappa\varepsilon^k<\varepsilon^2$.
 
 *Proof.* Cut a chain between two points of $U_{k+2}$ at its visits to $U_k\supseteq U_{k+2}$. Conversely, composites of germs of $P(r,U_k)$ are germs of chains. The zooms satisfy $Z_{k+2}=Z_k\circ(\varepsilon^2\cdot)$. $\square$
 
@@ -249,27 +255,28 @@ A germ of $\mathcal P_k(\theta)$ from the window of $\xi$ to that of $\xi'$ is $
 
 ### 5.4 Where the intermediate radii and the curvature enter
 
-- Only one sequence of radii is needed (monotonicity). By Theorem 5.5, the non-core factors are taken at $r_c$, and the core is the induced pseudogroup at the level scale, $\mathcal P_m(\theta_\ast)$ at $r_m$ with $\delta=\theta_\ast\varepsilon^m$.
-- So **only one zoomed parameter $\theta_\ast$ is involved for $r<r_c$**, together with $\theta=0$ at $r_c$. No uniformity over a level interval or over $\theta\to0$ is needed.
-- The phase $\theta_\ast\in\mathbb Q\setminus\mathbb Z$ excludes all tangencies and all lattice points on circles at every $r_m$ (Lemma 2.2(4)).
-- For a limiting line pseudogroup, whose offsets are affine in $\theta$, $\theta_\ast$ can also be chosen to avoid its finitely many events.
+Fix a phase $\theta_\ast\in\mathbb Q\setminus\mathbb Z$ and put $\lambda=\theta_\ast(3\sqrt2-2)$, $\delta_{(m)}=\lambda\varepsilon^m$ and $r_m^2=r_c^2-\delta_{(m)}$. (The factor $3\sqrt2-2$ makes $\theta_\ast$ the ratio $\delta_{(m)}/(\delta_m+\varepsilon^{2m})$ to the level spacing of Lemma 2.3.) At $r_m$ the window $U_m$ has zoomed parameter $\delta_{(m)}/\varepsilon^m=\lambda$.
+- Only one sequence of radii is needed (monotonicity). By Theorem 5.5, the non-core factors are taken at $r_c$, and the core is the induced pseudogroup at the level scale, $\mathcal P_m(\lambda)$ at $r_m$.
+- So **only one zoomed parameter $\lambda$ is involved for $r<r_c$**, together with $\theta=0$ at $r_c$. No uniformity over a level interval or over $\theta\to0$ is needed.
+- Since $\theta_\ast\notin\mathbb Z$, there are no tangencies and no lattice points on circles at any $r_m$ (Lemma 2.2(4)).
+- For a limiting line pseudogroup, whose offsets are affine in $\theta$, $\theta_\ast$ can also be chosen so that $\lambda$ avoids its finitely many events.
 
 ### 5.5 The remaining conjecture
 
-**Conjecture S.** There are $\kappa\in(0,1]$, $k_1\ge1$, $m_0$ and $\theta_\ast\in\mathbb Q\setminus\mathbb Z$ such that the following hold.
+**Conjecture S.** There are $\kappa\in(0,1]$, $k_1\ge1$ with $2\kappa\varepsilon^{k_1}<\varepsilon^2$, $m_0\ge k_1$ and $\theta_\ast\in\mathbb Q\setminus\mathbb Z$ such that the following hold, with $\lambda=\theta_\ast(3\sqrt2-2)$ and $r_m^2=r_c^2-\lambda\varepsilon^m$ as in §5.4.
 
 - **(S1, critical radius only).** At $r=r_c$: $\beta(U_{k_1})<\infty$ and $\beta(U_{k_1+1})<\infty$, and $\beta(U_{k+2};U_k)<\infty$ for every $k\ge k_1$.
-- **(S2, core renormalization).** Put $r_m^2=r_c^2-\theta_\ast(3\sqrt2-2)\varepsilon^m$. For every $m\ge m_0+2$, $\mathcal P_m(\theta_\ast)$ and $\mathcal P_{m-2}(\theta_\ast)$ have the same maximal orbit size. This would follow from a combinatorial conjugacy, that is, an orbit-size-preserving bijection of orbits.
+- **(S2, core renormalization).** For every $m\ge m_0+2$, $\mathcal P_m(\lambda)$ (at $r_m$) and $\mathcal P_{m-2}(\lambda)$ (at $r_{m-2}$) have the same maximal orbit size. This would follow from a combinatorial conjugacy, that is, an orbit-size-preserving bijection of orbits.
 - **(base).** $G(r_{m_0})$ and $G(r_{m_0+1})$ are finite.
 
 **Corollary 5.7 (proved).** Conjecture S implies F₈. Combined with Theorem A of `critical-radius-n8.md`, it implies that the critical radius of $GG_8$ is exactly $\sqrt{10-5\sqrt2}$.
 
 *Proof.* By (S2) and (base), $\sup_x|O_{r_m}(x)\cap U_m|$ equals its value at level $m_0$ or $m_0+1$. That value is finite because those groups are finite: the orbits of $\mathcal P_k$ are the sets $O\cap U_k$, zoomed. Apply Theorem 5.5 with $W_i=U_{k_1'+2i}$, where $k_1'\in\{k_1,k_1+1\}$ has the parity of $m$, and $W_n=U_m$. All factors are finite by (S1). So $G(r_m)$ is finite for all $m\ge m_0$, and monotonicity gives F₈. $\square$
 
-**The base is in reach.** With $\theta_\ast=4/5$ (the value used in §6.2 and §6.4), the radii are $\delta=0.3078$, $0.1275$, $0.0528$ and $0.02188$ at $m=2,3,4,5$.
-- $m=2,3$ satisfy $\delta\ge1/16$, so (base) would hold with $m_0=2$ by Theorem 3.2.
-- $m=4$ lies inside the range of the $1/20$ and $1/35$ certificates.
-- $m=5$ lies beyond every certificate here, since $0.02188<1/35$.
+**The base is in reach.** With $\theta_\ast=4/5$ (the value used in §6.2 and §6.4, so $\lambda=0.8(3\sqrt2-2)$), the radii are $\delta=0.3078$, $0.1275$, $0.0528$ and $0.02188$ at $m=2,3,4,5$.
+- $m=2,3$ satisfy $\delta\ge1/16$, so (base) would hold with $m_0=2$ by Theorem 3.1.
+- $m=4$ lies inside the certified range ($0.0528>1/36$).
+- $m=5$ lies beyond every certificate, since $0.02188<1/36$.
 
 The sampled core maxima (188, 224, 223 at $m=2,4,6$; §6.4) suggest that the core stabilizes only from $m=4$ on. If so, (S2) holds from $m_0+2$ with $m_0=4$, and the base needs levels 4 and 5. Level 4 is certified; level 5 is the next computational target.
 
@@ -282,8 +289,8 @@ More generally, if a perturbation argument proves (S2) only from some $m_1$ on, 
 
   Given (R_c), finiteness for two consecutive $k$ gives it for all $k$.
 - **(S2)** concerns one parameter value. The expected route has three steps:
-  - (R1) *limit*: $\mathcal P_m(\theta_\ast)\to\mathcal P_\infty^{(m\bmod2)}(\theta_\ast)$, a pseudogroup with polygonal domains, bounded by lines in the 8 critical directions and by images of $\partial Q$, with exactly the observed germs;
-  - (R2) *genericity* of the two limit partitions at $\theta_\ast$, with explicit margins. With 8 directions and offsets in $\mathbb Q(\sqrt2)$, this is a finite exact computation once the limits are written down;
+  - (R1) *limit*: $\mathcal P_m(\lambda)\to\mathcal P_\infty^{(m\bmod2)}(\lambda)$, a pseudogroup with polygonal domains, bounded by lines in the 8 critical directions and by images of $\partial Q$, with exactly the observed germs;
+  - (R2) *genericity* of the two limit partitions at $\lambda$, with explicit margins. With 8 directions and offsets in $\mathbb Q(\sqrt2)$, this is a finite exact computation once the limits are written down;
   - (R3) a *perturbation lemma*: domains bounded by arcs of radius $\ge R$ that are $C^1$-close to a generic polygonal partition, with the same exact germs, have the same combinatorics once $1/R$ is below an explicit multiple of the margins.
 
   Combined, these give (S2) for $m\ge m_1$ with $m_1$ explicit. The base must then reach level $m_1$.
@@ -299,7 +306,7 @@ More generally, if a perturbation argument proves (S2) only from some $m_1$ on, 
 - Induced germs at $p^\ast$ are the pairs $(j,\tau)$ with $\tau=\zeta^jp^\ast+t-p^\ast$ for the orbit points in the window.
 - Sampling finds germs; it cannot exclude rare ones.
 
-### 6.1 Exact germ recursion with period two
+### 6.1 Sampled germ sets: agreement with period two
 
 The window is the disc of radius $0.4\delta$ about $p^\ast$, and $\delta=0.8\,\delta_m$.
 
@@ -311,9 +318,9 @@ The window is the disc of radius $0.4\delta$ about $p^\ast$, and $\delta=0.8\,\d
 | 5 | 0.02176 | 300 | 53 844 / 256 990 | 21 | 2.19 |
 | 6 | 0.00904 | 200 | 282 287 / 1 391 778 | 23 | 2.77 |
 
-**Observation 6.1.**
-- $\{(j,\varepsilon^2\tau)\}$ over $G_2$ equals $G_4$ exactly: all 27 germs, in both directions.
-- $\varepsilon^2G_3$ and $G_5$ share 20 germs. The 3 germs of $\varepsilon^2G_3$ missing at $m=5$ each had frequency at most 1% at $m=3$, and $m=5$ had only 300 samples.
+**Observation 6.1 (floating-point evidence; $G_m$ is the set of germs found in the samples).**
+- $\{(j,\varepsilon^2\tau)\}$ over $G_2$ equals $G_4$: all 27 sampled germs, in both directions.
+- $\varepsilon^2G_3$ (23 germs) and $G_5$ (21 germs) share 20 germs. The 3 germs of $\varepsilon^2G_3$ missing at $m=5$ each had frequency at most 1% at $m=3$, and $m=5$ had only 300 samples.
 - With period one, $\tau\mapsto\varepsilon\tau$, only 10 germs match. No additional rotation or reflection about $p^\ast$ fixes this: the best of 16 such maps matches 16 germs.
 - Orbit sizes grow by about $(1+\sqrt2)^2$ per level, while the number of visits to the window and the number of germs stay bounded.
 
@@ -334,7 +341,7 @@ The disagreement halves about every level, as expected if the boundaries move by
 
 At level 4 with a square window, `bdir.py` bisected 40 boundary points of the zoomed induced partition. Each boundary is one of two kinds:
 - an image of the window's sides: direction $\equiv0\pmod{\pi/4}$, straight;
-- an arc within $0.03$ rad of the critical directions $0.0709$ or $0.7145\pmod{\pi/4}$ of Lemma 2.4(4), with curvature consistent with radius $r\varepsilon^{-4}\approx57$.
+- an arc within $0.03$ rad of the critical directions $0.0709$ or $0.7144\pmod{\pi/4}$ of Lemma 2.4(4), with curvature consistent with radius $r\varepsilon^{-4}\approx57$.
 
 No other direction occurred. With a disc window there are, in addition, arcs of radius about 1 in all directions: the images of the window circle.
 
@@ -342,7 +349,7 @@ So in the limit the induced partition should be polygonal, with lines in 8 direc
 
 ### 6.4 The factors of Theorem 5.5
 
-Windows are squares with $\kappa=1$. Counts are sample maxima.
+Windows are squares with $\kappa=1$. Counts are sample maxima. At $\kappa=1$ the squares of $U_2$ overlap (§5.3), so the annulus rows that use $U_2$ refer to the union $U_2$, not to 32 separate windows. This does not affect the definitions of $R_W$ and $\beta$, which need only sets.
 
 | quantity | $m=2$ | $m=3$ | $m=4$ | $m=5$ | $m=6$ | $m=8$ | $r_c$ |
 |---|---|---|---|---|---|---|---|
@@ -368,14 +375,17 @@ Sample sizes:
 
 | claim | status |
 |---|---|
-| Lemma 2.1 (centres in $1+2\mathbb Z[\zeta]$); Lemma 2.2 (no tangency or lattice points on circles on the families used) | **proved** |
-| Lemma 2.3 (levels; scaling $\delta\asymp\varepsilon^m$, zoom $\varepsilon^{-m}$) | **proved** |
-| Lemma 2.4 (32 critical points, 8 classes, tangency circles, 16 normal directions); Proposition 2.5 (no affine recursion of the centre set) | **proved** |
-| Finiteness up to $\delta=1/16$ | **proved modulo the exact computation of Table 3.1** (both exact checkers VALID) |
-| Finiteness up to $\delta=1/35$ ($r_\ast\approx1.703045$) | **proved modulo the exact computation** (engine's exact checker VALID at $1/20$ and $1/35$; `verify.py` not run on these) |
-| Theorem 5.3, Lemma 5.4, Theorem 5.5, Lemma 5.6, Corollary 5.7 (S ⇒ F₈) | **proved** |
+| Lemma 2.1 (centres in $1+2\mathbb Z[\zeta]$); Lemma 2.2 (no tangency or lattice points on circles on the families used) | **proved**; referee: correct, recomputed |
+| Lemma 2.3 (levels; scaling $\delta\asymp\varepsilon^m$, zoom $\varepsilon^{-m}$) | **proved**; referee: correct, identity recomputed for $m\le12$ |
+| Lemma 2.4 (32 critical points, 8 classes, tangency circles, 16 normal directions) | **proved**; referee: correct, all recomputed exactly |
+| Proposition 2.5 (physical isometries among the lattice affine maps are internal isometries) | **proved**; referee: correct but weak, now stated with its premise |
+| Finiteness up to $\delta=1/36$ ($r_\ast\approx1.703278$; Theorem 3.1) | **proved modulo the exact computation recorded in `../certificates.md`** |
+| Finiteness up to $\delta=1/35$, and up to $1/16$ (Table 3.1) | **proved modulo the exact computation**; consistent with and implied by the $1/36$ record. Referee: re-ran `check-certificate` on the $1/35$ and $1/16$ files, both VALID. $1/16$ is also VALID under `verify.py` (not re-run by the referee) |
+| Lemmas 5.1, 5.2, Theorem 5.3, Lemma 5.4, Theorem 5.5 | **proved**; referee: correct line by line, and general in $n$ |
+| Lemma 5.6; the window condition $2\kappa\varepsilon^k<\varepsilon^2$ in §5.3 and Conjecture S | **proved**; the window condition is not yet refereed |
+| Corollary 5.7 (S ⇒ F₈) | **proved**; referee: correct, given the consistent notation $\lambda$ of §5.4 |
 | Stable limit of $K(r)$ at $p^\ast$ (the literal strategy) | **fails** (evidence, §4) |
-| Exact period-2 germ recursion; convergence of the zoomed induced partitions; 8 limit directions; bounded core; finite bulk factor at $r_c$ | **evidence** (§6) |
+| Period-2 agreement of sampled germ sets ($2\to4$: 27/27; $3\to5$: 20 of 23); convergence of the zoomed induced partitions; 8 limit directions; bounded core; finite bulk factor at $r_c$ | **evidence** (§6; floating-point sampling); not checked by the referee |
 | Conjecture S, hence F₈ | **open** |
 
 **Gaps.**
@@ -384,7 +394,11 @@ Sample sizes:
    - (S2) needs the two limit polygonal pseudogroups written down explicitly, from the active constraints of each germ's realizing word, together with an exact genericity check and a perturbation lemma. Not done.
    - The base must reach the perturbation threshold $m_1$, which is unknown.
 2. **Section 6 uses floating-point disk tests and samples.** Germ sets may miss rare germs. No proof step rests on §6.
-3. **Independent checking.** The $1/16$ certificate was checked by the engine's exact checker, which shares the exact field layer with the generator, and by the unrelated Python verifier (both VALID). The larger certificates were checked by the engine's checker only. This note has not been refereed.
+3. **Independent checking.**
+   - The $1/16$ certificate was checked by the engine's exact checker, which shares the exact field layer with the generator, and by the unrelated Python verifier; both VALID.
+   - The $1/20$, $1/35$ and $1/36$ certificates were checked by the engine's checker only. The referee re-ran it on $1/35$ and $1/16$.
+   - The correctness of the Lean engine itself rests on `../certificates.md` §7 and its referee report.
+   - The note has been refereed (`referee-report-sharp-lower-bounds.md`). The referee did **not** check: the floating-point experiments of §§4 and 6; `verify.py` on the $1/16$ certificate; the $1/20$ certificate; the regeneration of the $1/36$ certificate; the Lean engine's own correctness; or whether Conjecture S is plausible. In particular, (S1) at $r_c$ could fail if $r_c$ has infinite orbits that avoid all critical windows. Nothing here rules that out.
 4. **Where structure is born.** It is assumed, not proved, that the 32 lattice points of Lemma 2.4 are the only places where structure is born. Evidence: the level-4 jump is born within $0.31\delta$ of them (§3); orbits avoiding them stay small (§6.4); the bulk factor at $r_c$ is finite in every sample.
 
 ---
@@ -396,7 +410,7 @@ Sample sizes:
 - **Lemma 2.4** becomes a norm equation for the critical points and their normal directions. **Proposition 2.5** holds verbatim.
 - **The §4 test should be repeated.** The prediction is that $K(r)$ has no local limit for any $n$.
 - **The §6 programs** use only $\mathbb Z[\zeta]$ arithmetic with $\zeta^4=-1$. Porting them means changing the reduction rule, the critical points and the unit. The period of the germ recursion must be measured. For $n=8$ it is two levels ($\varepsilon^2$), even though the orbit-of-0 thresholds jump once per factor $1+\sqrt2$.
-- **The certificates** of §3 come from the repository engine, which handles $n=5,8,10,12$.
+- **The certificates** of §3 come from the repository engine, which handles $n=5,8,10,12$. Certified ranges for every $n$ are those recorded in `../certificates.md`.
 
 ---
 
