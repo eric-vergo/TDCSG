@@ -246,9 +246,10 @@ the author's run at 1/60 was stopped at more than 3.2·10⁵ circles.
 
 ### n = 10, r² = 4 − φ − δ (r_c ≈ 1.543362)
 
-No note on n = 10 is committed yet. A draft by another author (`critical-radius-n10.md`, Table 4.1,
-exact Python closure) lists δ = 1/2, 1/3, 1/5, 1/7, 1/10, 1/14; every one of its circle, piece,
-maximal-arc and (C4) counts agrees with ours.
+Table 4.1 of [`proofs/critical-radius-n10.md`](proofs/critical-radius-n10.md) (exact Python
+closure, reproduced by its referee) lists δ = 1/2, 1/3, 1/5, 1/7, 1/10, 1/14, 1/16; every one of its
+circle, piece, maximal-arc and (C4) counts agrees with ours, and its (C2) image counts are again 4
+higher (598 244 against 598 240 at 1/16).
 
 | δ | r | r_c − r | circles | maximal arcs | pieces | (C4) endpoints | max\|σ(c)\| | gen. | check | file |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -258,12 +259,13 @@ maximal-arc and (C4) counts agrees with ours.
 | 1/7 | 1.496365 | 0.046997 | 6 058 | 24 000 | 290 916 | 2 252 | 51.0 | 2.1 s | 6.8 s | 1.0 MB |
 | 1/10 | 1.510618 | 0.032744 | 11 722 | 47 128 | 530 151 | 3 112 | 79.9 | 4.5 s | 14 s | 2.0 MB |
 | 1/14 | 1.520045 | 0.023317 | 33 040 | 205 320 | 2 718 214 | 9 448 | 117.2 | 33 s, 0.14 GB | 61 s, 0.16 GB | 9.2 MB |
+| 1/16 | 1.522979 | 0.020383 | 33 364 | 260 176 | 3 901 930 | 11 792 | 117.2 | 43 s, 0.18 GB | 72 s, 0.21 GB | 12 MB |
 | 1/20 | 1.527078 | 0.016284 | 114 888 | 689 072 | 12 789 337 | 16 884 | 217.0 | 168 s, 0.45 GB | 221 s, 1.3 GB | 33 MB |
 | 3/100 | 1.533612 | 0.009750 | 144 882 | 1 453 954 | 54 835 671 | 31 572 | 245.0 | 1 058 s, 0.94 GB | 486 s, 1.1 GB | 70 MB |
 | 1/40 | 1.535241 | 0.008121 | 203 874 | 2 169 434 | 79 890 589 | 38 596 | 328.4 | 1 737 s, 1.4 GB | 716 s, 1.7 GB | 106 MB |
 | 1/47 | 1.536454 | 0.006908 | 418 510 | 3 936 494 | 105 364 502 | 43 768 | 449.7 | 2 564 s, 2.5 GB | 1 313 s, 3.1 GB | 197 MB |
 
-One count disagrees with the draft, and it is not an exact count there: at δ = 1/20 the draft
+One count disagrees with that note, and it is not an exact count there: at δ = 1/20 the note
 reports a floating-point closure (arcs stored as float angle intervals and merged numerically) with
 114 888 circles, as here, and 689 665 merged arcs, against 689 072 exact maximal arcs here. The
 exact count is the one the checker verifies (disjoint, non-touching arcs); the excess of 593 is
@@ -289,7 +291,7 @@ programs; by group monotonicity GG_n(r) is then finite for every r ≤ r_* (subj
 |---|---|---|---|---|---|---|
 | 5 | 3 + φ | 2.148961 | 1/55 | 2.144727 | 0.004235 | δ = 1/10, r_c − r = 0.023394 |
 | 8 | 10 − 5√2 | 1.711412 | 1/36 | 1.703278 | 0.008135 | δ = 1/14, r_c − r = 0.020997 |
-| 10 | 4 − φ | 1.543362 | 1/47 | 1.536454 | 0.006908 | δ = 1/14, r_c − r = 0.023317 (draft) |
+| 10 | 4 − φ | 1.543362 | 1/47 | 1.536454 | 0.006908 | δ = 1/16, r_c − r = 0.020383 |
 | 12 | 40 − 22√3 | 1.376547 | 1/180 | 1.374528 | 0.002019 | δ = 1/50, r_c − r = 0.007284 |
 
 The remaining gap is open in every case: no single computation reaches r_c, and the window
@@ -343,6 +345,7 @@ All certificates of §§4–5 (n, δ, maximal arcs, size in bytes, SHA-256):
 | 10 | 1/7 | 24000 | 1012489 | `a3ac01be07ea46b4d27774a7dcf0be960bb21896b69d557b619f0e29de67d1b3` |
 | 10 | 1/10 | 47128 | 2032164 | `1862bd39d72d52d5f25c45166c240d5dd40e221e73a8feeff910eacc12b857fe` |
 | 10 | 1/14 | 205320 | 9222916 | `91681b4e4fdb8f76968ffd88fd5a4d586a8bcfe01c07cf2bbf2c52198f38aebc` |
+| 10 | 1/16 | 260176 | 11739330 | `a1571a4b136f5d5a59699839b74af12eec71339ddfa62f0b7b51f7acacb7fdb1` |
 | 10 | 1/20 | 689072 | 32591803 | `074358575f58c4f3c66edfaa79dc8b15d515c1f30658fbe3e44f8152a31bb1b4` |
 | 10 | 3/100 | 1453954 | 69775831 | `4a7063345f10a8cccbfce3525dee6562c6d5c1fe49ad000b2f7f0fe7eb351c7a` |
 | 10 | 1/40 | 2169434 | 105619656 | `c63a069880b20bdf14838ca33d31ab35046936f4a783477057695305822c9398` |
