@@ -299,6 +299,23 @@ theorem applyWord_line {n : ℕ} {r : ℝ} {w : List Letter} {V : ℂ} {t₀ t�
   rw [hst]
   ring
 
+/-! ### Distances in coordinates -/
+
+theorem dist_sq_eq_re_im (z w : ℂ) :
+    dist z w ^ 2 = (z.re - w.re) ^ 2 + (z.im - w.im) ^ 2 := by
+  rw [dist_eq_norm, ← normSq_eq_norm_sq, normSq_apply]
+  simp only [sub_re, sub_im]
+  ring
+
+theorem mem_closedBall_of_sq_le {z w : ℂ} {r : ℝ} (hr : 0 ≤ r)
+    (h : (z.re - w.re) ^ 2 + (z.im - w.im) ^ 2 ≤ r ^ 2) : z ∈ closedBall w r := by
+  rw [mem_closedBall, ← pow_le_pow_iff_left₀ dist_nonneg hr two_ne_zero, dist_sq_eq_re_im]
+  exact h
+
+theorem sq_le_of_sqrt_le {r x : ℝ} (hx : 0 ≤ x) (hr : √x ≤ r) : x ≤ r ^ 2 := by
+  have := pow_le_pow_left₀ (Real.sqrt_nonneg x) hr 2
+  rwa [Real.sq_sqrt hx] at this
+
 end TDCSG
 
 end
