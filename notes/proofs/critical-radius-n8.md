@@ -7,8 +7,9 @@ Authors: Eric Vergo, Claude
 > (A) $GG_8(r)$ is infinite for every $r\ge r_c$; and (B) $GG_8(r)$ is finite for every $r<r_c$.
 
 **Status.**
-- **(A) is proved, modulo an exact finite computation that was carried out.** The infinite orbit is the orbit of the lattice point $p^\ast=1-2\zeta+\zeta^2-\zeta^3=-1+(2+i)(1-\zeta)$. It lies exactly on $\partial D_1$ when $r=r_c$, since $|p^\ast+1|^2=5|1-\zeta|^2=10-5\sqrt2$. For every $r\ge r_c$ the orbit of $p^\ast$ contains the points $p^\ast+i(4\sqrt2-4)\varepsilon^k$ for all $k\ge0$ (Theorem A, §2.5). These points accumulate at $p^\ast$ along a straight vertical line, at ratio $\varepsilon$. This is a rigorous form of the paper's "path from the centre to the boundary", whose limit point is $p^\ast$. The mechanism is a one-dimensional self-similar structure on a chord through $p^\ast$: 31 partial isometries of the chord, each realized by an explicit group word, form a family that is closed under rescaling by $\varepsilon$ about $p^\ast$. Every disk test, domain endpoint and composition behind this closure was checked in exact arithmetic. The data are listed in full in Appendix A, so they can be re-checked independently.
-- **(B) is open.** It is proved only on an initial range $r\le r_\ast$, with $r_\ast^2=r_c^2-\delta_\ast$, by an exact finite computation (§3) combined with the already-refereed group monotonicity. The best certified value is $\delta_\ast=1/7$, which gives $r_\ast\approx1.669154$ and $r_c-r_\ast\approx0.0423$ (Table 3.1). The window $r_\ast<r<r_c$ is not proved.
+- **(A) is proved, modulo an exact finite computation that was carried out.** The infinite orbit is the orbit of the lattice point $p^\ast=1-2\zeta+\zeta^2-\zeta^3=-1+(2+i)(1-\zeta)$. It lies exactly on $\partial D_1$ when $r=r_c$, since $|p^\ast+1|^2=5|1-\zeta|^2=10-5\sqrt2$. For every $r\ge r_c$ the orbit of $p^\ast$ contains the points $p^\ast+i(4\sqrt2-4)\varepsilon^k$ for all $k\ge0$ (Theorem A, §2.5). These points accumulate at $p^\ast$ along a straight vertical line, at ratio $\varepsilon$. This is consistent with the limit point and the scale of the paper's "path from the centre to the boundary"; whether it is that path is not shown (§2.6). The mechanism is a one-dimensional self-similar structure on a chord through $p^\ast$: 31 partial isometries of the chord, each realized by an explicit group word, form a family that is closed under rescaling by $\varepsilon$ about $p^\ast$. Every disk test, domain endpoint and composition behind this closure was checked in exact arithmetic. The data are listed in full in Appendix A, so they can be re-checked independently.
+- **(B) is open.** It is proved only on an initial range $r\le r_\ast$, with $r_\ast^2=r_c^2-\delta_\ast$, by an exact finite computation (§3) combined with the already-refereed group monotonicity. The best exact certificate is at $\delta_\ast=1/14$, which gives $r_\ast\approx1.690415$ and an open window of length $r_c-r_\ast\approx0.0210$ (Table 3.1). Certificates beyond $\delta=1/7$ ($r\approx1.669154$) are newer than the referee report and not yet refereed. The window $r_\ast<r<r_c$ is not proved.
+- **Refereeing.** This note was independently refereed; see `referee-report-critical-radius-n8-n12.md` in this directory. The referee reproduced Part A fully and exactly, from Appendix A and the definitions, including end-to-end checks that expand the induction into explicit group words for $k\le7$ and apply them letter by letter with the true generators. It reproduced the Theorem B certificates at every table radius up to $\delta=1/7$ with its own closure program, which used floating-point comparisons; all canonical invariants agree.
 - **Is $r_c$ the exact threshold?** What is proved is $r_\ast\le\inf\{r: GG_8(r)\text{ infinite}\}\le r_c$. The closed form is confirmed as an *upper bound* for the critical radius, and as the exact radius at which this particular mechanism switches on: $p^\ast$ enters $D_1$ exactly at $r_c$. Whether some other point already has an infinite orbit at a radius in $(r_\ast,r_c)$ is not excluded. The numerical evidence (§5) says no.
 
 Throughout, "verified exactly" means that every equality, and the sign of every real number used, is decided by integer and rational arithmetic in $\mathbb Q(\sqrt2)$ or in towers $\mathbb Q(\sqrt2)(\sqrt{H_1},\sqrt{H_2})$ with $H_i\in\mathbb Q(\sqrt2)$. No floating-point decision enters any proof step. Floats are used only to *search* for the data that are then checked.
@@ -33,7 +34,7 @@ Throughout, "verified exactly" means that every equality, and the sign of every 
 
 **Lemma 1.1 (convexity).** Let $[x,y]$ be a segment, $g\in\{a^{\pm1},b^{\pm1}\}$ with disk $D$, and suppose $x,y\in D$. Then $[x,y]\subseteq D$, and $g$ acts on $[x,y]$ as the global rotation. *Proof.* Disks are convex. $\square$
 
-**Definition 1.2 (word valid on a segment).** A word $w=g_1\cdots g_\ell$ is *valid* on a segment $\sigma$ if, for each $j$, the image of $\sigma$ under the global rotations of $g_1,\dots,g_{j-1}$ lies in the disk of $g_j$. By Lemma 1.1 it suffices to check this at the two endpoints. Then $w$ acts on $\sigma$ as the composite isometry $x\mapsto\zeta^jx+t$, and $w(y)\in O(y)$ for every $y\in\sigma$.
+**Definition 1.2 (word valid on a segment).** A word $w=g_1\cdots g_\ell$ is *valid* on a segment $\sigma$ if, for each $j$, the image of $\sigma$ under the global rotations of $g_1,\dots,g_{j-1}$ lies in the disk of $g_j$. Every letter is thus required to *rotate* the whole segment; a letter is never allowed to act as the identity. This is what makes an endpoint check sufficient: "inside a disk" is a convex condition, while "wholly outside a disk" is not. So by Lemma 1.1 it suffices to check validity at the two endpoints. Then $w$ acts on $\sigma$ as the composite isometry $x\mapsto\zeta^jx+t$, and $w(y)\in O(y)$ for every $y\in\sigma$.
 
 If a word is valid on $\sigma$ at radius $r_0$, it is valid on $\sigma$ at every $r\ge r_0$, with the same action, because the disks only grow.
 
@@ -92,15 +93,15 @@ Then for every $k\ge0$, every $f\in\mathcal F$ and every $t\in\varepsilon^kD_f$,
 
 ### 2.4 The certificate
 
-Appendix A lists a family $\mathcal F$ of **31 words**. For each word it gives its type $t\mapsto\pm t+c$, with $c\in\mathbb Z[\sqrt2]$, its exact domain $D_f$, and, for the closure, the decomposition of $\varepsilon D_f$ into pieces with the sequence of family members used on each piece. There are 49 pieces and 172 composition steps in total; every sequence has length at most 4. The words have length at most 12.
+Appendix A lists a family $\mathcal F$ of **31 words**. For each word it gives its type $t\mapsto\pm t+c$, with $c\in\mathbb Z[\sqrt2]$, its exact domain $D_f$, and, for the closure, the decomposition of $\varepsilon D_f$ into pieces with the sequence of family members used on each piece. There are 46 pieces and 172 composition steps in total; every sequence has length at most 4. (Appendix A also lists 3 redundant one-point pieces, in rows 10, 13 and 15. Each consists only of the right endpoint of $\varepsilon D_f$, which the previous piece already reaches. They are valid but play no role, and are ignored in the counts and in Lemma 2.3.) The words have length at most 12.
 
 **Lemma 2.3 (exact check).** At $r=r_c$:
-1. For each of the 31 words, the exact domain $D_w$ is the listed interval, and the word is valid at both endpoints. The endpoints are computed as roots of the binding quadratic constraints and compared exactly. Validity at an endpoint $u+v\sqrt d$ is the sign of an element of $\mathbb Q(\sqrt2)(\sqrt d)$.
+1. For each of the 31 words, the word is valid at both endpoints of the listed interval $D_w$, hence on all of it. (The listed intervals are in fact the maximal domains, but the proof uses only validity on them.) The endpoints are computed as roots of the binding quadratic constraints and compared exactly. Validity at an endpoint $u+v\sqrt d$ is the sign of an element of $\mathbb Q(\sqrt2)(\sqrt d)$.
 2. The composite rotation of each word is $\pm1$, and the translation part is the listed $c$, exactly in $\mathbb Z[\sqrt2]$.
 3. For each family member $f$ and each listed piece $[x,R]\subseteq\varepsilon D_f$, with sequence $g_1,\dots,g_L$:
    - every intermediate image interval lies in the next domain $D_{g_i}$, checked exactly by comparing endpoints in towers with at most two radicals;
    - the composite equals $t\mapsto\varepsilon f(t/\varepsilon)$ exactly;
-   - consecutive pieces share endpoints and cover $\varepsilon D_f$.
+   - consecutive pieces share endpoints and cover $\varepsilon D_f$; pieces listed after full coverage is reached are ignored.
 
 *Proof.* Exact computation: program `verify_closure_n.py` with the module `exactn.py`, data file `closure_bbab.pkl`, run as `python3 -I verify_closure_n.py 8 closure_bbab.pkl`. Output:
 ```
@@ -126,12 +127,12 @@ Hence the orbit is infinite and $GG_8(r)$ is infinite.
 
 *Proof.*
 1. At $r=r_c$, Lemma 2.3 gives the hypotheses of Lemma 2.1 for the 31-element family.
-2. For $r>r_c$ every word stays valid on its domain with the same action (§1). The closure condition refers only to the fixed intervals $D_f$ and isometries $f$, so it still holds.
+2. For $r>r_c$ no monotonicity theorem is needed. Every letter of every word rotates because the point lies in the closed disk at $r_c$; the disks only grow, so the same letters still rotate, with the same action (§1). The closure condition refers only to the fixed intervals $D_f$ and isometries $f$, so it still holds.
 3. The seed has $0\in D_{\mathtt{bbab}}$ and $\mathtt{bbab}(0)=4\sqrt2-4=4\varepsilon\neq0$. Corollary 2.2 gives the points $p^\ast+4i\varepsilon\cdot\varepsilon^k$.
 4. They are distinct because $0<\varepsilon<1$. An infinite orbit forces an infinite group. $\square$
 
 **Remarks.**
-1. Only the closed-disk convention at the single point $p^\ast\in\partial D_1$ matters at $r=r_c$: the seed is valid at $t=0$ because $p^\ast$ lies on the closed disk $D_1$. For $r<r_c$ the seed is not valid at $t=0$, and the argument says nothing.
+1. *Where $r_c$ enters.* The seed itself does **not** need $p^\ast\in\partial D_1$. Its four disk tests at $p^\ast$ have squared distances $6-3\sqrt2,\ 6-3\sqrt2,\ 14-9\sqrt2,\ 22-15\sqrt2$ to the relevant centres (checked exactly), so $\mathtt{bbab}$ is valid at $t=0$ for every $r\ge\sqrt{6-3\sqrt2}\approx1.3256$. What needs $r=r_c$ is the family as a whole. The domains in Appendix A are the maximal domains at $r_c$, and at many of their endpoints the active constraint is a letter's disk test holding with equality at $r=r_c$. For example, along row 9 ($\mathtt{bbaabbaBABaB}$, domain $[0,3\sqrt2-4]$) started at $t=0$, the 7th letter $a$ and the 9th letter $\mathtt A$ are applied to the lattice points $-2+\zeta+2\zeta^2-2\zeta^3$ and $-\zeta+2\zeta^2-2\zeta^3$, which lie exactly on $\partial D_1$ at $r_c$ (squared distance $10-5\sqrt2$ from $-1$; they are among the 16 critical points of §2.1). This is where the closed-disk convention is used. For $r<r_c$ those domains shrink, Lemma 2.3 as stated fails, and the argument says nothing.
 2. *Independent sanity check (not part of the proof).* An exact breadth-first search of the orbit of $p^\ast$ at $r_c$, capped at $3\cdot10^6$ points, finds $p^\ast+4i\varepsilon^{k+1}$ for $k=0,\dots,6$. The internal-space modulus grows like $|\bar\varepsilon|^{k}=(1+\sqrt2)^k$, as it must.
 3. *The orbit of $0$.* The same kind of search finds that at $r_c$ the orbit of $0$ contains $p^\ast+i\varepsilon^m$ for $m=0,\dots,8$, reached by words of lengths $3,1,7,9,27,57,143,337,819$, growing like $(1+\sqrt2)^m$. Whether the orbit of $0$ is infinite at $r_c$ is not proved here, although this strongly suggests it.
 
@@ -142,7 +143,7 @@ The paper describes a path of segments that follows the fractal from a disk cent
 - **The self-similarity is exact and one-dimensional.** The renormalization is the similarity $z\mapsto p^\ast+\varepsilon(z-p^\ast)$ of the chord $J$. The induced pseudogroup of partial isometries of $J$ near $p^\ast$ reproduces itself under it (Lemma 2.3).
 - **The construction stays inside the disks.** Every letter of every word is checked to be applied inside its closed disk. Validity is in fact all that is ever used.
 - **Approach to the boundary.** The points $p^\ast+4i\varepsilon^{k+1}$ approach $p^\ast$ along $J$ from inside $D_1$. In the threshold sweep of the orbit of $0$ (`notes/engine.md`), the entering points at the main jumps of one type are $p^\ast+i\varepsilon^{2k+1}$. Exactly, these are $(1,27,-40,28)$ at $r^2=3117-2202\sqrt2$ and $(1,167,-238,168)$ at $r^2=112761-79732\sqrt2$. The jumps of the other type enter near the points $-1+(2-i)(1-\zeta)\zeta^{k}$.
-- What was **not** reproduced: the paper's statement that consecutive segments "traverse angles of $\pi/8$". In the construction here the approach to $p^\ast$ is along a straight line. The paper's figure could not be inspected for this note.
+- What was **not** reproduced: the paper's statement that consecutive segments "traverse angles of $\pi/8$". In the construction here the approach to $p^\ast$ is along a straight line. The paper's figure could not be inspected for this note. One observation (from the referee report): if "traverse angles of $\pi/8$" meant that consecutive segment vectors differ by the factor $\varepsilon e^{i\pi/8}$, the vertices could not all be orbit points of a lattice point, because differences of such orbit points lie in $\mathbb Z[\zeta_8]$ and $e^{i\pi/8}\notin\mathbb Q(\zeta_8)$. So either the paper's path is not made of orbit points, or "angle" means something else; in either case the straight-line mechanism here does not contradict the paper's text.
 
 ---
 
@@ -163,7 +164,7 @@ The certificate is the one formulated for $n=5$ in `critical-radius-n5.md` (Theo
 **Theorem 3.1.** Fix $r>1$. Let $K\subset\mathbb C$ be a finite union of non-degenerate closed arcs of circles of radius $r$ such that:
 - **(C1)** $\partial D_1\cup\partial D_2\subseteq K$;
 - **(C2)** $A^{\pm1}(K\cap D_1)\subseteq K$ and $B^{\pm1}(K\cap D_2)\subseteq K$;
-- **(C3)** no circle carrying an arc of $K$ is tangent to $\partial D_1$ or $\partial D_2$;
+- **(C3)** no circle carrying an arc of $K$, other than $\partial D_p$ itself, is tangent to $\partial D_p$ ($p=1,2$);
 - **(C4)** every endpoint of a maximal arc of $K$ (a connected component of $K\cap C$ for a circle $C$) that lies on $\partial D_p$ belongs to a maximal arc entering $\operatorname{int}D_p$ there.
 
 Then $GG_8(r)$ is finite.
@@ -180,14 +181,14 @@ Then $GG_8(r)$ is finite.
    - By (C1), a face lies in $\operatorname{int}D_1$ or outside $D_1$.
    - An edge not on $\partial D_1$ cannot meet $\partial D_1$, because a meeting point would be in $V$.
    - So each generator acts on each cell by a single isometry and maps it onto a cell.
-5. **Finiteness.** Every $g\in GG_8(r)$ acts on each cell $X$ by a single map $x\mapsto\zeta^jx+t$ carrying $X$ onto a cell.
+5. **Finiteness.** By induction along words, every $g\in GG_8(r)$ acts on each cell $X$ by a single map $x\mapsto\zeta^jx+t$ carrying $X$ onto a cell: the letter applied at each step is the single isometry by which that generator acts on the current cell. This covers the singleton cells of $V$ as well.
    - For a bounded cell and a given target cell there are at most $8$ such maps, one for each $j$: a non-trivial translation cannot preserve a bounded set.
    - The unbounded face is fixed pointwise by every generator.
    - So $g$ is one of finitely many maps on each of finitely many cells, and $GG_8(r)$ is finite. $\square$
 
 ### 3.3 The computation
 
-**Program.** `cut/cut.py` (closure) and `cut/verify.py` (certificate check), with the exact field module `cut/field.py`, in the scratch directory `t4_8/`. They were written independently of the $n=5$ programs, following the same design, with one change: all ordering decisions are exact here, not interval-arithmetic. Input: a rational $\delta$, with $r^2=\rho=(10-\delta)-5\sqrt2$.
+**Program.** `cut/cut.py` (closure) and `cut/verify.py` (certificate check), with the exact field module `cut/field.py`, in the scratch directory `t4_8/`. They were written independently of the $n=5$ programs, following the same design, with one change: all ordering decisions are exact here, not interval-arithmetic. During the closure the covered part of each circle is kept as a list of disjoint maximal arcs (a new piece is joined to stored arcs it touches), and only float angles are cached; exact data of an endpoint are recomputed on demand. This keeps memory near $1$–$2$ GB at the largest radii certified. Input: a rational $\delta$, with $r^2=\rho=(10-\delta)-5\sqrt2$.
 
 **Closure.**
 1. Start from the full circles $\partial D_1,\partial D_2$.
@@ -215,27 +216,33 @@ Then $GG_8(r)$ is finite.
 
 ### 3.4 Results
 
-**Table 3.1.** Cut set $K(r)$ at $r^2=r_c^2-\delta$. "Pieces" are stored arcs before merging. "Max $|\sigma(c)|$" is the largest internal-space modulus of a circle centre, with $\sigma:\zeta\mapsto\zeta^3$.
+**Table 3.1.** Cut set $K(r)$ at $r^2=r_c^2-\delta$. Circles, maximal arcs and (C4) endpoints are invariants of the minimal cut set $K(r)$. "Max $|\sigma(c)|$" is the largest internal-space modulus of a circle centre, with $\sigma:\zeta\mapsto\zeta^3$. Every listed certificate was checked by the exact verifier, with (C4) failures $0$ and no tangency.
 
-| $\delta$ | $r$ | $r_c-r$ | closure | circles | pieces | maximal arcs | (C2) image arcs checked | (C4) endpoints / failures | max $\lvert\sigma(c)\rvert$ | exact verification |
-|---|---|---|---|---|---|---|---|---|---|---|
-| $1$ | 1.3889 | 0.3226 | closed | 52 | 140 | — | — | — | 6.2 | — |
-| $1/2$ | 1.5585 | 0.1529 | closed | 726 | 8 563 | 1 920 | 4 548 | 676 / 0 | 20.7 | **valid** |
-| $1/3$ | 1.6111 | 0.1003 | closed | 3 648 | 49 425 | 10 824 | 25 540 | 1 420 / 0 | 46.1 | **valid** |
-| $1/5$ | 1.6519 | 0.0595 | closed | 4 222 | 143 703 | 18 780 | 44 548 | 2 920 / 0 | 47.6 | **valid** |
-| $1/6$ | 1.6620 | 0.0494 | closed | 5 024 | 184 459 | 22 258 | 52 772 | 3 176 / 0 | 51.1 | **valid** |
-| $1/7$ | 1.6692 | 0.0423 | closed | 24 150 | 824 763 | 122 762 | 290 660 | 5 692 / 0 | 110.4 | **valid** |
-| $1/10$ | 1.6819 | 0.0295 | not finished: cap of $2\cdot10^6$ pieces reached, 30 490 circles | | | | | | 122.8 | |
+| $\delta$ | $r$ | $r_c-r$ | circles | maximal arcs | (C2) image arcs checked | (C4) endpoints | max $\lvert\sigma(c)\rvert$ | exact verification |
+|---|---|---|---|---|---|---|---|---|
+| $1$ | 1.3889 | 0.3226 | 52 | 84 | 196 | 80 | 6.2 | **valid** |
+| $1/2$ | 1.5585 | 0.1529 | 726 | 1 920 | 4 548 | 676 | 20.7 | **valid** |
+| $1/3$ | 1.6111 | 0.1003 | 3 648 | 10 824 | 25 540 | 1 420 | 46.1 | **valid** |
+| $1/5$ | 1.6519 | 0.0595 | 4 222 | 18 780 | 44 548 | 2 920 | 47.6 | **valid** |
+| $1/6$ | 1.6620 | 0.0494 | 5 024 | 22 258 | 52 772 | 3 176 | 51.1 | **valid** |
+| $1/7$ | 1.6692 | 0.0423 | 24 150 | 122 762 | 290 660 | 5 692 | 110.4 | **valid** |
+| $1/10$ | 1.6819 | 0.0295 | 30 490 | 213 418 | 506 084 | 10 328 | 122.8 | **valid** (not yet refereed) |
+| $1/12$ | 1.6869 | 0.0245 | 31 366 | 229 058 | 543 460 | 11 252 | 124.6 | **valid** (not yet refereed) |
+| $1/13$ | 1.6888 | 0.0226 | 33 690 | 259 266 | 615 076 | 11 824 | 138.1 | **valid** (not yet refereed) |
+| $1/14$ | 1.6904 | 0.0210 | 36 024 | 291 418 | 691 684 | 13 320 | 138.1 | **valid** (not yet refereed) |
+| $1/16$ | 1.6931 | 0.0184 | not finished: stopped at the run's cap with 124 752 circles and 3.5 GB in use | | | | 262.5 | — |
 
-$\delta=1/2$ has $4\delta\in\mathbb Z$, so tangency was possible in principle. The run would have aborted on one, and none occurred.
+$\delta=1$ and $\delta=1/2$ have $4\delta\in\mathbb Z$, so tangency was possible in principle; the run would have aborted on one, and none occurred.
 
-**Theorem B (proved modulo the computation of Table 3.1).** $GG_8(r)$ is finite for every $r\le r_\ast$, where $r_\ast^2=10-5\sqrt2-\delta_\ast$ with $\delta_\ast=1/7$. Numerically, $r_\ast\approx1.669154$ and $r_c-r_\ast\approx0.0423$.
+**Growth of the computation.** With the storage above, closure time / peak memory / exact-verification time were: $\delta=1/10$: 201 s / 1.1 GB / 795 s; $1/12$: 250 s / 1.25 GB / 856 s; $1/13$: 262 s / 1.5 GB / 977 s; $1/14$: 329 s / 1.7 GB / 1084 s. Between $1/7$ and $1/14$ the cut set grows slowly (circles $\times1.5$); between $1/14$ and $1/16$ it jumps by more than a factor of 3 in circles and in internal extent. The growth is in steps rather than smooth; the two observed jumps (between $1/6$ and $1/7$, and between $1/14$ and $1/16$) are a factor of about $2.3$ apart in $\delta$, consistent with one step per factor $1+\sqrt2$, i.e. one per level of §4.
+
+**Theorem B (proved modulo the computation of Table 3.1).** $GG_8(r)$ is finite for every $r\le r_\ast$, where $r_\ast^2=10-5\sqrt2-\delta_\ast$ with $\delta_\ast=1/14$, i.e. $r_\ast\approx1.690415$. The certificates at $\delta\le1/10$ were produced after the referee's pass and are not yet refereed; the refereed certificate is $\delta=1/7$ ($r\approx1.669154$). The open window is $(r_\ast,r_c)$, of length about $0.0210$.
 
 *Proof.* The certificate for $\delta_\ast$ satisfies (C1)–(C4), checked exactly. Theorem 3.1 gives finiteness at $r_\ast$, and group monotonicity extends it to all $r\le r_\ast$. $\square$
 
 ### 3.5 Why the computation does not reach $r_c$
 
-- The size of $K(r)$ grows roughly like a power of $\delta^{-1}$. From $\delta=1/6$ to $\delta=1/7$ the piece count grows by a factor of 4.5, and at $\delta=1/10$ it exceeds $2\cdot10^6$.
+- The size of $K(r)$ grows in steps, one per level, with an overall rate like a power of $\delta^{-1}$ (Table 3.1 and the growth paragraph). The limit reached here ($\delta=1/16$ did not finish) is a resource limit of this implementation, not an intrinsic one; each further level costs roughly a constant factor more.
 - The internal extent of the circle centres grows like $\delta^{-1}$, matching the orbit data: $R\cdot\delta$ stays bounded (`arithmetic.md` §3.2).
 - So no single computation reaches $r_c$. A proof of (B) on all of $(r_\ast,r_c)$ needs an induction along the renormalization, discussed in §4.
 
@@ -248,44 +255,54 @@ $\delta=1/2$ has $4\delta\in\mathbb Z$, so tangency was possible in principle. T
 3. **Exact one-dimensional renormalization at $r_c$.** The family of Appendix A is closed under $t\mapsto\varepsilon t$ (Lemma 2.3). This is the precise sense in which the critical configuration is self-similar with ratio $\varepsilon$ about $p^\ast$.
 4. **Threshold data** (exact sweep, `notes/engine.md`). The gaps $\delta_k=r_c^2-t_k$ at the large jumps have successive ratios $2.4065, 2.4110, 2.4129\to1+\sqrt2$, from below. No gap is exactly a unit multiple of an earlier one.
 5. **Approach points.** The thresholds $t=3117-2202\sqrt2$ and $112761-79732\sqrt2$ are $|q+1|^2$ for $q=p^\ast+i\varepsilon^5$ and $q=p^\ast+i\varepsilon^7$. The orbit of $0$ reaches these points at exactly the radius where they enter $D_1$.
-6. **Why the renormalization is exact only at $r_c$.** At $r<r_c$ the seed fails at $p^\ast$, because $p^\ast\notin D_1$. More generally, a similarity of ratio $\varepsilon$ maps circles of radius $r$ to circles of radius $\varepsilon r$. So off criticality the renormalization can only be asymptotic, as for $n=5$ (`critical-radius-n5.md` §6.4).
+6. **Why the renormalization is exact only at $r_c$.** At $r<r_c$ the family's domains shrink: several of their endpoints are tight disk tests at $r_c$, among them letters applied at critical points on $\partial D_1(r_c)$ (§2.5, Remark 1), which leave $D_1$ for $r<r_c$. More generally, a similarity of ratio $\varepsilon$ maps circles of radius $r$ to circles of radius $\varepsilon r$. So off criticality the renormalization can only be asymptotic, as for $n=5$ (`critical-radius-n5.md` §6.4).
 
-**Conjecture R₈.** For $r^2=r_c^2-\delta$ with $\delta$ small, the combinatorial type of $K(r)$ in the $\varepsilon^k$-neighbourhood of $p^\ast$ and its symmetric images, for $\delta\in[\delta_{k+1},\delta_k]$, is the image under $z\mapsto p^\ast+\varepsilon(z-p^\ast)$ of the type at level $k-1$. Conjecture R₈ together with Table 3.1 at one level would prove (B).
+**Levels.** For $m\ge1$ put $q_m=p^\ast+i\varepsilon^m$ and $\delta_m=r_c^2-|q_m+1|^2>0$. So $q_m$ enters $D_1$ exactly at $r^2=r_c^2-\delta_m$; $\delta_m$ decreases to $0$ with $\delta_{m}/\delta_{m+1}\to1+\sqrt2$. For example $r_c^2-\delta_5=3117-2202\sqrt2$ and $r_c^2-\delta_7=112761-79732\sqrt2$, both thresholds of the orbit of $0$ (item 5). Say that $r^2=r_c^2-\delta$ is at **level $m$** if $\delta\in[\delta_{m+1},\delta_m)$. The **type of $K(r)$ at scale $\varepsilon^m$** means: the set of circles of $K(r)$ meeting the disk of radius $C\varepsilon^m$ about $p^\ast$ (for a fixed constant $C$), as centres taken modulo the map $z\mapsto p^\ast+\varepsilon^{-m}(z-p^\ast)$, together with the cyclic order of arc endpoints on each of them inside that disk.
+
+**Conjecture R₈.** There are $C$ and $m_0$ such that for every $m\ge m_0$, the type of $K(r)$ at scale $\varepsilon^{m+1}$ for $r$ at level $m+1$ is the image under $z\mapsto p^\ast+\varepsilon(z-p^\ast)$ of the type at scale $\varepsilon^m$ for $r$ at level $m$, and the same holds at the symmetric images of $p^\ast$.
+
+Conjecture R₈ alone does **not** imply (B). It describes $K(r)$ only in shrinking neighbourhoods of the critical points. To deduce finiteness one would also need: (i) that outside those neighbourhoods $K(r)$ has a fixed combinatorial type at each level, (ii) that (C1)–(C4) persist from one level to the next, and (iii) control of the curvature mismatch of item 6. Conjecture R₈ would reduce (B) to these statements and one certificate at level $m_0$.
+
+**Conjecture F₈.** $GG_8(r)$ is finite for every $r<r_c$. Equivalently, $r_c$ is exactly the infimum of the radii with infinite group.
 
 ---
 
 ## 5. Is the closed form exactly the critical radius?
 
-- **Proved:** $\inf\{r:GG_8(r)\text{ infinite}\}\in[r_\ast,r_c]$ with $r_\ast^2=r_c^2-1/7$.
+- **Proved:** $\inf\{r:GG_8(r)\text{ infinite}\}\in[r_\ast,r_c]$ with $r_\ast^2=r_c^2-1/14$ (refereed part: $r_c^2-1/7$).
 - **Proved:** $r_c$ is exactly the radius at which the point $p^\ast$ starts to be moved by $a$. Above it, the orbit of $p^\ast$ is infinite.
 - **Not proved:** that no point has an infinite orbit for $r\in(r_\ast,r_c)$. Possible failure modes would be another critical lattice point entering a disk at a smaller radius, or an infinite orbit at some radius in this window with no lattice point on a boundary circle.
 - **Evidence against such failure:**
   - the exact threshold sweep of the orbit of $0$ (331 thresholds up to the cap) has gaps that decrease geometrically to $0$ at ratio $\to1+\sqrt2$, with $r_c$ as the only accumulation point;
   - exact orbit searches at $r^2=r_c^2-\delta$ terminate. For example, the orbit of $0$ has 468 071 points at $\delta=1/100$, and the orbit of $p^\ast$ has 290 810 points at $\delta=1/100$;
-  - the cut-set closure terminates at every $\delta$ tried where it fit in memory.
+  - the cut-set closure terminates at every $\delta\ge1/14$ tried; at $\delta=1/16$ it was stopped by the resource cap, not found to diverge.
   - This is evidence, not proof.
 
 ---
 
 ## 6. Status and gaps
 
+Verdicts are those of the independent referee report (`referee-report-critical-radius-n8-n12.md`) unless marked otherwise.
+
 | claim | status |
 |---|---|
-| Convexity lemma, renormalization Lemma 2.1, Corollary 2.2 | proved |
-| Lemma 2.3 (31-word family closed under $\varepsilon$) | proved by exact computation; data in Appendix A |
-| Theorem A: $GG_8(r)$ infinite for all $r\ge r_c$; explicit infinite orbit of $p^\ast$ | **proved** (modulo Lemma 2.3) |
-| Theorem 3.1 (cut-set certificate) | proved (restated from the $n=5$ note and re-checked) |
-| Theorem B: finite for $r\le r_\ast$, $r_\ast^2=r_c^2-1/7$ | **proved modulo the computation of §3**, all decisions exact |
-| finite for $r_\ast<r<r_c$ | **open**; numerical evidence in §5 |
-| infimum of infinite radii equals $r_c$ exactly | open; equivalent to the previous row |
-| Conjecture R₈ | conjecture |
+| Convexity lemma, renormalization Lemma 2.1, Corollary 2.2 | proved; refereed: correct |
+| Lemma 2.3 (31-word family closed under $\varepsilon$) | proved by exact computation; refereed: correct, independently reproduced in full in exact arithmetic |
+| Theorem A: $GG_8(r)$ infinite for all $r\ge r_c$; explicit infinite orbit of $p^\ast$ | **proved**; refereed: correct |
+| Theorem 3.1 (cut-set certificate) | proved; refereed: correct (re-proved by the referee) |
+| Theorem B at $\delta=1/7$ | **proved modulo the computation of §3**, all decisions exact; refereed: correct as stated, certificate reproduced in floating point with matching invariants |
+| Theorem B at $\delta_\ast=1/14$ (and $1/10$, $1/12$, $1/13$) | **proved modulo the computation of §3**, all decisions exact; **not yet refereed** |
+| finite for $r_\ast<r<r_c$ (Conjecture F₈) | **open**; numerical evidence in §5 |
+| Conjecture R₈ | conjecture; it would reduce (B) to further statements (§4), not prove it |
 
-**Gaps and caveats, from my own adversarial check.**
-1. The programs behind Lemma 2.3 and Table 3.1 were written and run by the same author as this note. Neither has been re-implemented independently. Appendix A makes Lemma 2.3 independently checkable by hand-sized computer algebra. The cut-set data are too large to include, so an independent re-run of the closure is needed to check Theorem B.
+**Gaps and caveats.**
+1. *Independent checks.* Part A has been re-implemented and re-checked exactly by the referee. The exact cut-set verification behind Theorem B (`cut/verify.py`) is single-author: the referee did not read or run it, and its own reproduction of the certificates used floating-point comparisons (with margins far above rounding error). The certificates at $\delta\le1/10$ were produced after the referee's pass and have no independent reproduction yet.
 2. Lemma 2.3 uses exact arithmetic throughout. The only inputs taken from the search are the words, the piece decompositions and the composition sequences. Each is re-checked, never trusted.
 3. In `verify.py` the merging of stored pieces into maximal arcs uses exact endpoint equality. Overlapping (not just touching) pieces would not be merged. That can only make (C2) and (C4) harder to satisfy, never easier, so it is safe.
 4. Theorem A proves an infinite orbit of one explicit point. It does not prove that the orbit of $0$ is infinite at $r_c$; §2.5 Remark 3 is computational evidence only.
-5. The relation to the paper's path (§2.6) is an identification of the limit point and the scale. The paper's figure was not inspected, so its "angles of $\pi/8$" statement is neither confirmed nor refuted.
+5. The relation to the paper's path (§2.6) is an identification of the limit point and the scale. The paper's figures could not be rendered, so its "angles of $\pi/8$" statement is neither confirmed nor refuted.
+
+**Not checked by the referee:** the author's programs (`verify_closure_n.py`, `exactn.py`, `cut/cut.py`, `cut/verify.py`); the numerical evidence of §5 and of §2.5 Remarks 2–3 (orbit sizes, threshold sweeps, orbit-of-0 observations); the "how the family was found" description; `notes/engine.md` and companion notes; the paper's figures; §7.
 
 ---
 
@@ -303,10 +320,10 @@ $\delta=1/2$ has $4\delta\in\mathbb Z$, so tangency was possible in principle. T
    - The whole of Part A is a finite list of algebraic inequalities plus one induction. It is the most formalizable part of this note.
 4. **Part B, initial range.**
    - Theorem 3.1. Its main cost is the cell decomposition of a finite arc arrangement.
-   - The certificate data from §3, about $1.2\cdot10^5$ maximal arcs at $\delta=1/7$.
+   - The certificate data from §3, about $2.9\cdot10^5$ maximal arcs at $\delta=1/14$.
    - A verified checker for (C1)–(C4), using exact two-radical sign tests in $\mathbb Q(\sqrt2)(\sqrt{H_1},\sqrt{H_2})$.
    - Group monotonicity from `boundary-contact.md`.
-5. **Part B, full.** Conjecture R₈ first, then an induction on the level $k$ with explicit control of the curvature correction.
+5. **Part B, full.** Conjecture R₈ and the additional statements (i)–(iii) of §4 first, then an induction on the level $m$.
 
 ---
 
