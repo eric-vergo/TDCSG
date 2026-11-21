@@ -77,7 +77,8 @@ about 2·10⁵·n⁻⁶.
 
 So either the infinite orbits at r ≈ g live on a thin set that was not sampled, or the paper's
 criterion (at least 10¹⁰ images) fires at the onset of very large finite orbits. Which one is open.
-These runs sit at an exact threshold, where the floating-point membership test matters most.
+These runs sit at an exact threshold, where the floating-point membership test matters most. The
+exact search is in [`large-n-table.md`](large-n-table.md).
 
 ### E1c. The n ≡ 4 (mod 8) family (F2)
 
@@ -210,7 +211,9 @@ The orbit grows in big multiplicative jumps that recur with a fixed pattern. Sam
 - **Rank 1 matches closed forms.** The four n with closed forms are exactly those with φ(n) = 4, i.e.
   unit rank 1: a single scaling gives a geometric series and hence a closed form. For n = 7 (rank 2)
   the same-type ratios do not agree. This fits two incommensurate scalings and the paper's scale break
-  at about 5·10⁵ zoom. It is inconclusive, because r_c(7) is only known to 1e-6.
+  at about 5·10⁵ zoom. It is inconclusive, because r_c(7) is only known to 1e-6. The exact sweep to
+  10⁸ points ([`rank-conjecture.md`](rank-conjecture.md)) finds one repeating pattern of three jump
+  types, whose period matches the single Pisot unit θ⁻¹(1 + θ)³ in all three embeddings.
 - **Aitken extrapolation** of same-type thresholds recovers the known r_c to about 1e-6 from runs of
   4–20 million points: n = 5 gives 2.1489621 against 2.1489611; n = 8 gives 1.7114167 against
   1.7114123. It also gives r_c(20) ≈ 1.100581–1.100583.
@@ -218,7 +221,8 @@ The orbit grows in big multiplicative jumps that recur with a fixed pattern. Sam
   small, but its Galois conjugate is large (about −10⁶). The thresholds are not governed by a bounded
   window.
 - For n = 9, 16, 17, 28 the origin's orbit stays finite up to r_c (241, 6259, 2081, 2213 points). The
-  critical point is elsewhere, so the scan needs a different seed point there.
+  critical point is elsewhere, so the scan needs a different seed point there. Seeds for n = 9, 11
+  and 13 found with the exact engine are in [`rank-conjecture.md`](rank-conjecture.md).
 
 ### E3(iii). Spectrum of H = P_a + P_aᵀ + P_b + P_bᵀ on finite orbits
 
@@ -287,13 +291,15 @@ All of these need the exact orbit engine; the first three also need a compiled o
    - compute the resulting complex-dimension set, which is quasi-periodic if the scales are
      incommensurate.
 
-   This is the most promising arithmetic direction.
+   This is the most promising arithmetic direction. The first exact results, to 10⁸ points, are in
+   [`rank-conjecture.md`](rank-conjecture.md).
 2. **High-precision r_c by Aitken extrapolation on exact thresholds,** to get 12–20 digits for
    n = 7, 9, 11, 13–19. That makes PSLQ in ℚ(ζ_n)⁺ (degree 3–9) meaningful and answers the paper's
    question of whether r_c is algebraic.
 3. **Locate the infinite orbits at r ≈ g for large n** (for example n = 33, 49). Search systematically
    over piece-boundary points (images of disk-boundary arcs) at r = g + 10⁻⁹. Also test whether the
-   paper's large-n values are really "onset of very large finite orbits".
+   paper's large-n values are really "onset of very large finite orbits". The exact scans so far are
+   in [`large-n-table.md`](large-n-table.md).
 4. **Prove r_c ≥ |2 − ζ_n|,** or find a counterexample, and prove the n ≡ 4 mod 8 count n² − 3n + 1
    and the r₁ formula. Look for analogous second-threshold families for the other anomalous classes
    (n = 38, 42, 32, 40; odd 39, 43, 51), using a seed point other than the origin.

@@ -31,7 +31,7 @@ This repository has two parts: a Lean 4 / Mathlib formalization, and research no
 | Path | Contents |
 |---|---|
 | `TDCSG/` | Lean sources (`TDCSG.lean` is the root module) |
-| `TDCSGCompute/` | The exact orbit engine and the `tdcsg-orbit` executable (core Lean, no Mathlib); see [`notes/engine.md`](notes/engine.md) |
+| `TDCSGCompute/` | The exact orbit engine and the `tdcsg-orbit` executable (core Lean, no Mathlib): orbits, threshold sweeps, and GG_n(r) as a permutation group; see [`notes/engine.md`](notes/engine.md) |
 | `notes/` | Research notes in Markdown: [`overview.md`](notes/overview.md), [`arithmetic.md`](notes/arithmetic.md), [`analytic-continuation.md`](notes/analytic-continuation.md), [`experiments.md`](notes/experiments.md), [`engine.md`](notes/engine.md) |
 | `notes/proofs/` | Written proofs of results intended for formalization |
 | `2302.12950v1.pdf` | The paper |
@@ -71,7 +71,11 @@ part of this repository) that tested disk membership in floating point. The exac
 `TDCSGCompute/` decides membership exactly; [`notes/engine.md`](notes/engine.md) lists the numbers it
 has reproduced (the §3.2 orbit table, the n ≡ 4 (mod 8) count n² − 3n + 1 and threshold r₁, the
 unit ratios, the n = 33 plateau) and the one remark it corrected. Numbers not listed there remain
-preliminary.
+preliminary. The engine also computes the order of GG_n(r) itself (certified lower bounds from
+generic-point orbits); results from it are in [`notes/gap-structure.md`](notes/gap-structure.md)
+(the group changes at r_A), [`notes/rank-conjecture.md`](notes/rank-conjecture.md) (exact threshold
+sequences for n = 7, 9, 11, 13) and [`notes/large-n-table.md`](notes/large-n-table.md) (n = 33 and
+other large n at the touching radius).
 
 ## Licence and authors
 
