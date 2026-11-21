@@ -1,0 +1,22 @@
+name = "TDCSG"
+version = "0.1.0"
+keywords = ["math"]
+defaultTargets = ["TDCSG"]
+
+[leanOptions]
+pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+autoImplicit = false
+relaxedAutoImplicit = false
+maxSynthPendingDepth = 3
+weak.linter.mathlibStandardSet = true
+weak.linter.style.longLine = true
+# Source files carry a licence line and an authors line, without a copyright line.
+weak.linter.style.header = false
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "56a005855ea17e0b0958f73ec801ae140b0a1679"
+
+[[lean_lib]]
+name = "TDCSG"

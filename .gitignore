@@ -1,0 +1,6 @@
+# Lake build outputs and packages
+/.lake/
+/build/
+
+# macOS
+.DS_Store
