@@ -23,12 +23,20 @@ infinitely many distinct points `t_k E`.
 * `TDCSG.Five.zeta`: the root of unity `ζ = exp (2πi / 5)`.
 * `TDCSG.Five.Cyc`: elements `x₀ + x₁ ζ + x₂ ζ² + x₃ ζ³` of `ℤ[ζ]` by their integer coordinates,
   with the exact arithmetic used to check the words.
+* `TDCSG.Five.Cyc.Model`: an integer model of the generators of `GG n n r r` acting on `ℤ[ζ]`,
+  with exact disk tests at a radius `√(α + β φ)`; `TDCSG.Five.Cyc.pentagon` is the one for
+  `n = 5`. The model for `n = 10` (`TDCSG.Ten.model`) uses `ℤ[ζ₁₀] = ℤ[ζ]`.
+* `TDCSG.Five.Cyc.linePt`: the lattice point `(p + q φ) V` of the line through `0` in the
+  direction `V`.
 * `TDCSG.Five.pointE`: the end point `E = ζ - ζ²` of the critical chord.
 * `TDCSG.Five.word₁`, `TDCSG.Five.word₂`, `TDCSG.Five.word₃`: the three words of §3.2 of the
   written proof.
 
 ## Main statements
 
+* `TDCSG.Five.Cyc.Model.IsSound.applyWord_linePt`: a word whose exact check passes on a segment
+  of a line through `0` translates every point of the segment along the line, at every radius
+  `r ≥ √(α + β φ)`.
 * `TDCSG.Five.normSq_pointE_add_one`: `|E + 1|² = 3 + φ`, so `E` lies on the boundary circle of
   the left disk at the critical radius.
 * `TDCSG.Five.infinite_orbit_zero`: for `r ≥ √(3 + φ)` the orbit of `0` is infinite.
@@ -40,8 +48,9 @@ infinitely many distinct points `t_k E`.
 Every disk test and every endpoint image of the three words is computed in the integer model
 `TDCSG.Five.Cyc` and checked by `decide`. The model is linked to `ℂ` by
 `TDCSG.Five.Cyc.embed`, which turns the model rotations into the global rotations of the
-generators (`TDCSG.Five.Cyc.embed_step`), and the model disk test into membership in the closed
-disk of radius `r ≥ √(3 + φ)` (`TDCSG.Five.Cyc.mem_closedBall_of_memCheck`). Squared distances
+generators (`TDCSG.Five.Cyc.Model.IsSound.embed_step`), and the model disk test into membership
+in the closed disk of radius `r ≥ √(α + β φ)` (`TDCSG.Five.Cyc.mem_closedBall_of_memCheckAt`).
+Squared distances
 are elements `α + β φ` of `ℤ[φ]`, whose signs are decided by integer arithmetic
 (`TDCSG.Five.nonnegCheck`).
 -/
@@ -138,6 +147,18 @@ theorem nonneg_of_nonnegCheck {a b : ℤ} (h : nonnegCheck a b = true) :
     have hv' : (0 : ℝ) < b := by exact_mod_cast hv
     have hsq' : (u : ℝ) ^ 2 ≤ 5 * (b : ℝ) ^ 2 := by exact_mod_cast hsq
     nlinarith [mul_nonneg hv'.le hs]
+
+/-- `1` and `φ` are linearly independent over `ℤ`. -/
+theorem eq_zero_of_add_mul_phi_eq_zero {a b : ℤ} (h : (a : ℝ) + b * φ = 0) : a = 0 ∧ b = 0 := by
+  have hb : b = 0 := by
+    by_contra hb
+    have hb' : (b : ℝ) ≠ 0 := by exact_mod_cast hb
+    apply Real.goldenRatio_irrational.ne_rational (-a) b
+    push_cast
+    rw [eq_div_iff hb']
+    linarith
+  subst hb
+  exact ⟨by simpa using h, rfl⟩
 
 /-! ### The integer model of `ℤ[ζ]` -/
 
@@ -248,14 +269,14 @@ theorem norm_sq_embed {v : Cyc} (h1 : (mul v (conj v)).c1 = 0)
     linear_combination (y.c2 : ℂ) * zeta_sq_add_zeta_cube
   exact_mod_cast h'
 
-/-- The exact test that `v` lies in the closed disk of radius `√(3 + φ)` about `c`. -/
-def memCheck (c v : Cyc) : Bool :=
+/-- The exact test that `v` lies in the closed disk of radius `√(α + β φ)` about `c`. -/
+def memCheckAt (α β : ℤ) (c v : Cyc) : Bool :=
   let y := mul (v - c) (conj (v - c))
-  decide (y.c1 = 0) && decide (y.c3 = y.c2) && nonnegCheck (3 - y.c0) (1 + y.c2)
+  decide (y.c1 = 0) && decide (y.c3 = y.c2) && nonnegCheck (α - y.c0) (β + y.c2)
 
-theorem mem_closedBall_of_memCheck {c v : Cyc} (h : memCheck c v = true) {r : ℝ}
-    (hr : √(3 + φ) ≤ r) : embed v ∈ closedBall (embed c) r := by
-  simp only [memCheck, Bool.and_eq_true, decide_eq_true_eq] at h
+theorem mem_closedBall_of_memCheckAt {α β : ℤ} {c v : Cyc} (h : memCheckAt α β c v = true)
+    {r : ℝ} (hr : √(α + β * φ) ≤ r) : embed v ∈ closedBall (embed c) r := by
+  simp only [memCheckAt, Bool.and_eq_true, decide_eq_true_eq] at h
   obtain ⟨⟨h1, h3⟩, hn⟩ := h
   have hsq := norm_sq_embed h1 h3
   have hn' := nonneg_of_nonnegCheck hn
@@ -264,6 +285,14 @@ theorem mem_closedBall_of_memCheck {c v : Cyc} (h : memCheck c v = true) {r : �
   refine le_trans ?_ hr
   rw [← abs_norm]
   exact Real.abs_le_sqrt (by rw [hsq]; linarith)
+
+/-- The exact test that `v` lies in the closed disk of radius `√(3 + φ)` about `c`. -/
+def memCheck (c v : Cyc) : Bool :=
+  memCheckAt 3 1 c v
+
+theorem mem_closedBall_of_memCheck {c v : Cyc} (h : memCheck c v = true) {r : ℝ}
+    (hr : √(3 + φ) ≤ r) : embed v ∈ closedBall (embed c) r :=
+  mem_closedBall_of_memCheckAt h (by simpa using hr)
 
 /-- The centre `-1` of the left disk. -/
 def left : Cyc := ⟨-1, 0, 0, 0⟩
@@ -279,40 +308,74 @@ def center : Letter → Cyc
 theorem embed_center (l : Letter) : embed (center l) = l.center := by
   cases l <;> simp [center, left, right, embed, Letter.center, leftCenter, rightCenter]
 
+/-! ### Models of the generators -/
+
+/-- An integer model of the generators of `GG n n r r` acting on `ℤ[ζ]`: `rot` and `rotInv` are
+the multiplications by the rotation factors `exp (∓2πi / n)` (`TDCSG.Five.Cyc.Model.IsSound`),
+and the disk tests are made at the radius `√(α + β φ)`. -/
+structure Model where
+  /-- The rational part of the squared radius of the disk tests. -/
+  α : ℤ
+  /-- The coefficient of `φ` in the squared radius of the disk tests. -/
+  β : ℤ
+  /-- Multiplication by `exp (-2πi / n)`, the rotation factor of `a` and `b`. -/
+  rot : Cyc → Cyc
+  /-- Multiplication by `exp (2πi / n)`, the rotation factor of `a⁻¹` and `b⁻¹`. -/
+  rotInv : Cyc → Cyc
+
+namespace Model
+
+/-- The rotations of a model are the multiplications by the rotation factors of order `n`. -/
+structure IsSound (M : Model) (n : ℕ) : Prop where
+  embed_rot (v : Cyc) : embed (M.rot v) = exp (-(2 * π * I / n)) * embed v
+  embed_rotInv (v : Cyc) : embed (M.rotInv v) = exp (2 * π * I / n) * embed v
+
+variable (M : Model)
+
 /-- The global rotation of a letter, in the model. -/
 def step : Letter → Cyc → Cyc
-  | .a, v => left + mulZetaInv (v - left)
-  | .aInv, v => left + mulZeta (v - left)
-  | .b, v => right + mulZetaInv (v - right)
-  | .bInv, v => right + mulZeta (v - right)
-
-theorem embed_step (l : Letter) (v : Cyc) : embed (step l v) = l.glob 5 (embed v) := by
-  have hl := embed_center .a
-  have hr := embed_center .b
-  simp only [center] at hl hr
-  cases l <;>
-    simp [step, Letter.glob, Letter.factor, Letter.center, embed_add, embed_sub,
-      embed_mulZeta, embed_mulZetaInv, hl, hr, exp_rotationAngle_five, exp_two_pi_I_div_five]
+  | .a, v => left + M.rot (v - left)
+  | .aInv, v => left + M.rotInv (v - left)
+  | .b, v => right + M.rot (v - right)
+  | .bInv, v => right + M.rotInv (v - right)
 
 /-- The exact test that a word is valid on the segment from `P` to `Q` at every radius
-`r ≥ √(3 + φ)`. -/
+`r ≥ √(α + β φ)`. -/
 def valid : List Letter → Cyc → Cyc → Bool
   | [], _, _ => true
-  | l :: w, P, Q => memCheck (center l) P && memCheck (center l) Q &&
-      valid w (step l P) (step l Q)
+  | l :: w, P, Q => memCheckAt M.α M.β (center l) P && memCheckAt M.α M.β (center l) Q &&
+      valid w (M.step l P) (M.step l Q)
 
 /-- The composite global rotation of a word, in the model. -/
 def run : List Letter → Cyc → Cyc
   | [], v => v
-  | l :: w, v => run w (step l v)
+  | l :: w, v => run w (M.step l v)
 
-theorem embed_run (w : List Letter) (v : Cyc) : embed (run w v) = globalWord 5 w (embed v) := by
+/-- The exact check that `w` is valid on the segment from `P` to `Q` and maps `P` to `P'` and
+`Q` to `Q'`. -/
+def wordCheck (w : List Letter) (P Q P' Q' : Cyc) : Bool :=
+  M.valid w P Q && decide (M.run w P = P') && decide (M.run w Q = Q')
+
+namespace IsSound
+
+variable {M} {n : ℕ} (hM : M.IsSound n)
+include hM
+
+theorem embed_step (l : Letter) (v : Cyc) : embed (M.step l v) = l.glob n (embed v) := by
+  have hl := embed_center .a
+  have hr := embed_center .b
+  simp only [center] at hl hr
+  cases l <;>
+    simp [step, Letter.glob, Letter.factor, Letter.center, embed_add, embed_sub, hM.embed_rot,
+      hM.embed_rotInv, hl, hr]
+
+theorem embed_run (w : List Letter) (v : Cyc) : embed (M.run w v) = globalWord n w (embed v) := by
   induction w generalizing v with
   | nil => rfl
-  | cons l w ih => rw [run, ih, globalWord, embed_step]
+  | cons l w ih => rw [run, ih, globalWord, hM.embed_step]
 
-theorem wordValid_of_valid {w : List Letter} {P Q : Cyc} (h : valid w P Q = true) {r : ℝ}
-    (hr : √(3 + φ) ≤ r) : WordValid 5 r w (embed P) (embed Q) := by
+theorem wordValid_of_valid {w : List Letter} {P Q : Cyc} (h : M.valid w P Q = true) {r : ℝ}
+    (hr : √(M.α + M.β * φ) ≤ r) : WordValid n r w (embed P) (embed Q) := by
   induction w generalizing P Q with
   | nil => trivial
   | cons l w ih =>
@@ -320,16 +383,86 @@ theorem wordValid_of_valid {w : List Letter} {P Q : Cyc} (h : valid w P Q = true
     obtain ⟨⟨hP, hQ⟩, hw⟩ := h
     refine ⟨?_, ?_, ?_⟩
     · rw [← embed_center]
-      exact mem_closedBall_of_memCheck hP hr
+      exact mem_closedBall_of_memCheckAt hP hr
     · rw [← embed_center]
-      exact mem_closedBall_of_memCheck hQ hr
-    · rw [← embed_step, ← embed_step]
+      exact mem_closedBall_of_memCheckAt hQ hr
+    · rw [← hM.embed_step, ← hM.embed_step]
       exact ih hw
+
+end IsSound
+
+end Model
+
+/-- The model of the generators of `GG 5 5 r r`, with disk tests at radius `√(3 + φ)`. -/
+def pentagon : Model := ⟨3, 1, mulZetaInv, mulZeta⟩
+
+theorem pentagon_isSound : pentagon.IsSound 5 where
+  embed_rot v := by
+    rw [show pentagon.rot v = mulZetaInv v from rfl, embed_mulZetaInv, Nat.cast_ofNat,
+      exp_rotationAngle_five]
+  embed_rotInv v := by
+    rw [show pentagon.rotInv v = mulZeta v from rfl, embed_mulZeta, Nat.cast_ofNat,
+      exp_two_pi_I_div_five]
+
+/-- The global rotation of a letter of order `5`, in the model. -/
+def step : Letter → Cyc → Cyc :=
+  pentagon.step
+
+theorem embed_step (l : Letter) (v : Cyc) : embed (step l v) = l.glob 5 (embed v) :=
+  pentagon_isSound.embed_step l v
+
+/-- The exact test that a word is valid on the segment from `P` to `Q` at every radius
+`r ≥ √(3 + φ)`. -/
+def valid : List Letter → Cyc → Cyc → Bool :=
+  pentagon.valid
+
+/-- The composite global rotation of a word of order `5`, in the model. -/
+def run : List Letter → Cyc → Cyc :=
+  pentagon.run
+
+theorem embed_run (w : List Letter) (v : Cyc) : embed (run w v) = globalWord 5 w (embed v) :=
+  pentagon_isSound.embed_run w v
+
+theorem wordValid_of_valid {w : List Letter} {P Q : Cyc} (h : valid w P Q = true) {r : ℝ}
+    (hr : √(3 + φ) ≤ r) : WordValid 5 r w (embed P) (embed Q) :=
+  pentagon_isSound.wordValid_of_valid h (by simpa [pentagon] using hr)
 
 /-- The exact check that `w` is valid on the segment from `P` to `Q` and maps `P` to `P'` and
 `Q` to `Q'`. -/
 def wordCheck (w : List Letter) (P Q P' Q' : Cyc) : Bool :=
-  valid w P Q && decide (run w P = P') && decide (run w Q = Q')
+  pentagon.wordCheck w P Q P' Q'
+
+/-! ### Words acting along a line -/
+
+/-- The lattice point `(p + q φ) V` of the line through `0` in the direction `V`. -/
+def linePt (V : Cyc) (p q : ℤ) : Cyc := p • V + q • mulPhi V
+
+theorem embed_linePt (V : Cyc) (p q : ℤ) :
+    embed (linePt V p q) = ((p + q * φ : ℝ) : ℂ) * embed V := by
+  simp only [linePt, embed_add, embed_smul, embed_mulPhi]
+  push_cast
+  ring
+
+/-- A word checked on a segment of a line through `0` translates every point of the segment
+along the line. -/
+theorem Model.IsSound.applyWord_linePt {M : Model} {n : ℕ} (hM : M.IsSound n) {r : ℝ}
+    (hr : √(M.α + M.β * φ) ≤ r) {w : List Letter} {V : Cyc} {p₀ q₀ p₁ q₁ dp dq : ℤ}
+    (hcheck : M.wordCheck w (linePt V p₀ q₀) (linePt V p₁ q₁) (linePt V (p₀ + dp) (q₀ + dq))
+      (linePt V (p₁ + dp) (q₁ + dq)) = true)
+    (hlt : (p₀ + q₀ * φ : ℝ) < p₁ + q₁ * φ) {t : ℝ}
+    (ht : t ∈ Set.Icc (p₀ + q₀ * φ : ℝ) (p₁ + q₁ * φ)) :
+    applyWord n r w (t * embed V) = ((t + (dp + dq * φ) : ℝ) : ℂ) * embed V := by
+  simp only [Model.wordCheck, Bool.and_eq_true, decide_eq_true_eq] at hcheck
+  obtain ⟨⟨hv, h₀⟩, h₁⟩ := hcheck
+  have hv' := hM.wordValid_of_valid hv hr
+  rw [embed_linePt, embed_linePt] at hv'
+  refine applyWord_line hlt hv' ?_ ?_ ht
+  · rw [← embed_linePt, ← hM.embed_run, h₀, embed_linePt]
+    push_cast
+    ring_nf
+  · rw [← embed_linePt, ← hM.embed_run, h₁, embed_linePt]
+    push_cast
+    ring_nf
 
 end Cyc
 
@@ -360,12 +493,10 @@ theorem embed_pointE_ne_zero : embed pointE ≠ 0 := by
     (sub_ne_zero.2 (isPrimitiveRoot_zeta.ne_one (by norm_num)).symm)
 
 /-- The lattice point `(p + q φ) E` of the critical chord. -/
-def chordPt (p q : ℤ) : Cyc := p • pointE + q • mulPhi pointE
+def chordPt (p q : ℤ) : Cyc := linePt pointE p q
 
-theorem embed_chordPt (p q : ℤ) : embed (chordPt p q) = ((p + q * φ : ℝ) : ℂ) * embed pointE := by
-  simp only [chordPt, embed_add, embed_smul, embed_mulPhi]
-  push_cast
-  ring
+theorem embed_chordPt (p q : ℤ) : embed (chordPt p q) = ((p + q * φ : ℝ) : ℂ) * embed pointE :=
+  embed_linePt pointE p q
 
 /-- A word checked on a segment of the chord translates every point of the segment along the
 chord. -/
@@ -375,18 +506,8 @@ theorem applyWord_chord {r : ℝ} (hr : √(3 + φ) ≤ r) {w : List Letter}
       (chordPt (p₁ + dp) (q₁ + dq)) = true)
     (hlt : (p₀ + q₀ * φ : ℝ) < p₁ + q₁ * φ) {t : ℝ}
     (ht : t ∈ Set.Icc (p₀ + q₀ * φ : ℝ) (p₁ + q₁ * φ)) :
-    applyWord 5 r w (t * embed pointE) = ((t + (dp + dq * φ) : ℝ) : ℂ) * embed pointE := by
-  simp only [wordCheck, Bool.and_eq_true, decide_eq_true_eq] at hcheck
-  obtain ⟨⟨hv, h₀⟩, h₁⟩ := hcheck
-  have hv' := wordValid_of_valid hv hr
-  rw [embed_chordPt, embed_chordPt] at hv'
-  refine applyWord_line hlt hv' ?_ ?_ ht
-  · rw [← embed_chordPt, ← embed_run, h₀, embed_chordPt]
-    push_cast
-    ring_nf
-  · rw [← embed_chordPt, ← embed_run, h₁, embed_chordPt]
-    push_cast
-    ring_nf
+    applyWord 5 r w (t * embed pointE) = ((t + (dp + dq * φ) : ℝ) : ℂ) * embed pointE :=
+  pentagon_isSound.applyWord_linePt (by simpa [pentagon] using hr) hcheck hlt ht
 
 /-- The word `a⁻¹ a⁻¹ b⁻¹ a⁻¹ b⁻¹`, mapping `[E', F']` onto `[G, F]`. -/
 def word₁ : List Letter := [.aInv, .aInv, .bInv, .aInv, .bInv]
