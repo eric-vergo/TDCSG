@@ -1,0 +1,26 @@
+tdcsg-certificate 1
+# n = 6, r² = re:37 / 10 ≈ 3.7000000000000000e0 (3.7)
+# arcs run counterclockwise; symbol (e, ±) on the circle about c is the intersection point
+# c + (d/2)(1 ± i h), d = e - c, h = sqrt(4 r²/|d|² - 1); coefficients in 1, ζ, …, ζ^(φ(n)-1)
+n 6
+r2 37,0 / 10
+arc -5,2 -1,0 - -1,0 +
+arc -3,-2 -1,0 - -1,0 +
+arc -3,0 -1,0 - -1,0 +
+arc -3,2 -1,0 - -1,0 +
+arc -3,4 -1,0 - -1,0 +
+arc -1,-2 -1,0 - -1,0 +
+full -1,0
+arc -1,2 -1,0 - 1,0 +
+arc -1,4 1,0 - 1,0 +
+arc 1,-4 -1,0 - -1,0 +
+arc 1,-2 1,0 - -1,0 +
+full 1,0
+arc 1,2 1,0 - 1,0 +
+arc 3,-4 1,0 - 1,0 +
+arc 3,-2 1,0 - 1,0 +
+arc 3,0 1,0 - 1,0 +
+arc 3,2 1,0 - 1,0 +
+arc 5,-2 1,0 - 1,0 +
+summary circles 18 arcs 18 c4-endpoints 32
+end
