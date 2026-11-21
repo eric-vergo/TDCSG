@@ -7,6 +7,7 @@ module
 public import TDCSG.CriticalRadius.Certificate
 public import TDCSG.CriticalRadius.Eight
 public import TDCSG.CriticalRadius.Five
+public import TDCSG.CriticalRadius.Ten
 public import TDCSG.CriticalRadius.Twelve
 
 /-!
@@ -14,22 +15,25 @@ public import TDCSG.CriticalRadius.Twelve
 
 This file collects, in compact form, what is known about the critical radius
 `TDCSG.criticalRadius n` of the equal-radius family `GG n n r r` for `n = 5, 8, 10, 12`. The
-written sources are `notes/proofs/critical-radius-n5.md`, `critical-radius-n8.md` and
-`critical-radius-n12.md`.
+written sources are `notes/proofs/critical-radius-n5.md`, `critical-radius-n8.md`,
+`critical-radius-n10.md` and `critical-radius-n12.md`.
 
 Statements come in two kinds, kept strictly apart.
 
 * **Theorems** are proved in Lean, from the definitions of `TDCSG.Basic` and `TDCSG.Group`.
-* **Propositions** `def … : Prop` record claims that are **not proved in Lean**: the case
-  `n = 10` (no written proof yet), the finiteness on an initial range of radii (which rests on
-  the cut-set certificate theorem and on large external computations), and the conjectured exact
-  values of the critical radii. Nothing in this file asserts them.
+* **Propositions** `def … : Prop` record claims that are **not proved in Lean**: the finiteness
+  on an initial range of radii (which rests on the cut-set certificate theorem and on large
+  external computations), and the conjectured exact values of the critical radii. Nothing in
+  this file asserts them.
 
 ## Proved
 
 * `criticalRadius_five_le`, `infinite_GG_five`, `infinite_orbit_zero_five`: `GG₅(r)` is
   infinite for every `r ≥ √(3 + φ)`, through an infinite orbit of `0`; hence
   `1 ≤ criticalRadius 5 ≤ √(3 + φ)`.
+* `criticalRadius_ten_le`, `infinite_GG_ten`, `infinite_orbit_zero_ten`: `GG₁₀(r)` is
+  infinite for every `r ≥ √(4 - φ)`, through an infinite orbit of `0`; hence
+  `1 ≤ criticalRadius 10 ≤ √(4 - φ)`.
 * `mem_orbit_pStar_eight_pow`, `infinite_orbit_pStar_eight`, `infinite_GG_eight`,
   `criticalRadius_eight_le`: for every `r ≥ √(10 - 5√2)` the orbit of `p*` under `GG₈(r)`
   contains `p* + 4 i (√2 - 1)^(k+1)` for all `k`, so `GG₈(r)` is infinite and
@@ -41,13 +45,15 @@ Statements come in two kinds, kept strictly apart.
 * `pStar_eight_mem_sphere`, `mem_orbit_pStar_eight`; `pStar_twelve_mem_sphere`,
   `mem_orbit_pStar_twelve`: the critical points for `n = 8, 12` lie on the boundary circle at
   the conjectured critical radius, and the seed words reach the first point of their orbits.
-* `finiteBelowFive_of_certificate` and its analogues, `le_criticalRadius_five_of_finiteBelow`
-  and its analogues: the certificate theorem and the computed certificates give the lower
-  bounds.
+* `finiteBelowFive_of_certificate`, `le_criticalRadius_five_of_finiteBelow` and their analogues
+  for `n = 8, 12`: conditional theorems. The propositions `CutSetCertificate n` and
+  `ExistsCertificate n r` imply `FiniteBelow…`, which implies the corresponding lower bound on
+  the critical radius.
+* `infinite_GG_of_le`, `finite_GG_of_lt`, `infinite_GG_of_lt`, `finite_GG_of_lt_one`: the
+  basic properties of the critical radius, for every `n`.
 
 ## Not proved (propositions)
 
-* `InfiniteAboveTen`.
 * `CutSetCertificate n`, `ExistsCertificate n r` (in `TDCSG.CriticalRadius.Certificate`).
 * `FiniteBelowFive`, `FiniteBelowEight`, `FiniteBelowTwelve`.
 * `CriticalRadiusEqFive`, `CriticalRadiusEqEight`, `CriticalRadiusEqTen`,
@@ -96,6 +102,22 @@ theorem criticalRadius_five_le : criticalRadius 5 ≤ √(3 + φ) :=
 
 theorem one_le_criticalRadius_five : 1 ≤ criticalRadius 5 :=
   TDCSG.one_le_criticalRadius ⟨_, Five.infinite_GG le_rfl⟩
+
+/-! ### `n = 10` -/
+
+/-- `GG₁₀(r)` is infinite for every `r ≥ √(4 - φ)` (`critical-radius-n10.md`, Theorem A). -/
+theorem infinite_GG_ten {r : ℝ} (hr : √(4 - φ) ≤ r) : Infinite (GG 10 10 r r) :=
+  Ten.infinite_GG hr
+
+/-- For every `r ≥ √(4 - φ)` the orbit of `0` under `GG₁₀(r)` is infinite. -/
+theorem infinite_orbit_zero_ten {r : ℝ} (hr : √(4 - φ) ≤ r) : (orbit 10 10 r r 0).Infinite :=
+  Ten.infinite_orbit_zero hr
+
+theorem criticalRadius_ten_le : criticalRadius 10 ≤ √(4 - φ) :=
+  Ten.criticalRadius_le
+
+theorem one_le_criticalRadius_ten : 1 ≤ criticalRadius 10 :=
+  Ten.one_le_criticalRadius
 
 /-! ### `n = 8` and `n = 12`: the critical points -/
 
@@ -189,12 +211,6 @@ theorem criticalRadius_twelve_le : criticalRadius 12 ≤ √(40 - 22 * √3) :=
 
 theorem one_le_criticalRadius_twelve : 1 ≤ criticalRadius 12 :=
   TDCSG.one_le_criticalRadius ⟨_, infinite_GG_twelve le_rfl⟩
-
-/-! ### `n = 10`: infinitude (not proved) -/
-
-/-- **Not proved.** `GG₁₀(r)` is infinite for every `r ≥ √(4 - φ)`. -/
-def InfiniteAboveTen : Prop :=
-  ∀ r : ℝ, √(4 - φ) ≤ r → Infinite (GG 10 10 r r)
 
 /-! ### Finiteness on an initial range (not proved) -/
 
