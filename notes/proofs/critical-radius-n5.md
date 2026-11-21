@@ -1,16 +1,25 @@
-# The critical radius of $GG_5$
+# Bounds on the critical radius of $GG_5$: infinite for $r\ge\sqrt{3+\varphi}$, finite for $r\le r_\ast$
 
 Authors: Eric Vergo, Claude
 
-**Statement.** Let $r_c=\sqrt{3+\varphi}\approx 2.1489611$, where $\varphi=(1+\sqrt5)/2$. The target theorem is:
+**Statement.** Let $r_c=\sqrt{3+\varphi}\approx 2.1489611$, where $\varphi=(1+\sqrt5)/2$. In this note $r_c$ always denotes this number. The *critical radius* of the family is written $r_{\rm crit}(5)=\sup\{r:GG_5(r)\text{ finite}\}$. It is well defined because finiteness is monotone in $r$ (§2). The target theorem is:
 
 > (A) $GG_5(r)$ is infinite for every $r\ge r_c$; and (B) $GG_5(r)$ is finite for every $r<r_c$.
 
+Together these would give $r_{\rm crit}(5)=r_c$, the value conjectured in the paper from numerics.
+
 **Status.**
-- **(A) is proved.** The proof reconstructs the paper's Theorem 2. Every point, word and disk test is checked in exact arithmetic in $\mathbb Z[\zeta_5]$ (§3). One small extension: the same argument gives an infinite orbit (of $0$) at every $r\ge r_c$, not only at $r_c$.
-- **(B) is open.** It is proved here only on an explicit initial range $r\le r_\ast$, as a corollary of a finite exact computation (§5) combined with the already-proved group monotonicity. Here $r_\ast^2=3+\varphi-1/10$, so $r_\ast\approx2.12557$ and $r_c-r_\ast\approx0.0234$; this is the closest radius in Table 5.1 for which the computation finished. The remaining window $r_\ast<r<r_c$ is not proved.
-- **What is proved for $r\le r_\ast$.** The full group statement: $GG_5(r)$ is a finite group. This is stronger than "every orbit is finite".
-- **Evidence for the rest.** §6 records the renormalization data (the scale unit $\varphi^3$, the exact self-similarity of the critical segment, threshold ratios) and states the missing step as a precise conjecture. §7 explains why the most direct routes to (B) fail as stated.
+- **Proved: (A).** $GG_5(r)$ is infinite for every $r\ge r_c$, so $r_{\rm crit}(5)\le r_c$.
+  - At $r=r_c$ this is the paper's Theorem 2. Here every point, word and disk test of its proof is checked in exact arithmetic in $\mathbb Z[\zeta_5]$ (§3).
+  - The extension to $r>r_c$ is direct: the disks only grow, so every disk test still passes and the same words act in the same way.
+- **Proved modulo an exact computation, which was reproduced independently: finiteness on an initial range.** $GG_5(r)$ is a finite group for every $r\le r_\ast$, where $r_\ast^2=3+\varphi-1/10$, $r_\ast\approx2.12557$ and $r_c-r_\ast\approx0.0234$. Hence $r_\ast\le r_{\rm crit}(5)$.
+  - This is the full group statement, which is stronger than "every orbit is finite".
+  - It follows from a cut-set certificate (Theorem 4.2), verified by computer at $r_\ast$ (§5), together with the already-proved group monotonicity.
+- **Open: (B) on $r_\ast<r<r_c$,** and hence the equality $r_{\rm crit}(5)=r_c$.
+  - §6 records the renormalization data (the scale unit $\varphi^3$, the exact self-similarity of the critical chord, threshold ratios).
+  - It states the missing step as a precise conjecture (Conjecture R$^\ast$), which implies (B), and a structural Conjecture R describing the expected mechanism.
+  - §7 explains why the most direct routes to (B) fail as stated.
+- **Review.** The note has been independently refereed: `referee-report-critical-radius-n5.md` in this directory. §8 lists the referee's verdicts and what the referee did not check.
 
 Throughout, "verified exactly" means:
 - equalities and the signs of elements of $\mathbb Q(\sqrt5)$ are decided by integer and rational arithmetic;
@@ -85,7 +94,7 @@ With $x^{-1}$ written for inverses, the paper's three words are:
 
 Moreover, every intermediate image of the segment lies in the lens $D_1\cap D_2$.
 
-*Proof (exact computation, `t4/partA.py`).*
+*Proof (exact computation by a program outside the repository, re-done independently by the referee).*
 1. Apply the letters left to right to both endpoints. Before each letter, check exactly that both current endpoints lie in the closed disk of that letter. By Lemma 1.2 the letter then acts on the whole current segment as the global rotation.
 2. In fact both endpoints are checked to lie in both disks at every stage. So every intermediate segment lies in the lens.
 3. The exponents of $\zeta$ add up to $0\bmod 5$ for each word, so each composite is a translation.
@@ -115,7 +124,12 @@ The trajectories (exact vectors in the basis $1,\zeta,\zeta^2,\zeta^3$):
 | | $a^{-1}$ | $(1,2,1,1)$ | $(-3,2,-3,-1)$ |
 | | $b^{-1}$ | $E'=(0,-1,1,0)$ | $G=(2,-3,3,-2)$ |
 
-**All three words are tight at $r_c$.** In each word, the largest squared distance from an intermediate endpoint to a disk centre is exactly $3+\varphi$. It is attained at $\pm E$ and at the lens corners $\pm(\zeta-\zeta^{-1})=\pm 2i\sin 72^\circ=\pm1.9021i$, the vector $(1,2,1,1)$ and its negative.
+**All three words are tight at $r_c$.** In each word, the largest squared distance from an intermediate endpoint to a disk centre is exactly $3+\varphi$. It is attained exactly at three pairs of points:
+- $\pm E$;
+- $\mp\bar E=\pm(\zeta^3-\zeta^{-1})$, the vector $(1,1,1,2)$ and its negative, the mirror images of $\mp E$ in the real axis. The point $(1,1,1,2)$ lies on $\partial D_2$ and its negative on $\partial D_1$;
+- the lens corners $\pm(\zeta-\zeta^{-1})=\pm 2i\sin 72^\circ=\pm1.9021i$, the vector $(1,2,1,1)$ and its negative.
+
+Each word fails already at $r^2=3+\varphi-10^{-6}$.
 
 The lens corners are $\pm i\sqrt{r^2-1}$. So **$r_c$ is exactly the radius at which the lens corners become the lattice points $\pm(\zeta-\zeta^{-1})$**: $r_c^2=1+|\zeta-\zeta^{-1}|^2=1+4\sin^2(2\pi/5)$. The same identity holds for $n=10$: $1+4\sin^2(2\pi/10)=4-\varphi=r_c(10)^2$. It does **not** hold for $n=8$ or $n=12$.
 
@@ -141,7 +155,7 @@ Since $2\varphi^{-1}+2\varphi^{-2}=2$, $T$ is the rotation $t\mapsto t+2\varphi^
 
 **Remarks.**
 - The whole chord $E'E$ is invariant under the three words, and $T$ is minimal (every $T$-orbit is dense). So every point of the chord has an infinite orbit at every $r\ge r_c$.
-- Only the closed-disk convention at $E$ and $E'$ is used. Both lie on a boundary circle exactly at $r=r_c$.
+- The closed-disk convention is used at the tight points $\pm E$, $\pm\bar E$ and $\pm(\zeta-\zeta^{-1})$. All of them lie on a boundary circle exactly at $r=r_c$, and the words visit them.
 
 ---
 
@@ -164,9 +178,9 @@ Let $\sigma\colon\zeta\mapsto\zeta^2$. The map $x\mapsto(x,\sigma(x))$ embeds $\
    - So the word map of $w$ at $z$ depends only on which members of $\mathcal D$ contain $z$.
    - Hence every $w$ is determined by a function from a finite set of membership patterns to the finite set $\mathcal T(r)$. There are finitely many such functions. $\square$
 
-Equivalently, (B) asks for a **compact invariant window**: a compact $W\subset\mathbb C\times\mathbb C$ containing $(D_1\cup D_2)\times\{0\}$ and invariant under the lifted maps
+**A sufficient condition in Minkowski space.** (B) at radius $r$ follows from the existence of a **compact invariant window**: a compact $W\subset\mathbb C\times\mathbb C$ containing $(D_1\cup D_2)\times\{0\}$ and invariant under the lifted maps
 $$(y,u)\mapsto(A^{\pm1}y,\ \sigma(A)^{\pm1}u)\ \text{ if } y\in D_1,\qquad (y,u)\mapsto(B^{\pm1}y,\ \sigma(B)^{\pm1}u)\ \text{ if } y\in D_2.$$
-Here $\sigma(A)$ is the rotation by $\zeta^{-2}$ about $-1$, and $\sigma(B)$ is the rotation by $\zeta^{-2}$ about $+1$. The window is gated by the physical coordinate only.
+Here $\sigma(A)$ is the rotation by $\zeta^{-2}$ about $-1$, and $\sigma(B)$ is the rotation by $\zeta^{-2}$ about $+1$. The window is gated by the physical coordinate only. If such a $W$ exists, then the translation parts of all word maps have internal coordinate bounded by $\max\{|u|:(y,u)\in W\}$. Indeed, starting from $(z,0)$, the internal coordinate after a word is $\sigma(t)$ for the word map $x\mapsto\zeta^jx+t$, by Lemma 1.1, because $\sigma$ is a ring homomorphism and the generators' translation parts are $\pm(1-\zeta^{\pm1})$. So $\mathcal T(r)$ is finite by Lemma 4.1(2), and the group is finite by Lemma 4.1(3). I do not claim the converse: taking the closure of all lifted orbits gives an invariant set only after an argument about the discontinuities of the maps, which I have not made.
 
 ### 4.2 The cut-set certificate
 
@@ -190,19 +204,22 @@ Then $\mathcal T(r)$ and $GG_5(r)$ are finite. Consequently, by §2, $GG_5(r')$ 
    - Thus $a(V)\subseteq V$. The same argument for $a^{-1}$ and $b^{\pm1}$, and finiteness, give equality.
 4. **The cell decomposition.** The cells are:
    - the points of $V$;
-   - the *edges*, the components of $K\setminus V$, which are open arcs;
+   - the *edges*, the components of $K\setminus V$, which are open arcs or full circles;
    - the *faces*, the components of $\mathbb C\setminus K$.
-   They partition $\mathbb C$.
+   They partition $\mathbb C$. There are finitely many cells: $V$ is finite, $K\setminus V$ has finitely many components, and the complement of a finite union of circular arcs has finitely many components.
 5. **Faces.** By (C1), a face lies in $\operatorname{int}D_1$ or misses $D_1$. So $a$ is a single isometry on it ($A$ or $\mathrm{id}$). Its image is a connected subset of $\mathbb C\setminus K$, and applying the same to $a^{-1}$ shows the image is a face.
-6. **Edges.** An edge not contained in $\partial D_1$ does not meet $\partial D_1$, since a crossing point would lie in $V$. So $a$ is again a single isometry on each edge, and maps it onto an edge. The same holds for $b$.
+6. **Edges.** An edge not contained in $\partial D_1$ does not meet $\partial D_1$, since a crossing point would lie in $V$. So an edge lies in $\partial D_1$, in $\operatorname{int}D_1$, or misses $D_1$, and $a$ is a single isometry on it ($A$ or $\mathrm{id}$). Its image is a connected subset of $K\setminus V$, and applying the same to $a^{-1}$ shows the image is an edge. This covers edges that are full circles. The same holds for $b$.
 7. **Every group element acts on cells.** Every $g\in GG_5(r)$ permutes the cells. Along any word, the letter applied at a point $z$ is the isometry by which that letter acts on the cell containing the current point. Hence the word map $\mu_w(z)$ is an isometry $x\mapsto\zeta^jx+t$ carrying the cell $X$ of $z$ onto the cell $w(X)$.
 8. **Counting the possible word maps.**
-   - The unbounded face is $\mathbb C\setminus(D_1\cup D_2)$, by (C1). Every generator fixes it pointwise.
-   - For a bounded edge or face $X$ and a target cell $Y$, there are at most $5$ maps $x\mapsto\zeta^jx+t$ carrying $X$ onto $Y$: at most one $t$ for each $j$, since a non-trivial translation cannot map a bounded set onto itself.
+   - The unbounded face misses $D_1\cup D_2$: by (C1) the boundary circles lie in $K$, so a face lies inside $D_1\cup D_2$ or outside it, and the unbounded one lies outside. So every generator fixes it pointwise, and the only word map on it is the identity. ($K$ may contain arcs outside $D_1\cup D_2$, so the unbounded face need not be all of $\mathbb C\setminus(D_1\cup D_2)$; that does not matter.)
+   - Every other cell is bounded. For a bounded edge or face $X$ and a target cell $Y$, there are at most $5$ maps $x\mapsto\zeta^jx+t$ carrying $X$ onto $Y$: at most one $t$ for each $j$, since a non-trivial translation cannot map a bounded set onto itself.
    - For $X=\{x\}\subset V$, the image lies in the finite set $V$, giving at most $5|V|$ maps.
-   - So $\mathcal T(r)$ is finite, and Lemma 4.1(3) gives finiteness of the group. $\square$
+   - Since there are finitely many cells, $\mathcal T(r)$ is finite, and Lemma 4.1(3) gives finiteness of the group. $\square$
 
-**The minimal certificate.** The natural candidate is the *cut set* $K(r)=\bigcup_{g}g(\partial D_1\cup\partial D_2)$, the smallest set satisfying (C1)–(C2). The obvious "if" direction also holds: if $GG_5(r)$ is finite, then $K(r)$ is a finite union of arcs, because each element is a piecewise isometry with finitely many circular pieces. So computing $K(r)$ is the canonical finite test of finiteness at a single radius.
+**The minimal certificate.** The natural candidate is the *cut set* $K(r)=\bigcup_{g}g(\partial D_1\cup\partial D_2)$, the smallest set satisfying (C1)–(C2).
+- If $GG_5(r)$ is finite, then $K(r)$ is a finite union of arcs, because each element is a piecewise isometry with finitely many circular pieces.
+- But a finite $K(r)$ need not satisfy (C3)–(C4). For example, at $\delta=1$ (where $4\delta\in\mathbb Z$) the closure meets a tangency, although $GG_5$ is presumably finite there.
+- So computing $K(r)$ and checking (C3)–(C4) is a **sufficient** test of finiteness at a single radius, not a necessary one.
 
 ---
 
@@ -210,7 +227,13 @@ Then $\mathcal T(r)$ and $GG_5(r)$ are finite. Consequently, by §2, $GG_5(r')$ 
 
 ### 5.1 The computation
 
-Program: `certify.py` (with `z5.py`; Part A is `partA.py`), kept in the working session's scratch directory `t4/`, not in this repository. The description below is complete enough to re-implement it. Input: a rational $\delta$, with $r^2=\rho:=3+\varphi-\delta$. It computes $K(r)$ by closure:
+**Where the computation lives.** The certificate was produced by a program **outside this repository**: a Python program written in a working session, not archived here, because the repository holds Lean code only. Two things make the result reproducible without that program:
+- this section describes the algorithm and data formats fully enough to re-implement it;
+- the referee wrote an independent second implementation from the theorem statements alone (`referee-report-critical-radius-n5.md`, "Independent computations"). It produced byte-identical sets of maximal arcs at $\delta=13/5,\ 1/2,\ 9/10,\ 9/20,\ 3/10,\ 1/5$ and $1/10$, and matching counts at $3/20$. At $\delta=1/10$ the shared output is 50,714 circles, 1,437,580 pieces and 198,470 maximal arcs. The referee's separate checker of (C1)–(C4) also passes on the author's merged output.
+
+A port to the repository's Lean engine is planned. It should export the certificate as the list of **maximal arcs**, not only the circle centres, and verify it with a checker of (C1)–(C4) that is separate from the program producing it.
+
+**Algorithm.** Input: a rational $\delta$, with $r^2=\rho:=3+\varphi-\delta$. The program computes $K(r)$ by closure:
 1. Start from the two full circles $\partial D_{1}$ and $\partial D_2$.
 2. Repeatedly take a newly added arc, intersect it with $D_1$ and $D_2$, and rotate the parts by $A^{\pm1}$ and $B^{\pm1}$ respectively.
 3. Add the parts of the images that are not yet covered.
@@ -236,29 +259,50 @@ Program: `certify.py` (with `z5.py`; Part A is `partA.py`), kept in the working 
 
 When the closure terminates, $K(r)$ is the finite union of the stored arcs. Every stored arc had its four clipped images added, so (C1) and (C2) hold by construction. Then Theorem 4.2 applies.
 
+**Certificate format (for re-implementation and checking).**
+- Header: $n=5$; $\delta$ as an exact rational; the radius convention $r^2=3+\varphi-\delta$; the basis $1,\zeta,\zeta^2,\zeta^3$.
+- One record per maximal arc:
+  - the centre $c$, as an integer 4-vector;
+  - the start and end endpoint symbols $(e,s)$, each an integer 4-vector $e$ and a sign $s\in\{\pm1\}$;
+  - the arc runs counterclockwise from start to end.
+  A full circle is a record with a full-circle flag, and the two boundary circles $c=\mp1$ are full.
+- **The checker** reads only this file and verifies:
+  - (C1): the two full circles are present;
+  - (C2): for every arc, every $p=\pm1$ and $k=\pm1$, the part of the arc in $D_p$, rotated by $\zeta^{-k}$ about $p$, lies inside a single maximal arc of the target circle;
+  - (C3): $|c-p|^2\neq4\rho$ for every centre $c\neq p$, checked exactly;
+  - (C4): every maximal-arc endpoint equal to a symbol $(p,\pm1)$ is the start symbol $(p,-1)$ or the end symbol $(p,+1)$ of its arc, so that the arc runs into $D_p$.
+- Orderings may use interval arithmetic, or floating point with a proven error bound, as long as distinct endpoints closer than the error bound are sent to the exact equality test.
+
 ### 5.2 Results
 
-**Table 5.1.** Computation of the cut set $K(r)$ at $r^2=3+\varphi-\delta$. "Pieces" are stored arcs before merging adjacent ones. $\max|\sigma(c)|$ is the largest internal-space modulus of a circle centre.
+**Table 5.1.** Computation of the cut set $K(r)$ at $r^2=3+\varphi-\delta$.
+- "Pieces" are the stored arcs before adjacent ones are merged. This number depends on processing order and is not an invariant of $K$.
+- "Maximal arcs" is the invariant count, from the referee's merge.
+- "(C4) endpoints" is the number of maximal-arc endpoints lying on a boundary circle, all of which pass (C4).
+- $\max|\sigma(c)|$ is the largest internal-space modulus of a circle centre.
 
-| $\delta$ | $r$ | $r_c-r$ | closed | circles | pieces | endpoints on $\partial D_p$ / (C4) failures | $\max|\sigma(c)|$ | $\delta\cdot\max|\sigma(c)|$ | run time |
+| $\delta$ | $r$ | $r_c-r$ | closed | circles | maximal arcs | pieces | (C4) endpoints / failures | $\max|\sigma(c)|$ | $\delta\cdot\max|\sigma(c)|$ |
 |---|---|---|---|---|---|---|---|---|---|
-| $13/5$ | 1.42058 | 0.72839 | yes | 54 | 112 | 68 / 0 | 7.3 | 19.0 | 0.1 s |
-| $9/10$ | 1.92822 | 0.22074 | yes | 466 | 2 040 | 356 / 0 | 18.2 | 16.4 | 3 s |
-| $9/20$ | 2.04158 | 0.10738 | yes | 1 722 | 10 303 | 1 000 / 0 | 37.6 | 16.9 | 14 s |
-| $3/10$ | 2.07799 | 0.07097 | yes | 5 044 | 35 667 | 2 024 / 0 | 57.6 | 17.3 | 52 s |
-| $1/5$ | 2.10191 | 0.04705 | yes | 11 606 | 185 541 | 3 744 / 0 | 89.1 | 17.8 | 291 s |
-| $3/20$ | 2.11377 | 0.03519 | yes | 30 776 | 496 587 | 5 636 / 0 | 156.4 | 23.5 | 787 s |
-| $1/10$ | 2.12557 | 0.02339 | yes | 50 714 | 1 437 580 | 9 228 / 0 | 188.3 | 18.8 | 2244 s |
-| $3/40$, $1/20$ | | | not finished (cap) | | | | | | |
+| $13/5$ | 1.42058 | 0.72839 | yes | 54 | 64 | 112 | 60 / 0 | 7.3 | 19.0 |
+| $9/10$ | 1.92822 | 0.22074 | yes | 466 | 952 | 2 040 | 316 / 0 | 18.2 | 16.4 |
+| $9/20$ | 2.04158 | 0.10738 | yes | 1 722 | 4 222 | 10 303 | 864 / 0 | 37.6 | 16.9 |
+| $3/10$ | 2.07799 | 0.07097 | yes | 5 044 | 13 138 | 35 667 | 1 696 / 0 | 57.6 | 17.3 |
+| $1/5$ | 2.10191 | 0.04705 | yes | 11 606 | 35 194 | 185 541 | 2 964 / 0 | 89.1 | 17.8 |
+| $3/20$ | 2.11377 | 0.03519 | yes | 30 776 | 87 922 | 496 587 | 4 420 / 0 | 156.4 | 23.5 |
+| $1/10$ | 2.12557 | 0.02339 | yes | 50 714 | 198 470 | 1 437 580 | 7 172 / 0 | 188.3 | 18.8 |
+| $3/40$, $1/20$ | | | not finished (stopped at the cap of $10^6$ pieces) | | | | | | |
 
-In every finished run: no tangency occurred, the interval precision never had to be raised, and (C4) had no failures. The run at $9/10$ was also done with an earlier version of the program that called the exact equality test on every comparison (345 586 exact tests). It gave identical output.
+**Notes on the runs.**
+- In every finished run: no tangency occurred, the interval precision never had to be raised, and (C4) had no failures.
+- The run at $9/10$ was also done with an earlier version that called the exact equality test on every comparison (345,586 exact tests). It gave identical output.
+- From $\delta=9/20$ on, the author's store contains two degenerate pieces, each a single point. They lie on a boundary circle, which is contained in $K$, so they do not change the set $K$ or any hypothesis of Theorem 4.2. They account for the difference of 2 between the author's and the referee's piece counts at several radii; piece counts are not invariants in any case.
 
 **Theorem B (proved modulo the computation of Table 5.1).** $GG_5(r)$ is finite for every $r\le r_\ast$, where $r_\ast^2=3+\varphi-\delta_\ast$ with $\delta_\ast=1/10$, i.e. $r_\ast\approx 2.12557$ and $r_c-r_\ast\approx 0.0234$.
 
 *Proof.* The run for $\delta_\ast$ terminates and outputs $K(r_\ast)$ satisfying (C1)–(C4). Theorem 4.2 then gives finiteness at $r_\ast$, and group monotonicity (§2) extends it to every $r'\le r_\ast$. $\square$
 
 **Remarks.**
-- The circle counts at $\delta=13/5$, $3/10$, $1/5$ and $1/10$ (54, 5044, 11606, 50714) agree exactly with an independent floating-point implementation of the same closure (`t4/arcs_float.py`), which merges arcs numerically. That is a consistency check, not part of the proof.
+- The circle counts at $\delta=13/5$, $3/10$, $1/5$ and $1/10$ (54, 5044, 11606, 50714) also agree with a floating-point implementation of the same closure by the same author, which merges arcs numerically. That is a consistency check by the author, not an independent check and not part of the proof; the independent check is the referee's.
 - In every run, all coincidences of endpoints were between identical symbols. The circumcentre equality test was never needed to identify two different symbols.
 
 ### 5.3 Why the computation cannot reach $r_c$
@@ -288,21 +332,40 @@ These are the precise objects a renormalization proof would use, recorded so tha
 - That the 2-D minimal period is three 1-D steps is an observation, not a proved statement.
 
 **6.3 Geometry of the critical configuration (proved).**
-- At $r=r_c$ the boundary circles pass through the lattice points $\pm E$ (the chord's ends) and through the lens corners $\pm(\zeta-\zeta^{-1})$.
-- Every word of §3 touches a boundary circle at one of these points.
+- At $r=r_c$ the boundary circles pass through the lattice points $\pm E$ (the chord's ends), $\pm\bar E$, and the lens corners $\pm(\zeta-\zeta^{-1})$.
+- Every word of §3 touches a boundary circle at some of these points.
 
-**6.4 The obstruction to an exact renormalization off criticality.**
-- A similarity of ratio $\varphi^{3}$ maps circles of radius $r$ to circles of radius $\varphi^3r$. So no similarity can conjugate $GG_5(r)$ restricted to a small region to $GG_5(r')$ restricted to a larger one, for $r$ and $r'$ near $r_c$.
-- Near the accumulation point, at depth $k$, the boundary is a circle that deviates from its tangent line by $O(\varphi^{-6k})$ across a region of size $\varphi^{-3k}$.
-- Consequently the renormalization can be exact only *combinatorially and asymptotically*. This matches the threshold ratios converging to $\varphi^3$ rather than being equal to it.
+**6.4 What can and cannot renormalize exactly.**
+- **Only the 1-D chord map renormalizes exactly, and only at $r_c$.** The interval exchange $T$ on $E'E$ (§3.3, §6.2) is exactly self-similar, and $G=\varepsilon E$.
+- **The 2-D cut set does not renormalize exactly by a similarity at any $r$, including $r_c$.** A similarity of ratio $\varphi^{\pm3}$ maps a circle of radius $r$ to a circle of radius $\varphi^{\pm3}r$. So it cannot carry an arrangement of radius-$r$ arcs onto an arrangement of radius-$r'$ arcs with $r'\approx r$, over any region containing a non-degenerate arc.
+- This argument excludes only conjugacy by similarities. It says nothing against other kinds of exact conjugacy.
+- Near the accumulation point, at depth $k$, the boundary is a circle that deviates from its tangent line by $O(\varphi^{-6k})$ across a region of size $\varphi^{-3k}$. So at best the 2-D renormalization is exact *combinatorially and asymptotically*. This matches the threshold ratios converging to $\varphi^3$ rather than being equal to it.
 
-**Conjecture R (renormalization).** There exist a compact region $U\ni E$, a finite set of words, and $k_0$ with the following property. For each $k\ge k_0$, the combinatorial type of $K(r)$ inside $\varepsilon^{k}$-scaled copies of $U$ around $E$ (and the symmetric points), for $r^2\in[r_c^2-\delta_{k},\,r_c^2-\delta_{k+1}]$, is the image under $z\mapsto E+\varepsilon(z-E)$ of the type at level $k-1$.
+**What would prove (B).** By Theorem 4.2 and group monotonicity, the following statement implies (B). It is the precise missing step. It is not equivalent to (B), because a finite cut set need not satisfy (C4) (§4.2).
+
+**Conjecture R$^\ast$.** Put $r_k^2=3+\varphi-\tfrac1{10}\varepsilon^{k}$ for $k\ge0$, with $\varepsilon=\varphi^{-3}$. Then for every $k\ge0$ the cut set $K(r_k)$ is a finite union of arcs satisfying (C3) and (C4).
+
+**Why R$^\ast$ suffices, and what is already known.**
+- Since $r_k\uparrow r_c$, Theorem 4.2 and §2 give finiteness for every $r<r_c$, which is (B).
+- (C3) holds automatically at every $r_k$. We have $4\rho_k=12+4\varphi-\tfrac25\varepsilon^k$. Here $\varepsilon^k=\alpha+\beta\varphi$ is a unit of $\mathbb Z[\varphi]$, so $5$ does not divide both $\alpha$ and $\beta$. Hence $4\rho_k\notin\mathbb Z[\varphi]$, while every $|c-p|^2$ lies in $\mathbb Z[\varphi]$.
+- $k=0$ is Table 5.1 ($\delta=1/10$).
+- The content of R$^\ast$ is therefore that the closure terminates at every level, and that (C4) holds.
+
+**Conjecture R (structural mechanism).** There exist a compact region $U\ni E$ and $k_0$ with the following property. For each $k\ge k_0$, the combinatorial type of $K(r_k)$ inside the $\varepsilon^{k}$-scaled copy $E+\varepsilon^k(U-E)$ (and its images under the symmetries $z\mapsto-z$, $z\mapsto\bar z$) is the image under $z\mapsto E+\varepsilon(z-E)$ of the type of $K(r_{k-1})$ inside $E+\varepsilon^{k-1}(U-E)$.
 
 Here combinatorial type means:
-- the set of circles, as centres modulo the scaling;
-- the cyclic order of the arc endpoints on each circle.
+- the set of circles meeting the region, as centres modulo the scaling;
+- the cyclic order of the arc endpoints on each such circle.
 
-The correction from curvature never changes the sign of any of the finitely many disk tests that define the type, once $k\ge k_0$. Conjecture R plus Table 5.1 at level $k_0$ would prove (B) by induction on $k$.
+**What Conjecture R gives and does not give.**
+- It gives only the **local** structure of $K(r_k)$ near $\pm E$ and $\pm\bar E$, uniformly in $k$.
+- It does **not** give, by itself, that $K(r_k)$ is finite as a whole (outside the copies of $U$), or that (C4) holds.
+- To deduce R$^\ast$ from R one would also need:
+  - (i) that outside the copies of $U$ the cut set has a bounded number of arcs at every level;
+  - (ii) that the closure process at a fixed $r_k$ enters the nested copies only finitely many times, i.e. the recursion stops after about $k$ levels;
+  - (iii) an explicit bound showing that the curvature correction does not change the sign of any of the finitely many disk tests defining the type, once $k\ge k_0$.
+- Item (iii) is part of what R asserts. Items (i) and (ii) are additional.
+- So R is the main missing ingredient, not a proof of (B).
 
 **Template for $n=8,10,12$.** The same objects are expected with:
 
@@ -312,46 +375,63 @@ The correction from curvature never changes the sign of any of the finitely many
 | 10 | $\mathbb Q(\sqrt5)$ | $\varphi^3$ | $4-\varphi$ |
 | 12 | $\mathbb Q(\sqrt3)$ | $2+\sqrt3$ | $40-22\sqrt3$ |
 
-These are measured in `twodisk_experiments.md` E3. The certificate of Theorem 4.2 and the program of §5 carry over verbatim: replace $\mathbb Z[\zeta_5]$ by $\mathbb Z[\zeta_n]$ and $\mathbb Q(\sqrt5)$ by the real quadratic field. For $n=8$ and $12$ the paper's infinite-orbit constructions are limit-point arguments, not finite interval exchanges. Part A for those $n$ therefore needs a new exact construction, for example an invariant segment found at $r_c$ in the computed cut set.
+The values of $r_c^2$ are the paper's (Table 1 and its section on geometric constructions), as are the scale factors $\sqrt2-1$ and $2-\sqrt3$. The scale units are also measured in `twodisk_experiments.md` E3.
+
+Theorem 4.2 holds for any $n$ with the same proof. The algorithm of §5 generalizes routinely: replace $\mathbb Z[\zeta_5]$ by $\mathbb Z[\zeta_n]$ (reduction modulo $\Phi_n$) and $\mathbb Q(\sqrt5)$ by the real quadratic field, and replace $\zeta_5-\zeta_5^{-1}$ in the exact sign test for $\operatorname{Im}$ by $\zeta_n-\zeta_n^{-1}$. The author's program hard-codes $n=5$; the referee's field code shows that the generalization is routine. For $n=8$ and $12$ the paper's infinite-orbit constructions are limit-point arguments, not finite interval exchanges. Part A for those $n$ therefore needs a new exact construction, for example an invariant segment found at $r_c$ in the computed cut set.
 
 ---
 
 ## 7. Attempted routes that did not close
 
 1. **A simple window (approach (i)).** The internal-space images of orbits below $r_c$ are not filled by a fixed polygon or union of disks scaled with $\delta^{-1}$. The filling fraction of orbit points in the natural window decreases as $r\uparrow r_c$ (from $0.029$ to $0.012$ for $n=5$; `twodisk_experiments.md` E4). The invariant set is fractal, so no describable window $W(r)$ was found. Lemma 4.1 still reduces (B) to the existence of *some* compact invariant window, and $K(r)$ is the finite combinatorial substitute used in §5.
-2. **Exact periodic renormalization (approach (ii)).** It is exact only at $r_c$, for the curvature reason in §6.4. At $r_c$ itself the group is infinite, so a renormalization there does not by itself control $r<r_c$.
-3. **Direct certification along $r_k\uparrow r_c$ (approach (iii)).** It is carried out for finitely many $k$ (Table 5.1). It cannot be continued indefinitely without the uniform pattern of Conjecture R, because the computation grows like a power of $\delta^{-1}$.
-4. **Literature (approach (iv); cited from memory, not re-checked).**
+2. **Exact periodic renormalization (approach (ii)).** Only the 1-D chord map renormalizes exactly, and only at $r_c$. The 2-D cut set admits no exact similarity renormalization at any $r$, including $r_c$ (§6.4). And at $r_c$ the group is infinite, so a renormalization there would not by itself control $r<r_c$.
+3. **Direct certification along $r_k\uparrow r_c$ (approach (iii)).** It is carried out for finitely many $k$ (Table 5.1). It cannot be continued indefinitely without a uniform pattern such as Conjecture R$^\ast$, because the computation grows like a power of $\delta^{-1}$.
+4. **Literature (approach (iv)).** Cited from memory, except that the referee confirmed the bibliographic data and statement of Akiyama–Brunotte–Pethő–Steiner.
    - The closest proved results are global-stability theorems for single planar piecewise isometries or discretized rotations with quadratic rotation parameters, proved by self-similar domain-exchange renormalization:
      - Adler, Kitchens and Tresser (ETDS 2001), piecewise affine maps of the torus;
      - Kouptsov, Lowenstein and Vivaldi, "Quadratic rational rotations of the torus and dual lattice maps" (Nonlinearity 2002), the cases $q=5,8,10,12$;
-     - Akiyama, Brunotte, Pethő and Steiner, "Periodicity of certain piecewise affine planar maps" (Tsukuba J. Math. 2008), all orbits periodic for the quadratic parameters $\lambda=\pm\varphi^{\pm1},\pm\sqrt2,\pm\sqrt3$, i.e. exactly the $n=5,10,8,12$ cases;
+     - Akiyama, Brunotte, Pethő and Steiner, "Periodicity of certain piecewise affine planar maps" (Tsukuba J. Math. 32 (2008), no. 1): every *integer* sequence with $0\le a_{k-1}+\lambda a_k+a_{k+1}<1$ is periodic, for $\lambda\in\{(\pm1\pm\sqrt5)/2,\pm\sqrt2,\pm\sqrt3\}$. These are lattice orbits of the discretized rotation, and the parameters are exactly the $n=5,10,8,12$ cases;
+     - Lowenstein, Hatjispyros and Vivaldi (Chaos 1997), the golden case of the round-off rotation;
      - Goetz and Poggiaspalla, and Lowenstein, Kouptsov and Vivaldi, for rotations by $\pi/7$.
    - None of these applies directly. They treat one map on a fixed polygonal domain at one parameter. $GG_5(r)$ is a two-generator group, gated by disks, in a one-parameter family whose boundaries are curved.
-   - The Akiyama–Brunotte–Pethő–Steiner method is the best template. One finds a finite set of polygonal "atoms" and an exact induced map that reproduces itself after scaling by the unit. The new ingredient needed here is control of the curvature correction uniformly in $k$ (Conjecture R).
+   - The Akiyama–Brunotte–Pethő–Steiner method is the best template. One finds a finite set of polygonal "atoms" and an exact induced map that reproduces itself after scaling by the unit. The new ingredients needed here are control of the curvature correction uniformly in $k$ and global finiteness at each level (Conjecture R$^\ast$; §6).
    - Reduction to the single map $ab^{-1}$, which the paper mentions, would not suffice for group finiteness in any case. Finiteness of the orbits of one element does not bound the orbits of the group.
 
 ---
 
 ## 8. Status and gaps
 
+The referee's verdicts are in `referee-report-critical-radius-n5.md`. The table states the current status after the referee's fixes were applied.
+
 | claim | status |
 |---|---|
 | Lemma 1.1, 1.2; §2 monotonicity | proved (§2 cites refereed notes) |
-| Theorem A: infinite for all $r\ge r_c$ | **proved**; every arithmetic step verified exactly (`t4/partA.py`) |
-| Lemma 4.1 (window criterion; $\mathcal T$ finite $\Rightarrow$ group finite) | proved |
-| Theorem 4.2 (cut-set certificate) | proved |
-| Theorem B: finite for $r\le r_\ast$ | **proved modulo the computation of §5**. Exact except for strict angle comparisons, which use certified interval arithmetic |
-| finite for $r_\ast<r<r_c$ | **open**; strongly supported numerically by orbit scans up to $\delta\approx4\cdot10^{-3}$ (`twodisk_arith.md` §3.2) and the paper's searches |
-| Conjecture R | conjecture, with the evidence of §6 |
-| infinite orbit exactly at $r_c$ (paper's footnote 4) | proved here for $n=5$ (Theorem A) |
+| Theorem A: infinite for all $r\ge r_c$, so $r_{\rm crit}(5)\le r_c$ | **proved**; refereed correct after minor fixes. Every arithmetic step verified exactly, and re-verified independently by the referee |
+| Side fact: $r_c$ is where the lens corners are $\pm(\zeta-\zeta^{-1})$ (also $n=10$; not $n=8,12$) | proved; refereed correct |
+| Lemma 4.1 and Theorem 4.2 (cut-set certificate, a sufficient test) | proved; refereed correct after minor fixes |
+| Theorem B: finite for $r\le r_\ast$, so $r_\ast\le r_{\rm crit}(5)$ | **proved modulo the computation of §5**, refereed correct given the computation. The computation was reproduced by an independent implementation with identical arc sets. The program and certificate files are not archived in the repository (§5.1); a Lean port with an independent checker is planned |
+| finite for $r_\ast<r<r_c$; $r_{\rm crit}(5)=r_c$ | **open**; strongly supported numerically by orbit scans up to $\delta\approx4\cdot10^{-3}$ (`twodisk_arith.md` §3.2) and the paper's searches |
+| Conjecture R$^\ast$ (implies (B)) and Conjecture R (structural) | conjectures, with the evidence of §6 |
+| infinite at $r_c=\sqrt{3+\varphi}$ | proved (this is the paper's Theorem 2). The paper's footnote 4, that the group is infinite at the critical radius, would follow for $n=5$ from (B); it is not proved here |
+| The sufficient-condition argument for the window (§4.1) and Conjecture R$^\ast$ with its remarks (§6) | written after refereeing; **not yet refereed** |
 
-**Gaps and caveats, from my own adversarial check.**
-1. The computation of §5 was written and run by the same author as this note. It has not been re-implemented independently. In particular the cyclic-interval logic (intersection and subtraction of arcs) deserves an independent re-check. The exact agreement with the floating-point implementation at $\delta=3/10$ is reassuring but not a proof.
-2. Strict angle comparisons rely on `mpmath.iv` being correctly outward-rounded for `sqrt` and `atan2`. That is standard but is trust in a library.
-3. (C4) is checked only for endpoints not shared with an adjacent stored piece on the same circle. Pieces that meet at a common endpoint form one maximal arc, so that is the right condition. The check matches endpoints by exact symbol equality.
+**Not checked by the referee:**
+- the measured renormalization data in §6.1 and the files they cite;
+- the column $\max|\sigma(c)|$ of Table 5.1;
+- run times;
+- group orders at known radii;
+- the literature beyond Akiyama–Brunotte–Pethő–Steiner;
+- the Lean outline in §9;
+- the correctness of `mpmath.iv` beyond a spot check.
+
+The referee's own orderings rest on a stated double-precision error bound rather than interval arithmetic. The two implementations agree exactly, so they cross-check each other.
+
+**Remaining caveats.**
+1. Durability: the computation behind Theorem B lives outside the repository. The mathematical claim rests on two independent implementations that agree exactly, and on the algorithm and certificate format described in §5.1.
+2. Strict angle comparisons in the author's program rely on `mpmath.iv` being correctly outward-rounded for `sqrt` and `atan2`. That is standard, but it is trust in a library.
+3. (C4) is checked on endpoints of maximal arcs. The author's program checks a stricter version on pieces.
 4. Theorem A's statement "the group is infinite" uses only one orbit. It does not need, and does not prove, anything about the structure of $GG_5(r)$ beyond infinitude.
-5. Nothing here shows that $r_c$ is the critical radius of the *group*. That requires (B) on $(r_\ast,r_c)$.
+5. Nothing here shows that $r_c$ is the critical radius of the group. That requires (B) on $(r_\ast,r_c)$.
 
 ---
 
@@ -366,7 +446,7 @@ These are measured in `twodisk_experiments.md` E3. The certificate of Theorem 4.
    - "infinite orbit $\Rightarrow$ infinite group" (`Set.Infinite.of_image` style).
 4. **Part B, finite range:**
    - the cell-decomposition argument of Theorem 4.2. This is the main formalization cost: finite unions of arcs, regular points, components of complements. A cheaper route for Lean is Lemma 4.1(3) with an explicit finite $\mathcal T(r)$ and a certificate that $\mathcal T(r)$ is closed. That needs region-emptiness proofs for intersections of disks and disk complements, which may be harder;
-   - the certificate data from §5, exported as a list of circles and arcs with symbolic endpoints;
+   - the certificate data from §5, exported in the format of §5.1 (maximal arcs with symbolic endpoints), produced by the planned port to the repository's Lean engine;
    - a verified checker for (C1)–(C4), with exact arithmetic for equalities and verified interval arithmetic (or exact nested-square-root sign tests in the tower $\mathbb Q(\sqrt5,\sin72^\circ,h_1,h_2)$) for orderings;
    - group monotonicity from `boundary-contact.md`.
-5. **Part B, full:** Conjecture R would have to be proved first. A Lean proof would then be an induction on the level $k$ with explicit error bounds for the curvature correction.
+5. **Part B, full:** Conjecture R$^\ast$ would have to be proved first, presumably through Conjecture R plus items (i)–(iii) of §6. A Lean proof would then be an induction on the level $k$ with explicit error bounds for the curvature correction.
