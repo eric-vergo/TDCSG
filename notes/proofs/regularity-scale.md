@@ -7,38 +7,59 @@ radius $r$ about $\mp1$) that are invariant under the $-2\pi/n$ rotation of each
 $\mathcal C$ of functions, let $r_{\mathcal C}(n)$ be the radius beyond which every invariant function
 in $\mathcal C$ is constant. Then:
 
-1. **Every class with unique continuation has threshold $r_A$.** This covers every quasi-analytic
-   Denjoy–Carleman class that contains the real-analytic functions: $r_{\mathcal C}(n)=r_A(n)=\sec(\pi/n)$.
-2. **Every class with bump functions has a much larger threshold.** This covers every
-   non-quasi-analytic Denjoy–Carleman class, the Gevrey classes, $C^\infty$, $C^k$, Hölder, Sobolev,
-   continuous, $L^p$ and measurable functions. Their thresholds satisfy
+1. **Unique continuation gives threshold $r_A$.** Every motion-invariant class of continuous
+   functions that contains the constants and the real-analytic functions, and has unique continuation
+   from open sets, has threshold $r_{\mathcal C}(n)=r_A(n)=\sec(\pi/n)$. This covers every
+   quasi-analytic Denjoy–Carleman class containing $C^\omega$. Smaller quasi-analytic classes can have
+   a smaller threshold (Remark 3.4).
+2. **Bump functions give a much larger threshold.** This covers every non-quasi-analytic
+   Denjoy–Carleman class, the Gevrey classes, $C^\infty$, $C^k$, Hölder, Sobolev and continuous
+   functions, and $L^p$ and measurable functions taken modulo null sets. Their thresholds satisfy
    $$
    \max\bigl(2,\ d_n\bigr)\ \le\ r_{\mathcal C}(n)\ \le\ R_{\rm erg}(n)<\infty,\qquad
    d_n=\sqrt{\sec^2\tfrac{\pi}{n}+16\sin^2\tfrac{\pi}{n}} .
    $$
    The lower bound comes from two explicit families of periodic islands. The upper bound is the radius
    above which the action is ergodic.
-3. **So the thresholds do not fill the gap $(r_A,r_c)$.** The scale jumps from $r_A$ to a radius
-   above $r_c$, exactly at the Denjoy–Carleman quasi-analyticity boundary. On the whole interval
-   $r_A<r<\max(2,d_n)$, a Denjoy–Carleman class $\mathcal C\supseteq C^\omega$ has only constant
-   invariants **if and only if it is quasi-analytic**.
-4. **For $n=5$ the window is narrow.** All non-quasi-analytic thresholds lie in
-   $[\,2\sqrt{4-\sqrt5},\ 3.662\,]=[2.656,\,3.662]$, while $r_A=1.236$ and $r_c=2.149$.
+3. **The scale jumps at the quasi-analyticity boundary.** On the whole interval
+   $r_A<r<\max(2,d_n)$, a log-convex Denjoy–Carleman class has only constant invariants **if and only
+   if it is quasi-analytic**. So no continuum of thresholds fills $(r_A,\max(2,d_n))$.
+   - That this interval contains $(r_A,r_c)$, so that the bump thresholds lie above $r_c$, needs
+     $r_c(n)\le\max(2,d_n)$.
+   - For $n=5$ this is proved, since `critical-radius-n5.md` (Theorem A) proves
+     $r_c(5)\le\sqrt{3+\varphi}=2.149<d_5$.
+   - For $n\ne5$ it rests on the paper's computed table of $r_c$.
+4. **For $n=5$ the window is narrow.** All bump-class thresholds lie in
+   $[\,2\sqrt{4-\sqrt5},\ 3.662\,]=[2.656,\,3.662]$, while $r_A=1.236$ and $r_c(5)\le2.149$.
+   - The lower bound on $r_c(5)$, $r_c(5)\ge r_\ast\approx2.1138$, is proved in
+     `critical-radius-n5.md` only modulo its computation (Theorem B).
+   - Finiteness of $GG_5(r)$ on $(r_\ast,\sqrt{3+\varphi})$ is open there.
+   - Nothing below uses the lower bound.
 
-The critical radius $r_c(n)$ is therefore not a rigidity threshold for any regularity class. The
-function-theoretic radius that $r_A$ really is, besides the analytic threshold, is the radius where
-the orbit space stops being Hausdorff (§8).
+So, for the classes treated here (classes with unique continuation, Denjoy–Carleman classes and bump
+classes), $r_c(n)$ is not a rigidity threshold. The other characterization that $r_A$ has, besides
+being the analytic threshold, is the radius where the orbit space stops being Hausdorff (§8).
 
 **Status.**
-- **[proved]** here: items 1–3 in full; item 4's lower bound; the general upper bound $R_{\rm erg}(n)$.
-  The proofs use Theorem 4.1 and Theorem 8.1 of [`analytic-radius.md`](analytic-radius.md), which are
-  refereed.
-- **[proved by exact computation]**: item 4's upper bound $3.662$. The certificate is a finite orbit
-  computation in $\mathbb Z[\zeta_5]$, with every disk test decided exactly in $\mathbb Q(\sqrt5)$ (§5.3).
-- **[computed]** (floating point): the upper bounds for $n=7,8,10,12$ (§5.3).
-- **[conjecture]**: all bump classes have the same threshold, and it equals $\max(2,d_n)$, the radius
-  where the last explicit island dies. The evidence is in §6.
-- Not refereed.
+- **Proved here, without caveat:**
+  - item 1;
+  - the dichotomy on $(r_A,\max(2,d_n))$ of item 3: there are non-constant smooth, and even Gevrey,
+    invariants for every $r<\max(2,d_n)$;
+  - the general upper bound $R_{\rm erg}(n)$ of item 2.
+
+  The proofs use Theorems 4.1 and 8.1 of [`analytic-radius.md`](analytic-radius.md), which are refereed.
+- **Proved by exact computation**, and reproduced independently by the referee: the upper bound
+  $3.662$ of item 4. The certificate is a finite orbit computation in $\mathbb Z[\zeta_5]$, with every
+  disk test decided exactly in $\mathbb Q(\sqrt5)$; it is described in §5.3.
+- **[computed]** (floating point): the upper bounds for $n=7,8,10,12$ (§5.3), and the comparison with
+  $r_c$ for $n\ne5$.
+- **[conjecture]**: all bump classes have the same threshold, equal to $\max(2,d_n)$, the radius where
+  the last explicit island dies (§6).
+- **Refereeing.** The note has been independently refereed; the report is
+  [`referee-report-regularity-scale.md`](referee-report-regularity-scale.md), and §9 records its
+  verdicts. Two arguments were completed after the report and have not yet been refereed:
+  - the proof that a.e.-invariance and everywhere-invariance agree (Lemma 1.3);
+  - the extension of the non-Hausdorff statement to every $r>r_A$ (Proposition 8.2).
 
 ---
 
@@ -48,29 +69,33 @@ the orbit space stops being Hausdorff (§8).
    pseudogroup orbit meets $D(-1,K)\cup D(1,K)$.
 2. **[proved]** (Proposition 2.2) For every class closed under restriction, the set of radii at which
    the class is rigid is an up-set in $(r_A,\infty)$. So $r_{\mathcal C}$ is a genuine threshold.
-3. **[proved]** (Theorem 3.1) Let $\mathcal C$ be a class with unique continuation from open sets that
-   is invariant under Euclidean motions. Then every invariant $f\in\mathcal C(\Omega_r)$ is constant for
-   $r>r_A$. If also $\mathcal C\supseteq C^\omega$, then $r_{\mathcal C}=r_A$. Quasi-analytic
-   Denjoy–Carleman classes qualify (Proposition 3.2).
+3. **[proved]** (Theorem 3.1) Let $\mathcal C$ be a class of continuous functions that contains the
+   constants, has unique continuation from open sets, and is invariant under Euclidean motions. Then
+   every invariant $f\in\mathcal C(\Omega_r)$ is constant for $r>r_A$. If also
+   $\mathcal C\supseteq C^\omega$, then $r_{\mathcal C}=r_A$. Quasi-analytic Denjoy–Carleman classes
+   qualify (Proposition 3.2).
 4. **[proved]** (Lemma 4.1, Theorems 4.3–4.4, Proposition 4.2) A finite pseudogroup orbit that avoids
    the two circles is surrounded by an invariant island. Such islands exist:
-   - for almost every point when $r<r_c$;
+   - for almost every point when $GG_n(r)$ is finite, i.e. for $r<r_c$;
    - on the *necklace orbit*, with $2n-2$ points, for $r_A<r<d_n$;
-   - near the centres for $r<2$.
+   - near the centres for $0<r<2$.
 
-   So every class containing bump functions is non-rigid for $r<\max(2,d_n)$, and $d_n>r_c$.
+   So every bump class is non-rigid for $r<\max(2,d_n)$. Whether $d_n>r_c$ is proved for $n=5$ and
+   computed for the other $n$.
 5. **[proved]** (Theorem 5.2, Corollary 5.3) For
    $r>R_{\rm erg}(n)=\sec\frac{\pi}{n}+\max(2,4\sin\frac{\pi}{n})+16\sin\frac{\pi}{n}$, the
-   pseudogroup acts ergodically, and every continuous invariant is constant. For $n=5$ the same
-   holds for $r>3.662$ [proved by exact computation].
+   pseudogroup acts ergodically. So every class contained in $C^0$, and every class of measurable
+   functions taken modulo null sets, is rigid there. For $n=5$ the same holds for $r>3.662$
+   [proved by exact computation].
 6. **[proved]** (Theorem 4.5) The dichotomy of item 3 of the statement.
 7. **[proved]** (§7c) A single round of analytic continuation already gives the intermediate
    pseudogroup $H^{(1)}_r$ infinite, dense orbits at every $r>r_A$, for $n\ge63$. So the
    intermediate pseudogroups do not interpolate either.
-8. **[proved]** (Proposition 8.2) $\Omega_r/P_r$ is Hausdorff for $r\le r_A$. It is not Hausdorff for
-   $r_A<r<r_c$ or for $r>R_{\rm erg}$. **[proved]** (Proposition 8.3) For $r<r_c$, invariant smooth
-   functions separate almost every orbit from every other orbit. Whether this fails just above $r_c$
-   is **[conjecture]**.
+8. **[proved]** (Proposition 8.2) $\Omega_r/P_r$ is Hausdorff for $0<r\le r_A$ and not Hausdorff for
+   every $r>r_A$. The case $r>r_A$ in this generality is not yet refereed: the referee checked it on
+   $(r_A,r_c)$ and above $R_{\rm erg}$ and suggested the general argument.
+9. **[proved]** (Proposition 8.3) For $r<r_c$, invariant smooth functions separate almost every orbit
+   from every other orbit. That this fails just above $r_c$ is a **[conjecture]**.
 
 ---
 
@@ -87,11 +112,14 @@ Notation follows [`analytic-radius.md`](analytic-radius.md) (cited below as AR).
 
 **Definition 1.1.**
 1. **Classes.** A *class* $\mathcal C$ assigns to each open $U\subset\mathbb C$ a real vector space
-   $\mathcal C(U)$ of real functions on $U$. Measurable classes are taken modulo null sets.
+   $\mathcal C(U)$ of real functions on $U$. Throughout, a class is either contained in $C^0$, or
+   consists of measurable functions taken modulo null sets.
+   - Without this restriction rigidity can fail at every $r$. For example, the indicator of a single
+     orbit is a non-constant Borel invariant, since orbits are countable.
 2. **Invariant functions.** $f\in\mathcal C(\Omega_r)$ is *invariant* if $f\circ A=f$ on $D_1$ and
-   $f\circ B=f$ on $D_2$. For measurable classes, this means a fixed representative satisfying both
-   identities everywhere, or equivalently almost everywhere: the a.e. version follows from the
-   everywhere version, and the converse is not used.
+   $f\circ B=f$ on $D_2$. For measurable classes the two notions below agree, by Lemma 1.3:
+   - some representative satisfies both identities everywhere;
+   - $f$ satisfies both identities almost everywhere.
 3. **Rigidity.** $\mathcal C$ is *rigid at $r$* if every invariant $f\in\mathcal C(\Omega_r)$ is
    constant (a.e. constant, for measurable classes). Let
    $\mathcal R_{\mathcal C}=\{r>0:\mathcal C\text{ rigid at }r\}$ and
@@ -126,6 +154,26 @@ So the pseudogroup orbits off the boundary circles are exactly the $GG_n(r)$-orb
 
 So $r_c$ can be read through either convention.
 
+**Lemma 1.3 (a.e. invariance)** [proved; not yet refereed, following the referee's suggestion].
+Let $f$ be measurable on $\Omega_r$ with $f\circ A=f$ a.e. on $D_1$ and $f\circ B=f$ a.e. on $D_2$.
+Then $f$ agrees a.e. with an everywhere-invariant function. Hence $P_r$ is ergodic in the usual sense
+(every a.e.-invariant measurable set is null or conull) iff every everywhere-invariant measurable
+function is a.e. constant.
+
+*Proof.*
+1. **The bad set.** Let $E=\{z\in D_1:f(Az)\ne f(z)\}\cup\{z\in D_2:f(Bz)\ne f(z)\}$. It is null.
+2. **Its saturation is null.** The saturation $\hat E=\bigcup_w w(E\cap{\rm Dom}(w))$, over the
+   countably many words $w$, is a countable union of isometric images of null sets, so it is null.
+   It is $P_r$-invariant by construction.
+3. **The modified function.** Put $\tilde f=f$ off $\hat E$ and $\tilde f=0$ on $\hat E$. Take
+   $z\in D_1$:
+   - if $z\in\hat E$, then $Az\in\hat E$, and both values of $\tilde f$ are $0$;
+   - otherwise $z\notin E$ and $Az\notin\hat E$, so $\tilde f(Az)=f(Az)=f(z)=\tilde f(z)$.
+
+   The case of $B$ is the same.
+4. **Ergodicity.** Apply this to indicators for one direction. For the other, apply it to the level
+   sets $\{f>a\}$, $a\in\mathbb Q$. ∎
+
 ---
 
 ## 2. Descent to the centres, and monotonicity
@@ -147,9 +195,11 @@ $w(z)\in D(\pm1,K)$.
    $|z'-1|\le F(\rho)\le\rho-\delta<r$. So $z'\in D_2$, and $z'$ is at distance at most $\rho-\delta$
    from $+1$.
 5. By the symmetry $z\mapsto-z$, the same step applies with the roles of the disks exchanged.
-6. Alternating, the distance to the current centre drops by at least $\delta$ at each step while it
-   exceeds $K$. It starts below $r$, so after finitely many steps it is at most $K$. Each step is a
-   power of one generator applied inside its own open disk, so it is realized by a word. ∎
+6. Run steps 3–4 with some $K_1\in(\sec(\pi/n),K)$ in place of $K$. Alternating, the distance to the
+   current centre drops by at least $K_1-F(K_1)>0$ at each step while it exceeds $K_1$. It starts
+   below $r$, so after finitely many steps it is at most $K_1<K$. The point then lies in the open disk
+   $D(\pm1,K)$. Each step is a power of one generator applied inside its own open disk, so it is
+   realized by a word. ∎
 
 The fixed point of $F$ is the necklace radius $\sec(\pi/n)$. This is the same triangle as in AR,
 Lemma 1.2. Above $r_A$, every orbit is pulled into the necklace disks around the centres.
@@ -174,7 +224,8 @@ $r_{\mathcal C}\ge r_A$.
    real-analytic invariant. ∎
 
 So, unlike the naive restriction argument (which loses non-constancy for non-quasi-analytic
-classes), monotonicity holds for every class. The reason is dynamical, not function-theoretic.
+classes), monotonicity holds for every class closed under restriction. The reason is dynamical, not
+function-theoretic.
 
 ---
 
@@ -182,6 +233,7 @@ classes), monotonicity holds for every class. The reason is dynamical, not funct
 
 **Theorem 3.1** [proved]. Let $n=5$ or $n\ge7$, and let $\mathcal C$ be a class of continuous
 functions such that:
+- **(C0)** it contains the constants;
 - **(C1)** it is closed under restriction to open subsets;
 - **(C2)** it is closed under composition with orientation-preserving Euclidean motions, i.e.
   $f\in\mathcal C(U)\Rightarrow f\circ\gamma\in\mathcal C(\gamma^{-1}U)$;
@@ -205,8 +257,8 @@ then $r_{\mathcal C}(n)=r_A(n)=\sec(\pi/n)$, and $\mathcal R_{\mathcal C}=(r_A,\
 4. **Constancy on a disk.** Let $z,w\in D(-1,r/4)$ with $|w-z|<\varepsilon$. Choose such $s_k\to w-z$.
    Then $z+s_k\in D(-1,3r/8)$, so $f(w)=\lim f(z+s_k)=f(z)$ by continuity. Hence $f$ is locally
    constant, and so constant, on the disk $D(-1,r/4)$.
-5. **Constancy everywhere.** $f-c$ vanishes on an open set, so $f\equiv c$ on the connected
-   $\Omega_r$ by (C3).
+5. **Constancy everywhere.** By (C0), $f-c\in\mathcal C(\Omega_r)$. It vanishes on an open set, so
+   $f\equiv c$ on the connected $\Omega_r$ by (C3).
 6. **The threshold.** Under (C4), Proposition 2.2 gives non-rigidity for $r\le r_A$. ∎
 
 **What the argument needs.**
@@ -225,13 +277,16 @@ factorial; this is Rudin's convention).
 2. **[classical, confirmed]** (Denjoy–Carleman) The one-variable class $C\{M\}$ on an interval is
    quasi-analytic, i.e. a function all of whose derivatives vanish at a point vanishes identically,
    iff $\sum M_k/M_{k+1}=\infty$. If the sum converges, there are non-zero compactly supported
-   functions in $C\{M\}(\mathbb R)$.
+   functions in $C\{M\}(\mathbb R)$. See Rudin, *Real and Complex Analysis*, Theorem 19.11, and, for
+   the compactly supported functions, Hörmander, *The Analysis of Linear Partial Differential
+   Operators I*, Theorem 1.3.8. The theorem numbers are as given by the referee and have not been
+   checked against the books.
 3. **[proved from 2]** If $\sum M_k/M_{k+1}=\infty$, then $C\{M\}(U)$ satisfies (C3) on connected
    open $U\subset\mathbb R^2$.
 4. **[proved]** (C4) holds iff $\inf_k(M_k/k!)^{1/k}>0$.
 
 *Proof.*
-1. **(C1)** is clear.
+1. **(C0) and (C1)** are clear.
 2. **(C2), translations** do not change derivatives.
 3. **(C2), rotations.** For a rotation $R$, $D^k(f\circ R)(e_{i_1},\dots,e_{i_k})=D^kf(Re_{i_1},\dots,Re_{i_k})$.
    Expanding each $Re_i$ in the standard basis gives at most $2^k$ terms, each bounded by
@@ -250,7 +305,7 @@ factorial; this is Rudin's convention).
 
 **Corollary 3.3** [proved]. Every quasi-analytic Denjoy–Carleman class containing $C^\omega$ has
 $r_{\mathcal C}(n)=\sec(\pi/n)$. Examples are $M_k=k!$, $M_k=k!(\log(k+e))^k$, and
-$M_k=k!\prod_{j\le k}\log(j+e)$. The same conclusion holds for every class satisfying (C1)–(C4).
+$M_k=k!\prod_{j\le k}\log(j+e)$. The same conclusion holds for every class satisfying (C0)–(C4).
 For the real-analytic class it is AR, Theorem 4.1, which also covers the harmonic and holomorphic
 classes; those two satisfy (C1)–(C3) but not (C4), and are handled there directly.
 
@@ -264,7 +319,7 @@ $M_k\equiv1$, which is quasi-analytic.
 3. So $r_{C\{1\}}=1$. The same holds for polynomials.
 
 Inside the quasi-analytic world, then, the threshold moves only when the class is too small to contain
-the Behnke–Stein invariants. For every class containing $C^\omega$ it is $r_A$.
+the Behnke–Stein invariants. For every class satisfying (C0)–(C4) it is $r_A$.
 
 ---
 
@@ -326,7 +381,11 @@ is finite, then ${\rm Reg}_r$ is open and of full measure in $\Omega_r$.
    null.
 2. For $z\in\Omega_r\setminus E$, the closed orbit avoids the circles. So it equals $O_r(z)$
    (Lemma 1.2(4)), and it is finite.
-3. ${\rm Reg}_r$ is open by Lemma 4.1. ∎
+3. **${\rm Reg}_r$ is open.** Let $p\in{\rm Reg}_r$ with $|O_r(p)|=N$, and let $U$ be the
+   neighbourhood of Lemma 4.1. Each point $z\in D(p,\varepsilon)$ has its orbit in $U$, and that orbit
+   meets each disk $D(y_i,\varepsilon)$ in the images of $z$ under the motions carrying that disk to
+   itself. These are rotations about $y_i$ by powers of $\zeta$. So $O_r(z)$ is finite, with at most
+   $Nn$ points, and it avoids the circles because $U$ does. ∎
 
 **Theorem 4.3 (the necklace island)** [proved]. Let $n\ge5$, let $q=i\tan(\pi/n)$ be the upper corner
 of the lens at the necklace radius, and let $r_A<r<d_n$, where
@@ -362,9 +421,13 @@ corners $\pm q$ counted once. It avoids both circles, so $q$ is stable periodic.
 
 As $n\to\infty$, $d_n=1+\frac{17\pi^2}{2n^2}+O(n^{-4})$, while $r_c\approx g(n)=1+\frac{4\pi^2}{n^2}$
 [table, computed]. So $d_n>r_c$:
-- for every tabulated $n$ [computed];
-- for $n=5$, [proved], since $GG_5(r)$ is infinite for $r\ge\sqrt{3+\varphi}=2.149$
+- for every tabulated $n$ [computed, from the paper's table];
+- for $n=5$ [proved]: $GG_5(r)$ is infinite for $r\ge\sqrt{3+\varphi}=2.149$
   (`critical-radius-n5.md`, Theorem A), so $r_c(5)\le2.149<d_5$.
+
+For $n\ge7$ the dependence on the table could be removed by proving $GG_n(r)$ infinite for some
+$r\le2$. The referee found, in floating point, that the orbit of $-1$ is infinite at $r=2.001$ for
+$n=7,8,10,12$, which suggests this is true.
 
 The island is born exactly at $r_A$, when the lens corners enter both disks. That is the same
 necklace event that kills analytic invariants.
@@ -375,21 +438,36 @@ has $n$ points and avoids both circles.
 *Proof.* We have $|A^kz-1|\ge2-|z+1|>r$, so no orbit point is in $\bar D_2$. Each point is at
 distance $|z+1|\in(0,r)$ from $-1$. ∎
 
+**Further islands** [computed, by the referee; floating point]. Two more families were found. They
+lie below $\max(2,d_n)$, so neither changes any bound in this note.
+1. For $n=12$, the orbit of the lens corner $q$ stays finite (64 points, away from the circles) on
+   about $(d_{12},1.556)$. The necklace survives past $d_{12}$ in another form, but
+   $1.556<2=\max(2,d_{12})$.
+2. For $n=5$ and $2<r<|t|=2.351$, the orbit of the centre $-1$ is $\{-1\}\cup\{B^k(-1)\}$, with 5
+   points, and is stable.
+   - This is in fact [proved]: $|-1-1|=2<r$, and the points $B^k(-1)\ne-1$ are at distance at least
+     $|t|>r$ from $-1$.
+   - The interval lies below $d_5=2.656$.
+
 **Theorem 4.5 (the dichotomy)** [proved]. Let $n=5$ or $n\ge7$, let $r_A<r<\max(2,d_n)$, and let
-$\mathcal C=C\{M\}\supseteq C^\omega$ be a log-convex Denjoy–Carleman class. Then $\mathcal C$ is rigid
-at $r$ if and only if $\sum M_k/M_{k+1}=\infty$, i.e. iff $\mathcal C$ is quasi-analytic. Every bump
+$\mathcal C=C\{M\}$ be a log-convex Denjoy–Carleman class with $M_0=1$. Then $\mathcal C$ is rigid at
+$r$ if and only if $\sum M_k/M_{k+1}=\infty$, i.e. iff $\mathcal C$ is quasi-analytic. Every bump
 class is non-rigid at every $r<\max(2,d_n)$.
 
 *Proof.* The quasi-analytic case is Theorem 3.1 with Proposition 3.2. In the non-quasi-analytic case,
 $\mathcal C$ is a bump class, and an island exists by Theorem 4.3 (when $r<d_n$) or Theorem 4.4 (when
 $r<2$). Apply Lemma 4.1. For $r\le r_A$, use Proposition 2.2. ∎
 
-This holds without any computation and without knowing $r_c$. The interval $(r_A,r_c)$ is contained
-in it.
+The proof needs no computation and does not use $r_c$. For $n=5$ the interval contains
+$(r_A,r_c)$ [proved]; for the other $n$ it does so according to the paper's table [computed].
+
+What the system detects, strictly, is the alternative "unique continuation from open sets" versus
+"compactly supported $\zeta$-invariant bumps". For Denjoy–Carleman classes these coincide with
+quasi-analyticity and its failure.
 
 ---
 
-## 5. Ergodicity at large radius: every class becomes rigid
+## 5. Ergodicity at large radius: every continuous or measurable class becomes rigid
 
 **Lemma 5.1 (translations from the orbit of a centre)** [proved]. Let $r'<r$ and $\rho=r-r'$.
 1. If $y\in O_{r'}(-1)$, then $P_r$ contains $\tau_{y+1}$ on $D(-1,\rho)$.
@@ -417,10 +495,12 @@ r-r'>\sec\tfrac{\pi}{n}+6|y_2-y_1| .
 $$
 Then:
 - every continuous invariant function on $\Omega_r$ is constant;
-- every measurable invariant function is a.e. constant, i.e. $P_r$ is ergodic for Lebesgue measure;
+- every measurable invariant function is a.e. constant, i.e. $P_r$ is ergodic for Lebesgue measure
+  (Lemma 1.3);
 - ${\rm Reg}_r=\emptyset$.
 
-So every class of functions is rigid at $r$.
+So every class contained in $C^0$, and every class of measurable functions modulo null sets, is rigid
+at $r$.
 
 *Proof.*
 1. **Setup.** Let $s=y_2-y_1$ and $K'=r-r'-6|s|>\sec(\pi/n)$. Let $V=\{\pm\zeta^js\}$. By Lemma 5.1,
@@ -449,7 +529,8 @@ So every class of functions is rigid at $r$.
    Proposition 2.2, $f$ is constant (a.e. constant) on $\Omega_r$.
 7. **No islands.** An island would give a non-constant continuous invariant (Lemma 4.1). ∎
 
-**Corollary 5.3 (general bound)** [proved]. For $n=5$ or $n\ge7$, every class is rigid at every
+**Corollary 5.3 (general bound)** [proved]. For $n=5$ or $n\ge7$, every class contained in $C^0$,
+and every class of measurable functions modulo null sets, is rigid at every
 $$
 r>R_{\rm erg}(n):=\sec\tfrac{\pi}{n}+\max\bigl(2,4\sin\tfrac{\pi}{n}\bigr)+16\sin\tfrac{\pi}{n}.
 $$
@@ -464,24 +545,50 @@ This gives $12.99$ for $n=5$, $10.05$ for $n=7$, and $R_{\rm erg}(n)\to3$ as $n\
 
 ### 5.3 Sharper bounds by exact computation
 
-1. **$n=5$ [proved by exact computation].**
-   - Take $r'^2=(-56+30\sqrt5)/2$, so $r'=2.35394<2.354$. This is just above $|t|=2.35114$, the
-     radius at which $B^{\pm1}(-1)$ enter $D_1$.
-   - Breadth-first search generated $60\,001$ points of $O_{r'}(-1)\subset\mathbb Z[\zeta_5]$. Every
-     disk test was decided exactly: squared distances are $(a+b\sqrt5)/2$ with $a,b\in\mathbb Z$, and
-     signs were found by integer comparison.
-   - Two of the points differ by $s=576+110\zeta+288\zeta^2+466\zeta^3$, with
-     $|s|^2=(573140-256316\sqrt5)/2$. Exact rational comparison gives $0<|s|<0.0119$.
-   - Theorem 5.2 then gives rigidity of every class for
+1. **$n=5$ [proved by exact computation].** The computation is not in this repository. It is
+   specified here completely enough to reproduce, and the referee reproduced it independently
+   (`referee-report-regularity-scale.md`, §3.1).
+   - **Arithmetic.**
+     - A point of $\mathbb Z[\zeta_5]$ is an integer vector $(a_0,a_1,a_2,a_3)$, meaning
+       $\sum a_i\zeta^i$, with $\zeta^4=-1-\zeta-\zeta^2-\zeta^3$.
+     - The maps are $A(z)=\zeta^{-1}(z+1)-1$, $A^{-1}(z)=\zeta(z+1)-1$, and $B^{\pm1}$ likewise about
+       $+1$. They are integer-linear in these coordinates.
+     - For $w=\sum_{i=0}^4c_i\zeta^i$ (with $c_4=0$), put $e_m=\sum_jc_jc_{j-m}$, indices mod 5. Then
+       $|w|^2=e_0+e_1(\zeta+\zeta^4)+e_2(\zeta^2+\zeta^3)=\tfrac12\big((2e_0-e_1-e_2)+(e_1-e_2)\sqrt5\big)$.
+   - **Membership in $\mathbb Q(\sqrt5)$.** A point $z$ is in the open disk about $c=\pm1$ iff
+     $|z-c|^2-r'^2<0$. With
+     $$r'^2=\tfrac12(-56+30\sqrt5),\qquad r'=2.35394\ldots,$$
+     this is the sign of $P+Q\sqrt5$ with $P,Q\in\mathbb Z$. That sign is decided exactly: it is
+     immediate when $P$ and $Q$ have the same sign, and otherwise it is the sign of $P^2-5Q^2$
+     combined with the sign of the dominant term.
+   - **The radius.** Exact comparisons give $|t|<r'<2.354$. Here $|t|^2=10-2\sqrt5$, so
+     $|t|=2.35114\ldots$; this is the radius at which $B^{\pm1}(-1)$ enter $D_1$.
+   - **Breadth-first search.** Start from $-1=(-1,0,0,0)$. Repeatedly take the next unexplored point.
+     For each centre whose open disk contains it, decided exactly as above, apply both rotations about
+     that centre, and record each new point. Stop once $60\,001$ points have been recorded.
+   - **Why this suffices.** Every recorded point lies in $O_{r'}(-1)$, because it is the end of an
+     $r'$-chain with exactly verified steps. Theorem 5.2 needs only two distinct orbit points, so the
+     search need not be complete, and the orbit need not be finite.
+   - **The two points.** Among the recorded points there are two whose difference is
+     $s=576+110\zeta+288\zeta^2+466\zeta^3$. By the formula above,
+     $$|s|^2=\tfrac12(573140-256316\sqrt5).$$
+     - $|s|>0$, because $573140^2>5\cdot256316^2$.
+     - $|s|<0.0119$, because $L=573140-2(0.0119)^2>0$ and $L^2<5\cdot256316^2$.
+     - Numerically $|s|=0.011814\ldots$.
+     - The referee found this difference among 2163 pairs of recorded points.
+   - **Conclusion.** Theorem 5.2 with $y_1,y_2$ these two points gives rigidity, for every class
+     contained in $C^0$ and every measurable class modulo null sets, at every
      $$r>2.354+(\sqrt5-1)+6(0.0119)=3.6615 .$$
+     With the exact values of $r'$ and $|s|$ the bound is $3.66089$.
 2. **$n=7,8,10,12$ [computed].** The same method, with floating-point disk tests whose smallest
    margin was at least $4\cdot10^{-5}$ and with $r'$ just above 2, gives:
 
    | $n$ | 7 | 8 | 10 | 12 |
    |---|---|---|---|---|
    | rigid for $r>$ | 3.171 | 3.200 | 3.154 | 3.160 |
+   | referee, from $r'=2.001$ | 3.136 | 3.130 | 3.113 | 3.098 |
 
-   These are not certified.
+   None of these is certified.
 3. **The limits of the method.** It cannot go below about $\max(2,|t|)+\sec(\pi/n)$. Two things set
    that floor: the orbit of $-1$ is trivial until $-1$ enters $D_2$, at $r'=2$; and the descent of
    Lemma 2.1 only reaches $D(\pm1,K)$ with $K>r_A$.
@@ -496,14 +603,19 @@ $$
 \;<\;\max(2,d_n)\;\le\; r_{G^s}\le r_{G^{s'}}\le r_{C^\infty}\le r_{C^k}\le r_{C^0}\le r_{L^\infty}=r_{\rm erg}\;\le\;R_{\rm erg}(n)
 \qquad(1<s<s').
 $$
-The equality $r_{L^\infty}=r_{\rm erg}$, with $r_{\rm erg}$ the ergodicity threshold, holds because
-ergodicity is exactly rigidity of bounded measurable invariants. The threshold is well defined by
-Proposition 2.2. Every inequality is [proved], except that the numerical values of $r_c$ are
-[computed].
+Notes on the chain:
+- **$r_{L^\infty}=r_{\rm erg}$.** Here $r_{\rm erg}$ is the ergodicity threshold. Ergodicity is exactly
+  rigidity of bounded measurable invariants (Lemma 1.3), and the threshold is well defined by
+  Proposition 2.2.
+- **$r_{C^0}\le r_{L^\infty}$.** A continuous function need not be bounded on $\Omega_r$, so this does
+  not follow from inclusion. Instead: if $f$ is a non-constant continuous invariant, then $\arctan f$
+  is a bounded continuous invariant. It is not a.e. constant, since a continuous function that is
+  a.e. constant is constant.
+- **Status.** Every inequality is [proved].
 
 For $n=5$ this reads
 $$
-1.236 < 2.149\,(r_c) < 2.656 \le r_{\text{every bump class}} \le 3.662 .
+1.236 < r_c(5)\le 2.149 < 2.656 \le r_{\text{every bump class}} \le 3.662 .
 $$
 
 **Conjecture 6.1.** For $n=5$ or $n\ge7$, every bump class has the same threshold, namely
@@ -527,6 +639,10 @@ $2\sqrt{4-\sqrt5}$ for $n=5$, $2.0601$ for $n=7$, and $2$ for $n\ge8$.
    - $n=7$: none at $r=2.07,2.1$. $n=8$: none at $2.02,2.1$. $n=12$: none at $2.02$.
    - Just below the conjectured value they are found: $n=7$ at $r=2.0$ (necklace orbits of 84
      points), and $n=8$ at $r=1.9$ (central orbits of 8 points).
+   - The referee also found none, in 300 random points per radius with an orbit cap of 3000:
+     - $n=5$ at $r=2.7,3,3.5,4,13$;
+     - $n=8$ at $r=2.05,2.5,3,3.3$;
+     - $n=7$ at $r=2.07,2.5$.
 3. **Orbits fill the domain.** For $n=5$, orbits of 60 000 points from random starts visit every cell
    of a $0.1$-grid of $\Omega_r$ at $r=2.7$ and $r=3$, for each of 3 starting points. At $r=2.5$ they
    visit 99% of the cells; the missing cells are the necklace islands. For $n=8$ at $r=2.05$, they
@@ -535,7 +651,9 @@ $2\sqrt{4-\sqrt5}$ for $n=5$, $2.0601$ for $n=7$, and $2$ for $n\ge8$.
 **What the picture says about the owner's question.**
 - The hoped-for continuum of regularity thresholds filling $(r_A,r_c)$ **does not exist**.
 - Quasi-analytic classes stop at $r_A$. Non-quasi-analytic classes, even Gevrey classes arbitrarily
-  close to analytic, survive past $r_c$ up to at least $\max(2,d_n)$.
+  close to analytic, survive up to at least $\max(2,d_n)$.
+- $\max(2,d_n)$ lies above $r_c$: for $n=5$ this is proved, and for the other $n$ it follows from the
+  paper's table.
 - The two-disk system detects quasi-analyticity: for $r\in(r_A,\max(2,d_n))$, rigidity of a
   Denjoy–Carleman class is *equivalent* to $\sum M_k/M_{k+1}=\infty$ (Theorem 4.5).
 - Within the bump classes there is room for different thresholds, in $[\max(2,d_n),R_{\rm erg}]$.
@@ -548,7 +666,7 @@ $2\sqrt{4-\sqrt5}$ for $n=5$, $2.0601$ for $n=7$, and $2$ for $n\ge8$.
 **(a) Piecewise-analytic invariants.**
 - With finitely many analytic pieces, these behave like bump classes. The indicator of the
   $2n-2$ necklace disks has $2n-1$ pieces and is invariant on $(r_A,d_n)$. The central island gives
-  $n+1$ pieces on $(r_A,2)$. Above $R_{\rm erg}$ no non-constant measurable invariant exists. So there
+  $n+1$ pieces on $(0,2)$. Above $R_{\rm erg}$ no non-constant measurable invariant exists. So there
   is no new threshold.
 - A genuine integer-valued scale would be $\kappa(r)$, the least number of analytic pieces of a
   non-constant invariant. Theorem 4.1 of AR and the islands give $2\le\kappa(r)\le\min(2n-1,n+1)$ on
@@ -562,9 +680,12 @@ $2\sqrt{4-\sqrt5}$ for $n=5$, $2.0601$ for $n=7$, and $2$ for $n\ge8$.
   $r>r_A$ (§8).
 
 **(c) Intermediate pseudogroups.**
-- Let $H^{(1)}_r$ be the pseudogroup generated by $P_r$ and the one germ produced by one round of
-  continuation: $\tau_t$ on $U_{11}\cup U_{21}$ (AR, §6, Step 1), together with its conjugates and
-  inverse. For $r\le r_A$, $H^{(1)}_r=P_r$.
+- Let $H^{(1)}_r$ be the pseudogroup generated by $P_r$ and the germ produced by one round of
+  continuation. That germ is $\tau_t$, extended from its $P_r$-domain $U_{21}=D_2\cap(D_1-t)$ to the
+  union of the atoms of $\Omega_r\cap(\Omega_r-t)$ that it meets.
+  - For $r>r_A$, that union is $U_{11}\cup U_{21}$ (AR, §6, Step 1).
+  - For $r\le r_A$, it is $U_{21}$ itself, because $U_{11}\cap U_{21}=\emptyset$. So
+    $H^{(1)}_r=P_r$ there.
 - **[proved]** For $n\ge63$ and every $r>r_A$, $H^{(1)}_r$ has orbits dense in
   $D(-1,r-20\sin\frac{\pi}{n})\ne\emptyset$.
 
@@ -572,7 +693,8 @@ $2\sqrt{4-\sqrt5}$ for $n=5$, $2.0601$ for $n=7$, and $2$ for $n\ge8$.
   1. $\tau_{\pm\zeta^jt}$ is defined on $D_1\cap(D_1\mp\zeta^jt)\supseteq D(-1,r-|t|)$.
   2. Steinitz, as in Theorem 5.2, puts $z$ and $z+x$ in one orbit whenever both lie in
      $D(-1,r-5|t|)$ and $x\in\Lambda$.
-  3. That disk is non-empty, since $20\sin(\pi/63)<1<r$. ∎
+  3. That disk is non-empty, since $20\sin(\pi/n)<1<r$ for $n\ge63$. The bound $n\ge63$ is sharp for
+     this argument: $20\sin(\pi/62)=1.0130>\sec(\pi/62)$. ∎
 
   So the critical radius of $H^{(1)}$ is $r_A$. One continuation step already destroys finiteness.
 - The filtration $P_r=H^{(0)}\subset H^{(1)}\subset\cdots\subset H_r$ does not interpolate between
@@ -601,32 +723,45 @@ Equality is the paper's open question.
 So "$r_c=\sup\{r:\text{every pseudogroup orbit is finite}\}$" is exactly the statement
 $r_c=r_c^{\rm orb}$, which is open. It is not a separate characterization.
 
-**Proposition 8.2 (Hausdorff quotient)** [proved]. Let $n=5$ or $n\ge7$, and let $Q_r=\Omega_r/P_r$.
-1. $Q_r$ is Hausdorff for $1<r\le r_A$.
-2. $Q_r$ is not Hausdorff for $r_A<r<r_c$, nor for $r>R_{\rm erg}(n)$.
+**Proposition 8.2 (Hausdorff quotient)** [proved; part 2 in this generality is not yet refereed].
+Let $n=5$ or $n\ge7$, and let $Q_r=\Omega_r/P_r$.
+1. $Q_r$ is Hausdorff for $0<r\le r_A$.
+2. $Q_r$ is not Hausdorff for any $r>r_A$.
 
 *Proof.*
-1. **Part 1** is AR, Lemma 5.3.
-2. **Part 2, on $(r_A,r_c)$, setup.** There $P_r$ realizes finitely many motions. Suppose $Q_r$ were
-   Hausdorff. The relation is open, so its graph would be closed. Let $\gamma$ be a motion, let $C$ be
-   a component of $\Omega_r\cap\gamma^{-1}\Omega_r$ meeting ${\rm Dom}_P(\gamma)$, and let
-   $z_k\in{\rm Dom}_P(\gamma)$ converge to $p\in C$.
-3. **Fullness up to finite sets.** By closedness, $\gamma p=\delta p$ for some motion $\delta$ with
-   $p\in{\rm Dom}_P(\delta)$. Either $\delta=\gamma$, or $p$ is the unique fixed point of
-   $\delta^{-1}\gamma\ne{\rm id}$. So ${\rm Dom}_P(\gamma)\cap C$ is relatively closed in $C\setminus F_\gamma$,
-   for a finite set $F_\gamma$. Since $C\setminus F_\gamma$ is connected,
-   ${\rm Dom}_P(\gamma)\supseteq C\setminus F_\gamma$.
-4. **Dense orbits.** Rerun AR, §6 Steps 1–3 and the Steinitz step of AR, Theorem 8.1, with every
-   domain reduced by a finite set. Each translation in $S_H$ is then in $P_r$ on
-   $(D_1\cap(D_1-s))\setminus F_s$, with $F_s$ finite. So for $z\in D(-1,r/4)$ outside the countable
-   set $\bigcup_s(F_s\cup(F_s-s))$, the $P_r$-orbit contains $z+(S_H\cap D(0,\varepsilon))$, which is
-   infinite.
-5. **Contradiction.** $GG_n(r)$ is finite, so $P_r$-orbits are finite.
-6. **Part 2, for $r>R_{\rm erg}$.** Orbits are dense in $D(-1,K')$ (Theorem 5.2). So every saturated
-   open set meeting $D(-1,K')$ contains $D(-1,K')$. Distinct orbits through that disk exist, since the
-   orbits are countable and the disk is not, and they cannot be separated. ∎
+1. **Part 1.** For $1<r\le r_A$ this is AR, Lemma 5.3. For $r\le1$ the disks are disjoint, and $Q_r$
+   is two disjoint cones.
+2. **Part 2, setup.** Suppose $Q_r$ were Hausdorff. The orbit relation is open (AR, Lemma 5.3, step 1),
+   so its graph would be closed in $\Omega_r\times\Omega_r$. The motions realized by $P_r$ lie in the
+   countable group $\Gamma$.
+3. **Fullness up to countable sets.** Let $\gamma\in\Gamma$, let $C$ be a component of
+   $\Omega_r\cap\gamma^{-1}\Omega_r$ meeting ${\rm Dom}_P(\gamma)$, and let $z_k\in{\rm Dom}_P(\gamma)$
+   converge to $p\in C$. Then $(z_k,\gamma z_k)\to(p,\gamma p)$, so $\gamma p=\delta p$ for some
+   $\delta$ with $p\in{\rm Dom}_P(\delta)$.
+   - Either $\delta=\gamma$, or $p$ is the fixed point of the non-identity motion
+     $\delta^{-1}\gamma$, which has at most one.
+   - So ${\rm Dom}_P(\gamma)\cap C$ is relatively closed in $C\setminus F_\gamma$, with $F_\gamma$
+     countable.
+   - A connected open subset of the plane minus a countable set is connected. So
+     ${\rm Dom}_P(\gamma)\supseteq C\setminus F_\gamma$.
+4. **The hull construction, up to countable sets.** Rerun AR, §6 Steps 1–3 and the Steinitz step of
+   AR, Theorem 8.1, with $P_r$ in place of the hull.
+   - Each step composes elements of $P_r$, which gives an open domain containing a non-empty open set
+     minus a countable set, or extends a domain to a component, which step 3 allows up to a
+     countable set.
+   - So every $s$ in the countable set $S_H$ of AR, Theorem 8.1, satisfies $\tau_s\in P_r$ on
+     $(D_1\cap(D_1-s))\setminus F_s$, with $F_s$ countable.
+   - Let $E=\bigcup_s(F_s\cup(F_s-s))$, which is countable. For $z\in D(-1,r/4)\setminus E$, the
+     orbit $O_r(z)$ contains $z+(S_H\cap D(0,\varepsilon))$. This set is dense in $D(z,\varepsilon)$.
+5. **Contradiction.** Choose such a $z$, and $w\in D(z,\varepsilon/2)\setminus E$ with
+   $w\notin O_r(z)$. This is possible because $E\cup O_r(z)$ is countable. Every saturated open set
+   containing $w$ contains a ball about $w$. That ball meets the dense set $O_r(z)\cap D(z,\varepsilon)$,
+   so the saturated set contains $z$. Hence $[w]$ and $[z]$ cannot be separated, contradicting the
+   assumption. ∎
 
-On $[r_c,R_{\rm erg}]$ the question is **open**. A non-closed orbit would suffice.
+The referee checked part 2 on $(r_A,r_c)$, where $P_r$ has finitely many motions and the exceptional
+sets are finite, and above $R_{\rm erg}$, where orbits are dense by Theorem 5.2. The referee suggested
+the countable version above (report, issue 11); its write-up here has not been refereed.
 
 The parallel the brief suggests therefore has a different shape. $r_A$ carries all of the following:
 - analytic invariants exist;
@@ -634,7 +769,9 @@ The parallel the brief suggests therefore has a different shape. $r_A$ carries a
 - $Q_r$ is Hausdorff;
 - $Q_r$ is a Riemann surface.
 
-All four hold up to $r_A$ and fail on $(r_A,r_c)$. Invariant continuous functions already fail to
+All four hold up to $r_A$ and fail just above it. Non-Hausdorffness, which implies the failure of
+the other three, fails for every $r>r_A$ by Proposition 8.2. Fullness fails at least on $(r_A,r_c)$
+(AR, Corollary 8.2). Invariant continuous functions already fail to
 separate orbits at $r_A$: they cannot separate $[p]$ from $[\gamma p]$ at a boundary point $p$ of a
 non-full domain. So "$r_c$ = where continuous invariants stop separating orbits" is false as stated.
 The correct statement is measure-theoretic.
@@ -643,9 +780,11 @@ The correct statement is measure-theoretic.
 a set of full measure by Proposition 4.2, and every $w\notin O_r(z)$, there is a $C^\infty$ (even
 Gevrey) invariant $f$ with $f(z)\ne f(w)$.
 
-*Proof.* Use Lemma 4.1 with $\psi(z)=g(|z|^2)$, where $g$ is smooth (or Gevrey), compactly supported
-in $[0,\varepsilon^2)$, and strictly decreasing there. If $w$ lies in an island disk $D(y_i,\varepsilon)$
-around a point of the orbit of $z$, then $w\ne y_i$ and $f(w)<f(y_i)=f(z)$. Otherwise $f(w)=0<f(z)$. ∎
+*Proof.* Use Lemma 4.1 with $\psi(z)=g(|z|^2)$. Here $g$ is smooth (or Gevrey), strictly decreasing
+on $[0,a]$ for some $a<\varepsilon^2$, and zero on $[a,\infty)$.
+- If $w$ lies in an island disk $D(y_i,\varepsilon)$ with $|w-y_i|^2<a$, then $w\ne y_i$, since
+  $w\notin O_r(z)$. So $f(w)<f(y_i)=f(z)$.
+- Otherwise $f(w)=0<f(z)$. ∎
 
 Let $r_{\rm sep}$ be the supremum of the radii at which invariant continuous functions separate almost
 every point from the points outside its orbit. Then
@@ -659,30 +798,57 @@ $r=2.2$ are consistent with this, but they do not decide it: 29% of the points h
 below the cap.
 
 This would give the two ends a parallel description:
-- **$r_A$:** where the orbit space stops being Hausdorff, and where invariants of every class with
-  unique continuation become constant;
-- **$r_c$:** (conjecturally) where invariants of every class stop separating almost every orbit;
+- **$r_A$:** where the orbit space stops being Hausdorff, and where invariants of every class
+  satisfying (C0)–(C4) become constant;
+- **$r_c$:** (conjecturally) where smooth and continuous invariants stop separating almost every
+  orbit;
 - **$r_{\rm bump}$:** (conjecturally $\max(2,d_n)$) where they become constant.
 
 ---
 
 ## 9. Status and gaps
 
-**Proved here.**
-- Lemma 1.2, Lemma 2.1 and Proposition 2.2 (monotonicity for all classes).
-- Theorem 3.1, Proposition 3.2(1,3,4), Corollary 3.3 and Remark 3.4.
-- Lemma 4.1, Proposition 4.2, Theorems 4.3–4.5.
-- Lemma 5.1, Theorem 5.2 and Corollary 5.3.
-- §7(c), and Propositions 8.2 and 8.3.
+**Independent referee's verdicts**
+([`referee-report-regularity-scale.md`](referee-report-regularity-scale.md)). The referee
+re-derived every proof in §§1–5, §7(c) and §8 by hand, and found no fatal error and no gap in any
+proof. The issues raised were overstatements of wording and small omissions; their fixes are
+incorporated.
 
-**Proved by an exact computation.** The bound $r_{\mathcal C}(5)\le3.662$ for every class (§5.3).
-The scratch script is not in this repository. It should be re-run independently before the number
-is relied on.
+| claim | verdict |
+|---|---|
+| Rigidity is an up-set on $(r_A,\infty)$ (Lemma 2.1, Proposition 2.2) | correct |
+| Classes satisfying (C0)–(C4), including quasi-analytic Denjoy–Carleman classes $\supseteq C^\omega$, have $r_{\mathcal C}=r_A$; $C\{1\}$ has threshold 1 | correct after minor fixes |
+| Bump classes: $\max(2,d_n)\le r_{\mathcal C}\le R_{\rm erg}(n)$, through the necklace island, the central islands and ergodicity | correct after minor fixes |
+| The dichotomy (Theorem 4.5) | correct; the status wording around it was corrected |
+| $n=5$: bump thresholds in $[2\sqrt{4-\sqrt5},3.662]$ | correct; the exact certificate was reproduced independently |
+| Hausdorff for $r\le r_A$; not Hausdorff on $(r_A,r_c)$ or above $R_{\rm erg}$; a.e. separation below $r_c$ | correct |
+| $H^{(1)}_r$ has dense orbits for $r>r_A$, $n\ge63$ | correct after a minor fix |
+| The classical inputs (Denjoy–Carleman, Steinitz with the Grinberg–Sevast'yanov constant, Behnke–Stein via AR) | correctly stated and used |
+
+**Not yet refereed.** These were written after the report:
+- Lemma 1.3 (a.e. versus everywhere invariance), which follows the referee's sketch;
+- Proposition 8.2 part 2 for all $r>r_A$, which follows the referee's sketch (issue 11);
+- the remark in §4 proving the $n=5$ centre island on $(2,|t|)$.
+
+**Not checked by the referee.**
+- AR's results (Theorems 4.1 and 8.1, Lemma 5.3). These are refereed in
+  [`referee-report-thread6.md`](referee-report-thread6.md) and were relied on.
+- `critical-radius-n5.md` Theorems A and B, and the paper's table of $r_c$.
+- The classical theorems against their sources: Denjoy–Carleman (Rudin, Theorem 19.11; Hörmander,
+  Theorem 1.3.8) and Grinberg–Sevast'yanov.
+- The §6 evidence (random scans and coverage tests), beyond the referee's own spot checks.
+
+**Proved by an exact computation.** The bound of $3.662$ for $n=5$, for every class contained in
+$C^0$ and every measurable class modulo null sets (§5.3). It was reproduced independently by the
+referee. The computation is specified in §5.3; it is not in the repository.
 
 **Computed only.**
 - The bounds for $n=7,8,10,12$ in §5.3.
-- All island searches and coverage tests in §6.
+- All island searches and coverage tests in §6, and the $n=12$ corner orbit of §4.
 - $d_n>r_c(n)$ for $n\ne5$, which rests on the paper's table.
+- For $n=5$, $r_c(5)\le\sqrt{3+\varphi}$ is proved (Theorem A of `critical-radius-n5.md`). The lower
+  bound $r_c(5)\ge r_\ast\approx2.1138$ is proved there modulo a computation, and finiteness on
+  $(r_\ast,\sqrt{3+\varphi})$ is open. Only the upper bound is used here.
 
 **Classical results used.**
 - Denjoy–Carleman, both directions, in Rudin's normalization: **[classical, confirmed]** in the
@@ -698,9 +864,10 @@ is relied on.
 2. Whether $C^0$, $C^\infty$ and Gevrey rigidity can differ inside $[\max(2,d_n),r_{\rm erg}]$, for
    example through non-ergodic decompositions with fractal boundaries.
 3. **$r_{\rm sep}=r_c$?** Do infinite orbits have positive measure just above $r_c$?
-4. Whether $Q_r$ is Hausdorff anywhere on $[r_c,R_{\rm erg}]$; conjecturally never.
-5. The piece-counting scale $\kappa(r)$ of §7(a).
-6. Whether $H^{(1)}_r$ has infinite orbits just above $r_A$ for $5\le n<63$.
+4. The piece-counting scale $\kappa(r)$ of §7(a).
+5. Whether $H^{(1)}_r$ has infinite orbits just above $r_A$ for $5\le n<63$.
+6. Remove the dependence on the table for $n\ge7$ by proving $GG_n(r)$ infinite for some $r\le2$
+   (§4).
 7. **Self-check.**
    - In Theorem 5.2 the descent radius $K$ must be strictly below $r$ and strictly above $r_A$. That
      holds, since $K'<r-r'<r$.
