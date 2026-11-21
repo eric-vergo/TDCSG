@@ -661,8 +661,7 @@ def cmdCertify (a : Args) : IO UInt32 := do
 def cmdCheck (a : Args) : IO UInt32 := do
   let some (path : String) := a.pos[1]? | throw <| IO.userError "usage: check-certificate FILE"
   let t0 ← IO.monoNanosNow
-  let text ← IO.FS.readFile path
-  match parseCertificate text >>= checkCertificate with
+  match (← parseCertificateFile path) >>= checkCertificate with
   | .ok rep =>
     IO.println s!"certificate VALID: circles {rep.circles} (full {rep.fullCircles}), \
       maximal arcs {rep.arcs}, (C2) image arcs {rep.c2Images}, (C4) endpoints {rep.c4Endpoints}"

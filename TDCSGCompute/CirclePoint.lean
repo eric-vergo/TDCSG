@@ -154,14 +154,27 @@ def validSym (c : Elem) (s : Sym) : Except String Unit := do
   if g == 0 then throw "symbol circle is tangent to the carrying circle"
   if g < 0 then throw "symbol circle does not meet the carrying circle"
 
-/-- The exact direction data of a point (see the module docstring). -/
+/-- The exact tower coordinates `(X, Y)` of the point named by `s` on the circle about `c`, and
+the radicand `H = q N G₀` (see the module docstring); the symbol must be valid. -/
+def towers (c : Elem) (s : Sym) : TowerElem × TowerElem × Elem :=
+  let F := C.F
+  let d := F.sub s.e c
+  let q : Int := C.r2.den
+  let qN := F.smul q (F.normSq d)
+  let H := F.mul qN (F.sub C.R4 qN)
+  let dc := F.conj d
+  let A := F.add d dc
+  let T := F.neg (F.mul (F.sub d dc) C.omega)
+  let sg := s.side
+  (#[F.zero, F.mul qN A, F.smul (-sg) T, F.zero], #[F.mul qN T, F.zero, F.zero, F.smul sg A], H)
+
+/-- A point of a circle with its certified half and enclosures of its coordinates. The exact
+tower coordinates are recomputed from the centre and the symbol when needed (`towers`). -/
 structure ExactPt where
-  /-- `X` over the radicands `(S₄, H)`. -/
-  X : TowerElem
-  /-- `Y` over the radicands `(S₄, H)`. -/
-  Y : TowerElem
-  /-- The radicand `H = q N G₀ > 0`. -/
-  H : Elem
+  /-- The centre of the circle. -/
+  c : Elem
+  /-- The symbol. -/
+  sym : Sym
   /-- Whether the point is in the lower half (angle in `[π, 2π)`). -/
   lower : Bool
   /-- An enclosure of `X` at precision `ballPrec`, if one could be formed. -/
@@ -170,23 +183,12 @@ structure ExactPt where
   by_ : Option Ball
   deriving Inhabited
 
-/-- Exact direction data of the point named by `s` on the circle about `c`. Fails if the symbol
-is not valid. -/
+/-- The point named by `s` on the circle about `c`, with its exact half. Fails if the symbol is
+not valid. -/
 def exactPt (c : Elem) (s : Sym) : Except String ExactPt := do
   let F := C.F
   C.validSym c s
-  let d := F.sub s.e c
-  let q : Int := C.r2.den
-  let N := F.normSq d
-  let qN := F.smul q N
-  let G0 := F.sub C.R4 qN
-  let H := F.mul qN G0
-  let dc := F.conj d
-  let A := F.add d dc
-  let T := F.neg (F.mul (F.sub d dc) C.omega)
-  let sg := s.side
-  let X : TowerElem := #[F.zero, F.mul qN A, F.smul (-sg) T, F.zero]
-  let Y : TowerElem := #[F.mul qN T, F.zero, F.zero, F.smul sg A]
+  let (X, Y, H) := C.towers c s
   let rs := #[C.S4, H]
   -- enclosures of `X` and `Y`
   let p := C.ballPrec
@@ -210,7 +212,7 @@ def exactPt (c : Elem) (s : Sym) : Except String ExactPt := do
     match Tower.sign C.S rs X with
     | some v => pure (decide (v ≤ 0))
     | none => throw "sign determination failed (precision bound exceeded)"
-  return { X := X, Y := Y, H := H, lower := lower, bx := bx, by_ := by_ }
+  return { c, sym := s, lower, bx, by_ }
 
 /-- Re-index a tower element over `(S₄, H)` as one over `(S₄, H₁, H₂)`, with `H` in position
 `slot` (1 or 2). -/
@@ -221,7 +223,8 @@ def embed3 (F : CycField) (slot : Nat) (x : TowerElem) : TowerElem := Id.run do
     out := out.set! j x[i]!
   return out
 
-/-- The exact sign of the cross product `X₁ Y₂ - Y₁ X₂` of two points of one circle. -/
+/-- The exact sign of the cross product `X₁ Y₂ - Y₁ X₂` of two points of one circle (the same
+centre `c`). -/
 def crossSign (p p' : ExactPt) : Except String Int := do
   let F := C.F
   match p.bx, p.by_, p'.bx, p'.by_ with
@@ -230,11 +233,13 @@ def crossSign (p p' : ExactPt) : Except String Int := do
     let s := ((Ball.mul pr x1 y2).sub (Ball.mul pr y1 x2)).sign
     if s != 0 then return s
   | _, _, _, _ => pure ()
-  let rs := #[C.S4, p.H, p'.H]
-  let x1 := embed3 F 1 p.X
-  let y1 := embed3 F 1 p.Y
-  let x2 := embed3 F 2 p'.X
-  let y2 := embed3 F 2 p'.Y
+  let (X1, Y1, H1) := C.towers p.c p.sym
+  let (X2, Y2, H2) := C.towers p'.c p'.sym
+  let rs := #[C.S4, H1, H2]
+  let x1 := embed3 F 1 X1
+  let y1 := embed3 F 1 Y1
+  let x2 := embed3 F 2 X2
+  let y2 := embed3 F 2 Y2
   let cr := Tower.sub F (Tower.mul F rs x1 y2) (Tower.mul F rs y1 x2)
   match Tower.sign C.S rs cr with
   | some v => return v
