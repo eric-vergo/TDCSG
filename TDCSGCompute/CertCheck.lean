@@ -90,87 +90,106 @@ def parseSym (d : Nat) (v s : String) : Except String Sym := do
   | "-" => return ⟨e, false⟩
   | _ => throw s!"bad side {s}"
 
-/-- The state of the line-by-line parser. -/
-structure ParseState where
-  /-- Whether the header line has been read. -/
-  header : Bool := false
-  /-- `n`, once read. -/
-  n : Option Nat := none
-  /-- `r²`, once read. -/
-  r2 : Option RadiusSq := none
-  /-- Full circles so far. -/
-  full : Array Elem := #[]
-  /-- Arcs so far. -/
-  arcs : Array CertArcRec := #[]
-  /-- The summary line, once read. -/
-  summary : Option (Nat × Nat × Nat) := none
-  /-- Whether `end` has been read. -/
-  ended : Bool := false
+/-- One line of a certificate file. -/
+inductive CertLine where
+  /-- A blank or comment line. -/
+  | skip
+  /-- `tdcsg-certificate 1`. -/
+  | header
+  /-- `n N`. -/
+  | n (k : Nat)
+  /-- `r2 v / q`. -/
+  | r2 (x : RadiusSq)
+  /-- `full c`. -/
+  | full (c : Elem)
+  /-- `arc c e₁ s₁ e₂ s₂`. -/
+  | arc (A : CertArcRec)
+  /-- `summary circles C arcs A c4-endpoints E`. -/
+  | summary (c a e : Nat)
+  /-- `end`. -/
+  | stop
 
-/-- Process one line of a certificate file. -/
-def ParseState.step (st : ParseState) (line : String) : Except String ParseState := do
+/-- Parse one line, given `n` if it has been read. -/
+def parseLine (n : Option Nat) (line : String) : Except String CertLine := do
   let t := line.trimAscii.toString
-  if t.isEmpty || t.startsWith "#" then return st
-  if st.ended then throw "text after 'end'"
+  if t.isEmpty || t.startsWith "#" then return .skip
   let w := (t.splitOn " ").filter (!·.isEmpty)
-  if !st.header then
-    if w != ["tdcsg-certificate", "1"] then throw "missing header 'tdcsg-certificate 1'"
-    return { st with header := true }
+  let dim : Except String Nat := match n with
+    | some k => pure (totient k)
+    | none => throw "record before n"
   match w with
+  | ["tdcsg-certificate", "1"] => return .header
   | ["n", v] =>
-    if st.n.isSome then throw "duplicate n"
     match v.toNat? with
-    | some k => if k < 3 then throw "n must be at least 3" else return { st with n := some k }
+    | some k => if k < 3 then throw "n must be at least 3" else return .n k
     | none => throw "bad n"
   | ["r2", v, "/", q] =>
-    let some k := st.n | throw "r2 before n"
-    if st.r2.isSome then throw "duplicate r2"
-    let num ← parseVec (totient k) v
+    let num ← parseVec (← dim) v
     match q.toNat? with
-    | some qq => if qq == 0 then throw "zero denominator" else return { st with r2 := some ⟨num, qq⟩ }
+    | some qq => if qq == 0 then throw "zero denominator" else return .r2 ⟨num, qq⟩
     | none => throw "bad denominator"
-  | ["full", v] =>
-    let some k := st.n | throw "record before n"
-    return { st with full := st.full.push (← parseVec (totient k) v) }
+  | ["full", v] => return .full (← parseVec (← dim) v)
   | ["arc", v, e1, s1, e2, s2] =>
-    let some k := st.n | throw "record before n"
-    let d := totient k
-    let A : CertArcRec := { c := ← parseVec d v, a := ← parseSym d e1 s1, b := ← parseSym d e2 s2 }
-    return { st with arcs := st.arcs.push A }
+    let d ← dim
+    return .arc { c := ← parseVec d v, a := ← parseSym d e1 s1, b := ← parseSym d e2 s2 }
   | ["summary", "circles", c, "arcs", a, "c4-endpoints", e] =>
-    if st.summary.isSome then throw "duplicate summary"
     match c.toNat?, a.toNat?, e.toNat? with
-    | some c, some a, some e => return { st with summary := some (c, a, e) }
+    | some c, some a, some e => return .summary c a e
     | _, _, _ => throw "bad summary line"
-  | ["end"] => return { st with ended := true }
+  | ["end"] => return .stop
   | _ => throw s!"cannot parse the line: {t}"
 
-/-- The parsed certificate at the end of the file. -/
-def ParseState.finish (st : ParseState) : Except String ParsedCert := do
-  if !st.header then throw "empty file"
-  if !st.ended then throw "missing 'end' (truncated file?)"
-  let some k := st.n | throw "missing n"
-  let some r := st.r2 | throw "missing r2"
-  return { n := k, r2 := r, full := st.full, arcs := st.arcs, summary := st.summary }
+/-- Parse a certificate from a source of lines (`next` returns `none` at the end). -/
+def parseLines {m : Type → Type} [Monad m] (next : m (Option String)) :
+    m (Except String ParsedCert) := do
+  let mut header := false
+  let mut n : Option Nat := none
+  let mut r2 : Option RadiusSq := none
+  let mut full : Array Elem := #[]
+  let mut arcs : Array CertArcRec := #[]
+  let mut summary : Option (Nat × Nat × Nat) := none
+  let mut ended := false
+  repeat
+    let some l ← next | break
+    match parseLine n l with
+    | .error e => return .error e
+    | .ok .skip => pure ()
+    | .ok rec =>
+      if ended then return .error "text after 'end'"
+      match header, rec with
+      | false, .header => header := true
+      | false, _ => return .error "missing header 'tdcsg-certificate 1'"
+      | true, .header => return .error "duplicate header"
+      | true, .n k => if n.isSome then return .error "duplicate n" else n := some k
+      | true, .r2 x => if r2.isSome then return .error "duplicate r2" else r2 := some x
+      | true, .full c => full := full.push c
+      | true, .arc A => arcs := arcs.push A
+      | true, .summary c a e =>
+        if summary.isSome then return .error "duplicate summary"
+        summary := some (c, a, e)
+      | true, .stop => ended := true
+      | true, .skip => pure ()
+  if !header then return .error "empty file"
+  if !ended then return .error "missing 'end' (truncated file?)"
+  let some k := n | return .error "missing n"
+  let some r := r2 | return .error "missing r2"
+  return .ok { n := k, r2 := r, full, arcs, summary }
 
 /-- Parse a certificate given as text. -/
-def parseCertificate (text : String) : Except String ParsedCert := do
-  let mut st : ParseState := {}
-  for l in text.splitOn "\n" do
-    st ← st.step l
-  st.finish
+def parseCertificate (text : String) : Except String ParsedCert :=
+  let ls := (text.splitOn "\n").toArray
+  let next : StateM Nat (Option String) := do
+    let i ← get
+    set (i + 1)
+    return ls[i]?
+  (parseLines next).run' 0
 
 /-- Parse a certificate file, line by line. -/
 def parseCertificateFile (path : System.FilePath) : IO (Except String ParsedCert) := do
   let h ← IO.FS.Handle.mk path .read
-  let mut st : ParseState := {}
-  repeat
+  parseLines do
     let l ← h.getLine
-    if l.isEmpty then break
-    match st.step l with
-    | .ok st' => st := st'
-    | .error e => return .error e
-  return st.finish
+    return if l.isEmpty then none else some l
 
 /-- A point with its exact data. -/
 structure CPt where
