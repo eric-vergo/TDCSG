@@ -1,7 +1,9 @@
 name = "TDCSG"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["TDCSG"]
+defaultTargets = ["TDCSG", "tdcsg-orbit"]
+testDriver = "tdcsg-orbit"
+testDriverArgs = ["--selftest"]
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -20,3 +22,11 @@ rev = "56a005855ea17e0b0958f73ec801ae140b0a1679"
 
 [[lean_lib]]
 name = "TDCSG"
+
+# The exact orbit engine: core Lean only, no Mathlib import.
+[[lean_lib]]
+name = "TDCSGCompute"
+
+[[lean_exe]]
+name = "tdcsg-orbit"
+root = "TDCSGCompute.Main"
