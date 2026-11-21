@@ -2,7 +2,7 @@ name = "TDCSG"
 version = "0.1.0"
 keywords = ["math"]
 defaultTargets = ["TDCSG", "tdcsg-orbit"]
-testDriver = "tdcsg-orbit"
+testDriver = "«tdcsg-orbit»"
 testDriverArgs = ["--selftest"]
 
 [leanOptions]

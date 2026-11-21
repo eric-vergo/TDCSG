@@ -249,6 +249,34 @@ def testOrbits (log : IO.Ref TestLog) : IO Unit := do
   check log "2^70 overflows loudly"
     (match s.insert (F.ofInt (2 ^ 70)) with | .overflow _ => true | _ => false)
 
+/-- Exact results recorded in `notes/engine.md`, re-checked as regression tests. -/
+def testKnownResults (log : IO.Ref TestLog) : IO Unit := do
+  let parse (F : CycField) (s : String) : IO RadiusSq := match parseReal F s with
+    | .ok x => pure x
+    | .error e => throw <| IO.userError e
+  -- n ≡ 4 (mod 8): exactly n² - 3n + 1 points at r = g, and the next threshold is exactly r₁
+  for n in [12, 20, 28, 36, 44] do
+    let F := CycField.make n
+    let g2 ← parse F "touch"
+    let res ← orbit (DiskTest.make F g2) F.zero { cap := 100000, conj := false }
+    check log s!"n={n}: n² - 3n + 1 points at r = g ({res.size})"
+      (res.complete && res.size == n * n - 3 * n + 1)
+    let sw ← sweep F F.zero { cap := 3000000, start2 := some g2, maxSteps := 1 }
+    let r1 ← parse F "r1"
+    check log s!"n={n}: the next threshold after g² is r₁²"
+      (sw.initialSize == n * n - 3 * n + 1 &&
+        (sw.thresholds[0]?.map (·.value == r1.num)).getD false)
+  -- n = 33 at r = g: 65 089 points
+  let F33 := CycField.make 33
+  let res ← orbit (DiskTest.make F33 (← parse F33 "touch")) F33.zero { cap := 200000, conj := false }
+  check log s!"n=33: 65089 points at r = g ({res.size})" (res.complete && res.size == 65089)
+  -- rows of the preliminary table, reproduced exactly at r² = r_c² - δ
+  for (n, δ, size) in [(5, "7.36e-2", 9477), (5, "1.52e-2", 112539), (8, "6.13e-2", 16297),
+      (8, "2.15e-2", 87247), (12, "1.67e-2", 23813)] do
+    let F := CycField.make n
+    let res ← orbit (DiskTest.make F (← parse F s!"closed-{δ}")) F.zero { cap := 1000000, conj := false }
+    check log s!"n={n}, δ={δ}: {size} points ({res.size})" (res.complete && res.size == size)
+
 /-- Run all self-tests; returns the process exit code. -/
 def runSelfTests : IO UInt32 := do
   let log ← IO.mkRef ({} : TestLog)
@@ -256,6 +284,7 @@ def runSelfTests : IO UInt32 := do
   testArithmetic log
   testMembership log
   testOrbits log
+  testKnownResults log
   let l ← log.get
   let t1 ← IO.monoMsNow
   IO.println s!"self-test: {l.passed} passed, {l.failed.size} failed ({t1 - t0} ms)"
