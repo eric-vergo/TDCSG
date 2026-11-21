@@ -154,6 +154,33 @@ def symOrbit (F : CycField) (x : Elem) : Array Elem :=
 def symCanonical (F : CycField) (x : Elem) : Elem :=
   (symOrbit F x).foldl (fun m y ↦ if elemLexLt y m then y else m) x
 
+/-- The symmetry `g ∈ {0, 1, 2, 3}` applied to a point: bit 1 is `z ↦ z̄` (applied first), bit 0
+is `z ↦ -z`. -/
+def symApply (F : CycField) (g : Nat) (x : Elem) : Elem :=
+  let x := if g &&& 2 != 0 then F.conj x else x
+  if g &&& 1 != 0 then F.neg x else x
+
+/-- The symmetry `g` applied to the arc of the circle about `c` from `(a)` counterclockwise to
+`(b)`. A symbol `(e, s)` becomes `(g e, s)` under `z ↦ -z` and `(ē, -s)` under `z ↦ z̄`; the
+reflection reverses the orientation, so the endpoints are exchanged. -/
+def symArc (F : CycField) (g : Nat) (c : Elem) (a b : Sym) : Elem × Sym × Sym :=
+  let c' := symApply F g c
+  let a' : Sym := { a with e := symApply F g a.e }
+  let b' : Sym := { b with e := symApply F g b.e }
+  if g &&& 2 != 0 then (c', { b' with plus := !b'.plus }, { a' with plus := !a'.plus })
+  else (c', a', b')
+
+/-- A symmetry taking `c` to `symCanonical F c`. -/
+def symCanonG (F : CycField) (c : Elem) : Nat := Id.run do
+  let mut best := 0
+  let mut bc := c
+  for g in [1:4] do
+    let x := symApply F g c
+    if elemLexLt x bc then
+      bc := x
+      best := g
+  return best
+
 /-- Remove duplicates and sort lexicographically. -/
 def sortDedup (xs : Array Elem) : Array Elem := Id.run do
   let s := xs.qsort elemLexLt
@@ -386,17 +413,44 @@ def relInsert (G : Gen) (WS : WindowSet) (store : Std.HashMap Elem CircSt)
     work := work.push (c, some g)
   return (store.insert c st, work, gaps.size)
 
-/-- Compute the smallest restricted closure for the windows `WS` (module docstring). -/
-def relClosure (G : Gen) (WS : WindowSet) (opts : CloseOptions) : IO RelResult := do
+/-- Insert an image arc, in the symmetric mode reduced to the canonical circle of its orbit
+together with its images under the stabiliser of that circle. -/
+def relInsertS (G : Gen) (WS : WindowSet) (sym : Bool) (store : Std.HashMap Elem CircSt)
+    (work : Array (Elem × Option GArc)) (tang : IO.Ref (Array (Elem × Elem))) (c : Elem)
+    (sa sb : Sym) : IO (Std.HashMap Elem CircSt × Array (Elem × Option GArc) × Nat) := do
+  if !sym then return ← relInsert G WS store work tang c sa sb
+  let F := G.C.F
+  let (c0, a0, b0) := symArc F (symCanonG F c) c sa sb
+  let (s, w, k) ← relInsert G WS store work tang c0 a0 b0
+  let mut store := s
+  let mut work := w
+  let mut total := k
+  for h in [1:4] do
+    if symApply F h c0 == c0 then
+      let (_, a1, b1) := symArc F h c0 a0 b0
+      let (s, w, k) ← relInsert G WS store work tang c0 a1 b1
+      store := s
+      work := w
+      total := total + k
+  return (store, work, total)
+
+/-- Compute the smallest restricted closure for the windows `WS` (module docstring). With `sym`,
+only one circle of each orbit of `z ↦ ±z, ±z̄` is stored (the lexicographically least, with all
+arcs of `K'` on it); this is exact because the system, the windows and hence the smallest
+restricted closure are invariant under these maps (`z ↦ -z` exchanges `A` and `B`, `z ↦ z̄`
+exchanges `A` and `A⁻¹`), and the images of `g(α)` are the `g`-images of the images of `α`. -/
+def relClosure (G : Gen) (WS : WindowSet) (opts : CloseOptions) (sym : Bool := false) :
+    IO RelResult := do
   let t0 ← IO.monoMsNow
   let C := G.C
   let tang ← IO.mkRef (#[] : Array (Elem × Elem))
   let mut clips := 0
   let mut store : Std.HashMap Elem CircSt := {}
-  for p in [C.left, C.right] do
+  let bds := if sym then [C.left] else [C.left, C.right]
+  for p in bds do
     let st ← relNewCircle G WS p
     store := store.insert p { st with full := true }
-  let mut work : Array (Elem × Option GArc) := #[(C.left, none), (C.right, none)]
+  let mut work : Array (Elem × Option GArc) := bds.toArray.map fun p ↦ (p, none)
   G.stats.modify fun st ↦ { st with pieces := 2 }
   -- the window boundary arcs
   for cs in WS.centres do
@@ -404,7 +458,7 @@ def relClosure (G : Gen) (WS : WindowSet) (opts : CloseOptions) : IO RelResult :
       match ← G.windowBoundaryArc cs i with
       | none => pure ()
       | some A =>
-        let (s, w, k) ← relInsert G WS store work tang cs[i]! A.a.sym A.b.sym
+        let (s, w, k) ← relInsertS G WS sym store work tang cs[i]! A.a.sym A.b.sym
         store := s
         work := w
         G.stats.modify fun st ↦ { st with pieces := st.pieces + k }
@@ -442,7 +496,7 @@ def relClosure (G : Gen) (WS : WindowSet) (opts : CloseOptions) : IO RelResult :
           for k in [(-1 : Int), 1] do
             let c' := C.rot p k c
             G.stats.modify fun st ↦ { st with images := st.images + 1 }
-            let (s, w, n) ← relInsert G WS store work tang c' (C.rotSym p k Z.a.sym)
+            let (s, w, n) ← relInsertS G WS sym store work tang c' (C.rotSym p k Z.a.sym)
               (C.rotSym p k Z.b.sym)
             store := s
             work := w
@@ -553,10 +607,12 @@ structure RelSummary where
   maxConj : Array (Nat × Float)
 
 /-- Count a closed relative store. -/
-def relSummarize (F : CycField) (store : Std.HashMap Elem CircSt) : RelSummary := Id.run do
+def relSummarize (F : CycField) (store : Std.HashMap Elem CircSt) (sym : Bool) :
+    RelSummary := Id.run do
   let ks := F.embeddings.filter (· != 1)
   let mut mx : Array Float := ks.map fun _ ↦ 0
   let mut arcs := 0
+  let mut circles := 0
   let mut full := 0
   let mut cc := 0
   let mut ca := 0
@@ -565,37 +621,50 @@ def relSummarize (F : CycField) (store : Std.HashMap Elem CircSt) : RelSummary :
       let (x, y) := F.evalConjF ks[i]! c
       mx := mx.set! i (max mx[i]! (Float.sqrt (x * x + y * y)))
     let k := if st.full then 1 else st.arcs.size
-    if st.full then full := full + 1
-    arcs := arcs + k
-    if symCanonical F c == c then
+    -- the number of circles this stored circle stands for
+    let orbit := if sym then 4 / ((List.range 4).filter fun h ↦ symApply F h c == c).length
+      else 1
+    if st.full then full := full + orbit
+    circles := circles + orbit
+    arcs := arcs + orbit * k
+    if sym || symCanonical F c == c then
       cc := cc + 1
       ca := ca + k
-  return { circles := store.size, fullCircles := full, arcs, canonCircles := cc, canonArcs := ca,
+  return { circles, fullCircles := full, arcs, canonCircles := cc, canonArcs := ca,
            maxConj := ks.zip mx }
 
-/-- The relative certificate file (format in `notes/relative-certificates.md`). -/
-def relCertificateText (G : Gen) (WS : WindowSet) (store : Std.HashMap Elem CircSt)
-    (S : RelSummary) (comment : Array String := #[]) : IO String := do
+/-- Write the relative certificate (format in `notes/relative-certificates.md`) line by line
+through `emit`. In the symmetric mode the arcs are those of the stored canonical circles, and the
+line `symmetric` says that `K'` is their union under `z ↦ ±z, ±z̄`. -/
+def relWriteCertificate (G : Gen) (WS : WindowSet) (store : Std.HashMap Elem CircSt)
+    (sym : Bool) (S : RelSummary) (comment : Array String) (emit : String → IO Unit) :
+    IO Unit := do
   let C := G.C
-  let sym (s : Sym) : String := s!"{elemToString s.e} {if s.plus then "+" else "-"}"
-  let mut out := "tdcsg-relative-certificate 1\n"
-  for l in comment do out := out ++ s!"# {l}\n"
-  out := out ++ s!"n {C.F.n}\n"
-  out := out ++ s!"r2 {elemToString C.r2.num} / {C.r2.den}\n"
-  out := out ++ s!"window {elemToString WS.w}\n"
-  for P in WS.crit do out := out ++ s!"critical {elemToString P}\n"
-  let centres := (store.toList.map (·.1)).toArray.qsort elemLexLt
+  let symS (s : Sym) : String := s!"{elemToString s.e} {if s.plus then "+" else "-"}"
+  emit "tdcsg-relative-certificate 1\n"
+  for l in comment do emit s!"# {l}\n"
+  emit s!"n {C.F.n}\n"
+  emit s!"r2 {elemToString C.r2.num} / {C.r2.den}\n"
+  emit s!"window {elemToString WS.w}\n"
+  if sym then emit "symmetric\n"
+  for P in WS.crit do emit s!"critical {elemToString P}\n"
+  let centres := (store.toArray.map (·.1)).qsort elemLexLt
+  let mut listed := 0
+  let mut nArcs := 0
   for c in centres do
     let st := store.getD c {}
+    listed := listed + 1
     if st.full then
-      out := out ++ s!"full {elemToString c}\n"
+      emit s!"full {elemToString c}\n"
+      nArcs := nArcs + 1
       continue
     let arcs ← sortArcsM (fun x y ↦ G.cmp c x.a y.a) st.arcs
+    nArcs := nArcs + arcs.size
     for A in arcs do
-      out := out ++ s!"arc {elemToString c} {sym A.a.sym} {sym A.b.sym}\n"
-  out := out ++ s!"summary circles {S.circles} arcs {S.arcs} windows {WS.crit.size}\n"
-  out := out ++ "end\n"
-  return out
+      emit s!"arc {elemToString c} {symS A.a.sym} {symS A.b.sym}\n"
+  let _ := S
+  emit s!"summary circles {listed} arcs {nArcs} windows {WS.crit.size}\n"
+  emit "end\n"
 
 /-- The outcome of `certifyRelative`. -/
 structure RelOutcome where
@@ -609,7 +678,7 @@ structure RelOutcome where
   coinc : Option CoincidenceClass
   /-- Tangency points that are critical points. -/
   tangentAtCritical : Nat
-  /-- The certificate text (if closed). -/
+  /-- The certificate text (if closed; empty if it was written to a file). -/
   text : Option String
   /-- Why there is no certificate (empty if there is one). -/
   reason : String
@@ -617,7 +686,8 @@ structure RelOutcome where
 /-- Compute the restricted closure for `r² = r2` and the window shape `w`, and produce the
 relative certificate if it closes. -/
 def certifyRelative (F : CycField) (r2 : RadiusSq) (w : Elem) (opts : CloseOptions)
-    (comment : Array String := #[]) : IO RelOutcome := do
+    (comment : Array String := #[]) (sym : Bool := false) (out : Option System.FilePath := none) :
+    IO RelOutcome := do
   let G : Gen := { FC := FilterCtx.make (CircleCtx.make F r2), stats := ← IO.mkRef {} }
   let C := G.C
   let WS ← Gen.liftE (WindowSet.make C w >>= WindowSet.withBound C)
@@ -627,7 +697,7 @@ def certifyRelative (F : CycField) (r2 : RadiusSq) (w : Elem) (opts : CloseOptio
   if !disj then
     return { WS, result := empty, summary := none, coinc := none, tangentAtCritical := 0,
              text := none, reason := "the windows are not pairwise disjoint" }
-  let res ← relClosure G WS opts
+  let res ← relClosure G WS opts sym
   -- tangency points: (c + p) / 2 must be a critical point
   let mut tc := 0
   for (c, p) in res.tangencies do
@@ -639,9 +709,17 @@ def certifyRelative (F : CycField) (r2 : RadiusSq) (w : Elem) (opts : CloseOptio
     return { WS, result := res, summary := none, coinc := none, tangentAtCritical := tc,
              text := none, reason := s!"cap reached ({what}); nothing is claimed" }
   | .closed =>
-    let S := relSummarize F res.store
+    let S := relSummarize F res.store sym
     let K ← Gen.liftE (classifyCoincidences C WS res.stats.coincLog)
-    let text ← relCertificateText G WS res.store S comment
+    let text ← match out with
+      | some path =>
+        IO.FS.withFile path .write fun h ↦
+          relWriteCertificate G WS res.store sym S comment h.putStr
+        pure ""
+      | none =>
+        let buf ← IO.mkRef ""
+        relWriteCertificate G WS res.store sym S comment fun t ↦ buf.modify (· ++ t)
+        buf.get
     return { WS, result := res, summary := some S, coinc := some K, tangentAtCritical := tc,
              text := some text, reason := "" }
 

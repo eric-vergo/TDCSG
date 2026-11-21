@@ -26,9 +26,10 @@ tdcsg-orbit certify -n N (--r2 SPEC | --r Q) [--out FILE] [--max-pieces P] [--ma
                        [--max-seconds S] [--progress K]
 tdcsg-orbit check-certificate FILE
 tdcsg-orbit critical-points -n N (--r2 SPEC | --r Q) [--window w0,w1,…]
-tdcsg-orbit certify-relative -n N (--r2 SPEC | --r Q) --window w0,w1,… [--out FILE]
+tdcsg-orbit certify-relative -n N (--r2 SPEC | --r Q) --window w0,w1,… [--symmetric] [--out FILE]
                        [--max-pieces P] [--max-circles C] [--max-seconds S] [--progress K]
 tdcsg-orbit check-relative-certificate FILE [--threads T]
+tdcsg-orbit validity-interval FILE [--threads T] [--no-check] [--out FILE]
 tdcsg-orbit info -n N
 tdcsg-orbit --selftest
 ```
@@ -56,7 +57,9 @@ structure Args where
   flags : Array String := #[]
 
 /-- Options that take no value. -/
-def flagNames : List String := ["--no-conj", "--selftest", "--help", "--confirm", "--reps", "--fix"]
+def flagNames : List String :=
+  ["--no-conj", "--selftest", "--help", "--confirm", "--reps", "--fix", "--symmetric",
+   "--no-check"]
 
 /-- Split the command line. -/
 def parseArgs (xs : List String) : Args := Id.run do
@@ -118,8 +121,11 @@ def usage : String :=
   "                    [--max-seconds S] [--progress K]\n" ++
   "  tdcsg-orbit check-certificate FILE\n" ++
   "  tdcsg-orbit critical-points -n N --r2 SPEC [--window w0,w1,…]\n" ++
-  "  tdcsg-orbit certify-relative -n N --r2 SPEC --window w0,w1,… [--out FILE] [caps]\n" ++
-  "  tdcsg-orbit check-relative-certificate FILE\n" ++
+  "  tdcsg-orbit certify-relative -n N --r2 SPEC --window w0,w1,… [--symmetric]\n" ++
+  "                    [--out FILE] [caps]\n" ++
+  "  tdcsg-orbit check-relative-certificate FILE [--threads T]\n" ++
+  "  tdcsg-orbit validity-interval FILE [--threads T] [--no-check] [--out FILE]\n" ++
+  "  tdcsg-orbit validity-interval FILE [--threads T] [--no-check] [--out FILE]\n" ++
   "  tdcsg-orbit info -n N\n" ++
   "  tdcsg-orbit --selftest\n" ++
   "SPEC: touch | closed | r1 | fund, optionally followed by +q or -q; re:b0,b1,...;\n" ++
@@ -749,7 +755,8 @@ def cmdCertifyRelative (a : Args) : IO UInt32 := do
     "arcs run counterclockwise; symbol (e, ±) on the circle about c is the intersection point",
     "c + (d/2)(1 ± i h), d = e - c, h = sqrt(4 r²/|d|² - 1); coefficients in 1, ζ, …, ζ^(φ(n)-1)"]
   IO.println s!"certify-relative: n = {F.n}, r² = {r2s} ≈ {r2v}, window {elemToString w}"
-  let o ← certifyRelative F r2 w opts comment
+  let sym := a.flags.contains "--symmetric"
+  let o ← certifyRelative F r2 w opts comment sym ((a.get? "--out").map (⟨·⟩))
   IO.println s!"critical points (windows) {o.WS.crit.size}, window disks {o.WS.shape.size}"
   if !o.reason.isEmpty && o.summary.isNone && o.result.millis == 0 then
     IO.println s!"result NOT CERTIFIED: {o.reason}"
@@ -777,12 +784,9 @@ def cmdCertifyRelative (a : Args) : IO UInt32 := do
     let cs := S.maxConj.toList.map fun (k, m) ↦ s!"σ_{k}: {fmtFloat m 5}"
     IO.println s!"max |σ_k(c)| over centres: {cs}"
   match o.text with
-  | some text =>
-    match a.get? "--out" with
-    | some path =>
-      IO.FS.writeFile path text
-      IO.println s!"relative certificate written to {path} ({text.utf8ByteSize} bytes)"
-    | none => pure ()
+  | some _ =>
+    if let some path := a.get? "--out" then
+      IO.println s!"relative certificate written to {path}{if sym then " (symmetric)" else ""}"
     IO.println "result CLOSED (generator); check with `check-relative-certificate`"
     return 0
   | none =>
@@ -807,6 +811,76 @@ def cmdCheckRelative (a : Args) : IO UInt32 := do
   | .error e =>
     IO.println s!"relative certificate REJECTED: {e}"
     return 2
+
+/-- The largest `m` with `m / 2^k < num / den` (`den > 0` real elements), by bisection with exact
+signs. -/
+def dyadicBelow (C : CircleCtx) (num den : Elem) (k : Nat) (hi0 : Nat) : IO Nat := do
+  let F := C.F
+  let below (m : Nat) : IO Bool := do
+    -- m / 2^k < num / den  ⟺  m den - 2^k num < 0
+    match C.S.sign (F.sub (F.smul (m : Int) den) (F.smul ((2 ^ k : Nat) : Int) num)) with
+    | some s => return s < 0
+    | none => throw <| IO.userError "sign determination failed"
+  let mut lo := 0
+  let mut hi := hi0
+  while !(← below 0) do throw <| IO.userError "the event is not positive"
+  while (← below hi) do hi := 2 * hi
+  while lo + 1 < hi do
+    let mid := (lo + hi) / 2
+    if ← below mid then lo := mid else hi := mid
+  return lo
+
+/-- The `validity-interval` command. -/
+def cmdValidity (a : Args) : IO UInt32 := do
+  let some (path : String) := a.pos[1]? |
+    throw <| IO.userError "usage: validity-interval FILE [--threads T] [--out FILE]"
+  let threads ← a.nat "--threads" 1
+  let t0 ← IO.monoNanosNow
+  let P ← orThrow (← parseCertificateFile path)
+  if !a.flags.contains "--no-check" then
+    match checkCertificate P with
+    | .ok _ => IO.println s!"certificate VALID at its radius ({fmtFloat (← secondsSince t0) 4} s)"
+    | .error e =>
+      IO.println s!"certificate REJECTED: {e}"
+      return 2
+  let F := CycField.make P.n
+  let C := CircleCtx.make F P.r2
+  let rep ← orThrow (validityInterval P threads)
+  IO.println s!"adjacent pairs examined {rep.pairs}, disk events {rep.diskEvents}, \
+    coincident at the start {rep.coincidentAtStart}"
+  IO.println s!"time {fmtFloat (← secondsSince t0) 4} s"
+  if rep.coincidentAtStart > 0 then
+    IO.println "result: two compared points coincide at the certificate's radius; no extension"
+    return 3
+  let some e := rep.least | do
+    IO.println "result: no event found"
+    return 3
+  let ev := (F.evalConjF 1 e.num).1 / (F.evalConjF 1 e.den).1
+  let r0 := (F.evalConjF 1 P.r2.num).1 / P.r2.den.toFloat
+  IO.println s!"least event: {e.kind} on the circle about {elemToString e.circle}"
+  IO.println s!"  ρ₁ = ({elemToString e.num}) / ({elemToString e.den}) ≈ {fmtFloat ev 15}; \
+    ρ₀ ≈ {fmtFloat r0 15}"
+  match namedReal F "closed" with
+  | .ok rc =>
+    let rcv := (F.evalConjF 1 rc.num).1 / rc.den.toFloat
+    IO.println s!"  r_c² - ρ₀ ≈ {fmtFloat (rcv - r0) 8}, r_c² - ρ₁ ≈ {fmtFloat (rcv - ev) 8}"
+  | .error _ => pure ()
+  -- a dyadic radius just below ρ₁, for an independent re-check of the same arcs there
+  let k := 100
+  let m ← dyadicBelow C e.num e.den k ((ev.ceil.toUInt64.toNat + 1) * 2 ^ k)
+  let above := match C.S.sign (F.sub (F.smul (m : Int) (F.ofInt P.r2.den))
+      (F.smul ((2 ^ k : Nat) : Int) P.r2.num)) with
+    | some s => decide (s > 0)
+    | none => false
+  IO.println s!"  dyadic radius below ρ₁: r² = {m} / 2^{k} (above ρ₀: {above})"
+  if let some out := a.get? "--out" then
+    let text ← IO.FS.readFile path
+    let ls := (text.splitOn "\n").map fun l ↦
+      if l.startsWith "r2 " then
+        s!"r2 {",".intercalate ((F.ofInt (m : Int)).toList.map toString)} / {2 ^ k}" else l
+    IO.FS.writeFile out ("\n".intercalate ls)
+    IO.println s!"  the same arcs at that radius written to {out}"
+  return 0
 
 /-- The `info` command. -/
 def cmdInfo (a : Args) : IO Unit := do
@@ -840,6 +914,7 @@ def main (argv : List String) : IO UInt32 := do
     | some "critical-points" => return (← cmdCritical a)
     | some "certify-relative" => return (← cmdCertifyRelative a)
     | some "check-relative-certificate" => return (← cmdCheckRelative a)
+    | some "validity-interval" => return (← cmdValidity a)
     | _ => IO.print usage
     return 0
   catch e =>

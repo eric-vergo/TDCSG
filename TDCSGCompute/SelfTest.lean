@@ -7,6 +7,7 @@ import TDCSGCompute.Closure
 import TDCSGCompute.CertCheck
 import TDCSGCompute.RelClosure
 import TDCSGCompute.RelCheck
+import TDCSGCompute.Validity
 
 /-!
 # Self-tests of the orbit engine
@@ -765,16 +766,25 @@ def testRelative (log : IO.Ref TestLog) : IO Unit := do
     (match K with
       | some K => K.records > 0 && K.inBulk == 0 && K.nonLattice == 0
       | none => false)
-  let cert5 := o.text.getD ""
-  match parseRelative cert5 >>= (checkRelative · 8) with
+  -- the symmetric mode: one circle per orbit, the same K'
+  let oS ← certifyRelative F5 C5.r2 w1 {} (sym := true)
+  check log "n=5, r_c, w = (0,2,-1,0), symmetric mode: the same counts"
+    (oS.text.isSome && (oS.summary.map fun S ↦ (S.circles, S.arcs, S.canonCircles, S.canonArcs))
+      == some (13692, 22230, 3442, 5615))
+  let cert5 := oS.text.getD ""
+  match parseRelative cert5 >>= checkRelative with
   | .ok rep =>
-    check log "n=5, r_c, w = (0,2,-1,0): the checker accepts, with 51 828 image arcs (as chk.py)"
-      (rep.images == 51828 && rep.canonCircles == 3442 && rep.arcs == 22230)
+    check log "n=5, r_c, w = (0,2,-1,0): the checker accepts the symmetric certificate, \
+      13 692 circles and 22 230 arcs in all"
+      (rep.canonCircles == 3442 && rep.circles == 13692 && rep.arcs == 22230)
   | .error e => check log s!"n=5, r_c, w = (0,2,-1,0): the checker accepts ({e})" false
   -- shrinking the window: the boundary of the smaller windows is not in K'
   let shrunk := cert5.replace "window 0,2,-1,0" "window 5,-1,4,0"
-  let (rejS, msgS) := rejectsRel shrunk 8
+  let (rejS, msgS) := rejectsRel shrunk
   check log s!"tampered relative certificate rejected: a smaller window ({msgS})" rejS
+  let unsym := cert5.replace "symmetric\n" ""
+  let (rejU, msgU) := rejectsRel unsym
+  check log s!"tampered relative certificate rejected: the symmetric line removed ({msgU})" rejU
   -- a small case for tamperings: n = 6, r² = 13, w = (2, 2)
   let F6 := CycField.make 6
   let o6 ← certifyRelative F6 (← specRadius F6 "13") #[2, 2] {}
@@ -818,6 +828,56 @@ def testRelative (log : IO.Ref TestLog) : IO Unit := do
   for (what, t) in tampered do
     let (rej, msg) := rejectsRel t
     check log s!"tampered relative certificate rejected: {what} ({msg})" rej
+  -- n = 6 in the symmetric mode: accepted with the same totals; a non-canonical circle and a
+  -- deleted arc are rejected
+  let o6s ← certifyRelative F6 (← specRadius F6 "13") #[2, 2] {} (sym := true)
+  let cert6s := o6s.text.getD ""
+  check log "n=6, r² = 13, symmetric: accepted with 215 circles and 536 arcs in all"
+    (match parseRelative cert6s >>= checkRelative with
+      | .ok rep => rep.circles == 215 && rep.arcs == 536
+      | .error _ => false)
+  let ls6 := (cert6s.splitOn "\n").toArray
+  let arc6 := (Array.range ls6.size).filter fun i ↦ ls6[i]!.startsWith "arc "
+  let nonCanon := arc6.find? fun i ↦
+    let w := ((ls6[i]!.splitOn " ").filter (!·.isEmpty)).toArray
+    let c := (parseVec 2 w[1]!).toOption.getD #[]
+    symApply F6 1 c != c
+  match nonCanon with
+  | some i =>
+    let w := ((ls6[i]!.splitOn " ").filter (!·.isEmpty)).toArray
+    let c := (parseVec 2 w[1]!).toOption.getD #[]
+    let (c', a', b') := symArc F6 1 c ⟨(parseVec 2 w[2]!).toOption.getD #[], w[3]! == "+"⟩
+      ⟨(parseVec 2 w[4]!).toOption.getD #[], w[5]! == "+"⟩
+    let sg (x : Sym) := if x.plus then "+" else "-"
+    let moved := editLine cert6s i (some s!"arc {elemToString c'} {elemToString a'.e} {sg a'} \
+      {elemToString b'.e} {sg b'}")
+    let (rej, msg) := rejectsRel moved
+    check log s!"tampered symmetric certificate rejected: an arc moved to a non-canonical circle \
+      ({msg})" rej
+  | none => check log "n=6 symmetric: an arc on a circle with trivial stabiliser" false
+  let (rejD, msgD) := rejectsRel (editLine cert6s arc6[arc6.size / 2]! none)
+  check log s!"tampered symmetric certificate rejected: delete an arc ({msgD})" rejD
+  -- the interval of validity of the δ = 9/10 certificate of n = 5: the first event is the
+  -- tangency of the circle about -3 + 2ζ to ∂D_R at ρ₁ = 7 - 2φ; the same arcs are accepted just
+  -- below ρ₁ and rejected just above
+  let o910 ← certify F5 (← specRadius F5 "closed-9/10") {}
+  match parseCertificate (o910.text.getD "") >>= (validityInterval · 1) with
+  | .ok rep =>
+    match rep.least with
+    | some e =>
+      let rho1 : RadiusSq := { num := F5.ofInt 7 |> F5.add (F5.smul 2 #[0, 0, 1, 1]), den := 1 }
+      let same := e.kind == "disk" && F5.smul (rho1.den : Int) e.num == F5.mul rho1.num e.den
+      let ls := ((o910.text.getD "").splitOn "\n").toArray
+      let r2i := (Array.range ls.size).filter fun i ↦ ls[i]!.startsWith "r2 "
+      -- 7 - 2φ ≈ 3.763932; test at 3.7639 (below) and 3.764 (above)
+      let at_ (num : Int) (den : Nat) := editLine (o910.text.getD "") r2i[0]!
+        (some s!"r2 {num},0,0,0 / {den}")
+      check log "n=5, δ = 9/10: the interval of validity ends at the tangency ρ₁ = 7 - 2φ; the \
+        arcs are accepted at r² = 3.7639 and rejected at 3.764"
+        (same && rep.coincidentAtStart == 0 && !(rejects (at_ 37639 10000)).1 &&
+          (rejects (at_ 3764 1000)).1)
+    | none => check log "n=5, δ = 9/10: an event is found" false
+  | .error e => check log s!"n=5, δ = 9/10: interval of validity ({e})" false
 
 /-- Run all self-tests; returns the process exit code. -/
 def runSelfTests : IO UInt32 := do

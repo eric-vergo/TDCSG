@@ -62,6 +62,8 @@ structure ParsedRel where
   summary : Option (Nat × Nat × Nat)
   /-- The optional face count. -/
   faces : Option Nat
+  /-- Whether the arcs are listed on one circle per orbit of `z ↦ ±z, ±z̄` only. -/
+  symmetric : Bool
 
 /-- Parse a relative certificate from a source of lines. -/
 def parseRelLines {m : Type → Type} [Monad m] (next : m (Option String)) :
@@ -75,6 +77,7 @@ def parseRelLines {m : Type → Type} [Monad m] (next : m (Option String)) :
   let mut arcs : Array CertArcRec := #[]
   let mut summary : Option (Nat × Nat × Nat) := none
   let mut faces : Option Nat := none
+  let mut symmetric := false
   let mut ended := false
   repeat
     let some l ← next | break
@@ -135,6 +138,9 @@ def parseRelLines {m : Type → Type} [Monad m] (next : m (Option String)) :
       match f.toNat? with
       | some f => faces := some f
       | none => return .error "bad faces line"
+    | ["symmetric"] =>
+      if symmetric then return .error "duplicate symmetric line"
+      symmetric := true
     | ["end"] => ended := true
     | _ => return .error s!"cannot parse the line: {t}"
   if !header then return .error "empty file"
@@ -142,7 +148,7 @@ def parseRelLines {m : Type → Type} [Monad m] (next : m (Option String)) :
   let some k := n | return .error "missing n"
   let some r := r2 | return .error "missing r2"
   let some ww := w | return .error "missing window"
-  return .ok { n := k, r2 := r, w := ww, crit, full, arcs, summary, faces }
+  return .ok { n := k, r2 := r, w := ww, crit, full, arcs, summary, faces, symmetric }
 
 /-- Parse a relative certificate given as text. -/
 def parseRelative (text : String) : Except String ParsedRel :=
@@ -186,6 +192,43 @@ structure RelReport where
 namespace RelChecker
 
 variable (C : CircleCtx)
+
+/-- The four symmetries of the system as maps of `ℤ[ζ_n]`: `0` the identity, `1` `z ↦ -z`,
+`2` `z ↦ z̄`, `3` `z ↦ -z̄`. -/
+def sym (g : Nat) (x : Elem) : Elem :=
+  match g with
+  | 1 => C.F.neg x
+  | 2 => C.F.conj x
+  | 3 => C.F.neg (C.F.conj x)
+  | _ => x
+
+/-- The image under the symmetry `g` of the arc of the circle about `c` from `a` counterclockwise
+to `b`: centre and partner centres are mapped; the reflections `2`, `3` reverse orientation, so
+they exchange the endpoints and the sides. -/
+def symArcOf (g : Nat) (c : Elem) (a b : Sym) : Elem × Sym × Sym :=
+  let a' : Sym := ⟨sym C g a.e, a.plus⟩
+  let b' : Sym := ⟨sym C g b.e, b.plus⟩
+  if g ≥ 2 then (sym C g c, ⟨b'.e, !b'.plus⟩, ⟨a'.e, !a'.plus⟩) else (sym C g c, a', b')
+
+/-- The lexicographically least image of `c` and a symmetry achieving it. -/
+def canonOf (c : Elem) : Elem × Nat := Id.run do
+  let mut best := (c, 0)
+  for g in [1, 2, 3] do
+    let y := sym C g c
+    if elemLexLt y best.1 then best := (y, g)
+  return best
+
+/-- Whether the arc of the circle about `c` from `a` to `b` lies inside `K'` as listed: inside one
+listed arc of its circle, or its circle is full. In the symmetric mode the arc is first moved to
+the canonical circle of its orbit. -/
+def coveredArc (circles : Std.HashMap Elem CheckCircle) (symmetric : Bool) (c : Elem)
+    (a b : Sym) : Except String Bool := do
+  let (c0, a0, b0) := if symmetric then symArcOf C (canonOf C c).2 c a b else (c, a, b)
+  match circles.get? c0 with
+  | none => return false
+  | some tc =>
+    if tc.full then return true
+    CertChecker.covered C tc.arcs (← CertChecker.mkPt C c0 a0) (← CertChecker.mkPt C c0 b0)
 
 /-- The trace of an element, as the constant coefficient of the sum of its conjugates. -/
 def trace (x : Elem) : Int := Id.run do
@@ -345,8 +388,9 @@ def minusHoles (u v : CPt) (holes : Array (CPt × CPt)) : Except String (Array (
 
 /-- Condition (K3) for the listed arcs (or full circle) `ck` on the circle about `c`; returns the
 number of image arcs verified. -/
-def checkImages (circles : Std.HashMap Elem CheckCircle) (centres : Array (Array Elem))
-    (crit : Array Elem) (rhoNum : Nat) (c : Elem) (ck : CheckCircle) : Except String Nat := do
+def checkImages (circles : Std.HashMap Elem CheckCircle) (symmetric : Bool)
+    (centres : Array (Array Elem)) (crit : Array Elem) (rhoNum : Nat) (c : Elem)
+    (ck : CheckCircle) : Except String Nat := do
   if !((c != C.left && ck.meet.1 > 0) || (c != C.right && ck.meet.2 > 0)) then return 0
   let mut nImg := 0
   let mut holes := #[]
@@ -368,17 +412,11 @@ def checkImages (circles : Std.HashMap Elem CheckCircle) (centres : Array (Array
         for k in [(-1 : Int), 1] do
           let c' := C.rot p k c
           nImg := nImg + 1
-          match circles.get? c' with
-          | none => throw s!"(K3) fails: an image lies on the circle about {elemToString c'}, \
-              which carries no arc"
-          | some tc =>
-            if tc.full then continue
-            let u' ← CertChecker.mkPt C c' (C.rotSym p k u1.sym)
-            let v' ← CertChecker.mkPt C c' (C.rotSym p k v1.sym)
-            if !(← CertChecker.covered C tc.arcs u' v') then
-              throw s!"(K3) fails: the image of a part of an arc on {elemToString c} under \
-                the rotation by ζ^{k} about {elemToString p} is not inside one arc of the \
-                circle about {elemToString c'}"
+          if !(← coveredArc C circles symmetric c' (C.rotSym p k u1.sym) (C.rotSym p k v1.sym))
+          then
+            throw s!"(K3) fails: the image of a part of an arc on {elemToString c} under \
+              the rotation by ζ^{k} about {elemToString p} is not inside one arc of the \
+              circle about {elemToString c'}"
   return nImg
 
 end RelChecker
@@ -428,14 +466,20 @@ def checkRelative (P : ParsedRel) (threads : Nat := 1) : Except String RelReport
     | some (true, _) => throw s!"circle {elemToString A.c} is listed as full and with arcs"
     | some (false, xs) => raw := raw.insert A.c (false, xs.push A)
     | none => raw := raw.insert A.c (false, #[A])
-  -- (K1)
-  for p in [C.left, C.right] do
+  -- (K1); in the symmetric mode only canonical circles may be listed, and `-1` stands for `±1`
+  for p in (if P.symmetric then [C.left] else [C.left, C.right]) do
     match raw.get? p with
     | some (true, _) => pure ()
     | _ => throw s!"(K1) fails: the boundary circle about {elemToString p} is not full"
+  if P.symmetric then
+    for (c, _) in raw.toList do
+      if (RelChecker.canonOf C c).1 != c then
+        throw s!"the circle about {elemToString c} is not the canonical one of its orbit"
   -- symbols, sorting, disjointness
   let mut circles : Std.HashMap Elem CheckCircle := {}
   let mut nArcs := 0
+  let mut nCirc := 0
+  let mut nListedArcs := 0
   let mut nTan := 0
   let mut cc := 0
   let mut ca := 0
@@ -445,9 +489,13 @@ def checkRelative (P : ParsedRel) (threads : Nat := 1) : Except String RelReport
     if (c != C.left && mL == 0) || (c != C.right && mR == 0) then nTan := nTan + 1
     let cw := F.conj c
     let canon := [c, F.neg c, cw, F.neg cw].all fun y ↦ y == c || !elemLexLt y c
+    -- the number of circles of `K'` this record stands for
+    let stab := ([0, 1, 2, 3].filter fun g ↦ RelChecker.sym C g c == c).length
+    let orbit := if P.symmetric then 4 / stab else 1
+    nCirc := nCirc + orbit
     if isFull then
       circles := circles.insert c { full := true, arcs := #[], meet := (mL, mR) }
-      nArcs := nArcs + 1
+      nArcs := nArcs + orbit
       if canon then
         cc := cc + 1
         ca := ca + 1
@@ -467,10 +515,22 @@ def checkRelative (P : ParsedRel) (threads : Nat := 1) : Except String RelReport
         if (← CertChecker.posCmp C s e s') != .lt then
           throw s!"arcs overlap or touch on the circle about {elemToString c}"
     circles := circles.insert c { full := false, arcs := sorted, meet := (mL, mR) }
-    nArcs := nArcs + sorted.size
+    nArcs := nArcs + orbit * sorted.size
+    nListedArcs := nListedArcs + sorted.size
     if canon then
       cc := cc + 1
       ca := ca + sorted.size
+  -- in the symmetric mode, the arcs listed on a circle are invariant under its stabiliser
+  if P.symmetric then
+    for (c, ck) in circles.toList do
+      if ck.full then continue
+      for g in [1, 2, 3] do
+        if RelChecker.sym C g c != c then continue
+        for (u, v) in ck.arcs do
+          let (_, a', b') := RelChecker.symArcOf C g c u.sym v.sym
+          if !(← CertChecker.covered C ck.arcs (← CertChecker.mkPt C c a')
+              (← CertChecker.mkPt C c b')) then
+            throw s!"the arcs on {elemToString c} are not invariant under its stabiliser"
   -- (K2): the window boundary arcs
   let mut nBd := 0
   for cs in centres do
@@ -485,18 +545,15 @@ def checkRelative (P : ParsedRel) (threads : Nat := 1) : Except String RelReport
       | none => pure ()
       | some (u, v) =>
         nBd := nBd + 1
-        match circles.get? f with
-        | none => throw s!"(K2) fails: no arc on the window circle about {elemToString f}"
-        | some fc =>
-          if !fc.full && !(← CertChecker.covered C fc.arcs u v) then
-            throw s!"(K2) fails: a boundary arc of the window on {elemToString f} is not covered"
+        if !(← RelChecker.coveredArc C circles P.symmetric f u.sym v.sym) then
+          throw s!"(K2) fails: a boundary arc of the window on {elemToString f} is not covered"
   -- (K3), circle by circle, in `threads` parallel tasks over a shared immutable store
   let items := circles.toArray
   let k3 (lo hi : Nat) : Except String Nat := do
     let mut nImg := 0
     for i in [lo:hi] do
       let some (c, ck) := items[i]? | throw "index out of range"
-      nImg := nImg + (← RelChecker.checkImages C circles centres crit rhoNum c ck)
+      nImg := nImg + (← RelChecker.checkImages C circles P.symmetric centres crit rhoNum c ck)
     return nImg
   let mut nImg := 0
   if threads ≤ 1 || items.size < 1000 then
@@ -506,15 +563,16 @@ def checkRelative (P : ParsedRel) (threads : Nat := 1) : Except String RelReport
       Task.spawn fun _ ↦ k3 (t * items.size / threads) ((t + 1) * items.size / threads)
     for t in tasks do nImg := nImg + (← t.get)
   let rep : RelReport :=
-    { circles := circles.size, fullCircles := P.full.size, arcs := nArcs, canonCircles := cc,
+    { circles := nCirc, fullCircles := P.full.size, arcs := nArcs, canonCircles := cc,
       canonArcs := ca, windows := crit.size, boundaryArcs := nBd, images := nImg,
       tangentCircles := nTan, windowPairs := pairs }
   match P.summary with
   | none => throw "missing summary line"
   | some (cs, as, ws) =>
-    if cs != rep.circles || as != rep.arcs || ws != rep.windows then
+    let listedArcs := nListedArcs + P.full.size
+    if cs != circles.size || as != listedArcs || ws != rep.windows then
       throw s!"summary line ({cs}, {as}, {ws}) disagrees with the recomputed counts \
-        ({rep.circles}, {rep.arcs}, {rep.windows})"
+        ({circles.size}, {listedArcs}, {rep.windows})"
   return rep
 
 end TDCSGCompute
