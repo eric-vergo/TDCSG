@@ -7,9 +7,9 @@ Authors: Eric Vergo, Claude
 - **(Stability)** A finite orbit stays unchanged for radii slightly above, so for each point the set of radii with an infinite orbit is either empty or a closed half-line $[r^*(p),\infty)$.
 - **(Boundary contact)** At $r^*(p)$ the infinite orbit either contains a point lying exactly on a boundary circle, or has, for every $\varepsilon>0$, infinitely many points strictly inside a disk within $\varepsilon$ of its boundary, and therefore an accumulation point on a boundary circle.
 
-**Status: all three are proved.** The paper's stated *reason* for monotonicity ("all group elements that affect it are still available") is **false as literally stated**: the same word acts differently at different radii, and there is no generator-preserving homomorphism between the groups at two radii (Example 3.2). The conclusion is nevertheless true, by a different argument.
+**Status: all three are proved.** The paper's stated *reason* for monotonicity ("all group elements that affect it are still available") is **imprecise**. Read at the level of group words it is false: the same word acts differently at different radii, and there is no generator-preserving homomorphism between the groups at two radii (Example 3.2). Its intended meaning, that every move applied to the point is still applicable, is made rigorous by the chain argument of Theorem 3.1. The proofs have been independently refereed. The report is `referee-report-thread1.md` in this directory, and §10 records its verdicts and what it did not check.
 
-The boundary-contact theorem does **not** say *where* the contact occurs. It does not show that the specific limit point used in the paper's closed-form radii lies on a boundary circle. It does not decide which alternative of the dichotomy occurs. And it does not show that the group-level critical radius has an infinite orbit (the paper's footnote 4). These remain open (§9).
+The boundary-contact theorem does **not** say *where* the contact occurs. It does not show that the specific limit point used in the paper's closed-form radii lies on a boundary circle. It does not decide which alternative of the dichotomy occurs. And it does not show that the group-level critical radius has an infinite orbit (the paper's footnote 4). These remain open (§10).
 
 ---
 
@@ -58,7 +58,7 @@ Since $A(D_1)=D_1$, each $a_{\boldsymbol r}$ is a bijection, and $a_{\boldsymbol
 
 The argument deletes the trivial steps first. That deletion is the essential point, and Example 3.2 shows why it is needed.
 
-**Example 3.2 (the paper's justification is literally false).** Take $n_1=n_2=4$, so $\zeta_k=-\mathrm i$, and $p=-1+\mathrm i/2$. Then $A(p)=-1+(-\mathrm i)(\mathrm i/2)=-\tfrac12$, and $|-\tfrac12-c_2|=\tfrac32$.
+**Example 3.2 (the paper's justification is imprecise).** Take $n_1=n_2=4$, so $\zeta_k=-\mathrm i$, and $p=-1+\mathrm i/2$. Then $A(p)=-1+(-\mathrm i)(\mathrm i/2)=-\tfrac12$, and $|-\tfrac12-c_2|=\tfrac32$.
 - At $r=1$: $p\in D_1$ and $-\tfrac12\notin D_2$, so $(b_1\circ a_1)(p)=-\tfrac12$.
 - At $r=2$: $(b_2\circ a_2)(p)=B(-\tfrac12)=1+(-\mathrm i)(-\tfrac32)=1+\tfrac32\mathrm i$.
 
@@ -68,7 +68,7 @@ More strongly, there is in general no homomorphism $G_r\to G_{r'}$ with $a_r\map
 - For $r<1$ the disks are disjoint, so $[a_r,b_r]=\mathrm{id}$.
 - For $r'=5$, the chain $0\xrightarrow{b^{-1}}1-\mathrm i\xrightarrow{a^{-1}}2\mathrm i\xrightarrow{b}3+\mathrm i\xrightarrow{a}-4\mathrm i$ uses only points inside the relevant disk: $|0-1|=1$, $|2-\mathrm i|=\sqrt5$, $|2\mathrm i-1|=\sqrt5$, $|4+\mathrm i|=\sqrt{17}$, all $\le5$. So $[a_5,b_5](0)=a_5b_5a_5^{-1}b_5^{-1}(0)=-4\mathrm i\neq0$.
 
-"Group elements" are therefore not "still available" in any literal sense. What survives is the chain statement of Theorem 3.1.
+So, read word by word, "all group elements that affect it are still available" is false. The charitable reading is that every individual move $z\mapsto A^{\pm1}z$ or $z\mapsto B^{\pm1}z$ applied along the way stays applicable at the larger radius. That reading is correct, and it is exactly the chain argument of Theorem 3.1.
 
 To pass from orbits to the group we need the following lemma. It is also proved, in the same words, in `theorem1-converse.md` (Proposition 4.2).
 
@@ -89,12 +89,12 @@ To pass from orbits to the group we need the following lemma. It is also proved,
 - $\mathcal I=\{r>0:G_r\text{ has an infinite orbit}\}$;
 - $\mathcal I(p)=\{r>0:O_r(p)\text{ infinite}\}$.
 
-By Theorems 3.1 and 3.4, $\mathcal F$ is a down-set (an interval $(0,r_c)$ or $(0,r_c]$), and $\mathcal I$ and each $\mathcal I(p)$ are up-sets. Define $r_c=\sup\mathcal F$, $r_c^{\rm orb}=\inf\mathcal I$, and $r^*(p)=\inf\mathcal I(p)$ (each is $+\infty$ when the set is empty, and $\sup\emptyset=0$).
+By Theorems 3.1 and 3.4, $\mathcal F$ is a down-set. It is an interval $(0,r_c)$ or $(0,r_c]$, or all of $(0,\infty)$, in which case $r_c=\infty$; this happens for $n_1,n_2$ both dividing 4 or both dividing 6, by `theorem1-converse.md`. $\mathcal I$ and each $\mathcal I(p)$ are up-sets. Define $r_c=\sup\mathcal F$, $r_c^{\rm orb}=\inf\mathcal I$, and $r^*(p)=\inf\mathcal I(p)$ (each is $+\infty$ when the set is empty, and $\sup\emptyset=0$).
 
 **Corollary 3.6.** The following hold.
 1. $r_c\le r_c^{\rm orb}\le r^*(p)$ for every $p$. The first inequality holds because an infinite orbit forces an infinite group, and the second because $\mathcal I(p)\subseteq\mathcal I$.
 2. $\mathcal I=\bigcup_p\mathcal I(p)$.
-3. For $r>r_c$ the group $G_r$ is infinite. So the paper's statement that $GG_n$ "can never go from infinite to finite as $r$ increases" is **true** (Theorem 3.4), although its argument is not.
+3. For $r>r_c$ the group $G_r$ is infinite. So the paper's statement that $GG_n$ "can never go from infinite to finite as $r$ increases" is **true** (Theorem 3.4), although its argument is imprecise (Example 3.2).
 4. By Proposition 3.3, $G_r$ is infinite exactly when its orbit sizes are unbounded. Whether "unbounded" can occur with every orbit finite, that is whether $r_c<r_c^{\rm orb}$ is possible, is the paper's open question and is not settled here.
 
 Since $G_r$ is finite for $r<1$ (disjoint disks), $r_c\ge1$.
@@ -116,7 +116,7 @@ Closedness is used in step 1: a point with $|y-c_k|=r_0$ is in $D_k(r_0)$ and st
 
 **Corollary 4.2 (the per-point critical radius is attained).** For every $p$, either $\mathcal I(p)=\emptyset$ or $\mathcal I(p)=[r^*(p),\infty)$. In other words, $O_{r^*(p)}(p)$ is infinite.
 
-*Proof.* $\mathcal I(p)$ is an up-set (Theorem 3.1). Suppose $r^*=r^*(p)<\infty$ and $O_{r^*}(p)$ were finite. Then Theorem 4.1 gives $O_r(p)=O_{r^*}(p)$, finite, for all $r\in[r^*,r^*+\delta)$. That contradicts $r^*=\inf\mathcal I(p)$. $\square$
+*Proof.* First, $r^*(p)\ge1>0$, so $O_{r^*(p)}(p)$ is defined: for $r\le1$ the disks are disjoint or tangent, and every orbit is finite (Proposition 7.1 of `theorem1-converse.md`). $\mathcal I(p)$ is an up-set (Theorem 3.1). Suppose $r^*=r^*(p)<\infty$ and $O_{r^*}(p)$ were finite. Then Theorem 4.1 gives $O_r(p)=O_{r^*}(p)$, finite, for all $r\in[r^*,r^*+\delta)$. That contradicts $r^*=\inf\mathcal I(p)$. $\square$
 
 **Remark 4.3 (footnote 4 of the paper).** The paper believes, without proof, that the group is infinite *at* the critical radius. Corollary 4.2 is the per-point version, and it is proved. The group-level version does not follow.
 - The number $\delta$ in Theorem 4.1 depends on $p$, so a uniform orbit bound at $r_0$ does not give one at $r_0+\delta$.
@@ -170,33 +170,36 @@ For $y\in\mathbb C$ and $k$ with $y\in D_k(r_0)$, the *inner depth* of $y$ in di
 The boundary convention matters, and the open-disk statements are slightly different. Replace $\le$ by $<$ in Definition 1.1 and Lemma 2.1. Theorem 3.1, Proposition 3.3 and Theorem 3.4 hold verbatim, with the same proofs ($|z-c_k|<r_k\le r_k'$).
 
 **Proposition 6.1 (open disks).**
-1. If $O_{r_0}(p)$ is finite, then $O_r(p)=O_{r_0}(p)$ for $r\in(r_0-\delta',r_0]$, where $\delta'=\min\{r_0-|y-c_k| : y\in O_{r_0}(p),\ |y-c_k|<r_0\}$.
+1. If $O_{r_0}(p)$ is finite, then $O_r(p)=O_{r_0}(p)$ for $r\in(\max(0,r_0-\delta'),r_0]$. Here $\delta'=\min\{r_0-|y-c_k| : y\in O_{r_0}(p),\ |y-c_k|<r_0\}$, with $\delta'=+\infty$ when this set is empty (for example when $p$ lies in neither open disk).
 2. If $O_{r_0}(p)$ is finite and $O_r(p)\neq O_{r_0}(p)$ for $r$ arbitrarily close above $r_0$, then $O_{r_0}(p)$ contains a point of $\partial D_1(r_0)\cup\partial D_2(r_0)$.
 3. If $O_{r_0}(p)$ is infinite and $O_r(p)$ is finite for all $r<r_0$, then case (A) of Theorem 5.1 holds. Here an orbit point inside a disk is strictly inside, so the infimum of inner depths is never attained. Also $O_{r_0}(p)=\bigcup_{r<r_0}O_r(p)$.
 
 *Proof.*
-1. For $r\in(r_0-\delta',r_0]$: points with $|y-c_k|<r_0$ satisfy $|y-c_k|\le r_0-\delta'<r$, and points with $|y-c_k|\ge r_0$ are not in the open disk of radius $r\le r_0$. So membership agrees, and the argument of Theorem 4.1 applies.
-2. If no orbit point lies on a circle, let $\delta''$ be the minimum of $|y-c_k|-r_0$ over orbit points with $|y-c_k|>r_0$. Membership in the open disks then agrees for $r\in[r_0,r_0+\delta'')$, and the argument of Theorem 4.1 gives $O_r(p)=O_{r_0}(p)$ there.
+1. Let $S=O_{r_0}(p)$ and $r\in(\max(0,r_0-\delta'),r_0]$.
+   - *Same membership.* Points $y\in S$ with $|y-c_k|<r_0$ satisfy $|y-c_k|\le r_0-\delta'<r$. Points with $|y-c_k|\ge r_0$ are not in the open disk of radius $r\le r_0$. So membership of points of $S$ is the same at $r$ and at $r_0$, and by Lemma 2.1 each generator at radius $r$ agrees on $S$ with the corresponding generator at $r_0$.
+   - *$S\subseteq O_r(p)$.* Every $r_0$-chain from $p$ stays inside $S$, so by the previous point it is also an $r$-chain.
+   - *$O_r(p)\subseteq S$.* This is monotonicity (Theorem 3.1), since $r\le r_0$.
+2. If no orbit point lies on a circle, let $\delta''$ be the minimum of $|y-c_k|-r_0$ over orbit points with $|y-c_k|>r_0$, with $\delta''=+\infty$ if there are none. Membership in the open disks then agrees for $r\in[r_0,r_0+\delta'')$, and the argument of Theorem 4.1 applies there: the generators at $r$ agree with those at $r_0$ on $S$, so $S$ is invariant at radius $r$ and $O_r(p)\subseteq S$, while monotonicity ($r\ge r_0$) gives $S\subseteq O_r(p)$.
 3. Part 1 of Theorem 5.1 goes through with open disks. Non-trivial chain steps start strictly inside, so the argument of Theorem 5.1(3) applies without assumption. $\square$
 
 So with open disks the critical behaviour is "accumulation from inside" (case (A)) whenever the orbit is infinite at its critical radius. With closed disks, Theorem 4.1 makes the critical radius always carry an infinite orbit, at the price of the extra alternative (B).
 
 ---
 
-## 7. Other one-parameter families
+## 7. Other one-parameter families (sketch)
 
-The proofs use only coordinatewise monotonicity and one-sided continuity of the radii. Let $t\mapsto\boldsymbol r(t)=(r_1(t),r_2(t))$ be non-decreasing in each coordinate.
+This section is a **sketch**. It is not among the results claimed in the status paragraph or in §10. The proofs above use only coordinatewise monotonicity and one-sided continuity of the radii. Let $t\mapsto\boldsymbol r(t)=(r_1(t),r_2(t))$ be non-decreasing in each coordinate.
 - Theorem 3.1, Proposition 3.3 and Theorem 3.4 hold along the family.
 - If each $r_k$ is right-continuous, Theorem 4.1 and Corollary 4.2 hold, with $\delta$ chosen so that $r_k(t)<r_k(t_0)+\delta$ for $t$ near $t_0$.
-- If each $r_k$ is left-continuous at $t_0$, Theorem 5.1 holds with the inner depths taken only over disks $k\in J=\{k: r_k(t)<r_k(t_0)\text{ for all }t<t_0\}$. A disk $k\notin J$ has constant radius on some $[t_1,t_0]$ (by monotonicity), so membership in it never changes. For example, with $r_1$ fixed and $r_2$ varying, contact is with $\partial D_2$ only.
+- If each $r_k$ is left-continuous at $t_0$, and the orbit is infinite at $t_0$ and finite for all $t<t_0$, then Theorem 5.1 holds with the inner depths taken only over disks $k\in J=\{k: r_k(t)<r_k(t_0)\text{ for all }t<t_0\}$. A disk $k\notin J$ has constant radius on some $[t_1,t_0]$ (by monotonicity), so membership in it does not change there. In part 1 one chooses $t\in[t_1,t_0)$ with $r_k(t)>r_k(t_0)-\Delta$ for $k\in J$, which left-continuity allows; then $r_k(t)=r_k(t_0)$ for $k\notin J$. For example, with $r_1$ fixed and $r_2$ varying, contact is with $\partial D_2$ only.
 
 ---
 
-## 8. Relation to the working sketch
+## 8. Relation to `analytic-continuation.md`
 
-- The proposition in §2.3 of the working note `twodisk_continuation.md` ("Cauchy–Hadamard analogue") is **correct**. It is Theorem 5.1(1), and its proof is the one given there.
-- The note's remark that the set of radii with infinite orbit is "an open set plus radii where the orbit touches the boundary", of the form $(r^*,\infty)$ or $[r^*,\infty)$, is weaker than the truth for closed disks: it is always $[r^*,\infty)$ (Corollary 4.2).
-- The note relies on "the paper's monotonicity of orbit sizes". That monotonicity is true (Theorem 3.1), but not for the paper's reason (Example 3.2).
+- The proposition in §2.3 of [`analytic-continuation.md`](../analytic-continuation.md) (the "Cauchy–Hadamard theorem for two-disk orbits") is **correct**. It is Theorem 5.1(1) here, with the same proof.
+- That section's remark that the set of radii with an infinite orbit has the form $(r^*,\infty)$ or $[r^*,\infty)$ is weaker than the truth for closed disks: it is always $[r^*,\infty)$ (Corollary 4.2).
+- That section relies on "the paper's monotonicity of orbit sizes". That monotonicity is true (Theorem 3.1); the paper's justification is imprecise (Example 3.2).
 - Group-level monotonicity, which the paper's definition of the critical radius needs, is proved here via Proposition 3.3 (Theorem 3.4).
 
 ---
@@ -215,15 +218,20 @@ The scripts were scratch work and are not part of this repository.
 
 ## 10. Status
 
+Verdicts are those of the independent referee (`referee-report-thread1.md`), who also re-ran the computations of §9 and wider ones (orders $n=3,4,5,6$, boundary starting points, open disks) with no counterexample.
+
 | Statement | Status |
 |---|---|
-| Theorem 3.1: orbits non-decreasing (as sets) in the radii, any n₁, n₂ | proved |
-| Example 3.2: words act differently, and no generator-preserving homomorphism exists in general | proved; the paper's stated reason is false |
-| Theorem 3.4: G finite at r′ ⇒ G finite at r ≤ r′ (so r_c is well defined) | proved |
-| Theorem 4.1, Corollary 4.2: finite orbits are right-stable; 𝓘(p) = [r*(p), ∞) (closed disks) | proved |
-| Theorem 5.1: boundary contact dichotomy (A)/(B) at r*(p); (A) and blow-up of \|O_r(p)\| if (B) fails | proved |
-| Proposition 6.1: open-disk version, always (A) | proved |
+| Theorem 3.1: orbits non-decreasing (as sets) in the radii, any n₁, n₂ | proved; refereed correct |
+| Example 3.2: words act differently, and no generator-preserving homomorphism exists in general | proved; refereed correct; the paper's stated reason is imprecise |
+| Proposition 3.3, Theorem 3.4, Corollary 3.6: G finite at r′ ⇒ G finite at r ≤ r′ (so r_c is well defined) | proved; refereed correct |
+| Theorem 4.1, Corollary 4.2: finite orbits are right-stable; 𝓘(p) = [r*(p), ∞) (closed disks) | proved; refereed correct |
+| Theorem 5.1, Corollary 5.2: boundary contact dichotomy (A)/(B) at r*(p); (A) and blow-up of \|O_r(p)\| if (B) fails | proved; refereed correct |
+| Proposition 6.1: open-disk version, always (A) | proved; refereed correct |
+| §7: other one-parameter families | sketch only; not claimed |
 | Group-level footnote 4 (G infinite at r_c), and attainment of r_c^orb | open |
 | r_c = r_c^orb (infinite group ⇒ infinite orbit) | open (paper's open question) |
 | Location of the contact point; the paper's "limit point on the boundary" assumption | not implied; open |
 | Whether case (B) without (A) can occur | open |
+
+Not independently checked by the referee: computations for orders other than $n\in\{1,\dots,6\}$, and the comparisons of §8 (made against a note the referee did not have).
