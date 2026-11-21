@@ -5,7 +5,10 @@ Authors: Eric Vergo and Claude (Anthropic).
 This note explores research directions. It compares the two-disk systems GG_n(r) with analytic
 continuation and with Hecke groups. Labels, notation and the closed forms of r_c² follow
 [`overview.md`](overview.md); a proof labelled [proved] here is a sketch or short argument written
-out in this note and not refereed.
+out in this note and not refereed. The full proofs of §1.3 and of the boundary-contact statement
+are [`proofs/theorem1-converse.md`](proofs/theorem1-converse.md) and
+[`proofs/boundary-contact.md`](proofs/boundary-contact.md), both refereed and formalized in Lean
+(`TDCSG/Statements.lean`).
 
 Further notation:
 - A(z) = ζ⁻¹(z + 1) − 1 and B(z) = ζ⁻¹(z − 1) + 1 are the *global* rotations about −1 and +1.
@@ -119,7 +122,8 @@ every r.
 
 Step 2 needs care and is the step to check first. The discreteness argument of
 [`arithmetic.md`](arithmetic.md) §0 gives the same conclusion from the lattice side; the written proof
-in [`proofs/`](proofs/) is meant to merge the two.
+[`proofs/theorem1-converse.md`](proofs/theorem1-converse.md) merges the two (refereed; Lean:
+`TDCSG.Statements.finite_GG`, with lcm(n₁, n₂) ∈ {1, 2, 3, 4, 6}).
 
 The same argument works in any geometry: **a piecewise truncation of a discrete group is finite.** An
 infinite compound group therefore certifies that its global group is not discrete. In a precise
@@ -242,8 +246,10 @@ Remarks.
 - This is the analogue of **"every power series has a singularity on its circle of convergence"**. It
   turns half of the paper's unproven assumption (the limit point lies on the disk boundary at r_c)
   into a theorem: some accumulation point on the boundary exists. It does *not* show that the specific
-  limit point of the paper's segment construction is on the boundary, which is what the closed-form
-  radii need.
+  limit point of the paper's segment construction is on the boundary. For n = 8, 12 the closed-form
+  radii no longer need that: infinitude at and above them is proved directly
+  ([`proofs/critical-radius-n8.md`](proofs/critical-radius-n8.md),
+  [`proofs/critical-radius-n12.md`](proofs/critical-radius-n12.md), also in Lean).
 - The **Pringsheim/Landau refinement** would say *where* on the circle. For a series with
   non-negative coefficients the singularity is at the positive real point, because
   |Σ a_k z^k| ≤ Σ a_k |z|^k. The two-disk analogue would be accumulation at a canonical point of the
@@ -403,6 +409,11 @@ hence T-periodic.
   Series*. From memory, to be checked.)
 
 [conjecture, with a sketch] **Analytic threshold r_A(n).**
+- Now settled for invariant real-analytic functions in
+  [`proofs/analytic-radius.md`](proofs/analytic-radius.md) (refereed): for n = 5 and n ≥ 7 they are
+  forced to be constant exactly when r > r_A(n) = sec(π/n), and r_A < r_c holds for n = 5, 8, 10, 12
+  modulo the certified computations of [`certificates.md`](certificates.md). The sketch below is
+  the original heuristic.
 - For r > 1 the domain int(D_L ∪ D_R) is connected and f is real-analytic.
 - Suppose P_r contains a translation germ τ_t on an open set W. Then f(z + t) − f(z) solves Helmholtz
   on a connected domain and vanishes on W, so it vanishes on the whole connected component of its

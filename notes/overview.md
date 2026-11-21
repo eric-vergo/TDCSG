@@ -6,7 +6,9 @@ This note collects what is currently known or suspected about the two-disk syste
 *Two-Disk Compound Symmetry Groups* (Hearn, Kretschmer, Rokicki, Streeter, Vergo, arXiv:2302.12950)
 beyond the paper itself, and sets out a research program. The detailed material is in
 [`arithmetic.md`](arithmetic.md), [`analytic-continuation.md`](analytic-continuation.md) and
-[`experiments.md`](experiments.md). Written proofs are in [`proofs/`](proofs/).
+[`experiments.md`](experiments.md). Written proofs, each with an independent referee report, are in
+[`proofs/`](proofs/). The current status of every result (proved in Lean, refereed, certified,
+computed, open) is summarized in the Results section of the [README](../README.md).
 
 ## Conventions
 
@@ -14,7 +16,9 @@ beyond the paper itself, and sets out a research program. The detailed material 
 
 Each claim carries one label:
 
-- **[proved]**: a short argument has been written out (by a model; not independently refereed);
+- **[proved]**: an argument has been written out. Where a full proof exists in [`proofs/`](proofs/)
+  it has been independently refereed, and the main ones are formalized in Lean (§2, §4); a bare
+  [proved] in the exploratory notes marks a sketch;
 - **[computed]**: found by computation;
 - **[classical]**: a known theorem applied to this setting;
 - **[conjecture]**: precise and testable, not tested;
@@ -28,8 +32,10 @@ membership in the closed disks in double-precision floating point, with a tolera
 boundary ties. Results that sit exactly on a threshold (r = g(n), the second threshold r₁, the count
 n² − 3n + 1, boundary contact) depend on how points on a boundary circle are classified, so they are
 preliminary until an exact orbit engine (membership decided by the sign of |z ∓ 1|² − r² computed
-exactly in ℤ[ζ_n]⁺) has reproduced them. That engine is planned in Lean. Values of r_c(n) quoted
-without that mark are from the paper's Appendix A (six decimals, good to about 5e-6).
+exactly in ℤ[ζ_n]⁺) has reproduced them. That engine is `TDCSGCompute/` (the `tdcsg-orbit`
+executable); [`engine.md`](engine.md) lists the numbers it has reproduced, and numbers not listed
+there remain preliminary. Values of r_c(n) quoted without that mark are from the paper's Appendix A
+(six decimals, good to about 5e-6).
 
 ### Notation
 
@@ -39,7 +45,9 @@ without that mark are from the paper's Appendix A (six decimals, good to about 5
 - a(z) = ζ⁻¹(z + 1) − 1 on D_L(r) and the identity elsewhere; b(z) = ζ⁻¹(z − 1) + 1 on D_R(r) and the
   identity elsewhere. Both rotate clockwise by 2π/n. GG_n(r) = ⟨a, b⟩. These are `TDCSG.genA` and
   `TDCSG.genB` in the Lean sources.
-- r_c(n) is the critical radius: the least r at which GG_n(r) is infinite.
+- r_c(n) is the critical radius: the least r at which GG_n(r) is infinite. For n = 5, 8, 10, 12 the
+  notes in [`proofs/`](proofs/) write r_c for the closed form below and r_crit(n) for the critical
+  radius, since their equality is not proved.
 - g(n) = |2 − ζ_n| = √(1 + 8 sin²(π/n)).
 
 ### Closed forms of r_c²
@@ -54,8 +62,10 @@ The four known closed forms are written throughout these notes as elements a + b
 | 12 | 40 − 22√3 | 2 · (7 − 2√3) · (2 − √3) | x² − 80x + 148 |
 
 The product forms show the scale units √2 − 1 = tan(π/8) and 2 − √3 = tan(π/12) as factors. The
-closed forms for n = 8 and 12 rest on the paper's assumption that a certain limit point lies on a disk
-boundary; see §4.
+paper derived the closed forms for n = 8 and 12 from the assumption that a certain limit point lies
+on a disk boundary. For all four n, GG_n(r) is now proved infinite at and above the closed form, in
+writing and in Lean, so each closed form is a proved upper bound for the critical radius; that it is
+the critical radius is open (§4).
 
 ## 1. Summary
 
@@ -63,16 +73,18 @@ boundary; see §4.
    with t in the ideal (1 − ζ_n) of ℤ[ζ_n]. So GG_n(r) is the discrete group μ_n ⋉ (1 − ζ_n), cut
    down by a disk-shaped window at one archimedean place. An orbit is finite exactly when its images
    under the other complex embeddings of ℚ(ζ_n) stay bounded.
-2. **The dynamics picks out the unit group** [computed, preliminary]. For n = 5, 8, 10, 12 the orbit
+2. **The dynamics picks out the unit group** [computed]. For n = 5, 8, 10, 12 the orbit
    size grows like a power of 1/(r_c − r) with a log-periodic oscillation. The period is the
-   logarithm of a unit: φ³, 1 + √2, φ³, 2 + √3. Three independent computations agree on these units.
+   logarithm of a unit: φ³, 1 + √2, φ³, 2 + √3. Three independent computations agree on these units,
+   and the exact engine reproduces the unit ratios ([`engine.md`](engine.md)).
 3. **Through the units, the system carries L-values at s = 1** [classical]. For D = 5, 8, 12,
    log ε_D = (√D/2)·L(1, χ_D) by the class number formula. Experiments found no trace of L-values
    beyond what the regulator already encodes.
 4. **The most valuable outputs concern the two-disk systems themselves**: a proof of the half of
    Theorem 1 that the paper omits, a boundary-contact theorem at the critical radius, a baseline
    formula for r_c(n), a rank explanation for the n = 7 anomaly, and a possible issue with the large-n
-   entries of the critical-radius table (§5).
+   entries of the critical-radius table (§5). §7 records which of these are now proved, computed or
+   open.
 
 ## 2. The arithmetic structure of GG_n(r)
 
@@ -83,8 +95,10 @@ Details in [`arithmetic.md`](arithmetic.md).
   GG_n(r) is the cut-down of that group to the two disks.
 - **Finiteness criterion** [proved]. An orbit is finite if and only if the Galois conjugates of its
   translation parts stay bounded.
-- **The omitted half of Theorem 1** [proved]. If lcm(n₁, n₂) ∈ {2, 3, 4, 6}, the ambient group is a
-  discrete group of plane motions, so its cut-down to two disks is finite for every r. The underlying
+- **The omitted half of Theorem 1** [proved]. If lcm(n₁, n₂) ∈ {1, 2, 3, 4, 6}, the ambient group is
+  a discrete group of plane motions, so its cut-down to two disks is finite for every r. Refereed
+  proof: [`proofs/theorem1-converse.md`](proofs/theorem1-converse.md); Lean:
+  `TDCSG.Statements.finite_GG`. The underlying
   reason is that ℚ(cos 2π/n) = ℚ, i.e. the unit group of ℤ[ζ_n] is finite. This is the
   crystallographic restriction read as Dirichlet's unit theorem in rank zero.
 - **Galois acts on the family, not on one system** [proved]. Conjugation permutes φ(n)/2 versions of
@@ -122,9 +136,13 @@ Details in [`analytic-continuation.md`](analytic-continuation.md).
 
 - **Boundary contact** [proved]. If a point's orbit is infinite at radius r₀ and finite at radii
   arbitrarily close below r₀, the orbit accumulates on a boundary circle from inside. This is the
-  analogue of "a power series has a singularity on its circle of convergence". It does not show that
-  the paper's specific limit point lies on the boundary, which the closed-form radii for n = 8 and 12
-  need.
+  analogue of "a power series has a singularity on its circle of convergence". Refereed proof:
+  [`proofs/boundary-contact.md`](proofs/boundary-contact.md); Lean:
+  `TDCSG.Statements.touchesBoundary_or_accumulatesInside` and its companions. It does not show
+  where the contact occurs. For n = 8 and 12 the closed-form radii no longer depend on that: the
+  infinite orbits are exhibited directly
+  ([`proofs/critical-radius-n8.md`](proofs/critical-radius-n8.md),
+  [`proofs/critical-radius-n12.md`](proofs/critical-radius-n12.md)).
 - **Hecke groups** [proved/classical]. Adding the half-turn that swaps the disks gives a Euclidean
   Hecke group; for n = 3, 6 it is the (2,3,6) triangle group. The set {2, 3, 4, 6} also marks the
   arithmetic Hecke groups, for the same reason (ℚ(cos 2π/n) = ℚ), and the finiteness criterion has
@@ -132,11 +150,17 @@ Details in [`analytic-continuation.md`](analytic-continuation.md).
 - **The analogy inverts** [conjecture]. For functions invariant under both disk rotations, the
   identity theorem spreads the two local symmetries into the dense global group. Such functions
   should be forced to vanish above a radius r_A < r_c. So GG_n(r) staying finite up to r_c measures
-  the *failure* of analytic continuation for piecewise maps. The gap r_c − r_A is computable.
+  the *failure* of analytic continuation for piecewise maps. The threshold is now proved:
+  r_A(n) = sec(π/n) for n = 5 and n ≥ 7 ([`proofs/analytic-radius.md`](proofs/analytic-radius.md),
+  refereed); the group inside the gap (r_A, r_c) is computed in
+  [`gap-structure.md`](gap-structure.md).
 
 ## 5. Findings about the critical-radius table
 
-Details in [`experiments.md`](experiments.md). All findings in this section are preliminary.
+Details in [`experiments.md`](experiments.md). The findings in this section come from the
+floating-point scripts; the exact engine's re-checks are in [`engine.md`](engine.md), and the
+large-n question is followed up in [`large-n-table.md`](large-n-table.md), where it remains
+undetermined.
 
 - **Baseline** [computed]. r_c(n) ≥ g(n) for all 95 table entries. g(n) is the radius at which the two
   n-gon orbits of the origin first touch. For n ≥ 79 every entry equals g(n) to rounding, except
@@ -168,19 +192,28 @@ connection is thin, so this repository concentrates on the two-disk mathematics.
 
 ## 7. Research program
 
-1. **Write up and formalize the two proved results**: the omitted half of Theorem 1 and the
-   boundary-contact theorem. Written proofs go in [`proofs/`](proofs/); Lean statements and proofs in
-   `TDCSG/`.
-2. **Build an exact orbit engine** that decides disk membership exactly, and use it to confirm or
-   correct every preliminary number in these notes.
+Status of each item, as of the notes in this repository (details in the README's Results section):
+
+1. **Write up and formalize the omitted half of Theorem 1 and the boundary-contact theorem.**
+   Done: refereed proofs in [`proofs/`](proofs/), Lean statements in `TDCSG/Statements.lean`.
+2. **Build an exact orbit engine** and use it to confirm or correct the preliminary numbers. The
+   engine exists (`TDCSGCompute/`, [`engine.md`](engine.md)); the numbers it has reproduced, and the
+   one remark it corrected, are listed there. Numbers not listed remain preliminary.
 3. **Settle the large-n table question** (§5): find an infinite orbit at r ≈ g(n) for some n ≥ 30, or
-   revise what the table reports.
+   revise what the table reports. Pursued in [`large-n-table.md`](large-n-table.md); undetermined.
 4. **Test the rank conjecture** with deep exact orbits for n = 7, 9, 11, 13: do the scale ratios form a
-   two-unit regulator lattice?
-5. **Prove periodic renormalization for φ(n) = 4**, which would prove the closed forms for n = 8, 12
-   (and the limit-point assumption) and identify the scale unit.
-6. **Compute the orbit-counting zeta function** and its poles for n = 5, 8, 12.
-7. **Measure r_A against r_c** (§4).
+   two-unit regulator lattice? Exact threshold data in [`rank-conjecture.md`](rank-conjecture.md);
+   the conjecture is untested in that form.
+5. **Prove the closed forms for φ(n) = 4.** Infinitude at and above the closed forms is proved for
+   n = 5, 8, 10, 12, in writing and in Lean, so the closed forms are upper bounds for the critical
+   radius. Finiteness is proved below the closed forms only down to the certified radii of
+   [`certificates.md`](certificates.md); the remaining windows, and the renormalization that would
+   close them, are open ([`proofs/sharp-lower-bound-n5.md`](proofs/sharp-lower-bound-n5.md),
+   [`proofs/sharp-lower-bound-n8.md`](proofs/sharp-lower-bound-n8.md),
+   [`proofs/sharp-lower-bound-combined.md`](proofs/sharp-lower-bound-combined.md)).
+6. **Compute the orbit-counting zeta function** and its poles for n = 5, 8, 12. Not started.
+7. **Measure r_A against r_c** (§4). Done for r_A: r_A(n) = sec(π/n), proved and refereed; r_A < r_c
+   for n = 5, 8, 10, 12 modulo the certified computations.
 8. **Assemble over n**: look for a single object built from all GG_n whose partition function is an
    Euler product. This is speculative.
 
@@ -192,6 +225,9 @@ connection is thin, so this repository concentrates on the two-disk mathematics.
   n = 79 and n = 100 by hand.
 - Orbit computations stored points exactly in ℤ[ζ_n] but tested disk membership in floating point;
   two independent scripts agree on the units. See "Preliminary numbers" above.
-- The two proofs in §2 and §4 were each written by one model and have not been refereed.
+- The proofs cited in §2 and §4 have been independently refereed
+  ([`proofs/referee-report-thread1.md`](proofs/referee-report-thread1.md)) and formalized in Lean;
+  the sketches in [`analytic-continuation.md`](analytic-continuation.md) and
+  [`arithmetic.md`](arithmetic.md) are not refereed as such.
 - Literature citations marked "from memory, to be checked" need checking before use.
 - Everything labelled [conjecture] or [analogy] is untested.
