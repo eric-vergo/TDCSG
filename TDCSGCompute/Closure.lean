@@ -503,7 +503,8 @@ def certify (F : CycField) (r2 : RadiusSq) (opts : CloseOptions)
   | .smallRadius => return { result := res, summary := none, text := none,
                              reason := "r ≤ 1 (the certificate theorem needs r > 1)" }
   | .cap what => return { result := res, summary := none, text := none,
-                          reason := s!"cap reached ({what}); nothing is claimed" }
+                          reason := s!"cap reached ({what}); nothing is claimed (raise \
+                            --max-pieces, --max-circles or --max-seconds)" }
   | .tangency c p =>
     let reason := s!"tangency: the circle about {pr c} is tangent to the boundary circle \
       about {pr p}, so (C3) fails"

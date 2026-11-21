@@ -740,7 +740,8 @@ def certifyRelative (F : CycField) (r2 : RadiusSq) (w : Elem) (opts : CloseOptio
   match res.status with
   | .cap what =>
     return { WS, result := res, summary := none, coinc := none, tangentAtCritical := tc,
-             text := none, reason := s!"cap reached ({what}); nothing is claimed" }
+             text := none, reason := s!"cap reached ({what}); nothing is claimed (raise \
+               --max-pieces, --max-circles or --max-seconds)" }
   | .closed =>
     let S := relSummarize F res.store sym
     let c4 ← relC4 G res.store

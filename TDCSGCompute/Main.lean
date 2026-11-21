@@ -125,7 +125,6 @@ def usage : String :=
   "                    [--out FILE] [caps]\n" ++
   "  tdcsg-orbit check-relative-certificate FILE [--threads T]\n" ++
   "  tdcsg-orbit validity-interval FILE [--threads T] [--no-check] [--out FILE]\n" ++
-  "  tdcsg-orbit validity-interval FILE [--threads T] [--no-check] [--out FILE]\n" ++
   "  tdcsg-orbit info -n N\n" ++
   "  tdcsg-orbit --selftest\n" ++
   "SPEC: touch | closed | r1 | fund, optionally followed by +q or -q; re:b0,b1,...;\n" ++
