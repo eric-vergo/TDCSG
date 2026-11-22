@@ -201,6 +201,25 @@ and [`open-problem-critical-radius.md`](open-problem-critical-radius.md).
     realize the rotation of the long segment $[-\varphi^2E,\varphi^2E]$. Redo the token-component analysis
     of the chaining note with the $u$-tokens and their mirror images; the components may be simpler,
     and the offset-line holes of $M$ are one-sided at $-\varphi^{-1}$ and $\pm\varphi^2$.
+35. **Fences for the connectors.** The cut-off of token components
+    ([`proofs/sharp-bound-n5-token-components.md`](proofs/sharp-bound-n5-token-components.md)) comes from
+    a wall: the $\bar E$-line through $-F$ carries no forward $E$-step below $r_c$, up to dead ends. Look
+    for walls of the same kind for the full group in the lifted state space: sets of states, defined by
+    position relative to finitely many lines through corners, that no letter crosses except through dead
+    ends. A wall family with spacing $O(1/\delta)$ in each of the five rotated frames would give (K).
+36. **The symmetry behind the equal fence widths.** The critical width $\kappa(\delta)\delta$ of the
+    fence is the same, to six digits at every $\delta$ tested, for the corner $-F$ (domains $U_1,U_2$) and
+    for the corner $X^\ast=-\varphi^2E+2\bar E$ (domain $\overline{U_2}$). Find the isometry of the system
+    that carries one configuration to the other; it may organize all corners into a few classes.
+37. **A sharper constant in (T).** The proved bound is $72.07/\delta$, the data reach $34.3/\delta$
+    and index ranges $3.0/\delta$ against the proved $5.24/\delta$. Combine the forward fence at $-F$
+    with the backward fence at $+F$ (its image under $z\mapsto-z$) and with the row holes of the chaining
+    note's Theorem 1, which are wider than the fence on rows near the chord.
+38. **Box types for a renormalization of (K).** Every token component sits in one box of the grid of
+    fence columns and rows of its seed; box widths are golden-rotation return times to an arc of length
+    $\kappa_0\delta$, whose zoomed return map is exactly $\varepsilon^2$-periodic. Compute the graph of
+    boxes joined by connectors along an orbit, in zoomed coordinates, at two levels $\delta$ and
+    $\varepsilon^2\delta$, and test whether it is the same finite graph up to $O(\delta)$.
 
 ## Formalization
 
