@@ -2,13 +2,15 @@
 
 Authors: Eric Vergo, Claude
 
+**Review.** Independently refereed: [`referee-report-sharp-bound-n5-invariant.md`](referee-report-sharp-bound-n5-invariant.md). Verdict: Propositions 1, 2, Lemmas 4–6 and Theorem 7 correct (Lemma 4, Lemma 6 and Theorem 7 after minor fixes: a constant rounded down, a missing step, the domain of the run and the range $\delta>2/5$); Proposition 3 correct after a wording fix; Corollary 11 correct after restricting "Conjecture A" to $0<\delta\le\delta_0$, which is all that (B) needs. Conjecture B$^\ast$ is restated in the structural form that the evidence supports; in the form "a sum of arbitrary chord runs" it was equivalent to Conjecture A. The single-run comparison of item 4 rules out only the constant 1, not Conjecture B of line 1 with a constant. The referee's exact re-implementation reproduces Computations 2.1, 8, 9 and 10 at the radii checked, and finds the run patterns of item 4 unchanged under $\delta\mapsto\varphi^{-3}\delta$ (and $\varphi^{-6}\delta$ for $\delta=1/30$).
+
 **What is established and what is not.** Let $r_c=\sqrt{3+\varphi}$ and $\delta=r_c^2-r^2$. **(B), finiteness of $GG_5(r)$ for every $r<r_c$, is not proved here; it remains open.** This note pursues (B) through invariants and controlled quantities, following the reshaping of the line by `sharp-bound-n5-conjugate.md` ("line 1"). What it establishes:
 
 1. **Proved: the exact invariants are useless for (B).** Each letter conserves one element of $\mathbb Z[\varphi]$, the squared distance to its centre, in both embeddings (Proposition 1). The only congruence invariant of lattice orbits coming from the ambient group is a class in a set of 20 elements (Proposition 2), and no finer congruence invariant appears in the data (Computation 2.1). Every invariant, symmetry or reversing involution that is also present at $r_c$ is compatible with an infinite group, so it cannot by itself prove (B) (Proposition 3). Line (a) and line (c) of the brief are therefore closed in the negative.
-2. **Proved: every chord-type run is cut off at scale $1/\delta$, uniformly over all starting points of the plane** (Theorem 7). A *chord run* is an orbit segment along which the three critical words of Theorem A act as translations, at any perpendicular offset from the critical chord. For $0<\delta\le 2/5$ every chord run has at most $5.86/\delta$ steps, and every word map along it has internal translation at most $58.4/\delta+9.6$. The same holds for the four symmetric images of the mechanism. Line 1 proved the cut-off only for the orbit of $0$; the new ingredient is an exact identity at the breakpoint $-\varphi^{-1}$ (Lemma 5): the two tight test centres there are symmetric about the breakpoint, so a bad interval of length $2\delta/\sqrt5$ exists at every offset.
+2. **Proved: every chord-type run is cut off at scale $1/\delta$, uniformly over all starting points $sE+hN$, $s\in[-1,1)$, $h\in\mathbb R$** (Theorem 7). A *chord run* is an orbit segment along which the three critical words of Theorem A act as translations, at any perpendicular offset from the critical chord. For $0<\delta\le 2/5$ every chord run has at most $5.86/\delta$ steps, and every word map along it has internal translation at most $58.4/\delta+9.6$. The same holds for the four symmetric images of the mechanism. Line 1 proved the cut-off only for the orbit of $0$; the new ingredient is an exact identity at the breakpoint $-\varphi^{-1}$ (Lemma 5): the two tight test centres there are symmetric about the breakpoint, so a bad interval of length $2\delta/\sqrt5$ exists at every offset.
 3. **Computed (exact orbits): conjugate growth comes from chord tokens.** On the shortest words realizing the largest internal translations of 107 orbits at ten radii ($\delta$ from $1/10$ down to level 2), at least $90\%$ of the letters belong to the twelve chord tokens (the three critical words and their images under $z\mapsto\bar z$, $z\mapsto-z$). These words consist of at most 8 runs; the other letters contribute at most $24.73$ to the internal translation (Computation 10). Exact orbits give $\delta M(r)\ge16.9$ to $24.7$ (Computation 9).
-4. **Computed: one run is not enough.** At six of the ten radii the best single chord run accounts for the largest internal translation found, to within $1\%$ (Computation 8). At $\delta=1/30$ and $1/55$, words that chain several runs on the two chord lines $\mathbb RE$ and $\mathbb R\bar E$ exceed the best single run by factors $1.12$ and $1.45$. So the strong form of Conjecture B of line 1, "the chord alone dominates", fails for $M(r)$ when the chord is restricted to one run. The data support the refined form "chord tokens alone produce the growth" (item 3).
-5. **Conjectured:** Conjecture B$^\ast$, every internal translation is a sum of boundedly many chord runs plus a bounded error. With Theorem 7 it implies Conjecture A of line 1 ($M(r)\le C/\delta$), and hence (B).
+4. **Computed: one run is not enough.** At six of the ten radii the best single chord run accounts for the largest internal translation found, to within $1\%$ (Computation 8). At $\delta=1/30$ and $1/55$, words that chain several runs on the two chord lines $\mathbb RE$ and $\mathbb R\bar E$ exceed the best single run by factors $1.12$ and $1.45$. So a single run does not account for $M(r)$ with constant 1: a single-run form of Conjecture B of line 1 for $M(r)$ needs a constant $C'\ge1.45$ (and the data are consistent with $C'=1.5$). The data support the refined form "chord tokens alone produce the growth" (item 3).
+5. **Conjectured:** Conjecture B$^\ast$, every word map is realized by a word made of boundedly many chord-run segments plus connector letters of bounded total effect. With Theorem 7 it implies Conjecture A of line 1 ($M(r)\le C/\delta$) for $0<\delta\le\delta_0$, and hence (B).
 
 **The remaining gap.** The bound on the *number* of chord runs that a word can chain (Conjecture B$^\ast$). Runs end in the $\delta$-windows around the breakpoints, and the windows on the two chord lines are linked by single letters (for example $a(-\bar F)=-F$ exactly). Bounding the chaining is a statement about the first-return dynamics to these windows. That is the tight-window renormalization of the earlier notes in a new, one-dimensional form, and it is not solved here (§5).
 
@@ -61,13 +63,13 @@ As in `sharp-bound-n5-conjugate.md` §1. In brief:
 **Proposition 3 (structure shared with $r_c$ cannot give (B)).**
 1. $\iota a\iota=a^{-1}$, $\iota b\iota=b^{-1}$, $\nu a\nu=b$, at every $r$. Hence $a=(a\iota)\iota$ and $b=(b\iota)\iota$ are products of two involutions of $\mathbb C$, and the system is reversible at every $r$.
 2. Any property of $GG_5(r)$ that holds at every $r\le r_c$ with the same definition, such as an invariant function on $\mathbb C$ or $\Lambda$ that does not depend on $r$, a conserved quantity of Proposition 1, the classes of Proposition 2, or the reversibility of item 1, is compatible with an infinite group. So no such property implies (B) by itself.
-3. A function $F$ on $\Lambda$ that is constant on the orbits of $GG_5(r)$ for every $r$ in some interval $(r_c-\eta,r_c)$ satisfies $F(t_kE)=F(0)$ for every $k\ge0$, an unbounded set of lattice points (line 1, Theorem 4(1)).
+3. A function $F$ on $\Lambda$ that is constant on the orbits of $GG_5(r)$ for every $r$ in some interval $(r_c-\eta,r_c)$ satisfies $F(t_kE)=F(0)$ for every $k\ge0$, a set of lattice points with unbounded conjugates (line 1, Theorems 4(1) and 6(1)).
 
 **[proved]**
 
 ### 2.2 The chord-strip mechanism
 
-**Lemma 4 (chord tokens are exact translations).** If the word $w_i$ passes all its disk tests at $X$ at radius $r$, then $w_i(X)=X+v_iE$. So along a chord run $h$ is constant, $s_{k+1}=T(s_k)$, and the word map from $X_0$ to $X_k$ is the translation by $(s_k-s_0)E\in\mathbb Z[\varphi]E$, with conjugate $-(2k\varphi+2n_k)\,\sigma E$, where $n_k$ is the number of $w_3$-steps among the first $k$. Its modulus is at most $2\varphi^2|\sigma E|\,k=9.959\,k$. **[proved]**
+**Lemma 4 (chord tokens are exact translations).** If the word $w_i$ passes all its disk tests at $X$ at radius $r$, then $w_i(X)=X+v_iE$. So along a chord run $h$ is constant, $s_{k+1}=T(s_k)$, and the word map from $X_0$ to $X_k$ is the translation by $(s_k-s_0)E\in\mathbb Z[\varphi]E$, with conjugate $-(2k\varphi+2n_k)\,\sigma E$, where $n_k$ is the number of $w_3$-steps among the first $k$. Its modulus is at most $2\varphi^2|\sigma E|\,k<9.960\,k$. **[proved]**
 
 **Lemma 5 (a bad interval at every offset).** Let $u=(0,1,1,-1)$, $P=(-1,0,-2,2)$ (fourth test centre of $w_1$) and $P'=(-1,2,0,0)$ (second test centre of $w_2$). Then, exactly:
 1. $b^\ast E=-F$, $P+P'=-2F$ (the two centres are symmetric about the breakpoint), $-F-P=u$, and $|u|^2=3+\varphi$;
@@ -77,12 +79,14 @@ Consequently, for $0<\delta\le2/5$ and every $h\in\mathbb R$, the bad set $\math
 
 **Lemma 6 (gaps of the golden rotation).** Let $\theta=\varphi^{-1}$, $m\ge2$, and $x\in\mathbb R/\mathbb Z$. The $F_m$ points $x+j\theta$, $0\le j<F_m$, cut the circle $\mathbb R/\mathbb Z$ into arcs of length at most $1/F_m+\varphi^{-m}$. ($F_m$ are the Fibonacci numbers, $F_1=F_2=1$.) **[proved]**
 
-**Theorem 7 (uniform cut-off of chord runs).** Let $0<\delta\le2/5$, and let $m$ be the least integer $\ge2$ with $1/F_m+\varphi^{-m}<\delta/\sqrt5$. Then for every $X_0$ in the plane:
+**Theorem 7 (uniform cut-off of chord runs).** Let $0<\delta\le2/5$, and let $m$ be the least integer $\ge2$ with $1/F_m+\varphi^{-m}<\delta/\sqrt5$. Then for every $X_0=s_0E+hN$ with $s_0\in[-1,1)$ and $h\in\mathbb R$:
 1. $L(X_0;r)\le F_m-1\le5.86/\delta$;
 2. every word map along the chord run from $X_0$, including the maps of the prefixes of the word that ends the run, has $|\sigma t|\le58.4/\delta+9.6$;
 3. the same bounds hold for the chord runs of the classes $\iota,\nu,\iota\nu$.
 
-In particular no chord run of any class, from any point of the plane, is infinite at any $r<r_c$. **[proved]**
+In particular no chord run of any class is infinite at any $r<r_c$ (for $\delta>2/5$ by item 1 at $\delta=2/5$, since $L(X_0;r)$ is non-decreasing in $r$). **[proved]**
+
+The theorem bounds runs in which every token is the one assigned by $T$. Tokens used elsewhere (at a point with $s\notin[-1,1)$, or not the word $w_{i(s)}$; the domains overlap) are not covered; in the computed words they are rare (Computation 10).
 
 The theorem is uniform where line 1's Theorem 6 treats one orbit (the orbit of $0$, with $h=0$); its constant is weaker than the computed truth, which is about $2.5/\delta$ steps (Computation 8).
 
@@ -113,18 +117,20 @@ Two side results. At level 2, $M(r)\ge3582.41$ exceeds the largest internal modu
 - the chord tokens cover at least $90.5\%$ of the letters of every word (the minimum is the orbit of $0$ at $\delta=1/10$; from $96\%$ to $99.8\%$ for the extreme words at $\delta\le1/30$);
 - consecutive tokens of one class form at most 8 maximal runs;
 - the connectors change the internal coordinate by at most $24.73$ in total, so the tokens carry everything else;
-- among 1 798 tokens of the extreme words at four radii ($1/10$, $1/55$, level 1, $1/80$), all but 6 are the word that $T$ assigns, so the runs are chord runs;
-- the largest internal translations at $\delta=1/30$, $1/55$, $1/80$ come from words with 6 or 7 runs alternating between the lines $\mathbb RE$ and $\mathbb R\bar E$ (at $1/55$: runs of $66,10,21,11,10,54$ tokens, 963 of 975 letters). The runs switch lines at the windows of the breakpoints $\pm F,\pm\bar F$, through one or two letters. For example $a(-\bar F)=-F$ exactly, and the run on the new line starts at offset $|h|\le2\delta$.
+- among 1 798 tokens of the extreme words at four radii ($1/10$, $1/55$, level 1, $1/80$), all but 6 are the word that $T$ assigns, so the runs that avoid these 6 tokens are segments of chord runs;
+- the largest internal translations at $\delta=1/30$, $1/55$, $1/80$ come from words with 5 to 7 runs that change class at every switch (at $1/55$: runs of $66,10,21,11,10,54$ tokens alternating between the lines $\mathbb RE$ and $\mathbb R\bar E$, 963 of 975 letters; at $1/80$ most consecutive runs lie on $\mathbb R\bar E$ in opposite directions). The runs switch at the windows of the breakpoints $\pm F,\pm\bar F$, through one or two letters. For example $a(-\bar F)=-F$ exactly. Runs of ten or more tokens start at offsets $|h|$ of order $\delta$ (at most $2.1\delta$ in the referee's words).
 
 So all observed conjugate growth comes from the twelve chord tokens. The total number of chord steps on a word, multiplied by $\delta$, stays between $1.9$ and $3.2$ on the 32 extreme words. **[computed, exact orbits and words]**
 
 ### 2.4 Conjectures
 
-**Conjecture B$^\ast$ (chord classification with bounded chaining).** There are $\delta_0>0$, $N_0$ and $c_0$ such that for every $r$ with $0<\delta\le\delta_0$, every word map $x\mapsto\zeta^jx+t$ at every point satisfies
+**Conjecture B$^\ast$ (chord classification with bounded chaining).** There are $\delta_0\in(0,2/5]$, $N_0$ and $c_0$ such that for every $r$ with $0<\delta\le\delta_0$, every word map $x\mapsto\zeta^jx+t$ at every point $z$ is also the word map at $z$ of a word that splits into $N\le N_0$ segments of chord runs (of any classes) and further letters, the *connectors*, whose contributions to $\sigma t$ have total modulus at most $c_0$. Then
 $$|\sigma t|\le c_0+\sum_{i=1}^{N}D_i,\qquad N\le N_0,$$
-where each $D_i$ is the internal translation of a chord run, of any class, at radius $r$. **[conjecture]** Evidence: Computation 10 ($N\le8$, $c_0\le25$ suffice on 107 words at ten radii).
+where $D_i$ is the internal translation of the $i$-th segment. **[conjecture]** Evidence: Computation 10 ($N\le8$, $c_0\le25$ suffice on 107 shortest words at ten radii, counting the 6 tokens not assigned by $T$ as connectors).
 
-**Corollary 11.** Conjecture B$^\ast$ implies Conjecture A of line 1, with $M(r)\le c_0+N_0(58.4/\delta+9.6)$, and hence (B). **[proved, given the conjecture]**
+The requirement that the $D_i$ come from a word realizing the map is the content of the conjecture. If the $D_i$ may be arbitrary chord runs, the inequality is equivalent to Conjecture A for small $\delta$: line 1, Theorem 6(2) gives, for $\delta\le1/20$, a chord run from $0$ with internal translation above $0.50202/\delta-11.862$, so $M(r)\le C/\delta$ yields the inequality with $N_0=\lceil C/0.50202\rceil$ copies of that run and $c_0=11.862\,N_0$.
+
+**Corollary 11.** Conjecture B$^\ast$ implies $M(r)\le c_0+N_0(58.4/\delta+9.6)$ for $0<\delta\le\delta_0$, which is Conjecture A of line 1 for these radii, and hence (B). **[proved, given the conjecture]**
 
 ---
 
@@ -169,19 +175,21 @@ Put $c=gh$. Recall $b^\ast\in I_1$, so $b^\ast$ is in the first set exactly when
 
 ### 3.6 Lemma 6
 
-Put $q=F_m$, $p=F_{m-1}$. By Binet's formula $q\theta-p=(-1)^{m-1}\varphi^{-m}=:\epsilon$ (line 1, §3.5, item 3). So $x+j\theta=x+jp/q+j\epsilon/q$. Since $\gcd(p,q)=1$, $j\mapsto jp\bmod q$ is a bijection of $\{0,\dots,q-1\}$. So the $q$ points are $x+i/q+e_i$, $i=0,\dots,q-1$, with $e_i=j\epsilon/q$ for the $j$ with $jp\equiv i$, and all $e_i$ lie between $0$ and $\epsilon$. The arc from the point with index $i$ to the point with index $i+1$ (modulo $q$, going once around) has length $1/q+e_{i+1}-e_i\le1/q+|\epsilon|$. These $q$ arcs cover the circle, so every arc between consecutive points is at most $1/q+\varphi^{-m}$. $\square$
+Put $q=F_m$, $p=F_{m-1}$. By Binet's formula $q\theta-p=(-1)^{m-1}\varphi^{-m}=:\epsilon$ (line 1, §3.5, item 3). So $x+j\theta=x+jp/q+j\epsilon/q$. Since $\gcd(p,q)=1$, $j\mapsto jp\bmod q$ is a bijection of $\{0,\dots,q-1\}$. So the $q$ points are $x+i/q+e_i$, $i=0,\dots,q-1$, with $e_i=j\epsilon/q$ for the $j$ with $jp\equiv i$, and all $e_i$ lie between $0$ and $\epsilon$. The arc from the point with index $i$ to the point with index $i+1$ (modulo $q$, going once around) has length $1/q+e_{i+1}-e_i\le1/q+|\epsilon|$, and this length is positive because $|\epsilon|=\varphi^{-m}<1/F_m$ (as $F_m<\varphi^{m}$). These $q$ arcs have total length 1, so they tile the circle, so every arc between consecutive points is at most $1/q+\varphi^{-m}$. $\square$
 
 ### 3.7 Theorem 7
 
 1. In the coordinate $x=(s+1)/2\in\mathbb R/\mathbb Z$, $T$ is $x\mapsto x+\theta$, and $J_h$ of Lemma 5 is an open arc of length $\delta/\sqrt5$. If $L(X_0;r)\ge F_m$, the points $s_0,\dots,s_{F_m-1}$ avoid $\mathcal B_h(r)\supseteq J_h$. But by Lemma 6 their arcs are shorter than $\delta/\sqrt5$, so the open arc $J_h$ contains one of them: a contradiction. Hence $L\le F_m-1$.
 
    For the numerical form put $F=F_{m-1}$. The integer $m$ is well defined and at least 3, since $1/F_2+\varphi^{-2}>1>\delta/\sqrt5$. By minimality, $1/F+\varphi^{-(m-1)}\ge\delta/\sqrt5$. By Binet, $\varphi^{m-1}=\sqrt5F+\psi^{m-1}\ge\sqrt5F-\varphi^{-1}$ with $\psi=-\varphi^{-1}$, so $\varphi^{-(m-1)}\le1/(\sqrt5F-0.6181)\le0.6188/F$ for $F\ge1$ (since $1-0.6181/\sqrt5\ge0.7235$). Hence $1.6188/F\ge\delta/\sqrt5$, that is $F_{m-1}\le3.620/\delta$. And $F_m=\varphi F_{m-1}+\psi^{m-1}\le\varphi F_{m-1}+1$, so $L\le F_m-1\le\varphi\cdot3.620/\delta\le5.86/\delta$.
-2. By Lemma 4, the word maps after $k\le L$ complete tokens have $|\sigma t|\le9.959k\le9.959\cdot5.86/\delta\le58.4/\delta$. The prefixes of the token that fails add at most 5 letters that act. Each acting letter composes the word map with $x\mapsto\zeta^{\mp1}x+c$, $c=\pm(\zeta^{\mp1}-1)$, and changes $|\sigma t|$ by at most $|\sigma c|=|\zeta^{\mp2}-1|=1.9022$; that adds at most $9.6$.
+
+   For $\delta>2/5$: the disk tests have centres $P_m$ independent of $r$, so a test passed at radius $r$ is passed at every larger radius, and $L(X_0;r)$ is non-decreasing in $r$. So $L(X_0;r)$ is at most its value at $\delta=2/5$, where $m=7$ and $L\le12$.
+2. By Lemma 4, the word maps after $k\le L$ complete tokens have $|\sigma t|<9.960k\le9.960\cdot5.86/\delta\le58.4/\delta$. The prefixes of the token that fails add at most 5 letters that act. Each acting letter composes the word map with $x\mapsto\zeta^{\mp1}x+c$, $c=\pm(\zeta^{\mp1}-1)$, and changes $|\sigma t|$ by at most $|\sigma c|=|\zeta^{\mp2}-1|=1.9022$; that adds at most $9.6$.
 3. By Proposition 3(1), $g\in S$ conjugates the token $w_i$ to the token $g\cdot w_i$ and carries the run from $X_0$ to a run from $g(X_0)$ with the same length. $\sigma$ commutes with $\iota$ and $\nu$, so the internal translations have the same moduli. $\square$
 
 ### 3.8 Corollary 11
 
-By Theorem 7(2) every $D_i\le58.4/\delta+9.6$. $\square$
+A segment of a chord run is the chord run from its first point, cut short, so by Theorem 7(2), (3) every $D_i\le58.4/\delta+9.6$ for $\delta\le\delta_0\le2/5$. The connectors add at most $c_0$, by the triangle inequality. So $M(r)<\infty$ for $0<\delta\le\delta_0$, and $GG_5(r)$ is finite there by `critical-radius-n5.md` Lemma 4.1(2), (3), which holds at every radius, norm radius or not. For smaller $r$, finiteness follows by group monotonicity (`boundary-contact.md` Theorem 3.4). Conjecture A on all of $r<r_c$ would also need a bound on $\delta M(r)$ for $\delta>\delta_0$. That does not follow: the "only if" direction of the conjugate criterion is proved only at non-norm radii, and it is not uniform in $r$. (B) does not need it. $\square$
 
 ---
 
@@ -195,13 +203,13 @@ By Theorem 7(2) every $D_i\le58.4/\delta+9.6$. $\square$
 
 ## 5. The remaining gap, and an assessment
 
-**Gap.** Conjecture B$^\ast$: bound the number of chord runs that one word can chain, uniformly in $\delta$. With Theorem 7 this gives Conjecture A and (B). Two things are missing:
+**Gap.** Conjecture B$^\ast$: bound the number of chord runs that one word can chain, uniformly in $\delta$. With Theorem 7 this gives Conjecture A for small $\delta$, and (B). Two things are missing:
 1. *Classification.* Show that outside chord runs the conjugate coordinate changes by $O(1)$ per run. The data support it (Computation 10), but nothing here proves that there is no other mechanism.
 2. *Bounded chaining.* Runs end in $O(\delta)$-windows at the breakpoints $\pm F,\pm\bar F,\pm\varphi^{-3}E,\dots$ and of their mirror images, and they restart from there on either chord with a new offset $h=O(\delta)$. In coordinates zoomed by $1/\delta$ this is a first-return system on finitely many windows. Its transition maps are piecewise isometries (the connectors), composed with golden-rotation return times. Bounded chaining means that this zoomed system has bounded orbits, uniformly in $\delta$. That is the tight-window renormalization problem of `sharp-lower-bound-limit-system.md`, now in a form where the long excursions between windows are explicitly golden-rotation runs.
 
 **Assessment.**
 - *Exact invariants (line (a)) and symmetry or reversibility (line (c)): dead.* Every exact conserved quantity, congruence class or reversing involution is present at $r_c$ as well (Propositions 1–3), and there are no others in the congruence data. They constrain orbits but cannot close them.
-- *Controlled quantity (line (b)): repairable, not closed.* The line gives a correct new theorem: uniform $1/\delta$ control of the one mechanism that the data show to be responsible for all conjugate growth. It also reduces Conjecture A to a precise, well-supported statement about chaining (Conjecture B$^\ast$). The strong form of line 1's Conjecture B for $M(r)$, "a single chord run dominates", is false at $\delta=1/30$ and $1/55$ (ratios $1.12$, $1.45$). The chaining is where the difficulty of (B) now sits, and it is a renormalization statement, not an invariant.
+- *Controlled quantity (line (b)): repairable, not closed.* The line gives a correct new theorem: uniform $1/\delta$ control of the one mechanism that the data show to be responsible for all conjugate growth. It also reduces Conjecture A to a precise, well-supported statement about chaining (Conjecture B$^\ast$). With constant 1, the single-run form of line 1's Conjecture B for $M(r)$, "a single chord run dominates", fails at $\delta=1/30$ and $1/55$ (ratios $1.12$, $1.45$); with a constant $C'\ge1.45$ it is consistent with the data. The chaining is where the difficulty of (B) now sits, and it is a renormalization statement, not an invariant.
 
 ## 6. Reproduction
 
