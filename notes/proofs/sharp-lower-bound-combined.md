@@ -431,7 +431,7 @@ The referee's verdicts (`referee-report-sharp-lower-bound-combined.md`) are reco
 
 **Gaps and caveats.**
 1. (B) is open. The sufficient strategy is (R-bulk) together with (R-core) (§6.1).
-2. Only one row of Table 5.1 is certified. A float-free certificate for the others needs the Lean-engine port (§5.1).
+2. Rows 1–8 of Table 5.1 are certified without floating point by the Lean engine's generator and separate checker ([`../relative-certificates.md`](../relative-certificates.md)). Row 9 is computed, not certified.
 3. $F$, hence $\beta_W$ and the word-length bound of Proposition 4.4, is not computed.
 4. The programs and certificates are outside the repository, in a scratch directory (§5.1). A reboot or routine cleanup can clear them.
 
