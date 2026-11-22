@@ -1,36 +1,44 @@
-# Towards the sharp lower bound for $GG_{12}$: window reduction, rigidity, and the period-one renormalization tested to level five
+# Towards the sharp lower bound for $GG_{12}$: window reduction, rigidity, the exact period-one step refuted at levels 2 and 3, and monotone growth observed
 
 Authors: Eric Vergo, Claude
 
 **Status.** Let $r_c=\sqrt{40-22\sqrt3}\approx1.376547$. Infinitude of $GG_{12}(r)$ for $r\ge r_c$ is proved and Lean-checked (`critical-radius-n12.md`, Theorem A). **The converse (B₁₂), finiteness of $GG_{12}(r)$ for every $r<r_c$, is still open, so $r_{\rm crit}(12)=\sqrt{40-22\sqrt3}$ is not proved by this note.** Finiteness is certified for $r^2\le r_c^2-1/180$ (`../certificates.md`), which covers the levels $m=0,1,2$ defined below. The note does the following.
 
-1. **Proved (with exact finite computations that I ran): the set-up for $n=12$.**
+The note has been independently refereed (`referee-report-sharp-lower-bound-n12.md` in this directory). The referee's verdicts are recorded in §9; material added after the report is marked "not yet refereed". The note does the following.
+
+1. **Proved, with exact finite computations: the set-up for $n=12$.**
    - There are exactly 24 lattice vectors of norm $r_c^2$ and 48 critical points in 12 classes. None lies on both circles, and tangencies occur only at critical points (Lemmas 2.1, 2.2).
-   - Exactly **8 critical points are tight**, in two classes, $\{\pm p^\ast,\pm\bar p^\ast\}$ and $\{\pm P_4,\pm\bar P_4\}$ with $P_4=-5+3\zeta+5\zeta^2-5\zeta^3$. The other 40 are **rigid from level 0 on**, for every point and not only for lattice points (Theorem 5.1).
-   - At every level $r_m^2=r_c^2-\varepsilon^m/10$, no lattice point lies on a lattice-centred circle of radius $r_m$, and no two such circles are tangent. In the field sense of the non-norm lemma (no triple points), the levels $m=0,4,5$ and all $m\ge6$ are non-norm radii; **$m=1,2,3$ are norms from $\mathbb Q(\zeta_{12})$** (Lemma 3.1).
-2. **Certified (engine generator and independent float-free checker, run by me): the bulk is bounded uniformly in $r$.** Restricted closures exist at $r_c$ with windows about all 48 critical points, for window circumradii $0.0915$, $0.0358$ and $0.0197$ (all three VALID). Hence **for every $r<r_c$, $GG_{12}(r)$ is finite if and only if its orbits meet the 48 windows in uniformly boundedly many points** (Corollary 4.2). With the rigidity theorem, (B₁₂) follows from two statements about the 8 tight points (Theorem 5.4).
+   - Write $P_4=-5+3\zeta+5\zeta^2-5\zeta^3$. **The 40 critical points outside the classes of $p^\ast$ and $P_4$ have finite skeleta and are rigid from level 0 on**, for every point and not only for lattice points (Theorem 5.1, modulo an exact computation).
+   - The 8 points $\pm p^\ast,\pm\bar p^\ast,\pm P_4,\pm\bar P_4$ have skeleta of more than $2\cdot10^6$ points and are treated as *tight*. Their skeleta are not proved infinite, and nothing depends on that.
+   - At every level $r_m^2=r_c^2-\varepsilon^m/10$, no lattice point lies on a lattice-centred circle of radius $r_m$, and no two such circles are tangent.
+   - In the field sense of the non-norm lemma (no triple points), the levels $m=0,4,5$ and all $m\ge6$ are non-norm radii. **The levels $m=1,2,3$ are norms from $\mathbb Q(\zeta_{12})$**, with explicit witnesses (Lemma 3.1).
+2. **Certified (repository generator, and the repository's separate float-free checker): the bulk is bounded uniformly in $r$.**
+   - Restricted closures exist at $r_c$ with windows about all 48 critical points, for window circumradii $0.0915$, $0.0358$ and $0.0197$. All three are VALID.
+   - Hence **for every $r<r_c$, $GG_{12}(r)$ is finite if and only if its orbits meet the 48 windows in uniformly boundedly many points** (Corollary 4.2).
+   - With the rigidity theorem, (B₁₂) follows from two statements about the 8 tight points (Theorem 5.4).
 3. **Proved: the exact zoomed arithmetic** that an inductive step needs.
-   - The tight-test identity and the transfer of tight tests between consecutive levels (Lemma 6.1).
-   - The lune lemma for $n=12$, with the explicit constant $20|\sigma'w|=176.75$ (Lemma 6.2).
-   - The absence of any parity obstruction: $\operatorname{sign}(\sigma'\tilde\delta-1)$ does not depend on the level (Lemma 6.3).
+   - The tight-test identity, and the transfer of tight tests between consecutive levels (Lemma 6.1).
+   - The lune lemma for $n=12$, with the exact constant $20\sqrt{40+22\sqrt3}<176.76$ (Lemma 6.2).
+   - There is no parity obstruction: $\operatorname{sign}(\sigma'\tilde\delta-1)$ does not depend on the level (Lemma 6.3).
    - The **frozen-point lemma** (Lemma 3.3). For $m\ge2$, the level-$m$ system and the strict system at $r_c$ act identically at every lattice point whose internal coordinate is below $\sqrt{78.1+10\varepsilon^{-m}}$.
-4. **Refuted (exact): the literal period-one inductive step from level 2 or 3.**
-   - The referee's 265/265 agreement holds on its sample, whose internal radius is at most $100$. I reproduced it and extended it to level 5: 184/184 uncapped points agree $4\to5$.
-   - On the sample with internal radius at most $300$ (2 413 points at each tight class), the first-return sets **change** between levels $2\to3$ at 49 points and $3\to4$ at 22 points.
-   - The orbit partition of the core changes at 28 points between levels $2\to3$, and at 4 of the 1 489 points covered (partial run) between levels $3\to4$.
-   - The smallest internal radius of a disagreeing point is $124.5$. Example: $\eta=-45+11\zeta+71\zeta^2-67\zeta^3$ (§7.4). So the exact period-one statement holds only on lattice points of bounded internal radius, from a level that grows with that radius.
+4. **Refuted (exact): the exact period-one inductive step, for every starting level $m_0\le3$.**
+   - On the referee's earlier sample (internal radius $\le100$), consecutive levels agree from level 2 on, up to level 5: 184 of 184 uncapped points agree $4\to5$.
+   - On the sample $S_{300}$ (internal radius $\le300$; 2 413 points at $p^\ast$, with the same counts at $P_4$), first-return sets **change** at 49 points between levels $2\to3$ and at 22 points between $3\to4$.
+   - On $S_{300}$ the orbit partition of the core changes at 28 points between $2\to3$, and at 4 points between $3\to4$ (complete run by the referee). All of these changes are merges.
+   - The smallest internal radius of a changing point is $124.5$. Example: $\eta=-45+11\zeta+71\zeta^2-67\zeta^3$ (§7.4).
+   - **Whether exact period one holds from some deeper level $m_0\ge4$ on is open.** The rising onset radii and the thinning counts fit both answers. Lemma 6.2 gives only a sufficient condition for lune-freeness, so it cannot show that changes persist.
 5. **Conjecture with exact evidence: eventual period one, by monotone growth, with a lune criterion** (§8).
-   - From level 1 on, every observed change is a growth: the earlier first-return set (or core orbit set) is a proper subset of the later one. That is 557 of 557 first-return changes and 32 of 32 partition changes; 0 shrinkings.
+   - From level 1 on, every observed change is a growth: the earlier first-return set (or core orbit block) is a proper subset of the later one. Counted on one tight class (the other class gives identical counts): 290 of 290 first-return changes and 32 of 32 partition changes, with no shrinking.
    - Every change is preceded by a lune point in the excursion.
-   - A point whose level-$m$ excursion is lune-free never changed again: 6 216 cases, 0 failures.
-   - The number of core visits per full orbit is **level-independent** on every orbit computed (maximum 224, resp. 280, at levels 0–4).
-6. **The remaining gap** (§8.3) is two statements, both conjectural:
-   - **(R-core-lim)**: the limit core classes are uniformly bounded, together with monotone growth;
-   - **(R-bulk₁₂)**: restricted closures exist at $r_c$ for windows of every scale. Three are computed, down to the core scale of level 1.
+   - No point whose level-$m$ excursion was lune-free changed at the next level: 4 248 cases on one class, with no failure.
+   - The number of core visits per full orbit is **level-independent** on every orbit computed: at most 224 on 30 sampled orbits, and at most 280 on the closure samples, at levels 0–4.
+6. **The remaining gap** (§8.3) is two statements, both open.
+   - **(R-core-t₁₂)**: uniformly bounded visits to the tight cores. The note reduces it to a bound on the classes of the *eventual* (limit) core relation, together with monotone growth (Proposition 8.1, not yet refereed). Both are conjectures.
+   - **(R-bulk₁₂)**: restricted closures exist at $r_c$ for windows of every scale. Three are certified, reaching the core scale of level 1.
 
-   An exact one-step induction of the form envisaged does not exist, because of item 4. The correct inductive object is the monotone limit of item 5.
+   Because of item 4, there is no exact one-step induction starting at a level $\le3$. The route proposed in its place is the monotone limit of item 5.
 
-Terms: *critical, tight, rigid* (§2, §5), *level, zoomed coordinate, core, first-return set, core orbit set* (§3, §7), *lune point, frozen point* (§3, §6), *window, restricted closure* (§4).
+Terms: *critical* (§2), *tight, rigid* (§5), *level, zoomed coordinate, core, first-return set, core orbit set* (§3, §7), *lune point, frozen point* (§3, §6), *window, restricted closure* (§4).
 
 ---
 
@@ -69,7 +77,7 @@ Refereed facts used:
    - $37\equiv1\pmod{12}$ splits completely, so $(7-2\sqrt3)\Lambda=\mathfrak q\bar{\mathfrak q}$ with $\mathfrak q\ne\bar{\mathfrak q}$: the decomposition group is trivial, so complex conjugation moves every prime above 37.
    - $\Lambda$ is a principal ideal domain. If $w\bar w=r_c^2$, then $(w)\in\{\mathfrak P\mathfrak q,\mathfrak P\bar{\mathfrak q}\}$, so $w=u\pi$ or $w=u\bar\pi$ with $u\bar u=1$.
    - $\mathbb Q(\zeta)$ is CM, so every conjugate of $u$ has modulus 1, and $u$ is a root of unity (Kronecker). That gives 24 elements.
-   - Confirmed by exhaustive search over $[-12,12]^4$ (`rigid.py`) and by the engine's trace-form enumeration (`tdcsg-orbit critical-points -n 12 --r2 closed`).
+   - Confirmed by exhaustive search over $[-12,12]^4$ (`rigid.py`), by the engine's trace-form enumeration (`tdcsg-orbit critical-points -n 12 --r2 closed`), and by the referee's own code in a different point representation.
 2. Translate item 1. Exhaustive check: no point satisfies both equations.
 3. Exact enumeration (`rigid.py`).
 4. $\sigma'$ commutes with complex conjugation. $\square$
@@ -110,6 +118,7 @@ The engine reports 5 canonical circles tangent to a boundary circle in each rest
    - $N(\alpha_m)$ is: $14001=3\cdot13\cdot359$ ($m=0$); $14521=13\cdot1117$; $14481=3^2\cdot1609$; $13801=37\cdot373$; $11121=3\cdot11\cdot337$; $1081=23\cdot47$ ($m=5$).
    - For $m=0,4$, the ramified prime $(\sqrt3)$, with residue field $\mathbb F_3$, has odd valuation: non-norm. For $m=5$, the split primes above $23$ and $47$, both $\equiv11\pmod{12}$, have odd valuation: non-norm.
    - For $m=1,2,3$, every odd prime of odd valuation has $N\mathfrak l\equiv1\pmod4$. The valuation at $(\sqrt3)$ is $0$ or $2$, and $\alpha_m$ is totally positive. So all symbols at odd and real places are $1$, hence so is the one at $2$, and $\rho_m$ is a norm.
+   - Explicit witnesses, found by the referee: $\alpha_m=|u|^2$ with $u=(13,-18,-3,13)$, $(16,-16,-8,11)$, $(13,-16,-1,13)$ for $m=1,2,3$ (basis $1,\zeta,\zeta^2,\zeta^3$). So $r_m^2=|u/(3+i)|^2$ with $u/(3+i)\in\mathbb Q(\zeta)$.
    - For $m\ge6$, $\sigma'(\rho_m)=78.105-\varepsilon^{-m}/10<0$, which is item 1 of the non-norm lemma (`sharp-lower-bound-n5.md` Lemma 2.2(1); valid for any CM field). $\square$
 
 The referee's report calls these levels "non-norm radii, since $\varepsilon^m/10\notin\mathbb Z[\sqrt3]$". That argument gives item 1 only. Item 1 is all that the lattice computations of §7 need: no disk test at a lattice point is ever a tie. The passage from lattice points to all points (Lemma 3.4) needs item 2, so it is stated for the levels $m\in\{0,4,5\}\cup[6,\infty)$. A phase with all levels non-norm was looked for among $\delta_m=c\,\varepsilon^m$, for ten simple rationals $c$; each fails at some small $m$. By item 2 the levels $m\ge6$ are non-norm for every phase with $\sigma'(c)\ge1/10$.
@@ -137,17 +146,19 @@ $$\sup_{x\in\mathbb C}|O_r(x)\cap U|=\sup_{y\in\Lambda}|O_r(y)\cap U|,\qquad \su
 
 ## 4. The bulk at $r_c$: restricted closures for $n=12$ (certified)
 
-Windows are as in §3 of the combined note, for general $n$: for a shape $w\in\Lambda$, $W_0=\bigcap_{v\in\{\pm w,\pm\bar w\}}D(v,r_c)$, placed at all 48 critical points. I ran the repository engine read-only (`tdcsg-orbit certify-relative -n 12 --r2 closed --window w --symmetric` and `check-relative-certificate`). Disjointness of the 48 windows is proved exactly by the engine (1 128 pairs). Every decision of the generator was exact, and there were 0 coincidences.
+Windows are as in §3 of the combined note, for general $n$: for a shape $w\in\Lambda$, $W_0=\bigcap_{v\in\{\pm w,\pm\bar w\}}D(v,r_c)$, placed at all 48 critical points. I ran the repository engine read-only (`tdcsg-orbit certify-relative -n 12 --r2 closed --window w --symmetric` and `check-relative-certificate`). Disjointness of the 48 windows is proved exactly by the engine (1 128 pairs). Every decision of the generator was certified (a float filter with a proven error bound; 0 exact fallbacks were needed), and there were 0 coincidences. The checker is a separate module of the same code base, sharing the exact layer (`Field`, `Ball`, `Tower`, `CirclePoint`; `../relative-certificates.md` §2); it is not an independent implementation.
 
 **Table 4.1.** Restricted closures at $r_c$ for $n=12$. Counts are modulo $\pm z,\pm\bar z$; "in all" is the full count.
 
 | shape $w$ | inradius | circumradius $\rho_W$ | circles | maximal arcs | in all (circles / arcs) | tangent circles | $\max|\sigma'c|$ | generator | checker |
 |---|---|---|---|---|---|---|---|---|---|
-| $(1,1,-5,5)$ | 0.04594 | 0.09148 | 18 258 | 31 205 | 72 789 / 123 824 | 5 (all at critical points) | 112.5 | 2.3 s, 25 MB | **VALID**, 69 228 (K3) images, 19 s |
-| $(-13,10,7,-10)$ | 0.02252 | 0.03585 | 295 845 | 557 540 | 1 182 606 / 2 226 008 | 5 (all at critical points) | 519.5 | 90 s | **VALID**, 1 250 880 images, 400 s |
-| $(-11,9,5,-10)$ | 0.01027 | 0.01968 | 387 208 | 1 665 780 | 1 547 506 / 6 651 352 | 5 (all at critical points) | 566.3 | 312 s | **VALID**, 3 744 064 images, 891 s |
+| $(1,1,-5,5)$ | 0.04594 | 0.09148 | 18 258 | 31 205 | 72 789 / 123 824 | 5 (all at critical points) | 112.5 | 2.3 s, 25 MB | **VALID**, 69 228 (K3) images, 19 s; re-run VALID by the referee, negative tests rejected |
+| $(-13,10,7,-10)$ | 0.02252 | 0.03585 | 295 845 | 557 540 | 1 182 606 / 2 226 008 | 5 (all at critical points) | 519.5 | 90 s | **VALID**, 1 250 880 images, 400 s; re-run VALID by the referee |
+| $(-11,9,5,-10)$ | 0.01027 | 0.01968 | 387 208 | 1 665 780 | 1 547 506 / 6 651 352 | 5 (all at critical points) | 566.3 | 312 s | **VALID**, 3 744 064 images, 891 s (author's log; not re-run by the referee) |
 
 SHA-256 of the files (in my scratch directory `sharp12/`): `b37d6a7ca2178b3356c0b45a5dd7c76222eb051268d914fb72eca73f1d195ea7` (row 1), `01de2f8f773ef81e787d197f98bf4099edbc181902d8bc6d6b077f11da07df4d` (row 2), `0cadc53247d2f6a208a5dd5ba198c82040bc85cf909687937334e987c465a64e` (row 3). A parallel run of the same engine, in the scratch directory `relcert/`, closed and checked VALID the shapes $(-6,5,1,-4)$ ($\rho_W=0.0915$), $(-4,4,2,-5)$ ($0.0718$) and $(-5,4,1,-2)$ ($0.0405$), and generated $(-3,1,2,-3)$ ($\rho_W=0.01243$, 4 618 187 circles); I did not check those myself.
+
+The referee's own float-guided checker, an independent implementation, accepts all three rows (computed, not certified: double-precision angles, tolerance $10^{-9}$ for equal endpoints). The checker log of row 1 is not kept in `sharp12/`; the referee's re-run replaces it.
 
 **Theorem 4.1 (proved modulo the certified computation, any row of Table 4.1).** Let $W$ be the window set of row 1. There is $\beta_W<\infty$ such that, for every $r<r_c$ and every $x\in\mathbb C$, every chain at radius $r$ from $x$ whose intermediate points avoid $W$ has at most $\beta_W$ distinct endpoints.
 
@@ -163,18 +174,18 @@ The engine prints $\max|\sigma'c|\cdot\rho_W\approx10$–$19$. So, as for $n=5$,
 
 ## 5. Rigidity away from the tight points (proved modulo an exact finite computation)
 
-**Skeleta.** The skeleton $S_P$ of a critical point $P$ is the set of lattice points reached from $P$ by breadth-first search at $r_c$ with closed disks, where critical points other than $P$ are recorded and not expanded. Two independent programs compute it exactly: `skel12.c` (C, `__int128` signs) and `rigid.py` (Python, exact integers, 50-digit margins).
+**Skeleta.** The skeleton $S_P$ of a critical point $P$ is the set of lattice points reached from $P$ by breadth-first search at $r_c$ with closed disks, where critical points other than $P$ are recorded and not expanded. Two separate programs by the same author compute it exactly: `skel12.c` (C, `__int128` signs) and `rigid.py` (Python, exact integers). They share the $\zeta$-basis and the formulas for $|c|^2$ and for multiplication by $\zeta$, and differ only in language. Margins (a) and (c) are evaluated in 50-digit arithmetic and (b) in double precision. The referee reproduced the table with independent code in a different point representation (doubled coordinates in $\mathbb Z[\sqrt3]$), with 60-digit margins.
 
 **Table 5.1.** The 12 classes. $C$-margins: (a) $\min\bigl||q-p|-r_c\bigr|$ over non-critical $q\in S_P$, $p=\pm1$; (b) $\min|q-Q|$ over non-critical $q\in S_P$ and critical $Q$; (c) $\bigl||P-p'|-r_c\bigr|$ for the disk $D_{p'}$ not tight at $P$.
 
 | class representative (canonical) | value | other disk | $|S_P|$ | critical endpoints | (a) | (b) | (c) |
 |---|---|---|---|---|---|---|---|
-| $(-4,2,4,-5)=-\bar p^\ast$; $p^\ast=(0,-2,4,-3)$ | $\mp0.2679\mp0.5359i$ | inside | **infinite** (cap $2\cdot10^6$) | the other 7 tight points and 2 non-tight ones | | | 0.4693 |
-| $(-5,3,5,-5)=P_4$ | $0.0981+0.8301i$ | inside | **infinite** (cap $2\cdot10^6$) | the other 7 tight points and 2 non-tight ones | | | 0.1508 |
+| $(-4,2,4,-5)=-\bar p^\ast$; $p^\ast=(0,-2,4,-3)$ | $\mp0.2679\mp0.5359i$ | inside | exceeds the cap $2\cdot10^6$ | the other 7 tight points and 2 non-tight ones | | | 0.4693 |
+| $(-5,3,5,-5)=P_4$ | $0.0981+0.8301i$ | inside | exceeds the cap $2\cdot10^6$ | the other 7 tight points and 2 non-tight ones | | | 0.1508 |
 | $(-3,1,5,-5)$ | $0.3660-0.1699i$ | inside | 14 | 3 | 0.22794 | 0.27740 | 0.7202 |
 | nine classes (36 points) | | outside | 3 | 2 ($R_p^{\pm1}P$) | — | — | $\ge0.22794$ |
 
-The 8 tight points are $\pm p^\ast,\pm\bar p^\ast$ (indices 7, 23, 24, 40 in the lexicographic list of `r12n.c`) and $\pm P_4,\pm\bar P_4$ (indices 4, 22, 25, 43). They are joined by linear germs: the excursion of $p^\ast$ itself (zoomed $\eta=0$) returns, at levels $2$–$5$, to the zoomed point $0$ of each of the other seven. This is presumably why every statistic in §7 is identical, count for count, at $p^\ast$ and at $P_4$; that the two core systems are conjugate is not proved.
+*Tight* here means: skeleton exceeding the cap. For $p^\ast$ Theorem A gives an infinite orbit, but the skeleton stops at critical points, so Theorem A does not give an infinite skeleton. Only the rigidity of the other 40 is used below. The 8 tight points are $\pm p^\ast,\pm\bar p^\ast$ (indices 7, 23, 24, 40 in the lexicographic list of `r12n.c`) and $\pm P_4,\pm\bar P_4$ (indices 4, 22, 25, 43). They are joined by linear germs: the excursion of $p^\ast$ itself (zoomed $\eta=0$) returns, at levels $2$–$5$, to the zoomed point $0$ of each of the other seven. This is presumably why every statistic in §7 is identical, count for count, at $p^\ast$ and at $P_4$; that the two core systems are conjugate is not proved.
 
 **Theorem 5.1 (non-tight cores are rigid from level 0).** Let $C=0.09$, $m\ge0$, and let $P$ be one of the 40 non-tight critical points. For every $x\in\overline B(P,C\varepsilon^m)$, lattice point or not, every first return of $x$ to the core $B_m=\bigcup_Q\overline B(Q,C\varepsilon^m)$ at radius $r_m$ is linear, $x\mapsto Q'+\zeta^j(x-P)$. The excursion has at most $|S_P|\le14$ points.
 
@@ -186,7 +197,9 @@ The 8 tight points are $\pm p^\ast,\pm\bar p^\ast$ (indices 7, 23, 24, 40 in the
 
 The table gives (a) $0.2279$, (b) $0.2774$, (c) $\ge0.2279$, so all hold at $m=0$, hence for all $m$. The tight disk at $P$ maps the inside part of the core onto the core of the critical point $R_p^{\pm1}(P)$, and the chain stops there. $\square$
 
-**Corollary 5.2.** For every $m\ge0$ and every orbit $O$ at radius $r_m$: $|O\cap B_m|\le576\max(1,|O\cap B_m^{\rm t}|)$, where $B_m^{\rm t}$ is the core of the 8 tight points and $576=48\cdot12$ bounds a linear class (limit-system note, Corollary 4.3).
+The margins have slack: (a) holds for every $C\le0.19$ and (b) for every $C<0.1387$. So Theorem 5.1 holds verbatim for every core constant $C\le0.09$, in particular for $C'=0.089$.
+
+**Corollary 5.2.** Let $C\le0.09$ and let $B_m(C)$, $B_m^{\rm t}(C)$ be the closed cores of radius $C\varepsilon^m$ about all 48, respectively the 8 tight, critical points. For every $m\ge0$ and every orbit $O$ at radius $r_m$: $|O\cap B_m(C)|\le576\max(1,|O\cap B_m^{\rm t}(C)|)$. Here $576=48\cdot12$ bounds a linear class (limit-system note, Corollary 4.3). Write $B_m=B_m(0.09)$.
 
 **Definitions.**
 
@@ -198,10 +211,11 @@ The table gives (a) $0.2279$, (b) $0.2774$, (c) $\ge0.2279$, so all hold at $m=0
 *Proof.*
 - Restrict to the field-non-norm levels $m\ge\max(m_0,6)$.
 - By Lemma 3.4, the bound of (R-core-t₁₂) holds for every $x\in\mathbb C$.
-- By Corollary 5.2 it bounds $|O\cap\operatorname{int}B_m|$; the closed and open cores differ by a null set, which is irrelevant through Lemma 3.4.
-- Choose $j$ with $W^{(j)}\subset\operatorname{int}B_m$, and apply Corollary 4.3 of the combined note. Then group monotonicity. $\square$
+- Put $C'=0.089$ and $B'_m=B_m(C')$. The closed cores $B'^{\rm t}_m$ lie in the open set $\operatorname{int}B^{\rm t}_m$, so $|O_{r_m}(x)\cap B'^{\rm t}_m|\le N$ for every $x$.
+- By Corollary 5.2 with $C'$: $|O_{r_m}(x)\cap B'_m|\le576\max(1,N)$ for every $x$.
+- Choose $j$ with $W^{(j)}\subset\operatorname{int}B'_m$, and apply Corollary 4.3 of the combined note. Then group monotonicity. $\square$
 
-Instances of (R-bulk₁₂) computed (Table 4.1): $\rho_W=0.0915$, $0.0358$, $0.0197$, and $0.0124$ in the parallel run. A window fits inside the level-$m$ core when $\rho_W\le0.09\,\varepsilon^m$. Row 2 fits at level 0 and row 3 at level 1; nothing yet fits at level 2 ($0.00646$).
+Instances of (R-bulk₁₂) computed (Table 4.1): $\rho_W=0.0915$, $0.0358$, $0.0197$, and $0.0124$ in the parallel run. A window fits inside the level-$m$ core when $\rho_W<0.089\,\varepsilon^m$. Row 2 fits at level 0 and row 3 at level 1; nothing yet fits at level 2 ($0.00646$).
 
 ---
 
@@ -219,7 +233,7 @@ Let $Q\in\partial D_p(r_c)$ be critical, $w=Q-p$, and $y=Q+\varepsilon^mY$ with 
 2. The tests are $\lambda+10\varepsilon^m|Y|^2\le0$ and $\lambda+10\varepsilon^{m+1}|Y|^2\le0$. Neither is ever an equality, by Lemma 3.1(1).
 3. Frozen means $0<r_c^2-|y-p|^2<\delta_m$, that is $\lambda-1+10\varepsilon^m|Y|^2<0<\lambda+10\varepsilon^m|Y|^2$. A lune point has $\lambda<0$, so the first inequality holds when $10\varepsilon^m|Y|^2<1$. $\square$
 
-**Lemma 6.2 (lune lemma, $n=12$).** If $10\,\varepsilon^m|Y|^2\bigl(176.754\,|\sigma'Y|+1\bigr)<1$, then $Q+\varepsilon^mY$ is not a lune point at level $m$, nor at any level $m'\ge m$. The constant is $20|\sigma'w|=20\sqrt{40+22\sqrt3}$, the same at all 48 critical points.
+**Lemma 6.2 (lune lemma, $n=12$).** Let $\kappa=20|\sigma'w|=20\sqrt{40+22\sqrt3}=176.7542\ldots<176.76$, the same at all 48 critical points. If $10\,\varepsilon^m|Y|^2\bigl(\kappa\,|\sigma'Y|+1\bigr)<1$, which holds in particular when $10\,\varepsilon^m|Y|^2(176.76\,|\sigma'Y|+1)<1$, then $Q+\varepsilon^mY$ is not a lune point at level $m$, nor at any level $m'\ge m$.
 
 *Proof.* $\lambda=1+10t$ with $t\in\mathbb Z[\sqrt3]$, so $N(\lambda)=1+10\operatorname{Tr}t+100N(t)\equiv1\pmod{10}$ is non-zero, and $|\lambda|\ge1/|\sigma'\lambda|$. Also $|\sigma'\lambda|\le20|\sigma'Y||\sigma'w|+1$, and Lemma 2.1(4) gives $|\sigma'w|$. If $|\lambda|>10\varepsilon^m|Y|^2$, item 3 of Lemma 6.1 excludes a lune. $\square$
 
@@ -240,7 +254,7 @@ This is the referee's identity from §3 of `referee-report-sharp-lower-bound-lim
 
 *Proof.* $\eta\mapsto\eta$ is a bijection between the zoomed core lattice points of consecutive levels, since the core is $\overline B(Q,C\varepsilon^m)$ in zoomed units $\overline B(0,C)$. The hypothesis says that it maps core orbit sets onto core orbit sets. If $GG_{12}(r_{m_0})$ is finite, every orbit is finite. $\square$
 
-This is the induction the task envisaged, with base $m_0$. §7 shows that **its hypothesis is false at $m_0=2$ and $m_0=3$**, and in a way that indicates it fails at every $m_0$.
+This is the induction the task envisaged, with base $m_0$. §7 shows that **its hypothesis is false for every $m_0\le3$**. Whether it holds for some $m_0\ge4$ is open.
 
 ---
 
@@ -280,14 +294,14 @@ Median excursion sizes on $S_{100}$: 332, 3 382, 31 406, 284 116, 2 581 034 and 
 
 ### 7.3 Orbit partitions of the core
 
-**Table 7.2.** Closure mode (full orbits). A point *agrees* if its orbit block (its core orbit set intersected with the sample) is the same at both levels.
+**Table 7.2.** Closure mode (full orbits). A point *agrees* if its orbit block is the same at both levels. The block is its core orbit set (over all 48 cores) intersected with the $p^\ast$ sample, not the whole core orbit set.
 
 | sample | orbits per level | max core visits per orbit, levels 0,1,2,3,4 | $0\to1$ | $1\to2$ | $2\to3$ | $3\to4$ |
 |---|---|---|---|---|---|---|
 | $S_{100}$ | 136, 171, 165, 165, 165 | 280, 280, 280, 280, 280 | 187/265 | 253/265 | **265/265** | **265/265** |
-| $S_{300}$ | 1 464 ($m=2$), 1 451 ($m=3$) | 280 ($m=2,3$) | | | **2 385/2 413** (1 438/1 464 blocks) | **1 485/1 489** (partial: 934 level-4 orbits, max 280 core visits) |
+| $S_{300}$ | 1 464 ($m=2$), 1 451 ($m=3$) | 280 ($m=2,3$) | | | **2 385/2 413** (1 438/1 464 blocks) | **2 409/2 413** (1 447/1 451 blocks; complete run by the referee; 1 449 level-4 orbits, the largest 17 393 748 points, max 280 core visits). My partial run: 1 485/1 489 |
 
-The 28 points that change between levels $2\to3$ on $S_{300}$ all **merge**: the level-2 core orbit set is a proper subset of the level-3 one (28 of 28), for example of size $8\to16$, $8\to24$, $16\to24$, $8\to38$, $30\to38$. The smallest internal radius among them is $124.5$.
+The 4 points that change between $3\to4$ all merge, with full core orbit sets growing $30\to38$ and $8\to38$, and smallest internal radius $246.4$ (referee's complete run). The 28 points that change between levels $2\to3$ on $S_{300}$ all **merge**: the level-2 core orbit set is a proper subset of the level-3 one (28 of 28), for example of size $8\to16$, $8\to24$, $16\to24$, $8\to38$, $30\to38$. The smallest internal radius among them is $124.5$.
 
 Full orbits of 30 points of $S_{100}$ (every ninth) at levels 0–3, and 10 of them at level 4:
 - orbit sizes about 2 550, 23 000, 209 000, $1.9\cdot10^6$, $1.7\cdot10^7$ (a factor of about 9 per level);
@@ -297,8 +311,8 @@ Full orbits of 30 points of $S_{100}$ (every ninth) at levels 0–3, and 10 of t
 ### 7.4 The counterexamples (exact)
 
 1. **Orbit partition, $2\to3$.** Take $\eta=-45+11\zeta+71\zeta^2-67\zeta^3$ at $p^\ast$, with $|\eta|=0.0290$ and $|\sigma'\eta|=124.5$.
-   - At level 2 the core orbit set of $p^\ast+\varepsilon^2\eta$ has 8 points; at level 3 that of $p^\ast+\varepsilon^3\eta$ has 16, containing the 8.
-   - First-return sets: 8 points (excursion 27 456) at level 2, 16 points (excursion 284 494) at level 3.
+   - At level 2 the full orbit of $p^\ast+\varepsilon^2\eta$ has 27 456 points and its core orbit set 8 points. At level 3 the full orbit of $p^\ast+\varepsilon^3\eta$ has 284 536 points and its core orbit set **38** points: 16 in the 8 tight cores, two per tight point, and 22 in non-tight cores. It contains the 8. The referee obtained the same orbit sizes with its own engine and with the repository engine (`--r2 re:393/10,-108/5` and `re:187/5,-41/2`).
+   - First-return sets: 8 points (excursion 27 456) at level 2, 16 points (excursion 284 494) at level 3, with $R_2\subsetneq R_3$.
    - Its level-2 excursion contains 10 lune points; the level-3 one contains 6.
 2. **First-return set, $3\to4$.** Take $\eta=-75+48\zeta+67\zeta^2-82\zeta^3$, with $|\eta|=0.0732$ and $|\sigma'\eta|=142.7$.
 
@@ -310,22 +324,22 @@ Full orbits of 30 points of $S_{100}$ (every ninth) at levels 0–3, and 10 of t
 
    $R_3\subsetneq R_4$. Its full orbit, however, has the **same** core orbit set at levels 2, 3, 4 (224 core visits; orbit sizes 202 346, 1 837 436, 16 605 922). Here the level-4 first returns are shortcuts through points that at level 3 were core visits.
 
-So changes of first-return sets and changes of orbit partitions are different events. The first are more frequent; Proposition 6.4 needs only the second. Both occur between levels 2 and 3. Every change is a growth, preceded by a lune at the earlier level.
+So changes of first-return sets and changes of orbit partitions are different events. The first are more frequent; Proposition 6.4 needs only the second. Both occur between levels $2\to3$ and $3\to4$. Every change is a growth, preceded by a lune at the earlier level.
 
 ### 7.5 The lune criterion and monotone growth
 
 Over all comparisons made:
 
 - **Lune-free implies no change.** If the level-$m$ excursion has no lune point (zoomed distance $\le1$), then $R_m=R_{m+1}$. The cases are:
-  - $1\to2$: 1 258 of 1 258 ($S_{300}$, both classes);
-  - $2\to3$: 2 678 of 2 678;
+  - $1\to2$: 629 of 629 ($S_{300}$ at $p^\ast$; the same count at $P_4$);
+  - $2\to3$: 1 339 of 1 339;
   - $3\to4$: 1 881 of 1 881 ($S_{300}$, $p^\ast$) and 217 of 217 ($S_{\rm ann}$);
   - $4\to5$: 182 of 182 ($S_{100}$).
 
-  That is 6 216 cases with no failure. Conversely, all 2 464 + 436 + 98 + 22 + 1 changes have a lune point at the earlier level.
+  That is 4 248 cases on one class with no failure. Conversely, every change has a lune point at the earlier level: 1 232, 218, 49, 22 changes at $0\to1,\dots,3\to4$ on $S_{300}$ at $p^\ast$, and 1 on $S_{\rm ann}$. All these counts were reproduced by the referee, except those on $S_{\rm ann}$ and $S_{100}$ at $4\to5$.
 - **Lune-freeness persists.** No point that is lune-free at level $m\in\{1,2\}$ has a lune at $m+1$.
-- **Changes stabilize.** All 49 points of $S_{300}$ at $p^\ast$ that change between $2\to3$ agree between $3\to4$. Of the 436 that change between $1\to2$, 412 agree between $2\to3$.
-- **Monotone growth from level 1.** Every change of a first-return set at $1\to2$, $2\to3$, $3\to4$ is a strict growth: $R_m\subsetneq R_{m+1}$ in 436, 98, 22 and 1 of 436, 98, 22 and 1 cases. At $0\to1$ there are also shrinkings (1 556) and incomparable changes (92); level 0 is pre-asymptotic. Every change of an orbit block is a merge (28 of 28 at $2\to3$, 4 of 4 at $3\to4$).
+- **Changes stabilize.** All 49 points of $S_{300}$ at $p^\ast$ that change between $2\to3$ agree between $3\to4$. Of the 218 that change between $1\to2$, 206 agree between $2\to3$.
+- **Monotone growth from level 1.** Every change of a first-return set at $1\to2$, $2\to3$, $3\to4$ is a strict growth: $R_m\subsetneq R_{m+1}$ in 218, 49, 22 (at $p^\ast$) and 1 ($S_{\rm ann}$) of 218, 49, 22 and 1 cases. At $0\to1$ there are also shrinkings (778) and incomparable changes (46), against 408 growths; level 0 is pre-asymptotic. The statistics at $p^\ast$ and at $P_4$ coincide, so the second class adds no independent weight. Every change of an orbit block is a merge (28 of 28 at $2\to3$, 4 of 4 at $3\to4$).
 
 **Why growth is expected (heuristic, not a proof).** By Lemma 6.1(3) the tight disk $D_p(r_m)$ lies inside its tangent half-plane $\{\lambda_Q<0\}$ near $Q$. So a lune point is a point where the level-$m$ system *does not rotate* but the straight-cut limit would. Lunes only delete edges, relative to the limit. As $m$ grows the lunes shrink (Lemma 6.1(3)), and edges come back. Away from the critical points the level-$m$ system deletes edges only at frozen points (Lemma 3.3), which the excursions do not reach far from the critical points (§7.6).
 
@@ -361,73 +375,118 @@ Memberships found are exact. The failures are exact non-memberships. The first, 
 
 ### 8.1 Refuted
 
-**The hypothesis of Proposition 6.4 fails at $m_0=2$ and $m_0=3$ (orbit partitions; 28 points of $S_{300}$ at $2\to3$, 4 points at $3\to4$ with internal radius $\ge246.4$), and the first-return version fails at $m_0=2,3$ (49 and 22 points).** The failures are exact, by an engine whose arithmetic is exact and which was validated as in §7.1. In both cases the onset is at internal radius $\ge124.5$. The referee's sample ($\le100$) shows no failure from level 2 on, up to level 5.
+**The hypothesis of Proposition 6.4 fails at $m_0=2$ and $m_0=3$, hence for every $m_0\le3$** (orbit partitions: 28 points of $S_{300}$ at $2\to3$, 4 points at $3\to4$ with internal radius $\ge246.4$). The first-return version fails likewise (49 and 22 points). The failures are exact, by an engine whose arithmetic is exact and which was validated as in §7.1. In both cases the onset is at internal radius $\ge124.5$. The referee's sample ($\le100$) shows no failure from level 2 on, up to level 5.
 
-Exact period one therefore holds **only on lattice points of bounded internal radius**, from a level that grows with the radius. The onset radii $13.9$, $26.9$, $124.5$, $142.7$ grow, and disagreements thin out (1 232, 218, 49, 22 on $S_{300}$), but on every tested pair some point with larger internal radius still changes. Lemma 6.2 explains the mechanism: a point is protected from lunes once $\varepsilon^m|Y|^2|\sigma'Y|\lesssim1/1768$ along its excursion, and the zoomed core contains points of every internal radius. No single $m_0$ protects all of them. Since the hypothesis of Proposition 6.4 quantifies over all zoomed core lattice points, I expect it to fail at every $m_0$ (conjecture; not tested beyond level 4).
+**What is not established.** Whether exact period one holds from some $m_0\ge4$ on is **open**. On the samples tested, the changes thin out (1 232, 218, 49, 22 on $S_{300}$) and their onset radii grow ($13.9$, $26.9$, $124.5$, $142.7$). This fits eventual exactness from some $m_0\ge4$ as well as failure at every level. Lemma 6.2 gives a *sufficient* condition for lune-freeness. It shows that points of bounded internal radius are eventually protected. It cannot show that lunes, and hence changes, persist at every level for points of larger internal radius. Nothing has been tested from $m_0=4$ on except $S_{100}$ at $4\to5$ (no change) and $S_{\rm ann}$ at $3\to4$. My expectation, a conjecture, is that the hypothesis fails at every $m_0$, because the zoomed core contains points of every internal radius.
 
-In the terms of the task's step 2(ii): the lattice points that violate the inductive step are exactly the points whose excursion meets a lune of a tight disk, the thin region between the circle and its tangent line (Lemma 6.1(3)). They exist in the window at every level tested, and Lemma 6.2 controls them only for bounded internal radius. Step 2(iii) is confirmed and sharpened: the induced maps do *not* commute with $\Phi$ on all lattice points; the induced *partitions* do on bounded internal radius, and change only by merging.
+In the terms of the task's step 2(ii): the lattice points that violate the inductive step are exactly the points whose excursion meets a lune of a tight disk, the thin region between the circle and its tangent line (Lemma 6.1(3)). They exist in the window at every level tested, and Lemma 6.2 controls them only for bounded internal radius. On step 2(iii): the induced maps do *not* commute with $\Phi$ on all lattice points at levels $\le3$. The induced *partitions* commute with $\Phi$ on bounded internal radius, and in the data they change only by merging.
 
 ### 8.2 Conjectures with exact evidence
 
 **Conjecture E₁₂ (eventual period one, lune criterion).** For every zoomed tight-core lattice point $(Q,\eta)$, let $m^\ast(\eta)$ be the first level at which its excursion is lune-free. Then $R_m(Q,\eta)=R_{m^\ast}(Q,\eta)$ for all $m\ge m^\ast$, and likewise for the core orbit set.
 
-Evidence: 6 216 lune-free cases with no change (§7.5); persistence of lune-freeness; every change is preceded by a lune.
+Evidence: 4 248 lune-free cases with no change (§7.5); persistence of lune-freeness; every change is preceded by a lune.
 
-**Conjecture M₁₂ (monotone coarsening).** For $m\ge1$ and every zoomed tight-core lattice point, the zoomed core orbit set at level $m$ is contained in the one at level $m+1$.
+**Conjecture M₁₂ (monotone coarsening).** For $m\ge1$ write $\sim_m$ for the relation "lie in one orbit at $r_m$" on zoomed tight-core lattice points $(Q,\eta)\leftrightarrow Q+\varepsilon^m\eta$. Then $\sim_m\subseteq\sim_{m+1}$; equivalently, the zoomed core orbit set of every point at level $m$ is contained in the one at level $m+1$.
 
-Evidence: every partition change observed is a merge (32/32), and every first-return change from level 1 on is a growth (557/557).
+Evidence: every partition change observed is a merge (32/32), and every first-return change from level 1 on is a growth (290/290 on one class).
 
-**Conjecture L₁₂ (bounded limit classes).** There is $N$ with $|\bigcup_m\{\text{zoomed core orbit set of }(Q,\eta)\text{ at level }m\}|\le N$ for every $(Q,\eta)$.
+**The eventual relation.** Define $\sim_\infty$ by: $(Q,\eta)\sim_\infty(Q',\eta')$ if $(Q,\eta)\sim_m(Q',\eta')$ for all sufficiently large $m$. This is the *limit object*. It is an equivalence relation, as the lim inf of equivalence relations, and it does not involve any finite level by itself. Conjecture E₁₂ says that it is reached point by point at the first lune-free level.
 
-Evidence: the maximum number of core visits per orbit is 280 on $S_{100}$ and $S_{300}$ (levels 0–4 and 2–3), and the distribution of core visits is level-independent on the 30 full orbits (§7.3).
+**Conjecture L₁₂ (bounded limit classes).** There is $N$ such that every $\sim_\infty$-class has at most $N$ elements.
 
-**Proposition 8.1 (proved).** M₁₂ and L₁₂ imply (R-core-t₁₂) with $m_0=1$. Hence M₁₂, L₁₂ and (R-bulk₁₂) imply (B₁₂), so $r_{\rm crit}(12)=\sqrt{40-22\sqrt3}$.
+Evidence: at most 280 core visits per orbit on $S_{100}$ and $S_{300}$ (levels 0–4 and 2–4), and a level-independent distribution of core visits on the 30 full orbits (§7.3).
 
-*Proof.* Under M₁₂ the level-$m$ zoomed core orbit set of every lattice point is contained in its limit, which has at most $N$ points by L₁₂. Apply Theorem 5.4. $\square$
+**Proposition 8.1 (proved; not yet refereed).** M₁₂ and L₁₂ imply (R-core-t₁₂) with $m_0=1$: every $\sim_m$-class with $m\ge1$ has at most $N$ elements. Hence M₁₂, L₁₂ and (R-bulk₁₂) imply (B₁₂), and so $r_{\rm crit}(12)=\sqrt{40-22\sqrt3}$.
 
-Proposition 8.1 replaces the exact one-step induction, which is false, by a monotone limit. The base certificate is then not needed for the core; it is needed only if one wants explicit constants.
+*Proof.* Let $m\ge1$ and $x\sim_my$. By M₁₂, $x\sim_ky$ for every $k\ge m$, so $x\sim_\infty y$. Hence each $\sim_m$-class lies in a $\sim_\infty$-class, which has at most $N$ elements by L₁₂. Let $y$ be a lattice point whose orbit at $r_m$ meets the tight core in a lattice point $x$. Then that intersection is the $\sim_m$-class of $x$, so $|O_{r_m}(y)\cap\operatorname{int}B^{\rm t}_m|\le N$. Apply Theorem 5.4. $\square$
+
+**What the proposition does and does not do.**
+- A variant of L₁₂ that bounds the union over all levels of the zoomed core orbit sets would imply (R-core-t₁₂) at every level directly, with M₁₂ unused. It would be a restatement of the gap (referee's issue 3). L₁₂ is therefore stated for the eventual relation only.
+- In the present form, L₁₂ concerns only the eventual relation $\sim_\infty$, which a limit-system certificate (§8.3(ii)) could in principle bound. M₁₂ is exactly what transfers that bound to the finite levels.
+- The content is modest. Conversely, a uniform bound on the $\sim_m$-classes for all large $m$ implies L₁₂. So, given M₁₂, L₁₂ is equivalent to (R-core-t₁₂). The gain is only that L₁₂ is a statement about one limit object.
+- The certified base (levels 0–2) is not used on this route only because M₁₂ is assumed from level 1 on. Without M₁₂ nothing here replaces it.
 
 ### 8.3 The exact remaining gap
 
 (B₁₂) follows (Theorem 5.4, Proposition 8.1) from:
 
 1. **(R-bulk₁₂)**: restricted closures at $r_c$ for windows of every scale, or any other proof that $\beta^\ast(W)<\infty$ along windows shrinking to the critical points. Certified instances: $\rho_W=0.0915$, $0.0358$, $0.0197$ (this note); generated: $0.0124$ (parallel run, not checked by me). They reach the core scale of level 1. Closures grow roughly like $\rho_W^{-1}$ in internal extent. No self-similarity argument reducing the infinite family to finitely many instances is known. The curvature of the circles of radius $r_c$ through the critical points prevents a literal $\Phi$-conjugacy of closures, as for $n=5$.
-2. **(R-core-t₁₂)**: uniformly bounded visits to the tight cores, for all lattice points at all large levels. M₁₂ together with L₁₂ suffices. E₁₂ is the mechanism. **None of the three is proved.** The proof would need:
+2. **(R-core-t₁₂)**: uniformly bounded visits to the tight cores, for all lattice points at all large levels. M₁₂ together with L₁₂ (on the eventual relation) suffices. E₁₂ is the conjectured mechanism. **None of the three is proved.** The proof would need:
    - (i) a proof that lunes only delete edges *of the return relation*: the observed growth. This is an inclusion between induced relations at different levels, not an inclusion of graphs. Orbit monotonicity in $r$ compares the same points, and $\Phi$ moves points, so it does not give this;
-   - (ii) a finite certificate for the limit classes, that is, for the system with straight tangent cuts at the 8 tight points. The limit-system note shows (§5.4 there) that the chain-domain cuts away from the critical points do not form a finite line arrangement. Here §7.6 shows that they are confined to fixed macroscopic balls about the critical points, which is the setting of the relative certificates of §4. A *hybrid* object — the induced pseudogroup on the windows of §4 (finite word set, Proposition 4.3), with its tight tests replaced by tangent half-planes — is the natural limit system. Its construction and the proof that its classes are bounded are not done;
+   - (ii) a finite certificate for the classes of $\sim_\infty$, that is, for the system with straight tangent cuts at the 8 tight points. The limit-system note shows (§5.4 there) that the chain-domain cuts away from the critical points do not form a finite line arrangement. Here the data of §7.6 (not proved) place the level dependence in fixed macroscopic balls about the critical points, which is the setting of the relative certificates of §4. A *hybrid* object — the induced pseudogroup on the windows of §4 (finite word set, Proposition 4.3), with its tight tests replaced by tangent half-planes — is the natural limit system. Its construction and the proof that its classes are bounded are not done;
    - (iii) the $r_c$ self-similarity of §7.7, proved instead of tested.
 
-**The base.** Levels 0–2 are certified ($\delta=1/180$). Proposition 6.4 would have needed exactness from $m_0\le2$, which is refuted. Proposition 8.1 needs no base. Level 3 is not certified and appears out of reach of ordinary certificates in this memory budget.
+**The base.** Levels 0–2 are certified ($\delta=1/180$). Proposition 6.4 would have needed exactness from $m_0\le2$, which is refuted. Proposition 8.1 does not use the base, but only because M₁₂ is assumed from level 1 on (§8.2). Level 3 is not certified and appears out of reach of ordinary certificates in this memory budget.
+
+### 8.4 Referee's suggestions
+
+The following are the referee's proposals (`referee-report-sharp-lower-bound-n12.md` §5), recorded as proposals and not yet carried out.
+
+1. **The "enlarging disks" route to M₁₂ does not work as it stands.**
+   - Pull the level-$(m+1)$ system back by $\Phi_Q$. The tight disk becomes $\Phi_Q^{-1}(D_p(r_{m+1}))$, with centre $Q-\varepsilon^{-1}w$ and radius $r_{m+1}/\varepsilon$. This disk contains $D_p(r_m)$, because $r_c-r_{m+1}\le\varepsilon(r_c-r_m)$. The same holds for the other disk at the 8 tight points. So in zoomed coordinates "in at level $m$" implies "in at level $m+1$".
+   - The pulled-back generators, however, rotate about $Q+\varepsilon^{-1}(p-Q)$, not about $p$, and $R_p\Phi_Q z-\Phi_QR_pz=(1-\varepsilon)(R_pQ-Q)\ne0$.
+   - Orbit monotonicity in $r$ (`boundary-contact.md` Theorem 3.1) compares rotations about the same centres. It gives $O_{r_m}(x)\subseteq O_{r_{m+1}}(x)$ for the same physical point, and nothing about $\Phi_Q(x)$.
+2. **A provable partial lemma: linear first returns persist.** Let $h$ be a word whose chain from $Q$ runs through non-critical lattice points $h_k(Q)$ and ends at a critical point $Q'=h(Q)$. Put
+   - $\mu(h)=\min_k\bigl||h_k(Q)\mp1|-r_c\bigr|$, the test margin along the chain;
+   - $\nu(h)=\min_k\operatorname{dist}(h_k(Q),\text{critical points})$.
+
+   Suppose $C\varepsilon^m+(r_c-r_m)<\mu(h)$ and $2C\varepsilon^m<\nu(h)$, and the chain is valid at level $m$ from $Q+\varepsilon^mY$ with $|Y|\le C$. Then it is valid at level $m+1$ from $Q+\varepsilon^{m+1}Y$, with the same zoomed endpoint. The intermediate tests do not change, and the first, tight, test transfers by Lemma 6.1(2). So linear first returns persist from a level that depends on the word. The obstacle to M₁₂ is the non-linear returns, whose words must change with $m$.
+3. **Only near misses from outside the circle can shrink a domain.** For a far test with base vector $u$, exactly $\tilde\delta_{m+1}-1=\varepsilon^{-1}(\tilde\delta_m-1)$ (Lemma 6.3).
+   - Cuts from inner near misses ($|u|<r_c$, which include the frozen points) move so as to enlarge the "in" region, and so does the curvature term $10\varepsilon^m|Y|^2$.
+   - Only outer near misses ($|u|>r_c$) shrink it.
+
+   A proof of M₁₂ by transporting words would have to renormalize the level-$m$ return words to level-$(m+1)$ words with the same zoomed germ, and show that their outer near-miss tests survive. A cheap test: check whether every cut involved in a change comes from an inner near miss.
+4. **Test $m_0=4$ directly.** Compute first returns $4\to5$ on the 22 points of $S_{300}$ that change at $3\to4$, and on the points of $S_{300}$ with internal radius above 200. A change would extend the refutation to $m_0=4$; none would support eventual exactness.
+5. **An exact independent checker for row 1 of Table 4.1.** It has 31 205 arcs, so an exact re-implementation of (K1)–(K3) is small. It would make row 1 independently certified.
+6. **State the remaining gap honestly** (§8.2). The real target is a finite limit object, the hybrid pseudogroup of §8.3(ii), whose classes bound $\sim_\infty$.
 
 ---
 
 ## 9. Status and gaps
 
+The referee's verdicts are those of `referee-report-sharp-lower-bound-n12.md`. Items marked *not yet refereed* were added or reformulated after the report.
+
 | claim | status |
 |---|---|
-| Lemma 2.1 (24 vectors, 48 critical points, 12 classes, minimal distance $\sqrt{2\varepsilon^3}$), Lemma 2.2 (tangency only at critical points) | **proved**; enumerations exact (two programs and the engine) |
-| Lemma 3.1 (lattice non-norm at all levels; field non-norm at $m\in\{0,4,5\}\cup[6,\infty)$; norms at $m=1,2,3$) | **proved** (Hasse norm theorem, explicit factorizations) |
-| Lemma 3.3 (frozen points), Lemma 3.4 (lattice points suffice at field-non-norm levels) | **proved** |
-| Theorem 4.1, Corollary 4.2, Proposition 4.3 (window reduction for $n=12$) | **proved modulo the certified computation** (any row of Table 4.1: engine generator, float-free checker VALID); the theorem used is the combined note's Theorem 4.2 for general $n$, refereed for $n=5$ |
-| Theorem 5.1 (40 non-tight points rigid from level 0, all points), Corollary 5.2 | **proved modulo an exact finite computation** (Table 5.1; two independent programs; margins far from the thresholds) |
-| Theorem 5.4, Proposition 6.4, Proposition 8.1 (assembly) | **proved** |
-| Lemmas 6.1–6.3 (tight-test transfer, lune lemma with constant 176.754, no parity) | **proved** |
-| Literal period one (Proposition 6.4's hypothesis) from $m_0=2$ and $m_0=3$; first-return version from $m_0=2,3$ | **refuted** (exact counterexamples, §7.4, Table 7.2) |
-| Period one on bounded internal radius: $S_{100}$ $2\to3\to4\to5$ | **computed**, exact; 265, 265, 184/184 |
-| Conjectures E₁₂, M₁₂, L₁₂ | **conjectures**, exact evidence §7.5, §7.3 |
-| $\Phi$-invariance of $O(p^\ast)$ within $0.14$ of $p^\ast$ at $r_c$ | **computed** (4 149/4 149 exact memberships; exact failures from $0.1415$ on) |
-| (R-bulk₁₂) | open; three instances certified by me, one more generated in a parallel run |
+| Lemma 2.1 (24 vectors, 48 critical points, 12 classes, minimal distance $\sqrt{2\varepsilon^3}$), Lemma 2.2 (tangency only at critical points) | **proved**; refereed correct; enumerations reproduced by the referee's own code |
+| Lemma 3.1 (lattice non-norm at every level; field non-norm at $m\in\{0,4,5\}\cup[6,\infty)$; field norms at $m=1,2,3$) | **proved**; refereed correct. The referee checked the Hilbert-symbol arguments and found the explicit norm witnesses |
+| Lemma 3.3 (frozen points), Lemma 3.4 (lattice points suffice at field-non-norm levels) | **proved**; refereed correct (Lemma 3.4 read and found sound, its $n=5$ ingredients not re-derived) |
+| Theorem 4.1, Corollary 4.2, Proposition 4.3 (window reduction for $n=12$) | **proved modulo the certified computation**; refereed correct. Rows 1 and 2 of Table 4.1 were re-run VALID by the referee with the repository's exact checker. Row 3 rests on my log. All three rows are accepted by the referee's independent float-guided checker (computed, not certified). The theorem used is the combined note's Theorem 4.2 for general $n$ |
+| Theorem 5.1 (40 non-tight points rigid from level 0, all points), Corollary 5.2 | **proved modulo an exact finite computation** (Table 5.1: two separate programs by the same author, reproduced by the referee's own code); refereed correct |
+| The 8 points treated as tight | skeleta exceed the cap $2\cdot10^6$ (observed, not proved infinite); not used in any proof |
+| Theorem 5.4 (assembly), with the core constant $C'=0.089$ | **proved**; refereed correct after the fix of the closed/open cores (fix as the referee proposed; not yet refereed in this form) |
+| Lemmas 6.1–6.3 (tight-test transfer; lune lemma with constant $20\sqrt{40+22\sqrt3}<176.76$; no parity) | **proved**; refereed correct after the constant was fixed |
+| Proposition 6.4 | **proved**; refereed correct |
+| Exact period one (Proposition 6.4's hypothesis), first-return and orbit-partition versions, from any $m_0\le3$ | **refuted**, exact counterexamples (§7.4, Tables 7.1, 7.2); reproduced count for count by the referee's independent engine, including a complete $3\to4$ partition run |
+| Exact period one from some $m_0\ge4$ | **open** |
+| Period one on bounded internal radius: $S_{100}$ $2\to3\to4\to5$ | **computed**, exact: 265, 265, 184/184. The referee reproduced $2\to3\to4$; $4\to5$ not checked by the referee |
+| Proposition 8.1 (M₁₂ and L₁₂ on the eventual relation imply (R-core-t₁₂)) | **proved**; not yet refereed in this form |
+| Conjectures E₁₂, M₁₂, L₁₂ | **conjectures**, with exact evidence (§7.5, §7.3), correctly labelled according to the referee |
+| $\Phi$-invariance of $O(p^\ast)$ within $0.14$ of $p^\ast$ at $r_c$ | **computed**: 4 149/4 149 exact memberships, exact failures from $0.1415$ on. The referee reproduced the test up to $\rho=0.088$ and the exact failures |
+| (R-bulk₁₂) | open; three instances certified |
 | (R-core-t₁₂), (B₁₂), $r_{\rm crit}(12)=\sqrt{40-22\sqrt3}$ | **open** |
 
+**Not checked by the referee:**
+- §7.6, the frozen-hit statistics;
+- the core-visit distributions on the 30 full orbits (§7.3);
+- the sample $S_{\rm ann}$;
+- level 5;
+- $\Phi^2$, and $\rho\ge0.09$, in §7.7;
+- the parallel `relcert/` rows;
+- the exact checker on row 3;
+- §10;
+- the general-$n$ reading of the combined note's Theorem 4.2;
+- the $n=5$ ingredients of Lemma 3.4.
+
 **Caveats.**
-1. *Not refereed.* The excursion engines are the referee's `r12n.c` and my modifications of it, which change only the hash sizing, the stopping rule and the extra counters. Their results at levels $\le4$ were not re-derived by a second independent implementation. The level-1 orbit match with the repository engine was done by the referee, and the orbits of §7.7 were checked with the repository engine.
+1. *Implementations.* The excursion engines are the earlier referee's `r12n.c` and my modifications of it, which change only the hash sizing, the stopping rule and the extra counters. The present referee reproduced the results at levels $\le4$ with an independent engine in a different point representation (§7 above).
 2. *Samples.*
-   - The tests use lattice points of bounded internal radius ($\le800$) at the two tight classes.
+   - The tests use lattice points of bounded internal radius ($\le800$), at the two tight classes. The two classes give identical statistics, so the second adds no independent weight.
    - Level 5 covers 184 uncapped points of $S_{100}$ only; 81 points exceed $4.4\cdot10^7$ points per excursion.
-   - The orbit-partition comparison $3\to4$ on $S_{300}$ is partial (Table 7.2).
    - No test was run at the non-tight points; Theorem 5.1 covers them.
-3. *Lune counts* are taken within zoomed distance 1 only; the frozen-hit statistics of §7.6 show that frozen points up to zoomed distance 35 are visited at level 4.
-4. *Statistics in floating point.* The physical-distance figures of §7.6 and the window geometry ($\rho_W$) are double precision; they are evidence, not used in any proof. Window disjointness is exact (engine).
+3. *Lune counts* are taken within zoomed distance 1 only. The frozen-hit statistics of §7.6 show that frozen points up to zoomed distance 35 are visited at level 4.
+4. *Statistics in floating point.* The physical-distance figures of §7.6 and the window geometry ($\rho_W$) are double precision. They are evidence and are not used in any proof. Window disjointness is exact (engine).
 
 ---
 
@@ -435,9 +494,9 @@ Proposition 8.1 replaces the exact one-step induction, which is false, by a mono
 
 - **Lattice versus field non-norm.** Lemma 3.1 shows that "level radii are non-norm" must be checked in the field sense where triple points matter. For $n=5$ this was proved through the prime above $2$ (`sharp-lower-bound-n5.md` Lemma 2.2(3)); for $n=12$ that argument fails, since $v_{\mathfrak P}(r_m^2)=-2$ is even, and three levels are norms. For $n=8,10$ the same Hilbert-symbol computation decides each level.
 - **The frozen-point lemma** (Lemma 3.3) holds for every $n$ with $\varphi(n)=4$: replace $\sigma'(r_c^2)$ and $\varepsilon$. For $n=5$: $\sigma(r_c^2)=4-\varphi$, and $\sigma(\varepsilon^k)$ alternates in sign, so the threshold alternates, which matches the parity mechanism of the referee.
-- **The lune lemma** with constant $20|\sigma w|$: $30.87$ for $n=5$, $176.75$ for $n=12$.
+- **The lune lemma** with constant $20|\sigma w|$: $30.87$ for $n=5$, $20\sqrt{40+22\sqrt3}<176.76$ for $n=12$.
 - **Rigidity** (Theorem 5.1) and the window reduction (§4) transfer verbatim. For $n=8,10$ only the skeleton table and a relative certificate at $r_c$ are needed (the parallel run has $n=8,10$ relative closures in progress).
-- **First returns versus orbit partitions.** §7.4 shows that first-return sets can change while orbit partitions do not. The $n=5$ refutation of $\varphi^{-3}$ matching (limit-system note §5.2) was made on first-return sets; that of the combined note (§6.3) on orbit blocks. **The $n=5$ period-two conjecture should be re-tested on orbit partitions, and for monotone growth.** If M and L hold there, Proposition 8.1 needs no parity: monotone coarsening is insensitive to the period.
+- **First returns versus orbit partitions.** §7.4 shows that first-return sets can change while orbit partitions do not (second example). The $n=5$ refutation of $\varphi^{-3}$ matching (limit-system note §5.2) was made on first-return sets; that of the combined note (§6.3) on orbit blocks. **The $n=5$ period-two conjecture should be re-tested on orbit partitions, and for monotone growth.** If M and L hold there, Proposition 8.1 needs no parity: monotone coarsening is insensitive to the period.
 - **Frozen-hit localization** (§7.6) and the **local $\Phi$-invariance of the critical orbit** (§7.7) are cheap tests that apply to $n=5,8,10$ unchanged. For $n=5$ the latter is known: $\varphi^{-6}$ within distance 1, $\varphi^{-3}$ not.
 
 ---
