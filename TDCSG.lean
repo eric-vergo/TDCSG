@@ -10,6 +10,7 @@ public import TDCSG.CriticalRadius.CyclotomicModel
 public import TDCSG.CriticalRadius.Eight
 public import TDCSG.CriticalRadius.Five
 public import TDCSG.CriticalRadius.FiveConjugate
+public import TDCSG.CriticalRadius.FiveSharp
 public import TDCSG.CriticalRadius.QuadraticSigns
 public import TDCSG.CriticalRadius.Renormalization
 public import TDCSG.CriticalRadius.Statements

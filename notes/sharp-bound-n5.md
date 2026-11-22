@@ -1,12 +1,11 @@
 # Finiteness of $GG_5(r)$ below $\sqrt{3+\varphi}$: a guide to the notes
 
-Authors: Eric Vergo, Claude
+Authors: Eric Vergo, Claude and OpenAI GPT-6.2 Astra
 
-The target is statement **(B)**: $GG_5(r)$ is finite for every $r<r_c=\sqrt{3+\varphi}$. Infinitude
-at and above $r_c$ is proved in Lean (`infinite_GG_five`), so (B) is the remaining half of
-$r_{\rm crit}(5)=r_c$. **(B) is not proved.** Twelve notes in [`proofs/`](proofs/) attack it. This
-guide says what each proves, how they depend on each other, what the present reduction is, which
-formulations are refuted or closed, and which new ideas have been proposed. Every statement below
+**The exact critical radius is $r_{\rm crit}(5)=\sqrt{3+\varphi}$.** The fivefold group is finite at every smaller radius (statement **(B)**) and infinite at the endpoint. In the lower-bound proof, each active disk center has five integer coordinates. Certain levels in each coordinate can be crossed only along an edge with a terminal endpoint. Uniform gaps between these levels bound every orbit at fixed radius. The written proof also gives $M(r)=O(1/(r_c^2-r^2))$. [Proof](proofs/sharp-lower-bound-n5-pentagrid.md) · [Independent review](proofs/referee-report-sharp-lower-bound-n5-pentagrid.md) · [Lean threshold theorem](../TDCSG/CriticalRadius/FiveSharp.lean).
+
+The twelve notes below study a complementary route through the chord words and their components.
+Every statement below
 is labelled **proved** (written proof, refereed unless said otherwise), **computed** (exact
 arithmetic unless said otherwise) or **conjectured**; the notes themselves carry the details.
 
@@ -137,7 +136,7 @@ Conjecture B$^\sharp$. The component-graph note (9) uses (7) and (8); the transp
 (8) and (9); the atlas note (11) uses (8), (9) and (10); the rim note (12) uses the atlas referee's §4, and (8) and (9) only for its component-graph form. Notes 9–11 also use the certified
 finiteness at $\delta=1/55$ ([`certificates.md`](certificates.md)) as base case.
 
-## The present reduction
+## The chord-token reduction
 
 - **(T), proved** ([(T) note](proofs/sharp-bound-n5-token-components.md), Theorem 4). Every token
   component of every point of the plane has internal diameter less than $72.07/\delta+41.82$ for
@@ -145,7 +144,7 @@ finiteness at $\delta=1/55$ ([`certificates.md`](certificates.md)) as base case.
 - **Reduction, proved** (same note, Corollary 5). (T) and (K) imply (B). At each fixed $r<r_c$,
   $GG_5(r)$ is finite if and only if $D(r)<\infty$. A uniform bound $D(r)\le K_0$ also gives
   Conjecture A, $M(r)\le(K_0+1)(72.07/\delta+41.82)+1.903K_0$.
-- **(K), open.** It is the single remaining statement on this route. Its weakest sufficient form
+- **(K), uniform form open.** The per-radius form follows from (B) and the equivalence above. This weaker form
   is stated in [`proofs/sharp-bound-n5-component-graph.md`](proofs/sharp-bound-n5-component-graph.md),
   Proposition 1:
 
@@ -228,8 +227,8 @@ Recorded by the authors and referees; none is tested beyond what is said. Each a
 [`ideas.md`](ideas.md).
 
 1. **A wall or monotone quantity for connectors**, doing for sheet changes what the fence does for
-   token indices ((T) note §2.4; transport referee, §4). It would attack (K) directly. No candidate
-   is known.
+   token indices ((T) note §2.4; transport referee, §4). The integer-center walls bound the full orbit. It remains to bound the number
+   of connectors independently of the radius.
 2. **Renormalize the cut set instead of orbit graphs** (transport referee, §4): show that
    $K(\varepsilon\delta)$ is $\varepsilon K(\delta)$ plus finitely many explicitly described arc
    families. The proposed first test is to compute the cut sets at $1/55$ and $\varepsilon/55$ and

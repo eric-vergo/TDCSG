@@ -11,7 +11,8 @@ GG_n(r) is the group of bijections of the plane they generate (more generally GG
 with different orders and radii). The paper's Theorem 1 says that GG_n(r) is infinite for some r
 exactly when n ∉ {2, 3, 4, 6} (the set must also contain 1, see "Findings about the paper" below),
 and the paper estimates the critical radius r_crit(n) = sup{r : GG_n(r) finite} numerically, with
-closed forms conjectured for n = 5, 8, 10, 12.
+closed forms conjectured for n = 5, 8, 10, 12. The fivefold value is now proved:
+r_crit(5) = √(3+φ), where φ = (1+√5)/2. The other three equalities remain open.
 
 The repository contains a Lean 4 / Mathlib proof library, an exact computation engine written in
 Lean, research notes, written proofs with independent referee reports, and small finiteness
@@ -23,7 +24,7 @@ certificates.
 |---|---|
 | `TDCSG/` | The proof library (Lean 4, Mathlib); `TDCSG.lean` is the root module. Compact statements of the main results are in `TDCSG/Statements.lean` |
 | `TDCSG/Compound/` | The general definition: compound symmetry groups of an indexed family of closed balls in a pseudometric space, each ball carrying a group of its own isometries, and their general theorems; `TDCSG.GG` is the two-disk instance |
-| `TDCSG/CriticalRadius/` | The critical radius `TDCSG.criticalRadius n`, the infinite orbits for n = 5, 8, 10, 12, the Galois-conjugate orbit structure for n = 5 (`FiveConjugate.lean`), the cut-set certificate definitions (`Certificate.lean`), and compact statements in `TDCSG/CriticalRadius/Statements.lean` |
+| `TDCSG/CriticalRadius/` | The critical radius `TDCSG.criticalRadius n`, the exact fivefold threshold (`FiveSharp.lean`), the infinite orbits for n = 5, 8, 10, 12, the Galois-conjugate orbit structure for n = 5 (`FiveConjugate.lean`), the cut-set certificate definitions (`Certificate.lean`), and compact statements in `TDCSG/CriticalRadius/Statements.lean` |
 | `TDCSGCompute/` | The exact engine and the `tdcsg-orbit` executable (core Lean, no Mathlib): orbits (optionally with every point's exact Galois conjugates, `--conj-points`), threshold sweeps, GG_n(r) as a permutation group, cut-set certificates with an independent checker, and relative (window-clipped) certificates; see [`notes/engine.md`](notes/engine.md) |
 | `certificates/` | Small finiteness certificates (`.cert`, format of [`notes/certificates.md`](notes/certificates.md)) and two small relative certificates at r_c (`.rcert`, format of [`notes/relative-certificates.md`](notes/relative-certificates.md)), with their SHA-256 sums |
 | `notes/` | Research notes: [`overview.md`](notes/overview.md) (programme and conventions), [`arithmetic.md`](notes/arithmetic.md), [`analytic-continuation.md`](notes/analytic-continuation.md), [`experiments.md`](notes/experiments.md), [`engine.md`](notes/engine.md), [`certificates.md`](notes/certificates.md), [`gap-structure.md`](notes/gap-structure.md), [`rank-conjecture.md`](notes/rank-conjecture.md), [`large-n-table.md`](notes/large-n-table.md), [`relative-certificates.md`](notes/relative-certificates.md), [`open-problem-critical-radius.md`](notes/open-problem-critical-radius.md) (the critical-radius problem stated for specialists), [`sharp-bound-n5.md`](notes/sharp-bound-n5.md) (guide to the notes on finiteness of GG_5(r) below √(3+φ)), [`ideas.md`](notes/ideas.md) (open directions), and the referee report [`referee-report-engine-campaign.md`](notes/referee-report-engine-campaign.md) |
@@ -102,6 +103,13 @@ No `sorry`, no `native_decide`, no extra axioms: every theorem of `TDCSG` depend
   `one_le_criticalRadius_*` below.
 - **Disjoint disks.** For r₁ + r₂ < 2 the group is isomorphic to C_{n₁} × C_{n₂} and has order
   n₁n₂ (`nonempty_mulEquiv_of_add_lt_two`, `card_GG_of_add_lt_two`).
+- **Exact fivefold critical radius.** GG_5(r) is finite for every r < √(3+φ) and infinite
+  at and above that radius. Integer labels for the rotating disk centers encounter coordinate
+  levels whose crossing edges end at leaves. These levels bound every orbit uniformly at each
+  subcritical radius. The Lean theorems are `TDCSG.CriticalRadius.finiteBelowClosedFormFive`
+  and `TDCSG.CriticalRadius.criticalRadius_five_eq`. [Lean proof](TDCSG/CriticalRadius/FiveSharp.lean)
+  · [Written proof](notes/proofs/sharp-lower-bound-n5-pentagrid.md)
+  · [Independent review](notes/proofs/referee-report-sharp-lower-bound-n5-pentagrid.md)
 - **Infinitude at the closed-form radii.** GG_n(r) is infinite for every r at or above
   √(3+φ) (n = 5, `infinite_GG_five`), √(10−5√2) (n = 8, `infinite_GG_eight`), √(4−φ) (n = 10,
   `infinite_GG_ten`) and √(40−22√3) (n = 12, `infinite_GG_twelve`), through explicit infinite
@@ -118,21 +126,19 @@ No `sorry`, no `native_decide`, no extra axioms: every theorem of `TDCSG` depend
   x ↦ ζʲx + t with t ∈ (1 − ζ)ℤ[ζ] (`exists_affine`); a subset of ℤ[ζ] bounded in both
   embeddings is finite (`Cyc.finite_setOf_norm_le`); and GG_5(r) is finite exactly when the
   Galois conjugates σ(t) of the translation parts are bounded
-  (`finite_GG_iff_conjugatesBounded`), a condition that holds for r < 1 and fails for
-  r ≥ √(3+φ). The unproved proposition `FiniteBelowClosedFormFive` (finiteness for every
-  r < √(3+φ)) is equivalent to that condition below √(3+φ)
-  (`TDCSG.Five.finiteBelowClosedFormFive_iff`) and implies `CriticalRadiusEqFive`
-  (`criticalRadiusEqFive_of_finiteBelowClosedFormFive`).
+  (`finite_GG_iff_conjugatesBounded`). The exact threshold gives bounded conjugates precisely for
+  r < √(3+φ). The written fivefold proof also gives the rate O(1/(3+φ−r²)) as r approaches
+  the threshold from below. [Quantitative bound](notes/proofs/sharp-lower-bound-n5-pentagrid.md)
 - **From certificates to finiteness.** `TDCSG.finite_GG_of_certificate`
   (`TDCSG/CriticalRadius/Certificate.lean`): if the certificate theorem holds and a certificate
   exists at r₀, then GG_n(r) is finite for all r ≤ r₀; and `finiteBelowFive_of_certificate`,
   `le_criticalRadius_five_of_finiteBelow` and their analogues for n = 8, 12. The certificate
   theorem itself is the unproved proposition `TDCSG.CutSetCertificate n`, and the existence of a
   certificate is the unproved proposition `TDCSG.ExistsCertificate n r`; both enter only as
-  hypotheses. So no Lean theorem yet gives finiteness at any r > 1 for n = 5, 8, 10, 12. The
+  hypotheses. So no Lean theorem yet gives finiteness at any r > 1 for n = 8, 10, 12. The
   propositions `FiniteBelowFive`, `FiniteBelowEight`, `FiniteBelowTwelve` state finiteness at the
-  refereed ranges δ = 1/10, 1/7, 1/20; there is no `FiniteBelowTen`. The exact values are the open
-  propositions `CriticalRadiusEqFive`, `…Eight`, `…Ten`, `…Twelve`.
+  refereed ranges δ = 1/10, 1/7, 1/20; there is no `FiniteBelowTen`. The remaining open exact values are
+  `CriticalRadiusEqEight`, `CriticalRadiusEqTen` and `CriticalRadiusEqTwelve`.
 
 ### (b) Refereed written proofs, not in Lean
 
@@ -164,8 +170,8 @@ No `sorry`, no `native_decide`, no extra axioms: every theorem of `TDCSG` depend
 - **The cut-set certificate theorem.** A finite union of arcs satisfying (C1)–(C4) forces GG_n(r)
   to be finite (Theorem 4.2 of `critical-radius-n5.md`, Theorem 3.1 of `critical-radius-n8.md`).
 
-**The sharp-lower-bound series.** Five refereed notes attack finiteness below the closed forms. None
-proves it: **r_crit(n) = closed form remains open for all four n = 5, 8, 10, 12.** A self-contained
+**The sharp-lower-bound series.** Five refereed notes study finiteness below the closed forms using cut sets
+and return maps. The remaining open cases are n = 8, 10, 12. A self-contained
 statement of the problem for specialists, with the current status of every ingredient, is
 [`notes/open-problem-critical-radius.md`](notes/open-problem-critical-radius.md).
 
@@ -208,7 +214,7 @@ statement of the problem for specialists, with the current status of every ingre
 **The sharp-bound series for n = 5.** Twelve further notes attack finiteness of GG_5(r) for every
 r < √(3+φ); eleven are refereed, the rim-graph note is not. The guide
 [`notes/sharp-bound-n5.md`](notes/sharp-bound-n5.md) summarizes each note, its referee verdict, the
-refuted formulations and the proposed new ideas. **Finiteness below √(3+φ) is not proved.**
+refuted formulations and the proposed new ideas. The integer-center proof above establishes finiteness throughout this range.
 
 - Proved (refereed): every chord run and every chord passage below r_c, from every starting point,
   is cut off after O(1/δ) steps with explicit constants, δ = r_c² − r²
@@ -226,9 +232,9 @@ refuted formulations and the proposed new ideas. **Finiteness below √(3+φ) is
   (T) and (K) imply finiteness below r_c, and at each fixed r, GG_5(r) is finite if and only if
   the component graphs of its orbits (token components joined by single letters) have bounded
   diameter.
-- Open: **(K)**, a bound on the number of single letters outside tokens needed to reach every state
-  of an orbit; a bound for each radius separately suffices, though at a given radius it is
-  equivalent to finiteness there, so only uniform bounds are a genuine reduction. Computed: component-graph diameter at
+- Open: a bound on the number of single letters outside tokens needed to reach every state of
+  an orbit **uniformly as r approaches the threshold**. At each fixed subcritical radius this
+  number is bounded by the fivefold finiteness theorem and the component-graph equivalence. Computed: component-graph diameter at
   most 9 on every orbit computed exactly. Local transport of tokens by ε = φ⁻³ is proved
   ([`sharp-bound-n5-graph-renormalization.md`](notes/proofs/sharp-bound-n5-graph-renormalization.md));
   the global renormalization statements needed for (K) are not, and the referees conclude that
@@ -254,7 +260,7 @@ certificate theorem as the unproved hypothesis `CutSetCertificate`. Values are f
 [`notes/relative-certificates.md`](notes/relative-certificates.md) §10, which record every run and
 checksum.
 
-| n | r_c (proved in Lean to be an upper bound) | refereed r_* | best certified r_* (δ) | kind of certificate | open window r_c − r_* |
+| n | r_c (proved in Lean to be an upper bound) | refereed r_* | best certified r_* (δ) | kind of certificate | distance r_c − r_* |
 |---|---|---|---|---|---|
 | 5 | √(3+φ) ≈ 2.148961 | 2.125567 (δ = 1/10) | 2.144727 (δ = 1/55) | ordinary cut-set certificate | 0.004235 |
 | 8 | √(10−5√2) ≈ 1.711412 | 1.669154 (δ = 1/7) | 1.705008 (δ = 547/25000 = 0.02188) | symmetry-reduced window-free closure, (C1)–(C4) checked by `check-relative-certificate` (ordinary certificate at δ = 1/36, r_* = 1.703278) | 0.006404 |
@@ -262,8 +268,8 @@ checksum.
 | 12 | √(40−22√3) ≈ 1.376547 | 1.358264 (δ = 1/20) | 1.374528 (δ = 1/180); r² < ρ₁, δ ≈ 0.0055543, by the interval of validity | ordinary cut-set certificate, extended by the interval of validity | 0.002019 |
 
 "Refereed r_*" is the range whose computation was reproduced during refereeing (by an independent
-implementation) and is the range of the Lean propositions `FiniteBelow…`. The open window
-(r_*, r_c) is open in every case. Since r_* > r_A(n) in all four cases, r_A < r_crit holds there
+implementation) and is the range of the Lean propositions `FiniteBelow…`. For n = 8, 10, 12, finiteness throughout (r_*, r_c) is open.
+For n = 5 the entire interval is covered by the integer-center theorem. Since r_* > r_A(n) in all four cases, r_A < r_crit holds there
 modulo the same computations. The best entries for n = 8, 10, 12 rest on arguments proved in
 `relative-certificates.md` and refereed correct in
 [`notes/proofs/referee-report-relative-certificates.md`](notes/proofs/referee-report-relative-certificates.md):
@@ -326,14 +332,9 @@ into a certificate format or checker.
 
 ### (e) Open problems and conjectures
 
-- **r_crit(n) equals the closed form for n = 5, 8, 10, 12** (finiteness on the open windows above):
-  open for all four n. Current reductions, from the sharp-lower-bound and sharp-bound series in
-  (b): for n = 5, finiteness below r_c is equivalent to termination of the cut-set closure along
-  non-norm radii r_j ↑ r_c, follows from (R-bulk-t) with (R-core-t), statements about the four
-  tight points, and, since (T) is proved, follows from the single open statement (K) on
-  component graphs ([`notes/sharp-bound-n5.md`](notes/sharp-bound-n5.md));
-  for n = 8 it follows from Conjecture S; for n = 12 it follows from statements about the 8 tight
-  points. The renormalization these need is not found: exact φ⁻³ matching and unrestricted period
+- **Prove r_crit(n) equals the closed form for n = 8, 10, 12.** Current reductions are described
+  in the sharp-lower-bound series in (b). For n = 8 equality follows from Conjecture S. For
+  n = 12 it follows from statements about the eight tight points. The renormalization these need is not found: exact φ⁻³ matching and unrestricted period
   two of first-return sets are refuted for n = 5, exact period one from levels m₀ ≤ 3 is refuted
   for n = 12, and monotone period-two growth of tight-core orbit classes (n = 5) and eventual
   period one through monotone growth (n = 12) are conjectures. n = 10 has no note of its own; its relative certificates at r_c give the window reduction
@@ -342,7 +343,7 @@ into a certificate format or checker.
   [`notes/open-problem-critical-radius.md`](notes/open-problem-critical-radius.md) states the
   problem for specialists, with questions.
 - **The paper's footnote 4**: whether the group is infinite at the group-level critical radius. The
-  per-point version is proved (above); the group version is open.
+  per-point version is proved (above). The group version holds for n = 5 and is open in general.
 - **The rank conjecture**: the self-similarity is governed by the unit group of ℤ[ζ_n]⁺.
 - **The large-n entries** of the paper's critical-radius table: true critical radii, or the onset
   of very large finite orbits.
@@ -363,7 +364,7 @@ into a certificate format or checker.
 - **The closed forms for n = 8 and 12** were derived from the assumption that a limit point lies on
   a disk boundary. Infinitude at those radii is proved without it (in writing and in Lean):
   the limit point is a lattice point p* that lies on ∂D_L exactly at r_c. That these radii are the
-  critical radii is open, as for n = 5 and 10. The paper's description of segments that "traverse
+  critical radii is open, as for n = 10. The paper's description of segments that "traverse
   angles of π/8" (n = 8) was not reproduced; the approach to p* found here is along a straight line
   ([`critical-radius-n8.md`](notes/proofs/critical-radius-n8.md) §2.6).
 - **n = 10.** The paper's estimate 1.543357 lies just below the closed form √(4−φ) ≈ 1.543362,
@@ -377,6 +378,6 @@ riemann-hypothesis repository; see [`notes/overview.md`](notes/overview.md) §6.
 
 ## Licence and authors
 
-Apache License 2.0; see [`LICENSE`](LICENSE). Authors: Eric Vergo and Claude (Anthropic). Lean
-files carry a licence line and an `Authors: Eric Vergo, Claude` line, with no copyright line; notes
-carry an authors line.
+The project uses the [Apache License 2.0](LICENSE). Eric Vergo, Claude (Anthropic), and
+OpenAI GPT-6.2 Astra are credited in the files they contributed to. The fivefold critical-radius
+proof and its Lean formalization credit Eric Vergo and OpenAI GPT-6.2 Astra.

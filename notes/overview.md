@@ -1,6 +1,6 @@
 # Two-disk compound symmetry groups: research overview
 
-Authors: Eric Vergo and Claude (Anthropic).
+Authors: Eric Vergo, Claude (Anthropic) and OpenAI GPT-6.2 Astra.
 
 This note collects what is currently known or suspected about the two-disk systems GG_n(r) of
 *Two-Disk Compound Symmetry Groups* (Hearn, Kretschmer, Rokicki, Streeter, Vergo, arXiv:2302.12950)
@@ -49,9 +49,9 @@ there remain preliminary. Values of r_c(n) quoted without that mark are from the
   `TDCSG/Compound/Basic.lean`: closed balls in a metric space, each with a group of its own
   isometries extended by the identity outside the ball) with the two disks and the cyclic groups
   of their rotations; `TDCSG.GG_eq_closure` identifies it with ⟨a, b⟩.
-- r_c(n) is the critical radius: the least r at which GG_n(r) is infinite. For n = 5, 8, 10, 12 the
+- r_c(n) is the critical radius: the infimum of the radii at which GG_n(r) is infinite. For n = 5, 8, 10, 12 the
   notes in [`proofs/`](proofs/) write r_c for the closed form below and r_crit(n) for the critical
-  radius, since their equality is not proved.
+  radius, with equality proved for n = 5 and open for n = 8, 10, 12.
 - g(n) = |2 − ζ_n| = √(1 + 8 sin²(π/n)).
 
 ### Closed forms of r_c²
@@ -68,8 +68,9 @@ The four known closed forms are written throughout these notes as elements a + b
 The product forms show the scale units √2 − 1 = tan(π/8) and 2 − √3 = tan(π/12) as factors. The
 paper derived the closed forms for n = 8 and 12 from the assumption that a certain limit point lies
 on a disk boundary. For all four n, GG_n(r) is now proved infinite at and above the closed form, in
-writing and in Lean, so each closed form is a proved upper bound for the critical radius; that it is
-the critical radius is open (§7).
+writing and in Lean. For n = 5, coordinate barriers bound all subcritical orbits uniformly, proving
+r_crit(5) = √(3+φ). For n = 8, 10, 12 the matching lower bounds remain open (§7).
+[Fivefold proof](proofs/sharp-lower-bound-n5-pentagrid.md) · [Lean theorem](../TDCSG/CriticalRadius/FiveSharp.lean)
 
 ## 1. Summary
 
@@ -216,10 +217,10 @@ Status of each item, as of the notes in this repository (details in the README's
    the conjecture is untested in that form.
 5. **Prove the closed forms for φ(n) = 4.** Infinitude at and above the closed forms is proved for
    n = 5, 8, 10, 12, in writing and in Lean, so the closed forms are upper bounds for the critical
-   radius. Finiteness below them is proved, modulo certified computations, only up to the radii of
-   [`certificates.md`](certificates.md) and [`relative-certificates.md`](relative-certificates.md)
-   §10 (open windows r_c − r_* of 0.004235, 0.006404, 0.006908, 0.002019 for n = 5, 8, 10, 12).
-   Equality r_crit = r_c is **open for all four n**. The refereed sharp-lower-bound notes
+   radius. The fivefold value is exact by `TDCSG.CriticalRadius.criticalRadius_five_eq`.
+   The other three cases have certified gaps r_c − r_* of 0.006404, 0.006908 and 0.002019.
+   [Certificates](certificates.md) · [Relative certificates](relative-certificates.md).
+   The refereed sharp-lower-bound notes
    ([`proofs/sharp-lower-bound-n5.md`](proofs/sharp-lower-bound-n5.md),
    [`-n8`](proofs/sharp-lower-bound-n8.md), [`-combined`](proofs/sharp-lower-bound-combined.md),
    [`-limit-system`](proofs/sharp-lower-bound-limit-system.md),
@@ -232,8 +233,8 @@ Status of each item, as of the notes in this repository (details in the README's
    series of twelve notes, eleven of them refereed, works in the Galois-conjugate coordinate and with
    the chord words as tokens; the guide is [`sharp-bound-n5.md`](sharp-bound-n5.md). It proves
    (T), that every token component has internal diameter O(1/δ), so finiteness below √(3+φ)
-   follows from one open statement, (K): a bound on the number of single letters outside tokens
-   needed to reach every state of an orbit (computed: at most 9 wherever measured).
+   also follows by this route from a connector bound. A bound uniform in the radius is still
+   open (computed: at most 9 wherever measured).
    [`open-problem-critical-radius.md`](open-problem-critical-radius.md) states the problem for
    specialists.
 6. **Compute the orbit-counting zeta function** and its poles for n = 5, 8, 12. Not started.

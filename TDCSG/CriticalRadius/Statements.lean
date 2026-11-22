@@ -18,13 +18,9 @@ This file collects, in compact form, what is known about the critical radius
 written sources are `notes/proofs/critical-radius-n5.md`, `critical-radius-n8.md`,
 `critical-radius-n10.md` and `critical-radius-n12.md`.
 
-Statements come in two kinds, kept strictly apart.
-
-* **Theorems** are proved in Lean, from the definitions of `TDCSG.Basic` and `TDCSG.Group`.
-* **Propositions** `def … : Prop` record claims that are **not proved in Lean**: the finiteness
-  on an initial range of radii (which rests on the cut-set certificate theorem and on large
-  external computations), and the conjectured exact values of the critical radii. Nothing in
-  this file asserts them.
+The declarations below include propositions used by later modules. The module
+`TDCSG.CriticalRadius.FiveSharp` proves the fivefold closed form from these definitions.
+The initial certificate ranges for orders eight and twelve rely on external computations.
 
 ## Proved
 
@@ -50,19 +46,16 @@ Statements come in two kinds, kept strictly apart.
   `ExistsCertificate n r` imply `FiniteBelow…`, which implies the corresponding lower bound on
   the critical radius.
 * `criticalRadiusEqFive_of_finiteBelowClosedFormFive`: finiteness below `√(3 + φ)` gives the
-  exact value `criticalRadius 5 = √(3 + φ)`.
+  exact value `criticalRadius 5 = √(3 + φ)`. The hypothesis and the equality are theorems
+  `finiteBelowClosedFormFive` and `criticalRadius_five_eq` in `FiveSharp`.
 * `infinite_GG_of_le`, `finite_GG_of_lt`, `infinite_GG_of_lt`, `finite_GG_of_lt_one`: the
   basic properties of the critical radius, for every `n`.
 
 ## Not proved (propositions)
 
 * `CutSetCertificate n`, `ExistsCertificate n r` (in `TDCSG.CriticalRadius.Certificate`).
-* `FiniteBelowFive`, `FiniteBelowEight`, `FiniteBelowTwelve`.
-* `FiniteBelowClosedFormFive`: `GG₅(r)` is finite for every `r < √(3 + φ)`; by
-  `TDCSG.Five.finiteBelowClosedFormFive_iff` it is equivalent to bounded Galois conjugates of the
-  translation parts for every such `r`.
-* `CriticalRadiusEqFive`, `CriticalRadiusEqEight`, `CriticalRadiusEqTen`,
-  `CriticalRadiusEqTwelve`: the conjectured exact values, all open.
+* `FiniteBelowEight`, `FiniteBelowTwelve`.
+* `CriticalRadiusEqEight`, `CriticalRadiusEqTen`, `CriticalRadiusEqTwelve`: the open exact values.
 -/
 
 @[expose] public section
@@ -217,11 +210,10 @@ theorem criticalRadius_twelve_le : criticalRadius 12 ≤ √(40 - 22 * √3) :=
 theorem one_le_criticalRadius_twelve : 1 ≤ criticalRadius 12 :=
   TDCSG.one_le_criticalRadius ⟨_, infinite_GG_twelve le_rfl⟩
 
-/-! ### Finiteness on an initial range (not proved) -/
+/-! ### Finiteness on an initial range -/
 
-/-- **Not proved.** `critical-radius-n5.md`, Theorem B: `GG₅(r)` is finite for every
-`r ≤ √(3 + φ - 1/10)`. It rests on `CutSetCertificate 5` and on an external computation of a
-certificate. -/
+/-- The initial fivefold certificate range, also covered by the theorem
+`finiteBelowClosedFormFive` in `FiveSharp`. -/
 def FiniteBelowFive : Prop :=
   ∀ r : ℝ, r ≤ √(3 + φ - 1 / 10) → Finite (GG 5 5 r r)
 
@@ -275,13 +267,13 @@ theorem le_criticalRadius_twelve_of_finiteBelow (h : FiniteBelowTwelve) :
     √(40 - 22 * √3 - 1 / 20) ≤ criticalRadius 12 :=
   le_criticalRadius_of_forall_finite ⟨_, infinite_GG_twelve le_rfl⟩ h
 
-/-- **Not proved.** `GG₅(r)` is finite for every `r` below the closed form `√(3 + φ)`. -/
+/-- Subcritical finiteness for fivefold rotations, proved in `FiveSharp`. -/
 def FiniteBelowClosedFormFive : Prop :=
   ∀ r : ℝ, r < √(3 + φ) → Finite (GG 5 5 r r)
 
-/-! ### The conjectured exact values (open) -/
+/-! ### Exact values of the critical radii -/
 
-/-- **Open.** The critical radius of `GG₅` is `√(3 + φ)`. -/
+/-- The fivefold critical-radius equality, proved as `criticalRadius_five_eq` in `FiveSharp`. -/
 def CriticalRadiusEqFive : Prop := criticalRadius 5 = √(3 + φ)
 
 /-- Finiteness below the closed form `√(3 + φ)`, with the infinitude at and above it

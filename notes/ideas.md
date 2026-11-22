@@ -1,6 +1,6 @@
 # Ideas for later rounds
 
-Authors: Eric Vergo, Claude
+Authors: Eric Vergo, Claude and OpenAI GPT-6.2 Astra
 
 Open directions that are not part of the current work. Each entry says what the question is and what it
 depends on.
@@ -92,8 +92,8 @@ The items below concern $n = 5$ through the Galois-conjugate coordinate and the 
 guide [`sharp-bound-n5.md`](sharp-bound-n5.md) explains the terms and lists the formulations that
 are refuted or closed.
 
-9. **Bounded chaining of token components, (K).** The single open statement of the chord-token
-   route: a bound on the number of connector letters needed to reach every state of an orbit,
+9. **Uniform chaining of token components, (K).** Finiteness gives a bound at each subcritical
+   radius. The open problem asks for a radius-independent bound on the number of connector letters needed to reach every state of an orbit,
    equivalently on the diameter of its component graph
    ([`proofs/sharp-bound-n5-component-graph.md`](proofs/sharp-bound-n5-component-graph.md)
    Proposition 1; computed: at most 9 wherever measured exactly, on 18 named and 878 random orbits).
@@ -107,8 +107,9 @@ are refuted or closed.
     ends. Look for walls of the same kind for the full group in the lifted state space: sets of
     states, defined by position relative to finitely many lines through corners, that no letter
     crosses except through dead ends, or a quantity that connectors cannot increase. A wall family
-    with spacing $O(1/\delta)$ in each of the five rotated frames would give (K). No candidate is
-    known.
+    with spacing $O(1/\delta)$ exists for the integer labels of active centers and proves the
+    exact threshold. Bounding the number of connectors uniformly is a separate question.
+    [Integer-coordinate walls](proofs/sharp-lower-bound-n5-pentagrid.md)
 11. **Renormalize the cut set rather than orbit graphs.** Test whether the cut set $K(\varepsilon\delta)$
     is $\varepsilon K(\delta)$ together with finitely many explicitly described arc families: compute
     $K(r)$ at $\delta = 1/55$ and $\varepsilon/55$ with `certify`, map the first by $\varepsilon$ and
@@ -308,3 +309,16 @@ Depends on: `TDCSG/CriticalRadius/Certificate.lean`, [`certificates.md`](certifi
 2. **The large-$n$ table.** Whether the paper's large-$n$ critical radii are true critical radii or the
    onset of very large finite orbits is undetermined; orbits at the paper's scale need a deeper
    engine ([`large-n-table.md`](large-n-table.md)).
+
+3. **Attainment of the group-level critical radius.** For any rotation order with a nonempty set
+   of infinite-group radii, does the group already have an infinite orbit at their infimum?
+   A proposed compactness proof takes radii decreasing to the infimum and chooses arbitrarily
+   long simple paths of orbit points. Delete inactive letters and record the affine isometry
+   at each prefix. The rooted tree of active prefixes has finite branching. A diagonal argument
+   and König's lemma should select an infinite branch whose every finite prefix is legal at the
+   limiting radius. The closed disks give nested compact sets of seeds for those prefixes.
+   For any common seed, at most one translation per rotation index takes it to a specified
+   point. An infinite branch with distinct affine prefixes would therefore visit infinitely
+   many points. Check that arbitrarily long paths retain distinct affine prefixes across the
+   limit and that all prefix domains lie in a common compact set. This proposed proof for
+   general orders has not been checked here.

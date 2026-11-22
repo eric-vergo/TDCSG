@@ -42,9 +42,9 @@ exactly when the Galois conjugates `σ t` of the translation parts are bounded (
   `GG 5 5 r r` is finite exactly when the Galois conjugates of the translation parts are bounded
   (Lemma 4.1 and its converse). The condition holds for `r < 1` and fails for `r ≥ √(3 + φ)`
   (`TDCSG.Five.conjugatesBounded_of_lt_one`, `TDCSG.Five.not_conjugatesBounded`).
-* `TDCSG.Five.finiteBelowClosedFormFive_iff`: the unproved proposition
+* `TDCSG.Five.finiteBelowClosedFormFive_iff`: the proposition
   `TDCSG.CriticalRadius.FiniteBelowClosedFormFive` is equivalent to bounded conjugates at every
-  `r < √(3 + φ)`.
+  `r < √(3 + φ)`. The module `TDCSG.CriticalRadius.FiveSharp` proves this finiteness.
 
 ## Implementation notes
 
