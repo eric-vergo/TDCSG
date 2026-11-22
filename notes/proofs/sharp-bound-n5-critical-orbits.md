@@ -2,12 +2,14 @@
 
 Authors: Eric Vergo, Claude
 
+**Review.** Independently refereed: [`referee-report-sharp-bound-n5-critical-orbits.md`](referee-report-sharp-bound-n5-critical-orbits.md). Verdict: Theorems 1, 3, 4, 5, Propositions 2.2, 2.3, 6.1, Lemma 6 and Corollaries 1.1, 3.1, 5.1 correct; Theorem 2 and Corollary 2.1 correct after minor fixes (the domains of Theorem 2 are taken inside each word's own segment; the description of the holes; one rounded constant in the comparison with the conjugate note), applied below. The computed values of §4.1–§4.4 were reproduced with the engine and independent exact code. Conjecture K3 is false as stated, uniformly over all orbits, and needs a restriction on the starting points (report §5); K1, K2 and K4 are consistent with the data.
+
 **What this note establishes, and what it does not.**
 
 - **Not established: (B).** This note does **not** prove that $GG_5(r)$ is finite for every $r<r_c=\sqrt{3+\varphi}$. The equality $r_{\rm crit}(5)=r_c$ remains open. §6 explains why the two arguments this line was asked to try (a limiting or semicontinuity argument, and an arithmetic obstruction from norms) cannot by themselves give (B), and states the remaining gap.
 - **Proved** (§3), for the system at $r_c$ and just below it:
   1. the chord rotation of Theorem A is realized by chains that move only at points of the *open* disks, so the orbits of all but countably many chord points stay infinite when the disks are opened (Theorem 1). Hence the union of all the systems with $r<r_c$ is an infinite system, and orbit sizes tend to infinity as $r\uparrow r_c$;
-  2. below $r_c$ the three chord words still act on the chord, except on three holes of width $\delta/\sqrt5+O(\delta^2)$, $\delta=r_c^2-r^2$, given in closed form (Theorem 2). Consequently $|O_r(0)|\ge0.97/\delta-3$ and the internal extent of $O_r(0)$ is at least $4.13/\delta-12$ for $0<\delta\le1/10$ (Corollary 2.1);
+  2. below $r_c$ the three chord words still realize the chord rotation, except on holes of width $\delta/\sqrt5+O(\delta^2)$, $\delta=r_c^2-r^2$, on both sides of $-\varphi^{-1}$, to the right of $-\varphi^{-3}$ and to the left of $1$, given in closed form (Theorem 2). Consequently $|O_r(0)|\ge0.97/\delta-3$ and the internal extent of $O_r(0)$ is at least $4.13/\delta-12$ for $0<\delta\le1/10$ (Corollary 2.1);
   3. an exact height function: along the chord words, $\operatorname{Re}(\sigma x/\sigma E)-\operatorname{Re}(x/E)$ drops by exactly $2\sqrt5$ per step (Proposition 2.2);
   4. the chord words act as translations along $E$ on explicit two-dimensional convex domains (the *tube*), so every line parallel to the chord is invariant under them (Proposition 2.3);
   5. at every radius, points off the closure of the cut set have finite orbits, with $|O(x)|\le36.26/d(x)^2$ at $r_c$, where $d(x)$ is the distance to that closure; so every infinite orbit at $r_c$ lies in the closure of the cut set, which contains the chord (Theorem 3);
@@ -15,16 +17,16 @@ Authors: Eric Vergo, Claude
   7. openness at non-norm radii: if $GG_5(r_0)$ is finite and $r_0^2$ is not $|w|^2$ for any $w\in\mathbb Q(\zeta_5)$, then $GG_5$ is finite on a neighbourhood of $r_0$. So if $GG_5(r_{\rm crit})$ were finite, $r_{\rm crit}^2$ would be such a norm (Theorem 5).
 - **Computed** (exact arithmetic; §4, with the reproducing commands):
   1. a classification of all lattice points with coefficients in $[-2,2]$ at $r_c$: 19 orbits up to symmetry, 15 finite (largest 8 376 points) and 4 reaching the cap. Two of the four meet the chord. The other two lie in chord-free classes, so by Theorem 4 they never meet it, yet their orbits reach $3\cdot10^7$ points;
-  2. the large orbits at $r_c$ are organized along lines parallel to the chord, at offsets $\pm\tfrac12\varphi^{-m}$ or $\pm\tfrac{\sqrt5}2\varphi^{-m}$ that tend to $0$;
+  2. in the large orbits at $r_c$ the populated lines parallel to the chord nearest to it are at offsets $\pm\tfrac12\varphi^{-m}$ or $\pm\tfrac{\sqrt5}2\varphi^{-m}$ that tend to $0$; many other populated lines lie between them;
   3. at the levels $r_k$, $k\le3$, the innermost such line (other than $\mathbb RE$) sits at offset of order $\delta$: exactly $0.385\,\delta_k$ for the orbit of $0$ ($k=0,\dots,3$), and $0.041\,\delta_k$ or $0.066\,\delta_k$, alternating with the parity of $k$, for the orbit of $-\zeta^2$;
-  4. the orbit of $0$ at $r_c$ covers a set of box-counting dimension about $1.8$ at the scales tested.
+  4. the cell counts of the orbit of $0$ at $r_c$ (floating-point binning of exact points) give slopes about $1.8$ between the scales tested; the counts have not converged in the number of points, so this is not a dimension estimate.
 - **Conjectured** (§5): every infinite orbit at $r_c$ accumulates on the chord (or its mirror); the infinite orbits are cascades of chord-parallel runs with offsets tending to $0$; below $r_c$ the cascade stops at offset of order $\delta$. If the last statement could be made uniform, it would give (B). It is not proved.
 
 **Honest assessment.** The line does not close (B). The forcing argument (an infinite orbit below $r_c$ must create a structure that exists only at $r\ge r_c$) is **dead as stated**: the limit of the systems below $r_c$ is itself infinite (Theorem 1), and arithmetic excludes only exact boundary contact at lattice points, not accumulation (§6). What the line adds is a description of the infinite orbits at $r_c$ with a new, one-dimensional coordinate: the offset of a chord-parallel line. The remaining gap can be phrased as a statement about that coordinate (§6.3). Whether this is easier than the gap stated in the earlier notes is not known.
 
-**Relation to [`sharp-bound-n5-conjugate.md`](sharp-bound-n5-conjugate.md)** (refereed). That note proves the linear drift of the conjugate coordinate along the chord (its Theorem 4) and a two-sided cut-off of the chord at scale $1/\delta$ (its Theorem 6: $0.059/\delta-1.17<K(\delta)\le(F_j-1)/2<2.12/\delta$). Here Proposition 2.2 extends the drift identity from chord points to every lattice point of the tube, as the height $H$. Theorem 2 gives the exact holes, hence the leading constant of the lower bound: about $0.97/\delta$ chord points against $0.059/\delta$ there, and internal reach $4.13/\delta$ against $0.502/\delta$. The exact chain counts of §4.1 reproduce its exit index $K(\delta_k)=(F_{3k+7}-1)/2$ for $k=0,\dots,3$. The results on the strict system, the tube, the exceptional set, the congruence classes, openness, and the chord-parallel lines are not in that note.
+**Relation to [`sharp-bound-n5-conjugate.md`](sharp-bound-n5-conjugate.md)** (refereed). That note proves the linear drift of the conjugate coordinate along the chord (its Theorem 4) and a two-sided cut-off of the chord at scale $1/\delta$ (its Theorem 6: $0.0590/\delta-1.18<K(\delta)\le(F_j-1)/2<2.12/\delta$). Here Proposition 2.2 extends the drift identity from chord points to every lattice point of the tube, as the height $H$. Theorem 2 gives the exact holes, hence the leading constant of the lower bound: about $0.97/\delta$ chord points against $0.059/\delta$ there, and internal reach $4.13/\delta$ against $0.502/\delta$. The exact chain counts of §4.1 reproduce its exit index $K(\delta_k)=(F_{3k+7}-1)/2$ for $k=0,\dots,3$. The results on the strict system, the tube, the exceptional set, the congruence classes, openness, and the chord-parallel lines are not in that note.
 
-Everything here concerns $n=5$. Status labels: **proved**, **computed** (exact, with a command), **conjectured**. This note has not yet been refereed.
+Everything here concerns $n=5$. Status labels: **proved**, **computed** (exact, with a command), **conjectured**.
 
 ---
 
@@ -54,7 +56,7 @@ The *exceptional set* is $X=(1+2\mathbb Z[\varphi])\cup(\varphi^2+2\mathbb Z[\va
 
 **D7 (congruence classes).** $L=2(1-\zeta)\Lambda$, an ideal of index $N(2)N(1-\zeta)=16\cdot5=80$. $\Gamma=\langle A,B\rangle$ is the full-plane group. Since $L$ is stable under multiplication by $\zeta$, $\Gamma$ acts on $\Lambda/L$; its orbits there are the *$\Gamma$-classes*. A class is a *chord class* if it contains a lattice point of the line $\mathbb RE$ or of $\mathbb R\bar E$.
 
-**D8 (norm radius).** $r$ is a *norm radius* if $r^2=|w|^2$ for some $w\in\mathbb Q(\zeta)$; otherwise a *non-norm radius*. This includes every $r$ with $r^2\notin\mathbb Q(\varphi)$, and every level $r_k$ (`sharp-lower-bound-n5.md` Lemma 2.2).
+**D8 (norm radius).** $r$ is a *norm radius* if $r^2=|w|^2$ for some $w\in\mathbb Q(\zeta)$; otherwise a *non-norm radius*. The non-norm radii include every $r$ with $r^2\notin\mathbb Q(\varphi)$ (since $|w|^2\in\mathbb Q(\varphi)$), and every level $r_k$ (`sharp-lower-bound-n5.md` Lemma 2.2).
 
 **D9 (chord-parallel lines).** For $y\in\Lambda$, the line through $y$ parallel to the chord has *key* $\kappa(y)=y\bar E-\bar yE\in\Lambda$ (purely imaginary) and *offset* $s(y)=\operatorname{Im}(y\bar E)/|E|$, the signed distance of $y$ from the line $\mathbb RE$. Two lattice points lie on the same chord-parallel line iff their keys are equal.
 
@@ -92,9 +94,9 @@ At $r=r_c$, $\operatorname{Area}(D_1\cup D_2)=22.7826$, so $|O_{r_c}(x)|\le36.26
 
 **Theorem 2 (the chord words below $r_c$).** Let $0<\delta<0.65$ and put
 $$h(\delta)=\frac{2\delta/\sqrt5}{1+\sqrt{1-\kappa\delta}},\qquad\kappa=\tfrac45(3-\varphi)=1.10557 .$$
-At radius $r$, $r^2=3+\varphi-\delta$, the set of parameters $t$ at which $w_i$ applies on the chord (every letter's test passes) is exactly
+At radius $r$, $r^2=3+\varphi-\delta$, the set of parameters $t$ in the segment of $w_i$ at which $w_i$ applies (every letter's test passes) is exactly
 $$w_1:\ [-1,\,b_1-h(\delta)],\qquad w_2:\ [b_1+h(\delta),\,b_3],\qquad w_3:\ [b_3+h(\delta),\,1-h(\delta)].$$
-So the chord words realize $T$ on the chord minus three one-sided holes of width $h(\delta)=\delta/\sqrt5+O(\delta^2)$ next to $b_1$ (both sides), $b_3$ (right) and $b_2$ (left). [proved]
+So the chord words realize $T$ on the chord minus holes of width $h(\delta)=\delta/\sqrt5+O(\delta^2)$ on both sides of $b_1$, to the right of $b_3$ and to the left of $b_2$. ($w_2$ also applies beyond its segment, to the right of $b_3$; there it does not realize $T$, and the statement is restricted to the segments for that reason.) [proved]
 
 **Corollary 2.1 (explicit growth below $r_c$).** For $0<\delta\le1/10$:
 1. $O_r(0)$ contains at least $0.97/\delta-3$ points of the chord; in terms of $r$, $|O_r(0)|\ge0.226/(r_c-r)-3$;
@@ -186,7 +188,7 @@ The interval-of-validity argument of `relative-certificates.md` §8 (refereed co
 
 *Proposition 6.1.*
 1. This is Lemma 6.
-2. Corollary 4.4 of `sharp-lower-bound-limit-system.md` gives $|O_r(x)|\le\beta\max(1,|O_r(x)\cap W^{\rm t}|)$ for the certified four-window set. The same holds for the row $(5,-1,4,0)$, also certified there, whose windows have circumradius $0.1815$.
+2. Corollary 4.4 of `sharp-lower-bound-limit-system.md` is `sharp-lower-bound-combined.md` Corollary 4.3 for the certified four-window set. The statements there bound $|O_r(x)|$ by the supremum over all orbits, but their proof gives the per-orbit bound $|O_r(x)|\le\beta\max(1,|O_r(x)\cap W^{\rm t}|)$, which is what is used here. The same holds for the row $(5,-1,4,0)$, also certified there, whose windows have circumradius $0.1815$.
 3. The first part is the finiteness criterion. Bounded internal coordinates give finitely many lattice points in the bounded region $D_1\cup D_2$. For the second part: at a non-norm radius no point of $O_r(x)\subset\Lambda$ lies on a boundary circle (Corollary 2.3 there), so case (A) of `boundary-contact.md` Theorem 5.1 holds. The limit point $y^\ast$ is not in $\mathbb Q(\zeta)$, since a point of $\mathbb Q(\zeta)$ cannot lie on $\partial D_p(r)$. $\square$
 
 ---
@@ -233,7 +235,7 @@ For every lattice point with coefficients in $[-2,2]$ lying in $D_1\cup D_2$ at 
 | $(-2,-2,-1,-2)$ (chord-free) | cap | 0 | 0 | 817.0 |
 | $(-2,-2,-1,-1)$ (chord-free; contains $-\zeta^2$ up to symmetry) | cap | 0 | 0 | 886.1 |
 
-The two chord-free orbits are in chord-free $\Gamma$-classes, so Theorem 4 proves they never meet $\mathbb RE\cup\mathbb R\bar E$ at any radius. With `--cap 30000000` both $(-2,-2,-1,-2)$ and $-\zeta^2=$ `pow:0,0,-1,0` still reach the cap at $r_c$ (internal maxima $1.370\cdot10^4$ and $1.470\cdot10^4$, boundary count 0). For comparison, the orbit of $0$ reaches $1.52\cdot10^4$ at $5\cdot10^7$ points (`../engine.md`). Their boundary counts are 0, so these orbits are also strict orbits as far as computed. Whether they are infinite is not decided.
+The four capped runs are four distinct orbits up to symmetry, although none was completed: their starting points lie in four $\Gamma$-classes no two of which are exchanged by $z\mapsto-z,\bar z,-\bar z$ (these maps normalize $\Gamma$ and the groups $GG_5(r)$). The two chord-free orbits are in chord-free $\Gamma$-classes, so Theorem 4 proves they never meet $\mathbb RE\cup\mathbb R\bar E$ at any radius. With `--cap 30000000` both $(-2,-2,-1,-2)$ and $-\zeta^2=$ `pow:0,0,-1,0` still reach the cap at $r_c$ (internal maxima $1.370\cdot10^4$ and $1.470\cdot10^4$, boundary count 0). For comparison, the orbit of $0$ reaches $1.52\cdot10^4$ at $5\cdot10^7$ points (`../engine.md`). Their boundary counts are 0, so these orbits are also strict orbits as far as computed. Whether they are infinite is not decided.
 
 ### 4.3 Chord-parallel lines (exact keys)
 
@@ -273,7 +275,7 @@ The plane was cut into square cells of side $h$, and the cells containing a poin
 | $10^6$ | 5 416 | 27 192 | 90 676 |
 | $4\cdot10^6$ | 5 460 | 27 896 | 94 508 |
 
-From $h=0.05$ to $0.02$ to $0.01$ the counts give box-counting slopes $1.78$ and $1.76$. These are lower estimates, since the finest column is not saturated. The exponent is close to the growth exponent $1.7$–$1.9$ of $|O_r(0)|$ in $1/(r_c-r)$ (`../overview.md` §3).
+From $h=0.05$ to $0.02$ to $0.01$ the counts give slopes $1.78$ and $1.76$. The counts still grow with the number of points in every column, so these slopes are not estimates of a box-counting dimension of the orbit closure. The exponent is close to the growth exponent $1.7$–$1.9$ of $|O_r(0)|$ in $1/(r_c-r)$ (`../overview.md` §3).
 
 ---
 
@@ -281,11 +283,11 @@ From $h=0.05$ to $0.02$ to $0.01$ the counts give box-counting slopes $1.78$ and
 
 **Conjecture K1 (accumulation on the chord).** Every infinite orbit of $GG_5(r_c)$ has $\mathcal C$ or $\bar{\mathcal C}$ in its closure. Evidence: §4.3 (offsets of populated chord-parallel lines tend to $0$ in all three large orbits tested, including two chord-free ones) and the distance data. A weak point: any orbit with unbounded internal coordinate that is spread over a region approaches every line there; what supports K1 beyond this is the line structure, not the distances.
 
-**Conjecture K2 (cascade).** Every infinite orbit at $r_c$ contains points on chord-parallel lines of offsets $\pm c\varphi^{-m}$ for infinitely many $m$, with $c\in\{\tfrac12,\tfrac{\sqrt5}2\}$. Each such line carries a run of the chord rotation of length of order $\varphi^{m}$. By Proposition 2.3 the chord words preserve the line, and by the first-order tube computation of §4.1 the holes on a line of offset $s$ have width proportional to $|s|$.
+**Conjecture K2 (cascade).** Every infinite orbit at $r_c$ contains points on chord-parallel lines of offsets $\pm c\varphi^{-m}$ for infinitely many $m$, with $c\in\{\tfrac12,\tfrac{\sqrt5}2\}$. Each such line carries a run of the chord rotation of length of order $\varphi^{m}$. By Proposition 2.3 the chord words preserve the line, and to first order in $s$ the holes of the chord words on a line of offset $s$ at $r_c$ have width proportional to $|s|$ (computed in the referee report, §4).
 
-**Conjecture K3 (cut-off below $r_c$).** There is $c_1>0$ such that at radius $r<r_c$ no orbit meets a chord-parallel line of offset in $(0,c_1\delta)$ in more than a bounded number of points. Evidence: the innermost populated line has $s_{\min}/\delta_k=0.385$ (orbit of $0$, $k=0,\dots,3$) and $\in\{0.041,0.066\}$ (orbit of $-\zeta^2$, $k=0,\dots,3$) (§4.3). The offset $0$ itself, the line $\mathbb RE$, is populated by Corollary 2.1, which is why the statement excludes it.
+**Conjecture K3 (cut-off below $r_c$).** There is $c_1>0$ such that at radius $r<r_c$ no orbit meets a chord-parallel line of offset in $(0,c_1\delta)$ in more than a bounded number of points. Evidence: the innermost populated line has $s_{\min}/\delta_k=0.385$ (orbit of $0$, $k=0,\dots,3$) and $\in\{0.041,0.066\}$ (orbit of $-\zeta^2$, $k=0,\dots,3$) (§4.3). The offset $0$ itself, the line $\mathbb RE$, is populated by Corollary 2.1, which is why the statement excludes it. **As stated, uniformly over all orbits, K3 is false**: lattice points on lines of offset $s\ll\delta$ have orbits with of order $1/\delta$ points on their own line, because there the chord words act as on the chord (computed: $116$, $609$ and $4\,675$ points at levels $1,2,3$ on lines with $s/\delta\le0.0155$; referee report §5). A usable version must restrict the starting points, for instance to bounded internal coordinate in units of $1/\delta$, or count only the lines that an orbit reaches from the chord.
 
-**Conjecture K4 (the long chord).** The segment $[-\varphi^2E,\varphi^2E]$, whose ends are critical points, carries an interval exchange at $r_c$ realized by finitely many words, with $T$ as its induced map on $\mathcal C$. Evidence: the uniform distribution of §4.3 over $[-\varphi^2,\varphi^2]$.
+**Conjecture K4 (the long chord).** The segment $[-\varphi^2E,\varphi^2E]$, whose ends are critical points, carries an interval exchange at $r_c$ realized by finitely many words, with $T$ as its induced map on $\mathcal C$. Evidence: the uniform distribution of §4.3 over $[-\varphi^2,\varphi^2]$. More directly, the $4\,541$ points of $O_{r_c}(0)$ on $\mathbb RE$ at cap $4\cdot10^6$ have $t\in[-2.6173,2.6173]$, with $86$–$89$ points per interior interval of length $0.1$, and $2\,806$ of them lie outside $\mathcal C$ (referee report §4).
 
 **Heuristic, not a proof.** If K2 and K3 held with a uniform bound on the number of runs per offset scale and on the excursions between runs, then orbit sizes at radius $r$ would be bounded by a sum over $m\le\log_\varphi(1/\delta)+O(1)$ of (runs at scale $m$)$\times\varphi^m$, which is finite for each $\delta>0$. That would give (B). The branching (runs per scale) is what the observed exponent $\approx1.8>1$ measures. Nothing here bounds it.
 
@@ -296,7 +298,7 @@ From $h=0.05$ to $0.02$ to $0.01$ the counts give box-counting slopes $1.78$ and
 ### 6.1 Semicontinuity and limits
 
 - **The limit system is infinite.** Every system with $r<r_c$ is contained in the strict system at $r_c$ (Lemma 6), and that system has infinite orbits through the chord (Theorem 1). So an argument of the form "the limit is finite, hence nearby systems are finite" is not available. The limit is infinite because the chord rotation survives the opening of the disks, not because of the closed-disk convention at the tight points.
-- **The infinite set is closed, but that does not locate $r_{\rm crit}$.** Corollary 5.1 shows $\mathcal I=[r_{\rm crit},\infty)$ in all cases except a norm radius with a finite group. That is consistent with any $r_{\rm crit}\le r_c$. Closedness rules out an *accumulation* of finite radii onto an infinite one from above. It does not prevent the infinite set from starting below $r_c$.
+- **The infinite set is closed unless $r_{\rm crit}$ is a norm radius with a finite group, but that does not locate $r_{\rm crit}$.** Corollary 5.1 shows $\mathcal I=[r_{\rm crit},\infty)$ in all cases except a norm radius with a finite group. That is consistent with any $r_{\rm crit}\le r_c$. Closedness rules out an *accumulation* of finite radii onto an infinite one from above. It does not prevent the infinite set from starting below $r_c$.
 - **"The chord words are no longer valid" is true only at the ends.** Below $r_c$ the chord words fail only on holes of width $\approx\delta/\sqrt5$ (Theorem 2). They still produce $\Theta(1/\delta)$ chord points (Corollary 2.1, §4.1). The mechanism is truncated, not absent, and the truncation alone gives finiteness only for the chord-word pseudogroup, not for the group. The group's orbits grow like $\delta^{-1.8}$, faster than the chord part.
 
 ### 6.2 Arithmetic
