@@ -150,8 +150,8 @@ tested cases.
 The proof of Theorem 4.2 was re-derived while implementing the checker. No gap affects what the
 checker must verify; the points below fix readings.
 
-1. **Numbering.** The task description calls the relative-certificate theorem "Theorem 5.2"; in
-   the combined note the theorem is 4.2 and Theorem 5.2 is its application to Table 5.1.
+1. **Numbering.** In the combined note the relative-certificate theorem is Theorem 4.2;
+   Theorem 5.2 is its application to Table 5.1.
 2. **General `n`.** The constant `1 + 100F` is for `n = 5`; for general `n` it is `1 + 20nF`
    (§2). Only finiteness is used downstream.
 3. **"Every arc of `K'`".** Condition 2 of Definition 4.1 quantifies over arcs of `K'`. The proof
