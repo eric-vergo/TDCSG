@@ -120,6 +120,21 @@ lake test                       # runs `tdcsg-orbit --selftest`
   gap, e = 1, …, 6), `--max-steps`.
 - `--format lines` prints tab-separated records: `param`, `gen`, `conj`, `stat`, `threshold`,
   `result`.
+- `orbit --format lines --conj-points` also prints one `point` record per stored orbit point, in
+  insertion (breadth-first) order: `point`, the index, the generation, the exact coefficients of
+  the point in the power basis (comma-separated, the syntax of `pow:`), its approximate real and
+  imaginary parts, and then for each embedding σ_k with k ≠ 1 (k as in the `conj` records) the
+  fields k, the exact coefficients of σ_k(z) computed by `CycField.galois`, and the approximate
+  real part, imaginary part and modulus of σ_k(z). With `--scale M` the coefficients are those of
+  the numerator w (the point is w / M, its conjugate σ_k(w) / M) and the approximate values are
+  those of the point itself. `--conj-min Q` (a rational) keeps only the points with some
+  |σ_k(z)| ≥ Q. The approximate values are double-precision evaluations for reading only; the
+  exact coefficients are the data. When the cap is reached the records cover every stored point,
+  including those of the last generation that were not expanded.
+
+```sh
+.lake/build/bin/tdcsg-orbit orbit -n 5 --r2 closed-1/10 --format lines --conj-points --conj-min 50
+```
 
 ## The group as a permutation group
 
@@ -242,13 +257,17 @@ proposition `TDCSG.Certificate` is by correspondence of definitions (explained i
 
 ## Tests
 
-`lake test` (or `tdcsg-orbit --selftest`) runs about 4,600 checks in about 7 seconds: ring identities
+`lake test` (or `tdcsg-orbit --selftest`) runs about 4,650 checks in under a minute: ring identities
 (commutativity, associativity, distributivity, ζ^n = 1, Σζ^k = 0, conjugation and σ_kσ_l = σ_{kl},
 multiplicativity of |·|², real-basis round trips) for 20 values of n up to 100; π, cos 72°, cos 45°
 enclosures; the certified table error; exact signs of ±(√2 − 1)^k, k ≤ 80; membership of points
 exactly on the boundary at r = g and at g² ± 10⁻³⁰; agreement of filter and exact decisions; finite
 orbits for n ∈ {3, 4, 6} at r ∈ {1, 3/2, 2, 5/2, 3, g} from three starting points; growth below
-3 + φ and the cap at 3 + φ for n = 5; 2n − 1 points just below g; agreement of the serial and
+3 + φ and the cap at 3 + φ for n = 5; 2n − 1 points just below g; the per-point conjugate records (σ_2 of
+E = ζ − ζ² for n = 5 exactly, |σ_2 E|² = 2 + φ, the printed record, scaled points, both
+conjugates for n = 7, and over the 1 433-point orbit of 0 at r² = 3 + φ − 1/10 the per-point
+conjugates are the exact Galois images, their maximum is the reported one, and the generations
+match the per-generation counts); agreement of the serial and
 parallel searches and of the sweep with direct searches; widening and loud overflow of the
 storage; and the exact results below (n ≡ 4 mod 8 counts and r₁, n = 33 at g, rows of the
 preliminary table). For the group computations: Schreier–Sims on S_8, A_9, the Frobenius group of

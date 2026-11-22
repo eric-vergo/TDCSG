@@ -9,7 +9,7 @@ import TDCSGCompute.SelfTest
 
 ```
 tdcsg-orbit orbit -n N (--r2 SPEC | --r Q) [--start P] [--cap C] [--threads T] [--no-conj]
-                       [--width W] [--format text|lines]
+                       [--width W] [--format text|lines] [--conj-points [--conj-min Q]]
 tdcsg-orbit thresholds -n N [--start P] [--cap C] [--upto SPEC] [--from SPEC] [--rc SPEC]
                        [--unit SPEC] [--max-steps K] [--format text|lines]
 tdcsg-orbit group -n N (--r2 SPEC | --r Q) [--grid P] [--lens-B B --cloud-p P2 --cloud-k K]
@@ -42,7 +42,9 @@ options of `group`, `gap`, `walk` and `arrangement` are `--grid P`, `--center P;
 
 The grammar of `SPEC` (exact elements of `ℚ(ζ_n)⁺`) and `P` (points of `ℤ[ζ_n]`) is in
 `TDCSGCompute.Spec`. With `--format lines` every output line is a tab-separated record whose first
-field names its kind.
+field names its kind. `orbit --format lines --conj-points` also prints one `point` record per orbit
+point with its exact Galois conjugates (`TDCSGCompute.pointRecord`); `--conj-min Q` keeps only the
+points with some conjugate of modulus at least the rational `Q`.
 -/
 
 open TDCSGCompute
@@ -58,8 +60,8 @@ structure Args where
 
 /-- Options that take no value. -/
 def flagNames : List String :=
-  ["--no-conj", "--selftest", "--help", "--confirm", "--reps", "--fix", "--symmetric",
-   "--no-check"]
+  ["--no-conj", "--conj-points", "--selftest", "--help", "--confirm", "--reps", "--fix",
+   "--symmetric", "--no-check"]
 
 /-- Split the command line. -/
 def parseArgs (xs : List String) : Args := Id.run do
@@ -106,6 +108,7 @@ def usage : String :=
   "usage:\n" ++
   "  tdcsg-orbit orbit -n N (--r2 SPEC | --r Q) [--start P] [--cap C] [--threads T]\n" ++
   "                    [--no-conj] [--width W] [--format text|lines]\n" ++
+  "                    [--conj-points [--conj-min Q]]   (with --format lines)\n" ++
   "  tdcsg-orbit thresholds -n N [--start P] [--cap C] [--upto SPEC] [--from SPEC]\n" ++
   "                    [--rc SPEC] [--unit SPEC] [--max-steps K] [--format text|lines]\n" ++
   "  tdcsg-orbit group -n N (--r2 SPEC | --r Q) [--grid P] [--lens-B B --cloud-p P2\n" ++
@@ -156,6 +159,14 @@ def cmdOrbit (a : Args) : IO Unit := do
   let conj := !a.flags.contains "--no-conj"
   let scale ← a.nat "--scale" 1
   if scale == 0 then throw <| IO.userError "--scale must be positive"
+  let conjPoints := a.flags.contains "--conj-points"
+  if conjPoints && !lines then
+    throw <| IO.userError "--conj-points needs --format lines"
+  let conjMin ← match a.get? "--conj-min" with
+    | none => pure (0 : Float)
+    | some v => match parseRat v with
+      | some q => pure (Float.ofInt q.num / q.den.toFloat)
+      | none => throw <| IO.userError "--conj-min expects a rational number"
   let T := DiskTest.makeScaled F r2 scale
   let t0 ← IO.monoNanosNow
   let res ← orbit T start { cap, conj, threads, width, scale }
@@ -176,6 +187,16 @@ def cmdOrbit (a : Args) : IO Unit := do
       IO.println s!"gen\t{i}\t{res.generations[i]!}"
     for (k, m) in res.maxConj do
       IO.println s!"conj\t{k}\t{fmtFloat m 8}"
+    if conjPoints then
+      let ks := F.embeddings
+      let gen := generationOf res.generations res.size
+      let out ← IO.getStdout
+      for i in [0:res.size] do
+        let z := res.points.get i
+        if conjMin > 0 then
+          let big := (conjData F ks scale z).any fun (_, _, _, _, m) ↦ m ≥ conjMin
+          if !big then continue
+        out.putStrLn (pointRecord F ks scale i gen[i]! z)
     IO.println s!"stat\tfilter\t{res.stats.filter}"
     IO.println s!"stat\texact\t{res.stats.exact}"
     IO.println s!"stat\tboundary\t{res.stats.boundary}"

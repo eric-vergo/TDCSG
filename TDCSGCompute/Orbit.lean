@@ -266,4 +266,48 @@ def orbitParallel (T : DiskTest) (start : Elem) (opts : OrbitOptions) : IO Orbit
 def orbit (T : DiskTest) (start : Elem) (opts : OrbitOptions) : IO OrbitResult :=
   if opts.threads ≤ 1 then orbitSerial T start opts else orbitParallel T start opts
 
+/-- The breadth-first generation of each stored point, from the per-generation counts: point `i`
+is in generation `g` when `∑_{j<g} gens[j] ≤ i < ∑_{j≤g} gens[j]`. Points stored beyond the last
+count (impossible for a search result) get the last generation. -/
+def generationOf (gens : Array Nat) (size : Nat) : Array Nat := Id.run do
+  let mut out : Array Nat := Array.emptyWithCapacity size
+  let mut g := 0
+  let mut endG := gens[0]?.getD size
+  for i in [0:size] do
+    while i ≥ endG && g + 1 < gens.size do
+      g := g + 1
+      endG := endG + gens[g]!
+    out := out.push g
+  return out
+
+/-- Integer coefficients separated by commas, the syntax of `pow:c0,c1,…`. -/
+def coeffString (z : Elem) : String := ",".intercalate (z.toList.map toString)
+
+/-- The exact Galois conjugates of an orbit point `z / M` (`M = scale`) under the embeddings
+`σ_k`, `k ∈ ks`, `k ≠ 1`: for each, `k`, the exact coefficients of `σ_k z` (the numerator; the
+conjugate of the point is `σ_k z / M`), and the approximate real part, imaginary part and modulus
+of `σ_k z / M`. -/
+def conjData (F : CycField) (ks : Array Nat) (scale : Nat) (z : Elem) :
+    Array (Nat × Elem × Float × Float × Float) :=
+  let m := scale.toFloat
+  (ks.filter (· != 1)).map fun k ↦
+    let (x, y) := F.evalConjF k z
+    let (x, y) := (x / m, y / m)
+    (k, F.galois k z, x, y, Float.sqrt (x * x + y * y))
+
+/-- One `point` record of `orbit --format lines --conj-points`, tab-separated:
+`point`, the insertion index, the breadth-first generation, the exact coefficients of `z` (the
+numerator of the point `z / M`), the approximate real and imaginary parts of `z / M`, and then for
+each embedding `σ_k`, `k ≠ 1`, the fields `k`, the exact coefficients of `σ_k z`, and the
+approximate real part, imaginary part and modulus of `σ_k z / M`. The coefficients are in the power
+basis `1, ζ, …, ζ^{d-1}`; the floating-point values are for reading only. -/
+def pointRecord (F : CycField) (ks : Array Nat) (scale : Nat) (idx gen : Nat) (z : Elem) :
+    String := Id.run do
+  let m := scale.toFloat
+  let (x, y) := F.evalConjF 1 z
+  let mut s := s!"point\t{idx}\t{gen}\t{coeffString z}\t{fmtFloat (x / m) 10}\t{fmtFloat (y / m) 10}"
+  for (k, w, u, v, a) in conjData F ks scale z do
+    s := s ++ s!"\t{k}\t{coeffString w}\t{fmtFloat u 10}\t{fmtFloat v 10}\t{fmtFloat a 10}"
+  return s
+
 end TDCSGCompute

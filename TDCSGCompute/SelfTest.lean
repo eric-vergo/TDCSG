@@ -254,6 +254,59 @@ def testOrbits (log : IO.Ref TestLog) : IO Unit := do
   check log "2^70 overflows loudly"
     (match s.insert (F.ofInt (2 ^ 70)) with | .overflow _ => true | _ => false)
 
+/-- The per-point conjugate records of `orbit --conj-points`. -/
+def testConjPoints (log : IO.Ref TestLog) : IO Unit := do
+  let F5 := CycField.make 5
+  let ks := F5.embeddings
+  -- E = ζ - ζ², σ_2 E = ζ² - ζ⁴ = 1 + ζ + 2ζ² + ζ³, |σ_2 E|² = σ_2 (3 - φ) = 2 + φ
+  let e : Elem := #[0, 1, -1, 0]
+  match conjData F5 ks 1 e with
+  | #[(k, w, _, _, m)] =>
+    check log "conjugate record of E: k = 2" (k == 2)
+    check log "conjugate record of E: σ_2 E = 1 + ζ + 2ζ² + ζ³" (w == #[1, 1, 2, 1])
+    check log "conjugate record of E: |σ_2 E| ≈ √(2 + φ)" (Float.abs (m - 1.9021130) < 1e-6)
+    -- 2 + φ = 3 + θ_1 with θ_1 = ζ + ζ⁻¹ = φ - 1
+    check log "conjugate record of E: |σ_2 E|² is 2 + φ exactly"
+      (F5.toRealBasis (F5.normSq w) == some #[3, 1])
+  | _ => check log "conjugate record of E has one embedding" false
+  let rec5 := pointRecord F5 ks 1 7 3 e
+  check log "point record of E"
+    ((rec5.splitOn "\t").take 7 ==
+      ["point", "7", "3", "0,1,-1,0", "1.118033989e0", "3.632712640e-1", "2"])
+  check log "point record of E: conjugate coefficients" ((rec5.splitOn "\t")[7]? == some "1,1,2,1")
+  -- scaled points: the conjugate of w / M has modulus |σ w| / M, with the numerator printed
+  match conjData F5 ks 4 e with
+  | #[(_, w, _, _, m)] =>
+    check log "scaled conjugate record"
+      (w == #[1, 1, 2, 1] && Float.abs (4 * m - 1.9021130) < 1e-6)
+  | _ => check log "scaled conjugate record has one embedding" false
+  -- n = 7: two non-trivial embeddings, conjugates are the exact Galois images
+  let F7 := CycField.make 7
+  let a := pseudoElem F7 5 20
+  let d7 := conjData F7 F7.embeddings 1 a
+  check log "n=7: two conjugates per point" (d7.size == 2 && d7.map (·.1) == #[2, 3])
+  check log "n=7: conjugates are σ_k" (d7.all fun (k, w, _, _, _) ↦ w == F7.galois k a)
+  -- over an orbit, the per-point conjugates reproduce the reported maxima
+  match parseReal F5 "closed-1/10" with
+  | .ok r2 =>
+    let res ← orbit (DiskTest.make F5 r2) F5.zero { cap := 100000 }
+    let mut mx : Float := 0
+    let mut exactOk := true
+    for i in [0:res.size] do
+      let z := res.points.get i
+      for (k, w, _, _, m) in conjData F5 ks 1 z do
+        if m > mx then mx := m
+        if w != F5.galois k z then exactOk := false
+    let rep := (res.maxConj.find? (·.1 == 2)).map (·.2)
+    check log s!"n=5, δ = 1/10: per-point conjugate maximum equals the reported one ({mx})"
+      (res.complete && res.size == 1433 && rep == some mx)
+    check log "n=5, δ = 1/10: per-point conjugates are exact Galois images" exactOk
+    let gen := generationOf res.generations res.size
+    let counts := (Array.range res.generations.size).map fun g ↦ (gen.filter (· == g)).size
+    check log "generation of each point matches the per-generation counts"
+      (counts == res.generations && gen[0]! == 0)
+  | .error e => check log e false
+
 /-- Exact results recorded in `notes/engine.md`, re-checked as regression tests. -/
 def testKnownResults (log : IO.Ref TestLog) : IO Unit := do
   let parse (F : CycField) (s : String) : IO RadiusSq := match parseReal F s with
@@ -899,6 +952,7 @@ def runSelfTests : IO UInt32 := do
   testArithmetic log
   testMembership log
   testOrbits log
+  testConjPoints log
   testKnownResults log
   testGroups log
   testCertificates log
