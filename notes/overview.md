@@ -98,7 +98,10 @@ Details in [`arithmetic.md`](arithmetic.md).
   the two rotations generate the translations by 2(1 − ζ)ℤ[ζ_n] together with the rotations by μ_n;
   GG_n(r) is the cut-down of that group to the two disks.
 - **Finiteness criterion** [proved]. An orbit is finite if and only if the Galois conjugates of its
-  translation parts stay bounded.
+  translation parts stay bounded. For the group GG_5(r) the analogous criterion (the group is finite if and only
+  if the Galois conjugates σ(t), σ: ζ ↦ ζ², of the translation parts of all its elements are
+  bounded) is in Lean: `TDCSG.Five.finite_GG_iff_conjugatesBounded`
+  (`TDCSG/CriticalRadius/FiveConjugate.lean`).
 - **The omitted half of Theorem 1** [proved]. If lcm(n₁, n₂) ∈ {1, 2, 3, 4, 6}, the ambient group is
   a discrete group of plane motions, so its cut-down to two disks is finite for every r. Refereed
   proof: [`proofs/theorem1-converse.md`](proofs/theorem1-converse.md); Lean:

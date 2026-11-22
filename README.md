@@ -23,7 +23,7 @@ certificates.
 |---|---|
 | `TDCSG/` | The proof library (Lean 4, Mathlib); `TDCSG.lean` is the root module. Compact statements of the main results are in `TDCSG/Statements.lean` |
 | `TDCSG/Compound/` | The general definition: compound symmetry groups of an indexed family of closed balls in a pseudometric space, each ball carrying a group of its own isometries, and their general theorems; `TDCSG.GG` is the two-disk instance |
-| `TDCSG/CriticalRadius/` | The critical radius `TDCSG.criticalRadius n`, the infinite orbits for n = 5, 8, 10, 12, the cut-set certificate definitions (`Certificate.lean`), and compact statements in `TDCSG/CriticalRadius/Statements.lean` |
+| `TDCSG/CriticalRadius/` | The critical radius `TDCSG.criticalRadius n`, the infinite orbits for n = 5, 8, 10, 12, the Galois-conjugate orbit structure for n = 5 (`FiveConjugate.lean`), the cut-set certificate definitions (`Certificate.lean`), and compact statements in `TDCSG/CriticalRadius/Statements.lean` |
 | `TDCSGCompute/` | The exact engine and the `tdcsg-orbit` executable (core Lean, no Mathlib): orbits, threshold sweeps, GG_n(r) as a permutation group, cut-set certificates with an independent checker, and relative (window-clipped) certificates; see [`notes/engine.md`](notes/engine.md) |
 | `certificates/` | Small finiteness certificates (`.cert`, format of [`notes/certificates.md`](notes/certificates.md)) and two small relative certificates at r_c (`.rcert`, format of [`notes/relative-certificates.md`](notes/relative-certificates.md)), with their SHA-256 sums |
 | `notes/` | Research notes: [`overview.md`](notes/overview.md) (programme and conventions), [`arithmetic.md`](notes/arithmetic.md), [`analytic-continuation.md`](notes/analytic-continuation.md), [`experiments.md`](notes/experiments.md), [`engine.md`](notes/engine.md), [`certificates.md`](notes/certificates.md), [`gap-structure.md`](notes/gap-structure.md), [`rank-conjecture.md`](notes/rank-conjecture.md), [`large-n-table.md`](notes/large-n-table.md), [`relative-certificates.md`](notes/relative-certificates.md), [`open-problem-critical-radius.md`](notes/open-problem-critical-radius.md) (the critical-radius problem stated for specialists), [`ideas.md`](notes/ideas.md) (open directions), and the referee report [`referee-report-engine-campaign.md`](notes/referee-report-engine-campaign.md) |
@@ -111,6 +111,18 @@ No `sorry`, no `native_decide`, no extra axioms: every theorem of `TDCSG` depend
   1 ≤ r_crit(n) ≤ the closed form for n = 5, 8, 10, 12 (`criticalRadius_five_le`,
   `criticalRadius_eight_le`, `criticalRadius_ten_le`, `criticalRadius_twelve_le` and
   `one_le_criticalRadius_*`).
+- **The orbit structure for n = 5** (`TDCSG/CriticalRadius/FiveConjugate.lean`, namespace
+  `TDCSG.Five`). The integer model of ℤ[ζ₅] is a commutative ring, and the Galois map σ: ζ ↦ ζ²
+  is a ring homomorphism of it whose composite with the embedding is the second complex
+  embedding (`Cyc.galois`, `Cyc.embed_galois`). Every element of GG_5(r) acts at each point as
+  x ↦ ζʲx + t with t ∈ (1 − ζ)ℤ[ζ] (`exists_affine`); a subset of ℤ[ζ] bounded in both
+  embeddings is finite (`Cyc.finite_setOf_norm_le`); and GG_5(r) is finite exactly when the
+  Galois conjugates σ(t) of the translation parts are bounded
+  (`finite_GG_iff_conjugatesBounded`), a condition that holds for r < 1 and fails for
+  r ≥ √(3+φ). The unproved proposition `FiniteBelowClosedFormFive` (finiteness for every
+  r < √(3+φ)) is equivalent to that condition below √(3+φ)
+  (`TDCSG.Five.finiteBelowClosedFormFive_iff`) and implies `CriticalRadiusEqFive`
+  (`criticalRadiusEqFive_of_finiteBelowClosedFormFive`).
 - **From certificates to finiteness.** `TDCSG.finite_GG_of_certificate`
   (`TDCSG/CriticalRadius/Certificate.lean`): if the certificate theorem holds and a certificate
   exists at r₀, then GG_n(r) is finite for all r ≤ r₀; and `finiteBelowFive_of_certificate`,

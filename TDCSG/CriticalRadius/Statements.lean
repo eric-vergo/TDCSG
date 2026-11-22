@@ -49,6 +49,8 @@ Statements come in two kinds, kept strictly apart.
   for `n = 8, 12`: conditional theorems. The propositions `CutSetCertificate n` and
   `ExistsCertificate n r` imply `FiniteBelow…`, which implies the corresponding lower bound on
   the critical radius.
+* `criticalRadiusEqFive_of_finiteBelowClosedFormFive`: finiteness below `√(3 + φ)` gives the
+  exact value `criticalRadius 5 = √(3 + φ)`.
 * `infinite_GG_of_le`, `finite_GG_of_lt`, `infinite_GG_of_lt`, `finite_GG_of_lt_one`: the
   basic properties of the critical radius, for every `n`.
 
@@ -56,6 +58,9 @@ Statements come in two kinds, kept strictly apart.
 
 * `CutSetCertificate n`, `ExistsCertificate n r` (in `TDCSG.CriticalRadius.Certificate`).
 * `FiniteBelowFive`, `FiniteBelowEight`, `FiniteBelowTwelve`.
+* `FiniteBelowClosedFormFive`: `GG₅(r)` is finite for every `r < √(3 + φ)`; by
+  `TDCSG.Five.finiteBelowClosedFormFive_iff` it is equivalent to bounded Galois conjugates of the
+  translation parts for every such `r`.
 * `CriticalRadiusEqFive`, `CriticalRadiusEqEight`, `CriticalRadiusEqTen`,
   `CriticalRadiusEqTwelve`: the conjectured exact values, all open.
 -/
@@ -270,10 +275,22 @@ theorem le_criticalRadius_twelve_of_finiteBelow (h : FiniteBelowTwelve) :
     √(40 - 22 * √3 - 1 / 20) ≤ criticalRadius 12 :=
   le_criticalRadius_of_forall_finite ⟨_, infinite_GG_twelve le_rfl⟩ h
 
+/-- **Not proved.** `GG₅(r)` is finite for every `r` below the closed form `√(3 + φ)`. -/
+def FiniteBelowClosedFormFive : Prop :=
+  ∀ r : ℝ, r < √(3 + φ) → Finite (GG 5 5 r r)
+
 /-! ### The conjectured exact values (open) -/
 
 /-- **Open.** The critical radius of `GG₅` is `√(3 + φ)`. -/
 def CriticalRadiusEqFive : Prop := criticalRadius 5 = √(3 + φ)
+
+/-- Finiteness below the closed form `√(3 + φ)`, with the infinitude at and above it
+(`infinite_GG_five`), gives the exact value of the critical radius. -/
+theorem criticalRadiusEqFive_of_finiteBelowClosedFormFive (h : FiniteBelowClosedFormFive) :
+    CriticalRadiusEqFive := by
+  refine le_antisymm criticalRadius_five_le (le_csInf ⟨_, Five.infinite_GG le_rfl⟩ fun r hr ↦ ?_)
+  by_contra hlt
+  exact not_finite_iff_infinite.2 hr (h r (not_le.1 hlt))
 
 /-- **Open.** The critical radius of `GG₈` is `√(10 - 5√2)`. -/
 def CriticalRadiusEqEight : Prop := criticalRadius 8 = √(10 - 5 * √2)
