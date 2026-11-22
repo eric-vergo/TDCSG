@@ -182,11 +182,25 @@ and [`open-problem-critical-radius.md`](open-problem-critical-radius.md).
     the largest token components converge along $\delta\varepsilon^k$ ($15.64, 15.73, 15.75$;
     $23.13, 23.63, 23.65$; $32.25, 33.49, 33.51$). Look for the limit object: a piecewise translation
     in rescaled coordinates whose components are the limits of the large token components.
-31. **The linear hole width off the chord.** On a line at offset $h$, the gap between the domains of
-    $w_1$ and $w_2$ fits $\tfrac85|h|+(\tfrac15+\tfrac1{\sqrt5})\delta$ to first order (computed), while
-    Theorem 1 of the chaining note uses only $\delta+h^2$. Prove the linear width (it needs the
-    third-letter tests and new range checks for $w_3$ and the lifts); it would bound runs at offset $h$
-    by $O(1/\max(\delta,|h|))$.
+31. **Prove the renormalization inclusion at $E$.** Conjecture RI of
+    [`proofs/sharp-bound-n5-critical-renormalization.md`](proofs/sharp-bound-n5-critical-renormalization.md)
+    ($y\sim_\delta y'\Rightarrow\Psi y\sim_{\varepsilon\delta}\Psi y'$ near $E$, $\Psi(z)=E-\varepsilon(z-E)$)
+    would follow from a finite check: for each first-return germ $g$ of a four-window closure at $r_c$,
+    a word realizing $\Psi g\Psi^{-1}$ on $\Psi(\operatorname{dom}g)$, with containment of arc-bounded
+    domains. It would make the orbit of $-\zeta^2$ infinite (witness already computed).
+32. **Where the window counts grow.** Under the $-\varepsilon$ zoom the sets
+    $S_k=\Psi^{-k}(O(\Psi^kx)\cap B(E,\rho\varepsilon^k))$ grow and then stabilize. Test whether each new
+    point of $S_{k+1}\setminus S_k$ comes from a lune point or a non-critical near miss at scale $k$, as in
+    the lune criterion of the period-two note; a "lune-free implies $S_{k+1}=S_k$" statement would be a
+    usable form of the missing bound on $S_\infty$.
+33. **The natural window for RI.** RI holds on all tested pairs within $0.76$ of $E$ and fails at
+    $0.775$. Find the exact region (candidates: bounded by circles through $\bar E$ and through the
+    critical point $(-1,1,-1,-1)$ at distance $\varphi^{-1}$), and test the zoom $-\varepsilon$ about the
+    other natural centres $-\varphi^{-1}E$ and $\pm\varphi^2E$ (breakpoints of the long-segment rotation).
+34. **Tokens of length 4.** The critical words factor through $u_1=AAbb$, $u_2=abAA$, $u_3=bbAB$, which
+    realize the rotation of the long segment $[-\varphi^2E,\varphi^2E]$. Redo the token-component analysis
+    of the chaining note with the $u$-tokens and their mirror images; the components may be simpler,
+    and the offset-line holes of $M$ are one-sided at $-\varphi^{-1}$ and $\pm\varphi^2$.
 
 ## Formalization
 
