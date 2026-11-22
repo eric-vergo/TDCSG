@@ -117,6 +117,21 @@ and [`open-problem-critical-radius.md`](open-problem-critical-radius.md).
 17. **Exceptional set versus growth exponent.** The orbit of $0$ at $r_c$ has box-counting dimension
     about $1.8$, close to the exponent of $|O_r(0)|$ in $1/(r_c - r)$. Test this relation on other
     orbits and for $n = 8, 12$, and ask whether the closure of the cut set at $r_c$ has measure zero.
+18. **Bounded chaining of chord runs.** Conjecture B$^\ast$ of
+    [`proofs/sharp-bound-n5-invariant.md`](proofs/sharp-bound-n5-invariant.md): below $r_c$ the largest
+    conjugate translations come from up to 7 chord runs on $\mathbb RE$ and $\mathbb R\bar E$, chained
+    through the breakpoint windows (for example $a(-\bar F) = -F$). Write the zoomed window-to-window
+    system (connector maps composed with golden-rotation return times) explicitly and test whether its
+    orbits are bounded uniformly in $\delta$; with Theorem 7 there, that would give Conjecture A.
+19. **The strip graph.** Theorem 7 of the same note bounds runs that follow the rotation $T$. Prove the
+    same $1/\delta$ bound for the full strip graph (all chord tokens and inverses wherever their tests
+    pass, including the overlaps of the word domains), which the computations show adds almost nothing.
+20. **The word behind the cut-set extent at $\delta = 1/55$.** The closure's largest centre has internal
+    modulus $1407.2$, while about $1.2 \cdot 10^5$ sampled orbits reach only $1223.05$. Find that word map
+    and decompose it into chord runs; it is the strongest test of Conjecture B$^\ast$ in hand.
+21. **Sharp constant of the single run.** Computed $\delta \sup L$ lies in $[1.8, 2.6]$ against the proved
+    $5.86$; using the bad intervals at all four breakpoints in the three-distance argument should give
+    the sharp $\limsup$.
 
 ## Formalization
 
