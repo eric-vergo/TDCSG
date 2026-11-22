@@ -24,9 +24,9 @@ certificates.
 | `TDCSG/` | The proof library (Lean 4, Mathlib); `TDCSG.lean` is the root module. Compact statements of the main results are in `TDCSG/Statements.lean` |
 | `TDCSG/Compound/` | The general definition: compound symmetry groups of an indexed family of closed balls in a pseudometric space, each ball carrying a group of its own isometries, and their general theorems; `TDCSG.GG` is the two-disk instance |
 | `TDCSG/CriticalRadius/` | The critical radius `TDCSG.criticalRadius n`, the infinite orbits for n = 5, 8, 10, 12, the Galois-conjugate orbit structure for n = 5 (`FiveConjugate.lean`), the cut-set certificate definitions (`Certificate.lean`), and compact statements in `TDCSG/CriticalRadius/Statements.lean` |
-| `TDCSGCompute/` | The exact engine and the `tdcsg-orbit` executable (core Lean, no Mathlib): orbits, threshold sweeps, GG_n(r) as a permutation group, cut-set certificates with an independent checker, and relative (window-clipped) certificates; see [`notes/engine.md`](notes/engine.md) |
+| `TDCSGCompute/` | The exact engine and the `tdcsg-orbit` executable (core Lean, no Mathlib): orbits (optionally with every point's exact Galois conjugates, `--conj-points`), threshold sweeps, GG_n(r) as a permutation group, cut-set certificates with an independent checker, and relative (window-clipped) certificates; see [`notes/engine.md`](notes/engine.md) |
 | `certificates/` | Small finiteness certificates (`.cert`, format of [`notes/certificates.md`](notes/certificates.md)) and two small relative certificates at r_c (`.rcert`, format of [`notes/relative-certificates.md`](notes/relative-certificates.md)), with their SHA-256 sums |
-| `notes/` | Research notes: [`overview.md`](notes/overview.md) (programme and conventions), [`arithmetic.md`](notes/arithmetic.md), [`analytic-continuation.md`](notes/analytic-continuation.md), [`experiments.md`](notes/experiments.md), [`engine.md`](notes/engine.md), [`certificates.md`](notes/certificates.md), [`gap-structure.md`](notes/gap-structure.md), [`rank-conjecture.md`](notes/rank-conjecture.md), [`large-n-table.md`](notes/large-n-table.md), [`relative-certificates.md`](notes/relative-certificates.md), [`open-problem-critical-radius.md`](notes/open-problem-critical-radius.md) (the critical-radius problem stated for specialists), [`ideas.md`](notes/ideas.md) (open directions), and the referee report [`referee-report-engine-campaign.md`](notes/referee-report-engine-campaign.md) |
+| `notes/` | Research notes: [`overview.md`](notes/overview.md) (programme and conventions), [`arithmetic.md`](notes/arithmetic.md), [`analytic-continuation.md`](notes/analytic-continuation.md), [`experiments.md`](notes/experiments.md), [`engine.md`](notes/engine.md), [`certificates.md`](notes/certificates.md), [`gap-structure.md`](notes/gap-structure.md), [`rank-conjecture.md`](notes/rank-conjecture.md), [`large-n-table.md`](notes/large-n-table.md), [`relative-certificates.md`](notes/relative-certificates.md), [`open-problem-critical-radius.md`](notes/open-problem-critical-radius.md) (the critical-radius problem stated for specialists), [`sharp-bound-n5.md`](notes/sharp-bound-n5.md) (guide to the notes on finiteness of GG_5(r) below √(3+φ)), [`ideas.md`](notes/ideas.md) (open directions), and the referee report [`referee-report-engine-campaign.md`](notes/referee-report-engine-campaign.md) |
 | `notes/proofs/` | Written proofs, each with an independent referee report (`referee-report-*.md`) and, for the first Lean round, an independent Lean check (`lean-check-thread1.md`) |
 | `2302.12950v1.pdf` | The paper |
 
@@ -205,6 +205,38 @@ statement of the problem for specialists, with the current status of every ingre
   from a deeper level is open. Conjectured: eventual period one through monotone growth of
   first-return sets (§8; Proposition 8.1 there is not yet refereed).
 
+**The sharp-bound series for n = 5.** Eleven further notes attack finiteness of GG_5(r) for every
+r < √(3+φ); ten are refereed, the atlas note is not. The guide
+[`notes/sharp-bound-n5.md`](notes/sharp-bound-n5.md) summarizes each note, its referee verdict, the
+refuted formulations and the proposed new ideas. **Finiteness below √(3+φ) is not proved.**
+
+- Proved (refereed): every chord run and every chord passage below r_c, from every starting point,
+  is cut off after O(1/δ) steps with explicit constants, δ = r_c² − r²
+  ([`sharp-bound-n5-invariant.md`](notes/proofs/sharp-bound-n5-invariant.md),
+  [`sharp-bound-n5-orbit-of-zero.md`](notes/proofs/sharp-bound-n5-orbit-of-zero.md),
+  [`sharp-bound-n5-chaining.md`](notes/proofs/sharp-bound-n5-chaining.md)); at r_c the long segment
+  [−φ²E, φ²E] carries an exact rotation
+  ([`sharp-bound-n5-critical-renormalization.md`](notes/proofs/sharp-bound-n5-critical-renormalization.md));
+  the lattice splits into 20 congruence classes, and orbits in 18 of them never meet the chord; and
+  if GG_5(r₀) is finite at a non-norm radius r₀, it is finite on a neighbourhood of r₀
+  ([`sharp-bound-n5-critical-orbits.md`](notes/proofs/sharp-bound-n5-critical-orbits.md)).
+- Proved (refereed): **(T)**, every token component has internal diameter less than
+  72.07/δ + 41.82 for 0 < δ ≤ 2/5
+  ([`sharp-bound-n5-token-components.md`](notes/proofs/sharp-bound-n5-token-components.md)). Hence
+  (T) and (K) imply finiteness below r_c, and at each fixed r, GG_5(r) is finite if and only if
+  the component graphs of its orbits (token components joined by single letters) have bounded
+  diameter.
+- Open: **(K)**, a bound on the number of single letters outside tokens needed to reach every state
+  of an orbit; a bound for each radius separately suffices, though at a given radius it is
+  equivalent to finiteness there, so only uniform bounds are a genuine reduction. Computed: component-graph diameter at
+  most 9 on every orbit computed exactly. Local transport of tokens by ε = φ⁻³ is proved
+  ([`sharp-bound-n5-graph-renormalization.md`](notes/proofs/sharp-bound-n5-graph-renormalization.md));
+  the global renormalization statements needed for (K) are not, and the referees conclude that
+  (K) needs a new idea.
+- Refuted (exact): period two of first-return sets at the tight points in unrestricted form
+  ([`sharp-bound-n5-period-two.md`](notes/proofs/sharp-bound-n5-period-two.md)), the uniform
+  offset cut-off K3, and the component-graph renormalization Conjecture 5.1 as stated.
+
 ### (c) Proved modulo a certified computation
 
 GG_n(r) is finite for every r ≤ r_*, r_*² = r_c² − δ, by the certificate theorem (refereed, not in
@@ -292,12 +324,15 @@ into a certificate format or checker.
 ### (e) Open problems and conjectures
 
 - **r_crit(n) equals the closed form for n = 5, 8, 10, 12** (finiteness on the open windows above):
-  open for all four n. Current reductions, from the sharp-lower-bound series in (b): for n = 5,
-  finiteness below r_c is equivalent to termination of the cut-set closure along non-norm radii
-  r_j ↑ r_c, and follows from (R-bulk-t) with (R-core-t), statements about the four tight points;
+  open for all four n. Current reductions, from the sharp-lower-bound and sharp-bound series in
+  (b): for n = 5, finiteness below r_c is equivalent to termination of the cut-set closure along
+  non-norm radii r_j ↑ r_c, follows from (R-bulk-t) with (R-core-t), statements about the four
+  tight points, and, since (T) is proved, follows from the single open statement (K) on
+  component graphs ([`notes/sharp-bound-n5.md`](notes/sharp-bound-n5.md));
   for n = 8 it follows from Conjecture S; for n = 12 it follows from statements about the 8 tight
-  points. The renormalization these need is not found: exact φ⁻³ matching is refuted for n = 5,
-  exact period one from levels m₀ ≤ 3 is refuted for n = 12, and period two (n = 5) and eventual
+  points. The renormalization these need is not found: exact φ⁻³ matching and unrestricted period
+  two of first-return sets are refuted for n = 5, exact period one from levels m₀ ≤ 3 is refuted
+  for n = 12, and monotone period-two growth of tight-core orbit classes (n = 5) and eventual
   period one through monotone growth (n = 12) are conjectures. n = 10 has no note of its own; its relative certificates at r_c give the window reduction
   through the general-n form of Theorem 4.2 (refereed correct in
   [`notes/proofs/referee-report-relative-certificates.md`](notes/proofs/referee-report-relative-certificates.md)).
