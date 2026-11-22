@@ -117,15 +117,19 @@ and [`open-problem-critical-radius.md`](open-problem-critical-radius.md).
 17. **Exceptional set versus growth exponent.** The orbit of $0$ at $r_c$ has box-counting dimension
     about $1.8$, close to the exponent of $|O_r(0)|$ in $1/(r_c - r)$. Test this relation on other
     orbits and for $n = 8, 12$, and ask whether the closure of the cut set at $r_c$ has measure zero.
-18. **Bounded chaining of chord runs.** Conjecture B$^\ast$ of
-    [`proofs/sharp-bound-n5-invariant.md`](proofs/sharp-bound-n5-invariant.md): below $r_c$ the largest
-    conjugate translations come from up to 7 chord runs on $\mathbb RE$ and $\mathbb R\bar E$, chained
-    through the breakpoint windows (for example $a(-\bar F) = -F$). Write the zoomed window-to-window
-    system (connector maps composed with golden-rotation return times) explicitly and test whether its
-    orbits are bounded uniformly in $\delta$; with Theorem 7 there, that would give Conjecture A.
-19. **The strip graph.** Theorem 7 of the same note bounds runs that follow the rotation $T$. Prove the
-    same $1/\delta$ bound for the full strip graph (all chord tokens and inverses wherever their tests
-    pass, including the overlaps of the word domains), which the computations show adds almost nothing.
+18. **Bounded chaining of token components.** Conjecture B$^\sharp$(K) of
+    [`proofs/sharp-bound-n5-chaining.md`](proofs/sharp-bound-n5-chaining.md): every word map is
+    realized with boundedly many non-token letters (observed: at most 7 on 11 orbits at 10 radii;
+    6, 5, 6 along $\delta=\varphi^{-3k}/55$). The single-line window map is the
+    wrong object there, because connectors between large token components occur all over the disks.
+    Find the renormalization of the component graph.
+19. **A two-dimensional free-token cut-off.** Theorem 1 of
+    [`proofs/sharp-bound-n5-chaining.md`](proofs/sharp-bound-n5-chaining.md) bounds free-token walks on
+    one chord-parallel line. Prove the same $O(1/\delta)$ internal bound for walks that mix the tokens
+    of $\mathbb RE$ and $\mathbb R\bar E$ (B$^\sharp$(T); observed $\delta\cdot$extent $\le34.3$ from
+    134 000 random seeds). It is a statement about a piecewise translation of the plane on six
+    explicit convex domains; in coordinates $X=sE+t\bar E$ both $s$ and $t$ perform the golden
+    rotation modulo 2.
 20. **The word behind the cut-set extent at $\delta = 1/55$.** The closure's largest centre has internal
     modulus $1407.2$, while about $1.2 \cdot 10^5$ sampled orbits reach only $1223.05$. Find that word map
     and decompose it into chord runs; it is the strongest test of Conjecture B$^\ast$ in hand.
@@ -172,6 +176,17 @@ and [`open-problem-critical-radius.md`](open-problem-critical-radius.md).
 29. **Sharp passage constant on the chord.** For chord seeds the computed $\sup\delta L$ is about $1.05$
     against the proved $\varphi^3=4.24$; a gap theorem for the union of the three holes (at $b_1$, $b_3$
     and $1$) should give the sharp value.
+30. **A two-dimensional version of the window self-similarity.** The one-line first-return map to
+    the blocked window satisfies $R_{\varepsilon\delta}=R_\delta^{-1}$ exactly (Proposition 2 of
+    [`proofs/sharp-bound-n5-chaining.md`](proofs/sharp-bound-n5-chaining.md)). The rescaled extents of
+    the largest token components converge along $\delta\varepsilon^k$ ($15.64, 15.73, 15.75$;
+    $23.13, 23.63, 23.65$; $32.25, 33.49, 33.51$). Look for the limit object: a piecewise translation
+    in rescaled coordinates whose components are the limits of the large token components.
+31. **The linear hole width off the chord.** On a line at offset $h$, the gap between the domains of
+    $w_1$ and $w_2$ fits $\tfrac85|h|+(\tfrac15+\tfrac1{\sqrt5})\delta$ to first order (computed), while
+    Theorem 1 of the chaining note uses only $\delta+h^2$. Prove the linear width (it needs the
+    third-letter tests and new range checks for $w_3$ and the lifts); it would bound runs at offset $h$
+    by $O(1/\max(\delta,|h|))$.
 
 ## Formalization
 
