@@ -242,17 +242,32 @@ and [`open-problem-critical-radius.md`](open-problem-critical-radius.md).
 43. **Level 4 of the orbit of $0$.** It has $7.6\cdot10^7$ states, above the memory used here. The
     level-3 marginal satellites (rescaled extent $1.53$) are the first test of whether births grow
     into permanent satellites or merge into hubs.
-44. **An atlas of $\pm\varepsilon$-charts.** Besides $z\mapsto\varepsilon z$, at least nine maps
-    $z\mapsto c+u(z-c)$, $u=\pm\varepsilon$, $c$ small lattice points (for example $c=-F$), send $68\%$
-    of the level-1 orbit of $0$ into the level-2 orbit, and 30 such charts cover $80\%$ of it
-    ([`proofs/sharp-bound-n5-graph-renormalization.md`](proofs/sharp-bound-n5-graph-renormalization.md)
-    §6.4). Find a finite atlas whose images cover each child orbit up to dust, with local transport
-    lemmas per chart and bounded connector distance between overlapping charts. That would turn (R2)
-    into finitely many local statements.
+44. **The local half of the atlas recursion.** Theorem 8 of
+    [`proofs/sharp-bound-n5-atlas.md`](proofs/sharp-bound-n5-atlas.md) needs, besides three global
+    hypotheses, the local statements (A1)–(A3): edge transport per chart, a cover of the parent region
+    by chart regions, and bounded transitions (exactly 2 connectors in the data). Each is a cell problem
+    in circles of radii $r$ and $\varphi^3r'$; for nonzero charts the chart-$0$ transport words are cut
+    by 3–10 circles, so each chart needs its own word list near those circles.
 45. **A covering proof for connector transport.** For each letter, the transport words (two tokens
     and one letter, the letter possibly exchanged) cover the letter's domain inside the success region
     except an orbit-free lune in a gap. Prove the covering on an explicit region by a cell decomposition
     in circles of radii $r$ and $\varphi^3r'$, using the tangent-disk lemma at tight corners.
+46. **Gluing by completeness near $0$.** Near $0$ a child orbit collects its states from a growing
+    number of parent orbits (9, 105, 1 561 for the orbit of $0$ at levels 1–3), all glued into the token
+    components of the main one at distance $0$ or $1$
+    ([`proofs/sharp-bound-n5-atlas.md`](proofs/sharp-bound-n5-atlas.md) §4.6). A forward-type
+    statement would explain this: every lattice point of the right $\Gamma$-class near $0$, with internal
+    coordinate in a window of size $c/\delta$, lies in one of boundedly many large token components
+    whose mutual distance is bounded. On the chord line the analogue is the passage model set
+    (Proposition 13 of the orbit-of-zero note). Test first how much of the window near $0$ the large
+    components fill, at two levels.
+47. **Renormalize the radius instead of the plane.** By orbit monotonicity the orbits at the parent
+    radius $r$ of the points of a child orbit at $r'>r$ partition it, and they are joined only by letters
+    acting in the rim $r<|y\mp1|\le r'$. If a shortest path in the child needs boundedly many rim letters,
+    uniformly, then $D(\varepsilon\delta)\le(P+1)D(\delta)+P$ and (B) follows. Compute the rim-crossing
+    number on the orbit of $0$ at levels 1–3 and on random children; the rim is an $O(\delta)$ annulus,
+    so a bound on its crossings is a statement about a thin set, which may be easier to control than
+    the lunes of the atlas.
 
 ## Formalization
 
