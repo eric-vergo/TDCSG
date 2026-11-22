@@ -295,7 +295,11 @@ programs; by group monotonicity GG_n(r) is then finite for every r ≤ r_* (subj
 | 12 | 40 − 22√3 | 1.376547 | 1/180 | 1.374528 | 0.002019 | δ = 1/50, r_c − r = 0.007284 |
 
 The remaining gap is open in every case: no single computation reaches r_c, and the window
-(r_*, r_c) needs the renormalization argument of the notes.
+(r_*, r_c) needs the renormalization argument of the notes. A symmetry-reduced window-free closure
+(`certify-relative --window 0 --symmetric`, checked with (C1)–(C4) by
+`check-relative-certificate`) has since certified n = 8 at δ = 547/25000 ≈ 0.02188
+(r_c − r_* ≈ 0.006404), and exact intervals of validity extend the n = 10 and n = 12 rows slightly;
+see [`relative-certificates.md`](relative-certificates.md) §§7, 8, 10.
 
 ## 6. Committed certificates and checksums
 

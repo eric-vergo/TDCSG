@@ -229,6 +229,11 @@ Options of `certify`: `--max-pieces`, `--max-circles`, `--max-seconds` (caps; re
 nothing is claimed), `--progress K`, `--out FILE`. The exit code is 0 when certified, 3 when not;
 `check-certificate` exits 0 for a valid certificate and 2 for a rejected one.
 
+**Relative certificates.** `critical-points`, `certify-relative`, `check-relative-certificate`
+and `validity-interval` (modules `RelClosure`, `RelCheck`, `Validity`) compute and check
+window-clipped closures at a norm radius, symmetry-reduced closures, and intervals of validity;
+they are described, with all runs, in [`relative-certificates.md`](relative-certificates.md).
+
 **What is established.** A certificate that passes `check-certificate` satisfies (C1)–(C4) as
 checked by a compiled, tested Lean program; it is not a kernel-checked proof. Its link to the Lean
 proposition `TDCSG.Certificate` is by correspondence of definitions (explained in the docstring of

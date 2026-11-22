@@ -45,7 +45,9 @@ lake test            # self-test of the orbit engine
 `lake build` builds the proof library and the engine; `lake test` runs the engine's self-test
 (known finite cases, rows of the certificate tables, tangency and cap cases, tampered
 certificates). The commands that generate and check certificates, and the caps the large runs
-need, are in [`notes/certificates.md`](notes/certificates.md).
+need, are in [`notes/certificates.md`](notes/certificates.md); those for relative
+(window-clipped) certificates at the critical radius, symmetry-reduced closures and intervals of
+validity are in [`notes/relative-certificates.md`](notes/relative-certificates.md).
 
 ## Results
 
