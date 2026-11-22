@@ -80,6 +80,20 @@ and [`open-problem-critical-radius.md`](open-problem-critical-radius.md).
    `sharp-lower-bound-combined.md` are not explicit, because $F$ (bounded faces of the complement of
    a restricted closure) was never computed. It needs every crossing of two arcs, with exact
    identification of points on three or more circles.
+9. **The tight first returns in the conjugate coordinate.** The chord part of the orbit of $0$ reaches
+   conjugate modulus $\Theta(1/\delta)$ ([`proofs/sharp-bound-n5-conjugate.md`](proofs/sharp-bound-n5-conjugate.md)
+   Theorem 6). A scalar form of (R-core-t): every first return to the tight windows adds at most
+   $C/\delta$ to the conjugate coordinate. Test it with `orbit --conj-points` on the tight samples of
+   `sharp-lower-bound-limit-system.md` §5, then look for a proof.
+10. **Sharp constants of the chord cut-off.** Prove that the chord exit at level $k$ is exactly
+    $(F_{3k+7}-1)/2$ for every $k$, using the exact slopes ($\sqrt5$ and $5$) of the tight tests at all
+    breakpoints, and determine $\liminf$ and $\limsup$ of $\delta K(\delta)$ and of $\delta M_0(\delta)$.
+11. **A speed limit at $r_c$.** In the orbit of $0$ at $r_c$ the largest conjugate modulus in
+    breadth-first generation $g$ is the chord rate $1.514\,g$. Is the chord the fastest escape route, for
+    every starting point?
+12. **The conjugate cut-off for $n = 8, 10, 12$.** The analogue of Theorem 6 of
+    `sharp-bound-n5-conjugate.md` for the chord of $n = 10$ and the self-similar chord families at $p^\ast$
+    for $n = 8, 12$: a lower bound of order $1/\delta$ on the conjugate reach, and the exit index.
 
 ## Formalization
 
