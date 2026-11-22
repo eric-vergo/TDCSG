@@ -4,7 +4,7 @@ Authors: Eric Vergo, Claude
 
 The target is statement **(B)**: $GG_5(r)$ is finite for every $r<r_c=\sqrt{3+\varphi}$. Infinitude
 at and above $r_c$ is proved in Lean (`infinite_GG_five`), so (B) is the remaining half of
-$r_{\rm crit}(5)=r_c$. **(B) is not proved.** Eleven notes in [`proofs/`](proofs/) attack it. This
+$r_{\rm crit}(5)=r_c$. **(B) is not proved.** Twelve notes in [`proofs/`](proofs/) attack it. This
 guide says what each proves, how they depend on each other, what the present reduction is, which
 formulations are refuted or closed, and which new ideas have been proposed. Every statement below
 is labelled **proved** (written proof, refereed unless said otherwise), **computed** (exact
@@ -39,7 +39,7 @@ arithmetic unless said otherwise) or **conjectured**; the notes themselves carry
   $\varepsilon\delta$ of $\varepsilon$ times the seed. A *renormalization* statement compares the
   two.
 
-## The eleven notes
+## The twelve notes
 
 Listed in the order they build on each other. Each note's top paragraph records the referee's
 verdict and links its report.
@@ -114,7 +114,19 @@ verdict and links its report.
     $\pm\varepsilon$ charts $z\mapsto\pm\varepsilon z+t$, that no chart is a local conjugacy (the
     lune lemma, Proposition 7), and an atlas recursion (Theorem 8) that gives (B) from three local
     and three global hypotheses. Its own assessment: the global, reverse-type hypotheses (coverage
-    and gluing) are not reduced, so the atlas does not reduce (K). *Referee:* **not refereed.**
+    and gluing) are not reduced, so the atlas does not reduce (K). *Referee:* correct after minor
+    fixes; one computed claim corrected (transitions are free for a third of the states); the
+    conclusion that the atlas does not reduce (K) is an assessment supported by evidence, not a
+    proof. ([report](proofs/referee-report-sharp-bound-n5-atlas.md))
+12. [`sharp-bound-n5-rim-graph.md`](proofs/sharp-bound-n5-rim-graph.md) ("the rim note").
+    Renormalizes the radius instead of the plane: the parent-radius orbits (pieces) of a child
+    orbit, joined by letters acting only in the rim. Proves the rim recursion
+    $M(r')+c\le(R+1)(M(r)+c)$ (and $D(r')+1\le(R+1)(D(r)+1)$), so finite rim-graph diameters
+    along the level radii give (B) without (T); proves that parent orbits are glued only along the
+    two arcs of the lens boundary, by one partial translation by $v=2(\zeta^{-1}-1)\in\Lambda_T$,
+    plus junctions at the cusps. Computed: rim-graph diameter $12,14,14,14$ on the orbit of $0$ at
+    levels 1–4, at most 29 on 1 573 random children at 30 radii. Its assessment: a uniform bound is
+    (K) in a new, localized form. *Referee:* not refereed.
 
 **Dependencies.** Part I (1) starts from `critical-radius-n5.md` and `sharp-lower-bound-n5.md`.
 The critical-orbits note (2) and line 4 (3) build on Part I; Part II (4) continues Part I and uses
@@ -122,7 +134,7 @@ The critical-orbits note (2) and line 4 (3) build on Part I; Part II (4) continu
 The critical-renormalization note (6) proves K4 of (2) and feeds Proposition 4.5 of (5). The
 chaining note (7) continues line 4. The (T) note (8) proves part (T) of the chaining note's
 Conjecture B$^\sharp$. The component-graph note (9) uses (7) and (8); the transport note (10) uses
-(8) and (9); the atlas note (11) uses (8), (9) and (10). Notes 9–11 also use the certified
+(8) and (9); the atlas note (11) uses (8), (9) and (10); the rim note (12) uses the atlas referee's §4, and (8) and (9) only for its component-graph form. Notes 9–11 also use the certified
 finiteness at $\delta=1/55$ ([`certificates.md`](certificates.md)) as base case.
 
 ## The present reduction
@@ -154,6 +166,10 @@ finiteness at $\delta=1/55$ ([`certificates.md`](certificates.md)) as base case.
   ([transport note](proofs/sharp-bound-n5-graph-renormalization.md), Theorem 1). Statements with
   content are those with uniform constants: $D(r)\le K_0$ for small $\delta$, or
   $D(\varepsilon\delta)\le D(\delta)+C$.
+- **The rim route.** The rim note (12) gives a second sufficient condition, independent of (T):
+  finite rim-graph diameters between consecutive level radii. Per step it is again equivalent to
+  (B); its uniform form (Conjecture 7 there, at most 29 in the data) is open and is (K) in a
+  localized form.
 - **Evidence for (K), computed.** Component-graph diameter 6 to 9 wherever computed exactly; at
   most 9 on 878 random orbits at six radii from $\delta=1/30$ to $\varepsilon^3/10$, with no growth
   as $\delta$ decreases. Conjectured: diameter at most 9 for $\delta\le1/30$ (Conjecture 5.2 of the
@@ -203,7 +219,8 @@ Do not retry these in the form stated.
     stretch); the right global unit is $\varepsilon$ about $0$ (component-graph note §5).
 11. **The atlas of $\pm\varepsilon$ charts as a reduction of (K) to local statements:** dead in the
     author's assessment, because no chart is a local conjugacy and chart validity is not determined
-    by position (atlas note §6; not refereed).
+    by position (atlas note §6). Its referee agrees; this is an assessment supported by evidence,
+    not a proof.
 
 ## Candidate new ideas
 
@@ -220,9 +237,10 @@ Recorded by the authors and referees; none is tested beyond what is said. Each a
 3. **Gluing by completeness near $0$** (atlas note §6): every lattice point of the right class in a
    window near $0$ lies in one of boundedly many large token components, as the model set does on
    the chord line.
-4. **Renormalize the radius instead of the plane** (atlas note §6): the parent-radius orbits of the
-   points of a child orbit partition it and are joined only through the thin rim
-   $r<|y\mp1|\le r'$; a uniform bound on rim crossings of shortest paths gives (B).
+4. **Renormalize the radius instead of the plane**: worked out in the rim note (12). A uniform bound
+   on rim-graph diameters gives (B); it is supported by the data (at most 29) and open. Its
+   follow-ups (exact gluing windows, a rim model set, a rim renormalization) are in
+   [`ideas.md`](ideas.md).
 5. **Box types** ((T) note §2.4 and its referee): a finite graph of fence boxes joined by
    connectors, invariant under $\delta\mapsto\varepsilon^2\delta$; it must carry the physical
    position and the rotation index, not only the index box.

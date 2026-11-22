@@ -205,8 +205,8 @@ statement of the problem for specialists, with the current status of every ingre
   from a deeper level is open. Conjectured: eventual period one through monotone growth of
   first-return sets (§8; Proposition 8.1 there is not yet refereed).
 
-**The sharp-bound series for n = 5.** Eleven further notes attack finiteness of GG_5(r) for every
-r < √(3+φ); ten are refereed, the atlas note is not. The guide
+**The sharp-bound series for n = 5.** Twelve further notes attack finiteness of GG_5(r) for every
+r < √(3+φ); eleven are refereed, the rim-graph note is not. The guide
 [`notes/sharp-bound-n5.md`](notes/sharp-bound-n5.md) summarizes each note, its referee verdict, the
 refuted formulations and the proposed new ideas. **Finiteness below √(3+φ) is not proved.**
 
@@ -232,7 +232,10 @@ refuted formulations and the proposed new ideas. **Finiteness below √(3+φ) is
   most 9 on every orbit computed exactly. Local transport of tokens by ε = φ⁻³ is proved
   ([`sharp-bound-n5-graph-renormalization.md`](notes/proofs/sharp-bound-n5-graph-renormalization.md));
   the global renormalization statements needed for (K) are not, and the referees conclude that
-  (K) needs a new idea.
+  (K) needs a new idea. A radius renormalization, the rim graph, gives a second sufficient
+  condition independent of (T), a uniform bound on rim-graph diameters (computed: at most 29); it
+  is open, and is (K) in a localized form
+  ([`sharp-bound-n5-rim-graph.md`](notes/proofs/sharp-bound-n5-rim-graph.md), not refereed).
 - Refuted (exact): period two of first-return sets at the tight points in unrestricted form
   ([`sharp-bound-n5-period-two.md`](notes/proofs/sharp-bound-n5-period-two.md)), the uniform
   offset cut-off K3, and the component-graph renormalization Conjecture 5.1 as stated.

@@ -125,13 +125,11 @@ are refuted or closed.
     whose mutual distance is bounded. On the chord line the analogue is the passage model set
     (Proposition 13 of the orbit-of-zero note). Test first how much of the window near $0$ the large
     components fill, at two levels.
-13. **Renormalize the radius instead of the plane.** By orbit monotonicity the orbits at the parent
-    radius $r$ of the points of a child orbit at $r'>r$ partition it, and they are joined only by letters
-    acting in the rim $r<|y\mp1|\le r'$. If a shortest path in the child needs boundedly many rim letters,
-    uniformly, then $D(\varepsilon\delta)\le(P+1)D(\delta)+P$ and (B) follows. Compute the rim-crossing
-    number on the orbit of $0$ at levels 1–3 and on random children; the rim is an $O(\delta)$ annulus,
-    so a bound on its crossings is a statement about a thin set, which may be easier to control than
-    the lunes of the atlas.
+13. **Renormalize the radius instead of the plane.** Worked out in
+    [`proofs/sharp-bound-n5-rim-graph.md`](proofs/sharp-bound-n5-rim-graph.md): a uniform bound on
+    the diameter of the rim graph (parent-radius orbits of a child orbit, joined by rim letters)
+    gives finiteness without (T); the data give at most 29, and the bound is open. Items 38–41 are
+    its follow-ups.
 14. **Box types for a renormalization of (K).** Every token component sits in one box of the grid of
     fence columns and rows of its seed; box widths are golden-rotation return times to an arc of length
     $\kappa_0\delta$, whose zoomed return map is exactly $\varepsilon^2$-periodic. Compute the graph of
@@ -266,6 +264,24 @@ are refuted or closed.
 37. **Exceptional set versus growth exponent.** The orbit of $0$ at $r_c$ has box-counting dimension
     about $1.8$, close to the exponent of $|O_r(0)|$ in $1/(r_c - r)$. Test this relation on other
     orbits and for $n = 8, 12$, and ask whether the closure of the cut set at $r_c$ has measure zero.
+38. **The exact gluing windows of the rim.** Parent orbits are glued only along the two arcs of the
+    lens boundary, and in the data only in seven fixed angular windows per quarter-arc (rim note
+    §4.2; for example $[14.26^\circ,14.97^\circ]$ about $-1$). Find their endpoints exactly: test
+    whether they are arcs of the cut set at $r_c$ or images of critical points under short words,
+    and whether the parent orbits met in each window are of finitely many types.
+39. **A rim model set.** Describe the essential gluing sites in the coordinates (angle, rescaled
+    internal coordinate $\delta\sigma y$) at several levels, and test whether they converge to a
+    fixed set, as the chord-line model set does on the chord. A proved limit description would make
+    rim distances a finite problem.
+40. **A rim renormalization with additive growth.** Under $y\mapsto\varepsilon y$ the rim depth of
+    every non-singleton piece never increases, and every new piece lies within 2 rim steps of an
+    image (rim note §4.4, three level pairs). Proving both would give $R_k=O(k)$, which suffices
+    for finiteness through the rim recursion. The coverage half is the reverse-type step.
+41. **Rim graphs as a function of the step.** The rim-graph diameter grows with the step ratio (at
+    most 4, 8, 11, 20, 29, 84 for ratios $0.99$, $0.9$, $\varphi^{-1}$, $1/2$, $\varepsilon$,
+    $\varepsilon^2$), and over a fixed base like $1/\delta$ ($12,38,164$). A one-step bound
+    $R(r_0,r)=O(1/\delta)$ from a fixed certified radius would give Conjecture A directly; test
+    its constant on more orbits and radii.
 
 ## Formalization
 

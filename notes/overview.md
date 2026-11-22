@@ -229,7 +229,7 @@ Status of each item, as of the notes in this repository (details in the README's
    missing (exact φ⁻³ matching and unrestricted period two of first-return sets refuted for n = 5,
    exact period one from levels m₀ ≤ 3 refuted for n = 12; monotone period-two growth of orbit
    classes for n = 5 and eventual period one for n = 12 are conjectures). For n = 5 a second
-   series of eleven notes, ten of them refereed, works in the Galois-conjugate coordinate and with
+   series of twelve notes, eleven of them refereed, works in the Galois-conjugate coordinate and with
    the chord words as tokens; the guide is [`sharp-bound-n5.md`](sharp-bound-n5.md). It proves
    (T), that every token component has internal diameter O(1/δ), so finiteness below √(3+φ)
    follows from one open statement, (K): a bound on the number of single letters outside tokens
