@@ -24,7 +24,7 @@ certificates and their checker are in [`certificates.md`](certificates.md).
    the bound is `1 + 20nF` for general `n`; coincidences are not confined to the windows.
 3. **Float-free certified at `r_c`**: windows 1–8 of the note's Table 5.1 for `n = 5` (counts and
    check counts agree exactly with the note, `chk.py` and `rcut.c`); window 9 not run (memory);
-   two windows for `n = 8`, two for `n = 10`, four for `n = 12`.
+   one window for `n = 8` (a second did not close), two for `n = 10`, four for `n = 12`.
 4. **Hybrid**: Theorem H (proved here) makes a windowed storage of a cut set a valid
    certificate; it saves at most about 2.5× in memory, so level 2 for `n = 5` is not certified.
 5. **New best radius**: `n = 8` at level 5, `δ = 0.02188` (`r_c − r_* = 0.006404`, from
@@ -328,8 +328,11 @@ finite. Symmetric storage divides memory by about four, which reaches the next l
 | 8 | `57/5000 = 0.0114` | — | — | not closed: stopped at 2.0·10⁸ pieces, 8.3·10⁵ circles | — | — | 5 330 s | — | — |
 | 12 | `1/600` | — | — | not closed: stopped at 1.0·10⁸ pieces, 1.45·10⁶ circles | — | — | 1 061 s | — | — |
 
-`δ = 0.02188` is the level-5 radius of `sharp-lower-bound-n8.md` §5.5 (`m = 5`, `θ* = 4/5`), past
-the jump at `δ₅ ≈ 0.0272` that no earlier certificate crossed. Reproduction:
+`δ = 0.02188` is the level-5 radius of `sharp-lower-bound-n8.md` §5.5 (`m = 5`) rounded to five
+decimals, past the jump at `δ₅ ≈ 0.0272` that no earlier certificate crossed. The exact value
+`λε⁵` for `θ* = 4/5` is `0.0218762 < 0.02188`, so this certificate is at a radius just below that
+`r_5`; it covers `r_5` for every `θ* ≥ 0.80014` (for example `θ* = 4001/5000`), for which `r_4`
+is also inside the certified range. Reproduction:
 `tdcsg-orbit certify-relative -n 8 --r2 closed-547/25000 --window 0 --symmetric --out FILE`, then
 `tdcsg-orbit check-relative-certificate FILE --threads 4`. The `n = 12`, `δ = 1/250` closure is a
 computation only until it is checked (`certify-relative -n 12 --r2 closed-1/250 --window 0
@@ -476,8 +479,9 @@ floating-point computation of `sharp-lower-bound-n5.md`.
   with every decision certified, and the separate checker, which makes no floating-point decision,
   verified the hypotheses of the theorem used from the file alone. Generator and checker are tested
   by `lake test` (§4).
-- **Relative certificates at `r_c`** establish, through Theorem 4.2 of the combined note (a written,
-  unrefereed proof; re-read in §3), the uniform bound on window-avoiding chains (Theorem 5.2 there)
+- **Relative certificates at `r_c`** establish, through Theorem 4.2 of the combined note (refereed
+  for `n = 5` in `proofs/referee-report-sharp-lower-bound-combined.md`; re-read in §3, where the
+  general-`n` bound `1 + 20nF` is derived and not refereed), the uniform bound on window-avoiding chains (Theorem 5.2 there)
   for the windows marked VALID: the note's Theorem 5.2 is no longer conditional on floating-point
   ordering for those windows. (R-bulk), (R-core) and (B) remain open; a relative certificate says
   nothing about finiteness at any particular `r < r_c` by itself.
@@ -489,8 +493,8 @@ floating-point computation of `sharp-lower-bound-n5.md`.
   kernel-checked proofs; their correctness rests on the arguments in their docstrings, on the
   tests, and on the Lean compiler and runtime (and, for the generator's float filter, on IEEE 754
   arithmetic). The link between the checker's acceptance and the theorems' hypotheses is by
-  inspection of the definitions. Theorem 4.2 and Theorem H are proved on paper only, and neither
-  is refereed. The face count `F`, and hence the constant `β_W = 1 + 20nF`, was not computed: it
+  inspection of the definitions. Theorem 4.2 and Theorem H are proved on paper only; Theorem 4.2
+  is refereed for `n = 5`, Theorem H is not refereed. The face count `F`, and hence the constant `β_W = 1 + 20nF`, was not computed: it
   needs every crossing of two arcs of `K'` (a quadratic enumeration with exact identification of
   points on three or more circles), and no conclusion here uses its value, only its finiteness.
 - **Large files.** Only the small certificates are in the repository; the others were written to

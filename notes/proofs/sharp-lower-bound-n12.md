@@ -34,7 +34,7 @@ The note has been independently refereed (`referee-report-sharp-lower-bound-n12.
    - The number of core visits per full orbit is **level-independent** on every orbit computed: at most 224 on 30 sampled orbits, and at most 280 on the closure samples, at levels 0–4.
 6. **The remaining gap** (§8.3) is two statements, both open.
    - **(R-core-t₁₂)**: uniformly bounded visits to the tight cores. The note reduces it to a bound on the classes of the *eventual* (limit) core relation, together with monotone growth (Proposition 8.1, not yet refereed). Both are conjectures.
-   - **(R-bulk₁₂)**: restricted closures exist at $r_c$ for windows of every scale. Three are certified, reaching the core scale of level 1.
+   - **(R-bulk₁₂)**: restricted closures exist at $r_c$ for windows of every scale. Three are certified, reaching the core scale of level 1. Three further window shapes, with circumradii $0.0718$, $0.0405$ and $0.0124$, are certified in [`../relative-certificates.md`](../relative-certificates.md) §6.
 
    Because of item 4, there is no exact one-step induction starting at a level $\le3$. The route proposed in its place is the monotone limit of item 5.
 
@@ -104,7 +104,7 @@ The engine reports 5 canonical circles tangent to a boundary circle in each rest
 | 5 | 1/7240.0 | 1.376497 | 0.000050 | 0.00012 | yes |
 | $\ge6$ | | | | | yes ($\sigma'(r_m^2)<0$) |
 
-**The certified base.** The engine certificate at $\delta=1/180$ (`../certificates.md`; $r=1.374528$) gives finiteness for $r^2\le r_c^2-1/180$ by group monotonicity. Since $\delta_2=1/139.3>1/180$, **levels 0, 1, 2 are certified; level 3 is not.** Level 3 needs a certificate at $\delta\le1/520$. The cut set grew by a factor of about 13 in circles from $\delta=1/50$ to $1/180$, one level. Extrapolated, that suggests some $10^7$ circles at level 3, beyond the memory available here; this is an extrapolation, not a measurement.
+**The certified base.** The engine certificate at $\delta=1/180$ (`../certificates.md`; $r=1.374528$) gives finiteness for $r^2\le r_c^2-1/180$ by group monotonicity. Since $\delta_2=1/139.3>1/180$, **levels 0, 1, 2 are certified; level 3 is not.** (A symmetry-reduced window-free closure at $\delta=1/250$, still above $\delta_3$, closes, but its check is unfinished, so it is not certified; [`../relative-certificates.md`](../relative-certificates.md) §7.) Level 3 needs a certificate at $\delta\le1/520$. The cut set grew by a factor of about 13 in circles from $\delta=1/50$ to $1/180$, one level. Extrapolated, that suggests some $10^7$ circles at level 3, beyond the memory available here; this is an extrapolation, not a measurement.
 
 **Lemma 3.1 (radii).**
 1. *(Lattice sense, every $m$.)* No lattice point lies on a circle of radius $r_m$ about a lattice point, and no two such circles are tangent.

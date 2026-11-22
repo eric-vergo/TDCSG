@@ -216,7 +216,7 @@ The constant $\eta$ is not computed.
 
 ### 5.1 Programs, algorithm and certificate format
 
-The programs are **outside the repository**, which holds Lean code only. They are in the session scratch directory `sharp2/`, which a reboot or routine cleanup can clear. A port of the window clipping to the repository's Lean engine, with an independent checker, is in progress; it will be documented in `../relative-certificates.md`. The algorithm and format are described here fully enough to re-implement them.
+The programs are **outside the repository**, which holds Lean code only. They are in the session scratch directory `sharp2/`, which a reboot or routine cleanup can clear. The window clipping is also implemented in the repository's Lean engine, with a separate float-free checker, in [`../relative-certificates.md`](../relative-certificates.md): it reproduces the counts of Table 5.1 for windows 1–8 and certifies those eight restricted closures float-free (window 9 was not run). The algorithm and format are described here fully enough to re-implement them.
 
 **Algorithm (`rcut.c`).** It computes the smallest restricted closure, as a worklist closure.
 1. Start with the full circles $\partial D_1$ and $\partial D_2$, and with the four boundary arcs of every window $W_P$.
@@ -445,7 +445,7 @@ Theorems 4.2 and 5.2 and Propositions 4.4–6.3 are general. `rcut.c` needs the 
 
 ## 10. Next steps
 
-1. **Certify more rows.** Finish the Lean-engine port of window clipping (in progress, `../relative-certificates.md`). Count $F$ for the certified row, so that $\beta_W$ and Proposition 4.4 become explicit.
+1. **Certify more rows.** Windows 1–8 are certified by the Lean engine (`../relative-certificates.md` §5); window 9 needs more memory. Count $F$ for the certified row, so that $\beta_W$ and Proposition 4.4 become explicit.
 2. **Self-similarity of the critical system (towards R-bulk).** Compute the pseudogroup induced on a fixed window at $r_c$ explicitly, from the face graph of the certified closure, and test suggestion 3 of §7.
 3. **A hybrid certificate for level 3 and beyond.** Combine the fixed bulk certificate with a closure of the *induced* system inside $W$ at $r_k$, using the finite word set of Proposition 4.4. If the induced partition is much coarser than $K(r_k)\cap W$, as observed for $n=8$, this would certify finiteness at levels that the full closure cannot reach (level 3 needs about 150 GB). It would also serve as the base levels of suggestion 4 of §7.
 4. **Push the (R-core) data** to level 4 with a disk-backed breadth-first search, restricted to starting points in the lune regime. This would show whether the exact agreement of §6.3 persists, and from which $k_0$.
