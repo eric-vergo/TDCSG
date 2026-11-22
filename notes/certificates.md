@@ -301,7 +301,16 @@ The remaining gap is open in every case: no single computation reaches r_c, and 
 
 The small certificates are in [`../certificates/`](../certificates/); the others were written to a
 scratch directory and are recorded by SHA-256 (of the file exactly as written by `certify`). Each is
-reproduced by `tdcsg-orbit certify -n N --r2 closed-δ --out FILE`, which is deterministic.
+reproduced exactly (the output is deterministic) by
+
+```sh
+tdcsg-orbit certify -n N --r2 closed-δ --max-pieces 400000000 --max-circles 20000000 --out FILE
+tdcsg-orbit check-certificate FILE
+```
+
+with `δ` as in the tables (for example `closed-1/55`). The default caps (10⁷ pieces, 5·10⁶
+circles) suffice only for the rows with fewer than 10⁷ pieces; a run that reaches a cap says so
+and names the flags to raise.
 
 Committed (checked by `shasum -a 256 -c certificates/SHA256SUMS`): n = 5 at δ = 13/5, 9/10, 1/2;
 n = 8 at δ = 1, 1/2; n = 12 at δ = 1/3; n = 6 at r² = 3.7 (18 circles).

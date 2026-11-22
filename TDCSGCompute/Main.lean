@@ -887,8 +887,17 @@ def cmdValidity (a : Args) : IO UInt32 := do
   let some e := rep.least | do
     IO.println "result: no event found"
     return 3
-  let ev := (F.evalConjF 1 e.num).1 / (F.evalConjF 1 e.den).1
   let r0 := (F.evalConjF 1 P.r2.num).1 / P.r2.den.toFloat
+  -- the largest dyadic m / 2^k below ρ₁ (exact bisection); its float value is printed, since a
+  -- direct float evaluation of num / den can lose all its digits to cancellation
+  let k := 100
+  let hi0 := (r0.ceil.toUInt64.toNat + 2) * 2 ^ k
+  let m ← dyadicBelow C e.num e.den k hi0
+  let above := match C.S.sign (F.sub (F.smul (m : Int) (F.ofInt P.r2.den))
+      (F.smul ((2 ^ k : Nat) : Int) P.r2.num)) with
+    | some s => decide (s > 0)
+    | none => false
+  let ev := (m.toFloat) / (2 ^ k : Nat).toFloat
   IO.println s!"least event: {e.kind} on the circle about {elemToString e.circle}"
   IO.println s!"  ρ₁ = ({elemToString e.num}) / ({elemToString e.den}) ≈ {fmtFloat ev 15}; \
     ρ₀ ≈ {fmtFloat r0 15}"
@@ -897,13 +906,6 @@ def cmdValidity (a : Args) : IO UInt32 := do
     let rcv := (F.evalConjF 1 rc.num).1 / rc.den.toFloat
     IO.println s!"  r_c² - ρ₀ ≈ {fmtFloat (rcv - r0) 8}, r_c² - ρ₁ ≈ {fmtFloat (rcv - ev) 8}"
   | .error _ => pure ()
-  -- a dyadic radius just below ρ₁, for an independent re-check of the same arcs there
-  let k := 100
-  let m ← dyadicBelow C e.num e.den k ((ev.ceil.toUInt64.toNat + 1) * 2 ^ k)
-  let above := match C.S.sign (F.sub (F.smul (m : Int) (F.ofInt P.r2.den))
-      (F.smul ((2 ^ k : Nat) : Int) P.r2.num)) with
-    | some s => decide (s > 0)
-    | none => false
   IO.println s!"  dyadic radius below ρ₁: r² = {m} / 2^{k} (above ρ₀: {above})"
   if let some out := a.get? "--out" then
     let text ← IO.FS.readFile path
