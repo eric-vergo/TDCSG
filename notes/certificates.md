@@ -297,7 +297,7 @@ programs; by group monotonicity GG_n(r) is then finite for every r ≤ r_* (subj
 The remaining gap is open in every case: no single computation reaches r_c, and the window
 (r_*, r_c) needs the renormalization argument of the notes. A symmetry-reduced window-free closure
 (`certify-relative --window 0 --symmetric`, checked with (C1)–(C4) by
-`check-relative-certificate`) has since certified n = 8 at δ = 547/25000 ≈ 0.02188
+`check-relative-certificate`) certifies n = 8 at δ = 547/25000 ≈ 0.02188
 (r_c − r_* ≈ 0.006404), and exact intervals of validity extend the n = 10 and n = 12 rows slightly;
 see [`relative-certificates.md`](relative-certificates.md) §§7, 8, 10.
 
@@ -317,7 +317,11 @@ circles) suffice only for the rows with fewer than 10⁷ pieces; a run that reac
 and names the flags to raise.
 
 Committed (checked by `shasum -a 256 -c certificates/SHA256SUMS`): n = 5 at δ = 13/5, 9/10, 1/2;
-n = 8 at δ = 1, 1/2; n = 12 at δ = 1/3; n = 6 at r² = 3.7 (18 circles).
+n = 8 at δ = 1, 1/2; n = 12 at δ = 1/3; n = 6 at r² = 3.7 (18 circles); and two relative
+certificates at r_c in symmetric storage (format of
+[`relative-certificates.md`](relative-certificates.md) §4, checked by
+`check-relative-certificate`): `n5-rc-w0_2_-1_0.rcert` (n = 5, window shape 0,2,-1,0) and
+`n12-rc-w-6_5_1_-4.rcert` (n = 12, window shape -6,5,1,-4).
 
 All certificates of §§4–5 (n, δ, maximal arcs, size in bytes, SHA-256):
 

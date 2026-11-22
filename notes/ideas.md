@@ -80,9 +80,6 @@ and [`open-problem-critical-radius.md`](open-problem-critical-radius.md).
    `sharp-lower-bound-combined.md` are not explicit, because $F$ (bounded faces of the complement of
    a restricted closure) was never computed. It needs every crossing of two arcs, with exact
    identification of points on three or more circles.
-9. **Refereeing Theorem H** and the other arguments of `relative-certificates.md` that are proved but
-   not refereed: Theorem H (§9), the general-$n$ bound $1 + 20nF$ (§2), the symmetric unfolding of a
-   window-free closure into an ordinary certificate (§7), and the interval-of-validity argument (§8).
 
 ## Formalization
 

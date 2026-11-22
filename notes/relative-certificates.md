@@ -10,6 +10,10 @@ are certificates for, what was reproduced from
 ranges, the interval-of-validity computation, and the hybrid certificate. Ordinary cut-set
 certificates and their checker are in [`certificates.md`](certificates.md).
 
+The note has been independently refereed; the report is
+[`proofs/referee-report-relative-certificates.md`](proofs/referee-report-relative-certificates.md),
+and §11 records its verdicts.
+
 ## 1. Summary
 
 1. **Built.** `certify-relative` computes the smallest restricted closure (Definition 4.1 of the
@@ -25,7 +29,7 @@ certificates and their checker are in [`certificates.md`](certificates.md).
 3. **Float-free certified at `r_c`**: windows 1–8 of the note's Table 5.1 for `n = 5` (counts and
    check counts agree exactly with the note, `chk.py` and `rcut.c`); window 9 not run (memory);
    one window for `n = 8` (a second did not close), two for `n = 10`, four for `n = 12`.
-4. **Hybrid**: Theorem H (proved here) makes a windowed storage of a cut set a valid
+4. **Hybrid**: Theorem H (proved here; refereed correct after minor fixes) makes a windowed storage of a cut set a valid
    certificate; it saves at most about 2.5× in memory, so level 2 for `n = 5` is not certified.
 5. **New best radius**: `n = 8` at level 5, `δ = 0.02188` (`r_c − r_* = 0.006404`, from
    0.008135); tiny exact extensions for `n = 10, 12` by the interval of validity.
@@ -132,10 +136,14 @@ Windows near a circle are found with a certified prefilter: a circle can meet `i
 against every corner). The generator decides "certainly farther" with the float filter of
 `CircleFilter`, the checker with integer ball arithmetic; an undecided case keeps the window.
 
-The checker shares with the generator only the exact layer (`Field`, `Ball`, `Tower`,
-`CirclePoint`, including the new `CircleCtx.diskSign`, the exact sign of `t − |x − z|²` for a
-symbol point `x`), and with the ordinary checker the parsing of vectors and symbols and the arc
-primitives `clip`, `covered`, `posCmp`.
+The checker shares with the generator only the exact layer: `Ball`, `Field`, `Tower`, `Disk` and
+`CirclePoint`, including `CircleCtx.diskSign` (the exact sign of `t − |x − z|²` for a symbol point
+`x`), `gapSign`, `rot`, `rotSym` and `validSym`. It shares with the ordinary checker `parseVec`,
+`parseSym`, `mkPt`, `cmp`, `clip`, `covered`, `posCmp`, `inside` and `msort`. The generator
+(`RelClosure` → `Closure` → `CircleFilter`) does not import `CertCheck`. A defect in `diskSign`
+would be common to generator and checker, so the window geometry is not checked independently
+inside the repository; the `lake test` comparison of `diskSign` against floating point covers the
+tested cases.
 
 ## 3. Reading Theorem 4.2 critically
 
@@ -250,7 +258,7 @@ bulk**; row 4 and the symmetric rows 5–8, none met. No coincidence at a non-la
 Every tangency of a carrying circle to `∂D_p` has its point of contact at a critical point.
 
 **Status of Theorem 5.2 of the combined note.** For windows 1–8 the restricted closure
-is now certified float-free: generated with certified decisions and verified by the separate
+is certified float-free: generated with certified decisions and verified by the separate
 checker. So for those windows the uniform bound on window-avoiding chains for every `r < r_c`
 holds through Theorem 4.2 alone, with no floating-point ordering in the computation.
 
@@ -261,7 +269,9 @@ tdcsg-orbit certify-relative -n 5 --r2 closed --window w --symmetric --out n5-wk
 tdcsg-orbit check-relative-certificate n5-wk.rcert --threads 4
 ```
 
-(without `--symmetric` for the full-storage files of rows 1–4). The default caps (2·10⁹ pieces,
+(without `--symmetric` for the full-storage files of rows 1–4). The tables print shapes with the
+Unicode minus sign `−`; the command line needs ASCII hyphen-minus signs, for example
+`--window 0,2,-1,0`. The default caps (2·10⁹ pieces,
 2·10⁸ circles) suffice for every row. SHA-256 of the files as written:
 
 | file | SHA-256 |
@@ -304,10 +314,11 @@ lattice points, all on window boundaries.
 The `n = 12` shape `(−6, 5, 1, −4)` closure (565 kB) is committed as
 [`../certificates/n12-rc-w-6_5_1_-4.rcert`](../certificates/n12-rc-w-6_5_1_-4.rcert). Reproduction:
 `tdcsg-orbit certify-relative -n N --r2 closed --window w --symmetric --out FILE`, then
-`tdcsg-orbit check-relative-certificate FILE --threads 4`.
+`tdcsg-orbit check-relative-certificate FILE --threads 4`, with the shape typed in ASCII
+hyphen-minus signs (§5).
 
 So Theorem 5.2 of the combined note (the uniform bound on window-avoiding chains below `r_c`)
-now holds float-free for these windows for `n = 8, 10, 12` as well. Unlike `n = 5`, where the
+holds float-free for these windows for `n = 8, 10, 12` as well. Unlike `n = 5`, where the
 closure size grows slowly between `ρ_W = 0.29` and `0.025`, these closures grow fast already at
 moderate windows (`n = 10`, `ρ̄ = 0.048`, did not close within the memory available alongside the
 other runs).
@@ -358,7 +369,8 @@ centres, at `ρ = R² = |a|²|b|²|a − b|² / (4 (Im ā b)²)` (`a = e₁ − 
 the sides match (`s₁ = sign(|b|² − Re ā b)·sign(Im ā b)`, `s₂ = sign(Re ā b − |a|²)·sign(Im ā b)`)
 (*triple event*). At the first coincidence above `ρ₀` some coinciding pair is adjacent in the
 cyclic order valid just before it, so only adjacent pairs of the order at `ρ₀` need examining.
-`ρ₁` is the least disk or matching triple event above `ρ₀`. The tool also writes the same arcs
+`ρ₁` is the least disk or matching triple event above `ρ₀`. If two adjacent named points already
+coincide at `ρ₀`, the tool reports that there is no extension (exit code 3). Otherwise it also writes the same arcs
 with the radius replaced by the largest `m/2¹⁰⁰ < ρ₁` (verified exactly to exceed `ρ₀`), and the
 ordinary checker is run on that file as an independent confirmation.
 
@@ -390,52 +402,73 @@ certificate at `r_c` (for the bulk) with a closure of the induced system inside 
 radius `r < r_c`. This section states the theorem that makes such a combination valid, proves it,
 and reports what it buys.
 
-**Theorem H (strict cut-set theorem).** Let `r > 0` and let `M` be a finite union of
-non-degenerate closed circular arcs with `∂D_1(r) ∪ ∂D_2(r) ⊆ M` such that for every arc `α` of
-`M`, every `S ∈ {A^{±1}, B^{±1}}` and every non-degenerate component `κ` of `α ∩ D_S(r)`,
-`S(κ) ⊆ M`. Then every strict orbit at `r` has at most `n F` points (`F` the number of bounded
-faces of `ℂ ∖ M`), and `GG_n(r')` is finite for every `r' < r`.
+**Theorem H (strict cut-set theorem).** Let `r > 0` and let `M` be the union of a finite family
+of non-degenerate closed circular arcs, with `∂D_1(r) ∪ ∂D_2(r) ⊆ M`, such that for every arc `α`
+of the family, every `S ∈ {A^{±1}, B^{±1}}` and every non-degenerate component `κ` of
+`α ∩ D_S(r)`, `S(κ) ⊆ M`. Then every strict orbit at `r` has at most `n F` points (`F` the number
+of bounded faces of `ℂ ∖ M`), and `GG_n(r')` is finite for every `r' < r`.
 
 *Proof.* This is Theorem 4.2 of the combined note with `W = ∅` and `r_c` replaced by `r`; its
-proof does not use that `r_c` is critical. Faces lie inside `int D_S` or outside `D_S`. If `X` is
-a face in `int D_S` and `y ∈ S(X) ∩ M`, then `y ∈ int D_S`, so `y` lies in a non-degenerate
-component of `α ∩ D_S` for an arc `α ∋ y` of `M`, and the hypothesis for `S⁻¹` (same disk) gives
-`S⁻¹(y) ∈ M ∩ X = ∅`. So `S(X)` is a face, and `S⁻¹` maps it back onto `X`. A generic start `x`
-(dense, Lemma 3.4) has all strict-chain points in faces, each reached by an isometry
-`z ↦ ζ^j z + t` carrying the face of `x` onto the face of the point; such an isometry is fixed by
-`j` and the target face, so the strict orbit of `x` has at most `nF` points, and by Lemma 3.4 so
-does every strict orbit. A chain at `r' < r` is a strict chain at `r` after deleting trivial
+proof does not use that `r_c` is critical. Faces lie inside `int D_S` or outside `D_S`: a face is
+connected, open and disjoint from `∂D_S ⊆ M`. If `X` is a face in `int D_S` and
+`y ∈ S(X) ∩ M`, then `y ∈ int D_S`, so `y` lies in a non-degenerate component of `α ∩ D_S` for an
+arc `α ∋ y` of the family, and the hypothesis for `S⁻¹` (same disk) gives
+`S⁻¹(y) ∈ M ∩ X = ∅`. So `S(X)` is contained in one face `Y`. Conversely, `Y` meets `int D_S`,
+so `Y ⊆ int D_S`, and the same argument for `S⁻¹` on `Y` puts `S⁻¹(Y)` in one face, which
+contains `X`; hence `S⁻¹(Y) ⊆ X`, and `S(X) = Y` is a face. A generic start `x` (dense,
+Lemma 3.4) has all strict-chain points in faces, each reached by an isometry `z ↦ ζ^j z + t`
+(`t ∈ Λ`, since `±1 ∈ Λ`) carrying the face of `x` onto the face of the point. If `x` lies in the
+unbounded face, which lies outside both disks, no strict step applies and the strict orbit of `x`
+is `{x}`, with `1 ≤ nF` because `F ≥ 1`. Otherwise the face of `x` is bounded, so such an
+isometry is fixed by `j` and the target face (a bounded set is not invariant under a non-zero
+translation), the strict orbit of `x` has at most `nF` points, and by Lemma 3.4 so does every
+strict orbit. A chain at `r' < r` is a strict chain at `r` after deleting trivial
 steps, so the orbits of `GG_n(r')` are uniformly bounded, and the group is finite
 (`theorem1-converse.md`, Proposition 4.2). `□`
 
 **The hybrid certificate.** Fix windows `W` about the critical points of `r_c` (disks of radius
 `r`, so that one radius serves the exact layer) and a radius `r < r_c`. Store only
 `L = M ∩ W`, a finite union of closed arcs inside `W`, and verify the hypotheses of Theorem H for
-`M` *without storing the rest of `M`*: process `L` in batches; for a batch, form the relative
-closure `B` (sources clipped by `int W`, as in §2) of the images of the batch's arcs; check that
-`B` is closed relative to `W`, that every part of an arc of `B` inside `W` lies in `L`, and
-discard `B`; the first batch is seeded by `∂D_1 ∪ ∂D_2`. Then `M = L ∪ ⋃ B` satisfies
-Theorem H: an arc of some `B` has its components outside `int W` mapped into `B`, and its parts
-inside `W` lie in arcs of `L`, whose full images lie in the batch that processed them. So
-`GG_n(r')` is finite for every `r' < r`. The verification is proved by Theorem H alone; the
+`M` *without storing the rest of `M`*: process `L` in batches; for a batch, map the batch's arcs
+(arcs of `L`, and `∂D_1 ∪ ∂D_2` for the first batch) in full, with no clipping by `int W`, and
+form the relative closure `B` of these images, in which only the transported pieces are clipped
+by `int W`, as in §2; check that `B` is closed relative to `W`, that every part of an arc of `B`
+inside `W` lies in `L`, and discard `B`. Then the family of the arcs of `L` and of every `B`, with
+union `M = L ∪ ⋃ B`, satisfies Theorem H:
+
+- for an arc `α` of some `B` and a non-degenerate component `κ` of `α ∩ D_S`, the components of
+  `κ ∖ int W` are mapped into `B`, because `B` is closed relative to `W`;
+- the parts of `κ` in `W` lie in arcs of `L`, including isolated points on `∂W` (an isolated point of
+  `κ ∖ int W` cannot be interior to `κ`, because `C(c) ∩ W_P` is connected and the windows are
+  disjoint);
+- every component of `λ ∩ D_S` for an arc `λ` of `L` has its full image in the batch that
+  processed `λ`, which is part of `M`;
+- `∂D_1 ∪ ∂D_2` is seeded.
+
+So `GG_n(r')` is finite for every `r' < r`. The verification is proved by Theorem H alone; the
 relative certificate is not needed for *validity*.
 
-**Where the relative certificate enters.** It makes every batch finite *uniformly in `r`*: by
-Proposition 4.4 of the combined note (whose proof applies verbatim to strict chains), when a
-restricted closure exists for `W` at `r_c`, the germs of all chains at any `r < r_c` whose
-intermediate points avoid `W` lie in one finite set `G_W` (words of length at most `β_W + 1`), so
-a batch is contained in the images under `G_W` of its seeds. This is the precise content of "the
-induced dynamics on `W` comes from one fixed finite set of words", and it is what the
-combination needs. The *induced-system* formulation (an arc set `L` closed under the first-return
-maps to `W`, giving `|O_r(x) ∩ W| ≤ nF_L` and then, by Corollary 4.3, `|O_r(x)| ≤ β_W n F_L`)
-leads to the same computation: the first-return maps are bulk chains whose domains are cut by
+**Where the relative certificate would enter (motivation only).** No result here depends on this
+paragraph. Proposition 4.4 of the combined note says that when a restricted closure exists for the
+windows `W(r_c)` built from disks of radius `r_c`, the germs of all chains at any `r < r_c` whose
+intermediate points avoid `W(r_c)` lie in one finite set `G_W` (words of length at most
+`β_W + 1`). The hybrid windows above are built from disks of radius `r`, and `W(r) ⊆ W(r_c)`, so a
+chain that avoids `W(r)` need not avoid `W(r_c)`, and the proposition says nothing about the
+batches as constructed. The hope is that a hybrid built with the windows `W(r_c)` (Theorem H does
+not depend on the window shape, and Definition 4.1 does not use the window radius) has every
+batch inside the images under `G_W` of its seeds, hence finite uniformly in `r`; this would also
+need Proposition 4.4 for strict chains, which is not proved here. The *induced-system*
+formulation (an arc set `L` closed under the first-return maps to the windows `W(r_c)`, giving
+`|O_r(x) ∩ W| ≤ nF_L` and then, by Corollary 4.3, `|O_r(x)| ≤ β_W n F_L`) leads to the same
+computation: the first-return maps are bulk chains whose domains are cut by
 pullbacks of `∂D_p(r)` and `∂W`, so verifying that `L` is closed under them means transporting
 the arcs of `L` and of `∂D_p(r)` through the bulk exactly as above, plus the pullbacks of `∂W`.
 Theorem H is the simpler of the two and needs neither `β_W` nor `F`.
 
 **What it buys (measured).** A prototype of the windowed generator was run against the ordinary
 symmetric closure at `n = 5`, `δ = 1/20` (`K(r)`: 47 671 circles and 208 875 arcs modulo
-`±z, ±z̄`; 1.38·10⁶ pieces, 19 s):
+`±z, ±z̄`; 1.38·10⁶ pieces, 19 s). The prototype is not in the repository, so the measurements
+below cannot be reproduced from it.
 
 | window shape (at `r_c`) | batch size | stored `L` (arcs) | largest batch (arcs) | pieces processed | time |
 |---|---|---|---|---|---|
@@ -452,7 +485,7 @@ transports of a batch of seeds spread over the whole bulk. The saving is at most
 2.5 in memory, for a factor 3 in time. That does not reach level 2 for `n = 5`, whose cut set has
 6.9·10⁷ maximal arcs modulo symmetry (1.4·10⁹ pieces in `kcut4.c`): about 39 GB in the symmetric
 generator, against the 24 GB allowed. The prototype was therefore not developed into a
-certificate format and checker, and is not in the repository. **Level 2 for `n = 5` remains
+certificate format and checker. **Level 2 for `n = 5` remains
 uncertified.** What would change this is a coarser invariant partition than the arc arrangement,
 for instance the partition of `W` by the *set of available germs* of the first-return maps (many
 arcs of `K(r) ∩ W` separate regions with the same germs); computing it needs orbit and germ data,
@@ -480,23 +513,54 @@ floating-point computation of `sharp-lower-bound-n5.md`.
   verified the hypotheses of the theorem used from the file alone. Generator and checker are tested
   by `lake test` (§4).
 - **Relative certificates at `r_c`** establish, through Theorem 4.2 of the combined note (refereed
-  for `n = 5` in `proofs/referee-report-sharp-lower-bound-combined.md`; re-read in §3, where the
-  general-`n` bound `1 + 20nF` is derived and not refereed), the uniform bound on window-avoiding chains (Theorem 5.2 there)
-  for the windows marked VALID: the note's Theorem 5.2 is no longer conditional on floating-point
-  ordering for those windows. (R-bulk), (R-core) and (B) remain open; a relative certificate says
+  for `n = 5` in
+  [`proofs/referee-report-sharp-lower-bound-combined.md`](proofs/referee-report-sharp-lower-bound-combined.md),
+  correct after minor fixes; the general-`n` form replaces 5 by `n` in Step 2, giving `1 + 20nF`,
+  and is refereed correct in
+  [`proofs/referee-report-relative-certificates.md`](proofs/referee-report-relative-certificates.md)),
+  the uniform bound on window-avoiding chains (Theorem 5.2 there) for the windows marked VALID:
+  for those windows the note's Theorem 5.2 does not depend on floating-point ordering. (R-bulk), (R-core) and (B) remain open; a relative certificate says
   nothing about finiteness at any particular `r < r_c` by itself.
 - **Finiteness ranges** in §10 rest on the refereed certificate theorem where (C1)–(C4) were
-  checked, and on Theorem H (§9; proved here, not refereed; it is Theorem 4.2 with `W = ∅`) for the
-  ranges ending in an open interval; §8 on the interval-of-validity argument (proved here, not
-  refereed), with the arcs also re-checked just below the event.
+  checked, and on Theorem H (§9; proved here, refereed correct after minor fixes; it is
+  Theorem 4.2 with `W = ∅`) for the ranges ending in an open interval; §8 on the
+  interval-of-validity argument (proved here, refereed correct), with the arcs also re-checked
+  just below the event. The `n = 8` row rests on the symmetric unfolding of §§2, 7 (refereed
+  correct); during refereeing its file was regenerated byte for byte and accepted again by the
+  relative checker, which is the only checker that has read it.
 - **Not established by a proof.** The generator and the checkers are tested programs, not
   kernel-checked proofs; their correctness rests on the arguments in their docstrings, on the
   tests, and on the Lean compiler and runtime (and, for the generator's float filter, on IEEE 754
   arithmetic). The link between the checker's acceptance and the theorems' hypotheses is by
-  inspection of the definitions. Theorem 4.2 and Theorem H are proved on paper only; Theorem 4.2
-  is refereed for `n = 5`, Theorem H is not refereed. The face count `F`, and hence the constant `β_W = 1 + 20nF`, was not computed: it
+  inspection of the definitions. Theorem 4.2, Theorem H and the §8 argument are proved and refereed
+  on paper only; none is kernel-checked. The face count `F`, and hence the constant
+  `β_W = 1 + 20nF`, was not computed: it
   needs every crossing of two arcs of `K'` (a quadratic enumeration with exact identification of
   points on three or more circles), and no conclusion here uses its value, only its finiteness.
 - **Large files.** Only the small certificates are in the repository; the others were written to
   a scratch directory and are recorded by SHA-256 of the file exactly as written. Every command is
   deterministic, so each file is reproduced by the command given with its table.
+
+**Referee verdicts** (from
+[`proofs/referee-report-relative-certificates.md`](proofs/referee-report-relative-certificates.md),
+whose fixes are applied in this note):
+
+| claim | verdict |
+|---|---|
+| §2 critical points, window disjointness by the corner bound, items 1–7 of "What the checker verifies" | correct; critical-point counts reproduced |
+| §2 symmetric mode (canonical circles, stabiliser invariance, conjugation argument) | correct |
+| §2 general constant `1 + 20nF` | correct |
+| §2 no floating-point decision in the checker; shared code | correct (shared code listed precisely in §2) |
+| §3 readings of Theorem 4.2 | correct |
+| §5 Table 5.1 | rows 1–3 reproduced; rows 4–8 not re-run |
+| §6 `n = 8, 10, 12` relative certificates | `n = 8` `(−4,0,4,−4)`, `n = 10` `(−6,2,4,−6)`, `n = 12` `(−6,5,1,−4)` and `(−4,4,2,−5)` reproduced; the others not re-run |
+| §7 `n = 8`, `δ = 547/25000` | reproduced: regenerated byte for byte, accepted by the checker, (C3) and (C4) hold |
+| §8 interval-of-validity argument | correct; the `n = 12` and `n = 10` results reproduced |
+| §9 Theorem H | correct after minor fixes |
+| §9 hybrid certificate: validity via Theorem H | correct after a wording fix |
+| §9 where the relative certificate would enter | heuristic; motivation only |
+| §9 prototype measurements | not checkable: the prototype is not in the repository |
+| §10 best certified radius per `n` | consistent with what was reproduced |
+
+Not checked by the referee: Table 5.1 rows 4–9, `n = 10` `(−5,3,1,−4)`, `n = 12` `(−5,4,1,−2)` and
+`(−3,1,2,−3)`, and the `n = 12`, `δ = 1/250` closure.
