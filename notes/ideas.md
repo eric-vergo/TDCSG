@@ -220,15 +220,12 @@ and [`open-problem-critical-radius.md`](open-problem-critical-radius.md).
     $\kappa_0\delta$, whose zoomed return map is exactly $\varepsilon^2$-periodic. Compute the graph of
     boxes joined by connectors along an orbit, in zoomed coordinates, at two levels $\delta$ and
     $\varepsilon^2\delta$, and test whether it is the same finite graph up to $O(\delta)$.
-39. **Prove the token-edge transport for $w_3$.** In every orbit tested, the word
-    $w_3^{-1}w_2^{-1}w_3^{-1}w_1^{-1}w_3^{-1}$ acts at $\varepsilon X$ at defect $\varepsilon\delta$
-    wherever $w_3$ acts at $X$ at defect $\delta$
-    ([`proofs/sharp-bound-n5-component-graph.md`](proofs/sharp-bound-n5-component-graph.md) §4.8). This is a
-    containment of $\varepsilon U_3(r)$ in an intersection of 30 disks of radius $r'$. Prove it
-    as in Computation 1.2 of the chaining note, with a lune analysis at the tight corners. For
-    $w_1,w_2$ the transport word $w_3^{-1}w_1^{-1}w_3^{-1}$ (and its mirror) acts on only $54\%$ of
-    the domain: find the arcs that cut it, and test whether they are the boundary of the physical
-    success region $G$.
+39. **Detours for the $w_1,w_2$ transport.** Transport of $w_3$-type token edges by $\varepsilon$ is proved,
+    and the domain of the $w_1$ transport word is exactly cut by two circles of radius $\varphi^3r'$
+    ([`proofs/sharp-bound-n5-graph-renormalization.md`](proofs/sharp-bound-n5-graph-renormalization.md)
+    Theorems 3, 4). Near the two corners of the cut region, images are joined by 11- and 13-token detours
+    through family-2 tokens. Compute the domains of these detour words and test whether, with the
+    two-circle domain, they cover every $w_1$-edge whose endpoints both lie in the success region.
 40. **The success region $G$ of the $\varepsilon$-transport.** Whether $\varepsilon y$ lies in the
     child orbit is a function of the physical position of $y$, up to a thin layer. The region contains
     $|y|<1$ and $|y|\ge2.7$, and it fills $68\%$ of every large orbit. Describe $G$ by circles,
@@ -245,6 +242,17 @@ and [`open-problem-critical-radius.md`](open-problem-critical-radius.md).
 43. **Level 4 of the orbit of $0$.** It has $7.6\cdot10^7$ states, above the memory used here. The
     level-3 marginal satellites (rescaled extent $1.53$) are the first test of whether births grow
     into permanent satellites or merge into hubs.
+44. **An atlas of $\pm\varepsilon$-charts.** Besides $z\mapsto\varepsilon z$, at least nine maps
+    $z\mapsto c+u(z-c)$, $u=\pm\varepsilon$, $c$ small lattice points (for example $c=-F$), send $68\%$
+    of the level-1 orbit of $0$ into the level-2 orbit, and 30 such charts cover $80\%$ of it
+    ([`proofs/sharp-bound-n5-graph-renormalization.md`](proofs/sharp-bound-n5-graph-renormalization.md)
+    §6.4). Find a finite atlas whose images cover each child orbit up to dust, with local transport
+    lemmas per chart and bounded connector distance between overlapping charts. That would turn (R2)
+    into finitely many local statements.
+45. **A covering proof for connector transport.** For each letter, the transport words (two tokens
+    and one letter, the letter possibly exchanged) cover the letter's domain inside the success region
+    except an orbit-free lune in a gap. Prove the covering on an explicit region by a cell decomposition
+    in circles of radii $r$ and $\varphi^3r'$, using the tangent-disk lemma at tight corners.
 
 ## Formalization
 
