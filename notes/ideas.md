@@ -95,6 +95,29 @@ and [`open-problem-critical-radius.md`](open-problem-critical-radius.md).
     `sharp-bound-n5-conjugate.md` for the chord of $n = 10$ and the self-similar chord families at $p^\ast$
     for $n = 8, 12$: a lower bound of order $1/\delta$ on the conjugate reach, and the exit index.
 
+13. **The transverse cascade at $r_c$.** Large orbits at $r_c$ run along chord-parallel lines at
+    offsets $\pm\tfrac12\varphi^{-m}$, $\pm\tfrac{\sqrt5}2\varphi^{-m}$
+    ([`proofs/sharp-bound-n5-critical-orbits.md`](proofs/sharp-bound-n5-critical-orbits.md) §4.3).
+    Find the finitely many words that carry a run ending near a tight point at offset $s$ to the
+    lines of offset $\pm\varphi^{-j}s$, and prove a renormalization of this one-dimensional offset
+    map; with a cut-off at offset of order $\delta$ below $r_c$ (Conjecture K3 there) it would bound
+    orbits level by level.
+14. **Infinitude of a chord-free orbit.** The orbits of $-\zeta^2$ and $(-2,-2,-1,-2)$ at $r_c$
+    provably never meet the chord (congruence classes modulo $2(1-\zeta)$) and exceed $3 \cdot 10^7$
+    points. Proving one of them infinite, for instance by a family of partial isometries of
+    chord-parallel lines closed under rescaling as for $n = 8$, would show that infinite orbits at
+    $r_c$ need not contain chord points.
+15. **The long chord $[-\varphi^2E, \varphi^2E]$.** Its ends are critical points, and populated
+    chord-parallel lines are spread uniformly over its full length. Test whether it carries an exact
+    interval exchange at $r_c$ with the golden rotation on $E'E$ as induced map.
+16. **A height function beyond the chord words.** $\operatorname{Re}(\sigma x/\sigma E) -
+    \operatorname{Re}(x/E)$ drops by exactly $2\sqrt5$ under each chord word. Look for a
+    similar function, or a finite family of them, that is monotone along the first returns to the
+    tight windows.
+17. **Exceptional set versus growth exponent.** The orbit of $0$ at $r_c$ has box-counting dimension
+    about $1.8$, close to the exponent of $|O_r(0)|$ in $1/(r_c - r)$. Test this relation on other
+    orbits and for $n = 8, 12$, and ask whether the closure of the cut set at $r_c$ has measure zero.
+
 ## Formalization
 
 Depends on: `TDCSG/CriticalRadius/Certificate.lean`, [`certificates.md`](certificates.md) §7 and
