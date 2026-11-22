@@ -132,6 +132,26 @@ and [`open-problem-critical-radius.md`](open-problem-critical-radius.md).
 21. **Sharp constant of the single run.** Computed $\delta \sup L$ lies in $[1.8, 2.6]$ against the proved
     $5.86$; using the bad intervals at all four breakpoints in the three-distance argument should give
     the sharp $\limsup$.
+22. **The sign flip at $E$ itself.** The first-return set of $E$ (zoomed $\eta=0$) at level $k+1$ is
+    exactly the negative of that at level $k$, for $k=3,4$ (and level 5 equals levels 1 and 3), so at
+    $E$ the unit $-\varepsilon$ renormalizes the returns with period one, although cuts cannot match
+    ([`proofs/sharp-bound-n5-period-two.md`](proofs/sharp-bound-n5-period-two.md) §6.5). Explain it
+    (the non-linear return defects $\tau$ with $g(E)=Q'+\varepsilon^k\tau$ satisfy
+    $\tau_{k+1}=-\tau_k$), and test whether it extends to other points with an extra symmetry.
+23. **A measure-theoretic period two.** Lune points per tight excursion fall by about $\varepsilon$ per
+    level while visits near critical points stay bounded (`sharp-bound-n5-period-two.md` §6.4). Prove
+    that the zoomed starts whose level-$k$ excursion meets a lune have measure $O(\varepsilon^k)$; with
+    the lune criterion this would give exact period two for almost every start from a finite level,
+    and reduce the problem to an exceptional set.
+24. **Return defects as the finite object.** Non-linear returns of a zoomed start are coded by lattice
+    defects $\tau=\varepsilon^{-k}(g(E)-Q')$ in a bounded window of $\Lambda\subset\mathbb C^2$ if the
+    internal drift is $O(\varphi^{3k})$. Tabulate the defect sets per level and parity; stabilization of
+    the even and odd defect sets would be a finite, checkable form of period two.
+25. **Period two for orbit partitions, and level 5 without selection.** The $n = 5$ period-two tests
+    of `sharp-bound-n5-period-two.md` cover first-return sets at $2\to4$ fully but orbit partitions
+    only at $1\to3$, and level 5 only for starts whose excursions stay below $1.2 \cdot 10^8$ points
+    (biased towards stable starts). A packed or disk-backed point store would allow the $2\to4$
+    partition test (Conjecture M$_5$) and the capped level-5 starts.
 
 ## Formalization
 
