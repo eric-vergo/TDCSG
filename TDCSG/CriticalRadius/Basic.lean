@@ -78,7 +78,7 @@ theorem mem_infiniteRadii_of_le {n : ℕ} {r r' : ℝ} (h : r ≤ r') (hr : r �
 /-- If both generators are the identity, the group is trivial. -/
 theorem GG_eq_bot_of_eq_one {n₁ n₂ : ℕ} {r₁ r₂ : ℝ} (hA : permA n₁ r₁ = 1)
     (hB : permB n₂ r₂ = 1) : GG n₁ n₂ r₁ r₂ = ⊥ := by
-  rw [GG, hA, hB, Set.pair_eq_singleton, Subgroup.closure_singleton_one]
+  rw [GG_eq_closure, hA, hB, Set.pair_eq_singleton, Subgroup.closure_singleton_one]
 
 theorem diskPerm_eq_one_of_nonpos (n : ℕ) (c : ℂ) {r : ℝ} (hr : r ≤ 0) : diskPerm n c r = 1 :=
   Perm.ext fun z ↦ by

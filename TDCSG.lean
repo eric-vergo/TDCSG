@@ -3,6 +3,7 @@ module
 public import TDCSG.Basic
 public import TDCSG.BoundaryContact
 public import TDCSG.BoundedOrbits
+public import TDCSG.Compound.Basic
 public import TDCSG.CriticalRadius.Basic
 public import TDCSG.CriticalRadius.Certificate
 public import TDCSG.CriticalRadius.CyclotomicModel

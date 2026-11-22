@@ -196,22 +196,14 @@ theorem conj_I_eq_int_sub : conj I = (0 : ℤ) - I := by
 
 /-- Every element of the group fixes each point outside the two disks. -/
 theorem apply_eq_of_notMem_diskUnion {n₁ n₂ : ℕ} {r₁ r₂ : ℝ} {g : Perm ℂ}
-    (hg : g ∈ GG n₁ n₂ r₁ r₂) {z : ℂ} (hz : z ∉ diskUnion r₁ r₂) : g z = z := by
-  have hle : GG n₁ n₂ r₁ r₂ ≤ fixingSubgroup (Perm ℂ) (diskUnion r₁ r₂)ᶜ := by
-    rw [GG, Subgroup.closure_le]
-    rintro σ (rfl | rfl) <;> rw [SetLike.mem_coe, mem_fixingSubgroup_iff] <;>
-      intro y hy <;> simp only [diskUnion, Set.mem_compl_iff, Set.mem_union, not_or] at hy
-    · exact diskRotation_of_notMem hy.1
-    · exact diskRotation_of_notMem hy.2
-  exact (mem_fixingSubgroup_iff _).1 (hle hg) z hz
+    (hg : g ∈ GG n₁ n₂ r₁ r₂) {z : ℂ} (hz : z ∉ diskUnion r₁ r₂) : g z = z :=
+  apply_eq_of_notMem_ballUnion hg (by rwa [ballUnion_eq_diskUnion])
 
 /-- Every element of the group maps the union of the two disks into itself. -/
 theorem apply_mem_diskUnion {n₁ n₂ : ℕ} {r₁ r₂ : ℝ} {g : Perm ℂ} (hg : g ∈ GG n₁ n₂ r₁ r₂)
     {z : ℂ} (hz : z ∈ diskUnion r₁ r₂) : g z ∈ diskUnion r₁ r₂ := by
-  by_contra h
-  have h' := apply_eq_of_notMem_diskUnion hg h
-  rw [g.injective h'] at h
-  exact h hz
+  rw [← ballUnion_eq_diskUnion] at hz ⊢
+  exact (apply_mem_ballUnion_iff hg z).2 hz
 
 /-- Points of the two disks have norm at most `1 + max r₁ r₂`. -/
 theorem norm_le_of_mem_diskUnion {r₁ r₂ : ℝ} {z : ℂ} (hz : z ∈ diskUnion r₁ r₂) :
@@ -241,6 +233,7 @@ theorem exists_affine {η : ℂ} {p q : ℤ} (hη : η ^ 2 = p * η + q) (hc : c
     ∃ u ∈ intLattice η, ‖u‖ = 1 ∧ ∃ t ∈ intLattice η, g z = u * z + t := by
   have hid : ∀ w : ℂ, ∃ u ∈ intLattice η, ‖u‖ = 1 ∧ ∃ t ∈ intLattice η, w = u * w + t :=
     fun w ↦ ⟨1, intLattice.one_mem, norm_one, 0, intLattice.zero_mem, by ring⟩
+  rw [GG_eq_closure] at hg
   induction hg using Subgroup.closure_induction generalizing z with
   | mem σ hσ =>
     rcases hσ with rfl | rfl

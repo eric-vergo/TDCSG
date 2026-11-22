@@ -44,7 +44,11 @@ there remain preliminary. Values of r_c(n) quoted without that mark are from the
 - D_L(r) and D_R(r) are the closed disks of radius r about −1 and 1.
 - a(z) = ζ⁻¹(z + 1) − 1 on D_L(r) and the identity elsewhere; b(z) = ζ⁻¹(z − 1) + 1 on D_R(r) and the
   identity elsewhere. Both rotate clockwise by 2π/n. GG_n(r) = ⟨a, b⟩. These are `TDCSG.genA` and
-  `TDCSG.genB` in the Lean sources.
+  `TDCSG.genB` in the Lean sources. There GG_{n₁,n₂}(r₁, r₂) is `TDCSG.GG`, defined as the
+  instance of a general compound symmetry group (`TDCSG.compoundSymmetryGroup`,
+  `TDCSG/Compound/Basic.lean`: closed balls in a metric space, each with a group of its own
+  isometries extended by the identity outside the ball) with the two disks and the cyclic groups
+  of their rotations; `TDCSG.GG_eq_closure` identifies it with ⟨a, b⟩.
 - r_c(n) is the critical radius: the least r at which GG_n(r) is infinite. For n = 5, 8, 10, 12 the
   notes in [`proofs/`](proofs/) write r_c for the closed form below and r_crit(n) for the critical
   radius, since their equality is not proved.
