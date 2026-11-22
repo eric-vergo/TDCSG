@@ -21,3 +21,7 @@ html[data-theme="dark"] img[src*="figures/"] {
   max-width: 78ch;
   margin-inline: auto;
 }
+
+.license-info {
+  overflow-wrap: anywhere;
+}
