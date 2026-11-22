@@ -13,7 +13,7 @@ public import TDCSG.CriticalRadius.FiveCenterPaths
 namespace TDCSG.Five.Walls
 
 /-- A path starting inside a region with terminal crossing edges stays within one step of it. -/
-private theorem confined {V : Type*} {E : V → V → Prop} (hsym : ∀ {a b}, E a b → E b a)
+theorem confined {V : Type*} {E : V → V → Prop} (hsym : ∀ {a b}, E a b → E b a)
     (inside : V → Prop) {s v : V} (hs : inside s) (hstart : ∀ y, E s y → inside y)
     (hcross : ∀ a b, inside a → ¬inside b → E a b →
       (∀ w, E a w → w = b) ∨ (∀ w, E b w → w = a))
@@ -48,11 +48,6 @@ private def AtWall (r : ℝ) (x : ℂ) (j : Fin 5) (m : ℤ) : Prop :=
     ‖proj (n + basis j) - x‖ ≤ r / 2 →
     ((∀ k ≠ j, r / 2 < ‖proj (n + basis k) - x‖) ∨
       (∀ k ≠ j, r / 2 < ‖proj (n + basis j - basis k) - x‖))
-
-private theorem weight_add_basis (n : Label) (k : Fin 5) :
-    weight (n + basis k) = weight n + 1 := by
-  classical
-  simp [weight, basis, Pi.single_apply, Finset.sum_add_distrib]
 
 private theorem directed_wall {r : ℝ} {x : ℂ} {j : Fin 5} {lo hi : ℤ}
     (hw : ∀ m, m = lo ∨ m = hi → AtWall r x j m) {a b : Label}

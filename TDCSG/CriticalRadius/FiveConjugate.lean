@@ -1,12 +1,12 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Eric Vergo, Claude
+Authors: Eric Vergo, Claude, OpenAI GPT-6.2 Astra
 -/
 module
 
 public import TDCSG.CriticalRadius.Five
 public import TDCSG.Finiteness
-public import TDCSG.CriticalRadius.Statements
+public import TDCSG.CriticalRadius.FiveStatements
 
 /-!
 # The orbit structure of `GG₅(r)` and the Galois conjugate embedding
@@ -195,14 +195,6 @@ theorem embedTwo_mul (v w : Cyc) : embedTwo (v * w) = embedTwo v * embedTwo w :=
 end Cyc
 
 open Cyc
-
-/-- `|ζ| = 1`. -/
-theorem norm_zeta : ‖ζ‖ = 1 :=
-  isPrimitiveRoot_zeta.norm'_eq_one (by norm_num)
-
-/-- Powers of `ζ` only depend on the exponent modulo `5`. -/
-theorem zeta_pow_mod (k : ℕ) : ζ ^ (k % 5) = ζ ^ k := by
-  conv_rhs => rw [← Nat.mod_add_div k 5, pow_add, pow_mul, zeta_pow_five, one_pow, mul_one]
 
 theorem embed_oneSub_mul (s : Cyc) : embed ((1 - zetaC) * s) = (1 - ζ) * embed s := by
   rw [embed_mul', ← embedHom_apply, map_sub, map_one, embedHom_apply, embed_zetaC]

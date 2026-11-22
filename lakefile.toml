@@ -1,7 +1,7 @@
 name = "TDCSG"
 version = "0.1.0"
 keywords = ["math"]
-defaultTargets = ["TDCSG", "tdcsg-orbit"]
+defaultTargets = ["TDCSG", "tdcsg-orbit", "ComparatorSolution"]
 testDriver = "«tdcsg-orbit»"
 testDriverArgs = ["--selftest"]
 
@@ -14,6 +14,11 @@ weak.linter.mathlibStandardSet = true
 weak.linter.style.longLine = true
 # Source files carry a licence line and an authors line, without a copyright line.
 weak.linter.style.header = false
+
+[[require]]
+name = "VersoBlueprint"
+git = "https://github.com/eric-vergo/verso-blueprint.git"
+rev = "9fa92b2bf1d3bf2071963157e077b011666c435d"
 
 [[require]]
 name = "mathlib"
@@ -30,3 +35,23 @@ name = "TDCSGCompute"
 [[lean_exe]]
 name = "tdcsg-orbit"
 root = "TDCSGCompute.Main"
+
+[[lean_lib]]
+name = "ComparatorChallenge"
+roots = ["Comparator.Challenge"]
+
+[[lean_lib]]
+name = "ComparatorSolution"
+roots = ["Comparator.Solution"]
+
+[[lean_lib]]
+name = "TDCSGBlueprint"
+srcDir = "blueprint"
+
+[lean_lib.leanOptions]
+experimental.module = true
+weak.linter.mathlibStandardSet = false
+weak.linter.style.longLine = false
+weak.verso.blueprint.externalCode.strictResolve = true
+# These figures belong to the manual genre. The slide-specific image hint is inapplicable.
+weak.verso.slides.warnOnImage = false

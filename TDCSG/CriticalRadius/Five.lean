@@ -1,6 +1,6 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Eric Vergo, Claude
+Authors: Eric Vergo, Claude, OpenAI GPT-6.2 Astra
 -/
 module
 
@@ -75,6 +75,14 @@ theorem isPrimitiveRoot_zeta : IsPrimitiveRoot ζ 5 := by
 
 theorem zeta_pow_five : ζ ^ 5 = 1 :=
   isPrimitiveRoot_zeta.pow_eq_one
+
+/-- `|ζ| = 1`. -/
+theorem norm_zeta : ‖ζ‖ = 1 :=
+  isPrimitiveRoot_zeta.norm'_eq_one (by norm_num)
+
+/-- Powers of `ζ` only depend on the exponent modulo `5`. -/
+theorem zeta_pow_mod (k : ℕ) : ζ ^ (k % 5) = ζ ^ k := by
+  conv_rhs => rw [← Nat.mod_add_div k 5, pow_add, pow_mul, zeta_pow_five, one_pow, mul_one]
 
 theorem one_add_zeta_add : 1 + ζ + ζ ^ 2 + ζ ^ 3 + ζ ^ 4 = 0 := by
   have := isPrimitiveRoot_zeta.geom_sum_eq_zero (by norm_num)

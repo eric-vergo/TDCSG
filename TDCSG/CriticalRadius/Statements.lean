@@ -1,12 +1,12 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Eric Vergo, Claude
+Authors: Eric Vergo, Claude, OpenAI GPT-6.2 Astra
 -/
 module
 
 public import TDCSG.CriticalRadius.Certificate
 public import TDCSG.CriticalRadius.Eight
-public import TDCSG.CriticalRadius.Five
+public import TDCSG.CriticalRadius.FiveStatements
 public import TDCSG.CriticalRadius.Ten
 public import TDCSG.CriticalRadius.Twelve
 
@@ -84,22 +84,6 @@ theorem infinite_GG_of_lt {n : ℕ} (hne : ∃ r, Infinite (GG n n r r)) {r : �
 /-- The group is finite for every radius below `1`. -/
 theorem finite_GG_of_lt_one (n : ℕ) {r : ℝ} (hr : r < 1) : Finite (GG n n r r) :=
   TDCSG.finite_GG_of_lt_one n hr
-
-/-! ### `n = 5` -/
-
-/-- `GG₅(r)` is infinite for every `r ≥ √(3 + φ)` (`critical-radius-n5.md`, Theorem A). -/
-theorem infinite_GG_five {r : ℝ} (hr : √(3 + φ) ≤ r) : Infinite (GG 5 5 r r) :=
-  Five.infinite_GG hr
-
-/-- For every `r ≥ √(3 + φ)` the orbit of `0` under `GG₅(r)` is infinite. -/
-theorem infinite_orbit_zero_five {r : ℝ} (hr : √(3 + φ) ≤ r) : (orbit 5 5 r r 0).Infinite :=
-  Five.infinite_orbit_zero hr
-
-theorem criticalRadius_five_le : criticalRadius 5 ≤ √(3 + φ) :=
-  Five.criticalRadius_le
-
-theorem one_le_criticalRadius_five : 1 ≤ criticalRadius 5 :=
-  TDCSG.one_le_criticalRadius ⟨_, Five.infinite_GG le_rfl⟩
 
 /-! ### `n = 10` -/
 
@@ -267,22 +251,7 @@ theorem le_criticalRadius_twelve_of_finiteBelow (h : FiniteBelowTwelve) :
     √(40 - 22 * √3 - 1 / 20) ≤ criticalRadius 12 :=
   le_criticalRadius_of_forall_finite ⟨_, infinite_GG_twelve le_rfl⟩ h
 
-/-- Subcritical finiteness for fivefold rotations, proved in `FiveSharp`. -/
-def FiniteBelowClosedFormFive : Prop :=
-  ∀ r : ℝ, r < √(3 + φ) → Finite (GG 5 5 r r)
-
-/-! ### Exact values of the critical radii -/
-
-/-- The fivefold critical-radius equality, proved as `criticalRadius_five_eq` in `FiveSharp`. -/
-def CriticalRadiusEqFive : Prop := criticalRadius 5 = √(3 + φ)
-
-/-- Finiteness below the closed form `√(3 + φ)`, with the infinitude at and above it
-(`infinite_GG_five`), gives the exact value of the critical radius. -/
-theorem criticalRadiusEqFive_of_finiteBelowClosedFormFive (h : FiniteBelowClosedFormFive) :
-    CriticalRadiusEqFive := by
-  refine le_antisymm criticalRadius_five_le (le_csInf ⟨_, Five.infinite_GG le_rfl⟩ fun r hr ↦ ?_)
-  by_contra hlt
-  exact not_finite_iff_infinite.2 hr (h r (not_le.1 hlt))
+/-! ### Open exact values of the critical radii -/
 
 /-- **Open.** The critical radius of `GG₈` is `√(10 - 5√2)`. -/
 def CriticalRadiusEqEight : Prop := criticalRadius 8 = √(10 - 5 * √2)

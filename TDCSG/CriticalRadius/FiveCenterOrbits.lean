@@ -5,6 +5,7 @@ Authors: Eric Vergo, OpenAI GPT-6.2 Astra
 module
 
 public import TDCSG.CriticalRadius.FiveCenterPaths
+import TDCSG.DiskUnion
 
 /-! # Uniformly bounded active centers give finite fivefold disk-rotation groups -/
 
@@ -13,20 +14,6 @@ public import TDCSG.CriticalRadius.FiveCenterPaths
 open Complex Metric Equiv
 
 namespace TDCSG.Five.Walls
-
-private theorem proj_add' (n m : Label) : proj (n + m) = proj n + proj m := by
-  simp [proj, add_mul, Finset.sum_add_distrib]
-
-private theorem proj_basis' (j : Fin 5) : proj (basis j) = dir j := by
-  classical
-  simp [proj, basis, Pi.single_apply]
-
-private theorem weight_basis' (j : Fin 5) : weight (basis j) = 1 := by
-  classical
-  simp [weight, basis, Pi.single_apply]
-
-private theorem norm_dir' (j : Fin 5) : ‖dir j‖ = 1 := by
-  simp [dir, norm_pow, norm_zeta]
 
 private theorem reach_next {r : ℝ} {x : ℂ} {v w : Label} (h : CenterReach r x v)
     (he : CenterEdge r x v w ∨ CenterEdge r x w v) : CenterReach r x w := by
@@ -45,14 +32,14 @@ private def Framed (r : ℝ) (x y : ℂ) : Prop :=
 private theorem frame_right {x y : ℂ} {n : Label} {j : Fin 5}
     (h : 2 * (x - proj n) = dir j * (y + 1)) :
     2 * (x - proj (n + basis j)) = dir j * (y - 1) := by
-  rw [proj_add', proj_basis']
+  rw [proj_add, proj_basis]
   linear_combination h
 
 private theorem window_of_frame {x y p : ℂ} {n : Label} {j : Fin 5} {r : ℝ}
     (h : 2 * (x - proj n) = dir j * (y - p)) (hy : y ∈ closedBall p r) :
     InWindow r x n := by
   have e := congrArg norm h
-  rw [norm_mul, norm_mul, norm_dir', one_mul, norm_sub_rev x, Complex.norm_ofNat] at e
+  rw [norm_mul, norm_mul, norm_dir, one_mul, norm_sub_rev x, Complex.norm_ofNat] at e
   exact (le_div_iff₀ (by norm_num : (0 : ℝ) < 2)).2 (by
     rw [mul_comm, e]; simpa [dist_eq_norm] using mem_closedBall.1 hy)
 
@@ -89,10 +76,10 @@ private theorem frame_right_step {x y : ℂ} {r : ℝ} (hf : Framed r x y) :
       simp only [m, weight, Pi.sub_apply, Pi.add_apply, Finset.sum_sub_distrib,
         Finset.sum_add_distrib]
       change weight n + weight (basis j) - weight (basis k) = 0
-      rw [hn, weight_basis', weight_basis']; norm_num
+      rw [hn, weight_basis, weight_basis]; norm_num
     refine ⟨m, k, hmw, ?_, fun hleft ↦ reach_next (hR hw) (.inr ?_), ?_⟩
     · have ep : proj m + dir k = proj (n + basis j) := by
-        rw [← proj_basis', ← proj_add', hm]
+        rw [← proj_basis, ← proj_add, hm]
       rw [genB, diskRotation_of_mem hy, rotation, rightCenter, Nat.cast_ofNat,
         exp_rotationAngle_five]
       linear_combination h' - (y - 1) * hk - 2 * ep
@@ -153,7 +140,7 @@ theorem finite_GG_of_centerBox {r : ℝ} (hr : r ≤ 4) (hbox : CenterBox r) :
         linarith
       obtain ⟨n, j, _, he, hL, hR⟩ := framed_orbit r z ⟨g, hg, rfl⟩
       have hd : dir j ≠ 0 := by
-        intro h; have hj := norm_dir' j; rw [h, norm_zero] at hj; linarith
+        intro h; have hj := norm_dir j; rw [h, norm_zero] at hj; linarith
       have hmem {m : Label} (hm : CenterReach r x m) : m ∈ labels :=
         fun k _ ↦ hN x hx m hm k
       rcases apply_mem_diskUnion hg hz with hy | hy
