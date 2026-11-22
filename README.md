@@ -24,8 +24,8 @@ certificates.
 | `TDCSG/` | The proof library (Lean 4, Mathlib); `TDCSG.lean` is the root module. Compact statements of the main results are in `TDCSG/Statements.lean` |
 | `TDCSG/CriticalRadius/` | The critical radius `TDCSG.criticalRadius n`, the infinite orbits for n = 5, 8, 10, 12, the cut-set certificate definitions (`Certificate.lean`), and compact statements in `TDCSG/CriticalRadius/Statements.lean` |
 | `TDCSGCompute/` | The exact engine and the `tdcsg-orbit` executable (core Lean, no Mathlib): orbits, threshold sweeps, GG_n(r) as a permutation group, cut-set certificates with an independent checker, and relative (window-clipped) certificates; see [`notes/engine.md`](notes/engine.md) |
-| `certificates/` | Small finiteness certificates with their SHA-256 sums, in the format of [`notes/certificates.md`](notes/certificates.md) |
-| `notes/` | Research notes: [`overview.md`](notes/overview.md) (programme and conventions), [`arithmetic.md`](notes/arithmetic.md), [`analytic-continuation.md`](notes/analytic-continuation.md), [`experiments.md`](notes/experiments.md), [`engine.md`](notes/engine.md), [`certificates.md`](notes/certificates.md), [`gap-structure.md`](notes/gap-structure.md), [`rank-conjecture.md`](notes/rank-conjecture.md), [`large-n-table.md`](notes/large-n-table.md), [`ideas.md`](notes/ideas.md) (open directions), and the referee report [`referee-report-engine-campaign.md`](notes/referee-report-engine-campaign.md) |
+| `certificates/` | Small finiteness certificates (`.cert`, format of [`notes/certificates.md`](notes/certificates.md)) and two small relative certificates at r_c (`.rcert`, format of [`notes/relative-certificates.md`](notes/relative-certificates.md)), with their SHA-256 sums |
+| `notes/` | Research notes: [`overview.md`](notes/overview.md) (programme and conventions), [`arithmetic.md`](notes/arithmetic.md), [`analytic-continuation.md`](notes/analytic-continuation.md), [`experiments.md`](notes/experiments.md), [`engine.md`](notes/engine.md), [`certificates.md`](notes/certificates.md), [`gap-structure.md`](notes/gap-structure.md), [`rank-conjecture.md`](notes/rank-conjecture.md), [`large-n-table.md`](notes/large-n-table.md), [`relative-certificates.md`](notes/relative-certificates.md), [`open-problem-critical-radius.md`](notes/open-problem-critical-radius.md) (the critical-radius problem stated for specialists), [`ideas.md`](notes/ideas.md) (open directions), and the referee report [`referee-report-engine-campaign.md`](notes/referee-report-engine-campaign.md) |
 | `notes/proofs/` | Written proofs, each with an independent referee report (`referee-report-*.md`) and, for the first Lean round, an independent Lean check (`lean-check-thread1.md`) |
 | `2302.12950v1.pdf` | The paper |
 
@@ -133,61 +133,116 @@ No `sorry`, no `native_decide`, no extra axioms: every theorem of `TDCSG` depend
   [`…-n10`](notes/proofs/referee-report-critical-radius-n10.md)).
 - **The cut-set certificate theorem.** A finite union of arcs satisfying (C1)–(C4) forces GG_n(r)
   to be finite (Theorem 4.2 of `critical-radius-n5.md`, Theorem 3.1 of `critical-radius-n8.md`).
-- **Non-norm radii and the lattice window criterion.** At a radius r² that is not a norm from
-  ℚ(ζ), conditions (C3) and (C4) hold automatically and GG_n(r) is finite if and only if the
-  cut-set closure terminates; the Diophantine lune lemma and exact local renormalization at tight
-  points ([`sharp-lower-bound-n5.md`](notes/proofs/sharp-lower-bound-n5.md), Lemma 2.2,
-  Theorems 3.1, 4.1, 4.3, Lemma 6.1, Proposition 6.2; report
-  [`referee-report-sharp-lower-bounds.md`](notes/proofs/referee-report-sharp-lower-bounds.md)).
-- **Nested-window reduction.** Orbit sizes are bounded by a product of restricted-orbit factors
-  over nested windows, all but the innermost taken at the critical radius itself; Conjecture S
-  implies finiteness below √(10−5√2) for n = 8
-  ([`sharp-lower-bound-n8.md`](notes/proofs/sharp-lower-bound-n8.md), Theorems 5.3, 5.5,
-  Corollary 5.7; same report).
-- **Relative-certificate theorem.** One window-clipped closure at r_c bounds, for every r < r_c at
-  once, the chains that avoid the windows; so finiteness below r_c reduces to the windows, and
-  (R-bulk) with (R-core) implies it
-  ([`sharp-lower-bound-combined.md`](notes/proofs/sharp-lower-bound-combined.md), Theorem 4.2,
-  Corollary 4.3, Propositions 4.4, 4.5, 6.3; report
-  [`referee-report-sharp-lower-bound-combined.md`](notes/proofs/referee-report-sharp-lower-bound-combined.md)).
+
+**The sharp-lower-bound series.** Five refereed notes attack finiteness below the closed forms. None
+proves it: **r_crit(n) = closed form remains open for all four n = 5, 8, 10, 12.** A self-contained
+statement of the problem for specialists, with the current status of every ingredient, is
+[`notes/open-problem-critical-radius.md`](notes/open-problem-critical-radius.md).
+
+- **n = 5, non-norm radii** ([`sharp-lower-bound-n5.md`](notes/proofs/sharp-lower-bound-n5.md);
+  report [`referee-report-sharp-lower-bounds.md`](notes/proofs/referee-report-sharp-lower-bounds.md)).
+  Proved: at a radius r² that is not a norm from ℚ(ζ), (C3) and (C4) hold automatically and GG_5(r)
+  is finite if and only if the cut-set closure terminates; the lattice window criterion; the
+  Diophantine lune lemma and exact local renormalization at tight points (Lemma 2.2, Theorems 3.1,
+  4.1, 4.3, Lemma 6.1, Proposition 6.2). Conjectured: termination along non-norm radii r_j ↑ r_c
+  (Conjecture 8.1, equivalent to finiteness below r_c). Level two is computed, not certified.
+- **n = 8, nested windows** ([`sharp-lower-bound-n8.md`](notes/proofs/sharp-lower-bound-n8.md); same
+  report). Proved: orbit sizes are bounded by a product of restricted-orbit factors over nested
+  windows, all but the innermost taken at r_c itself, and Conjecture S implies finiteness below
+  √(10−5√2) (Theorems 5.3, 5.5, Corollary 5.7). Conjectured: Conjecture S. Evidence only
+  (floating-point sampling): period-two renormalization of the induced pseudogroup.
+- **Combined note, relative certificates** ([`sharp-lower-bound-combined.md`](notes/proofs/sharp-lower-bound-combined.md);
+  report [`referee-report-sharp-lower-bound-combined.md`](notes/proofs/referee-report-sharp-lower-bound-combined.md)).
+  Proved: one window-clipped closure at r_c bounds, for every r < r_c at once, the chains that avoid
+  the windows, so finiteness below r_c reduces to bounded visits to the windows; (R-bulk) with
+  (R-core) implies it (Theorem 4.2, Corollary 4.3, Propositions 4.4, 4.5, 6.3). Refuted (exact):
+  level independence of the core orbit partition under φ⁻³ (levels 2 → 3).
+- **n = 5, limit system** ([`sharp-lower-bound-limit-system.md`](notes/proofs/sharp-lower-bound-limit-system.md);
+  report [`referee-report-sharp-lower-bound-limit-system.md`](notes/proofs/referee-report-sharp-lower-bound-limit-system.md)).
+  Proved: the straight-cut limit of the fixed-word system is trivial (orbits of at most 190 points);
+  modulo an exact computation, the nine non-tight critical classes are rigid from level 4, so the
+  problem lives at the four tight points ±E, ±Ē; (R-bulk-t) with (R-core-t) implies finiteness
+  (Theorems 4.2, 6.1, Corollaries 4.3, 4.4). Refuted (exact): φ⁻³ matching of first-return sets at
+  the tight points, at every tested level pair up to 4 → 5. Conjectured: period two with unit φ⁻⁶
+  (Conjecture 5.1).
+- **n = 12** ([`sharp-lower-bound-n12.md`](notes/proofs/sharp-lower-bound-n12.md); report
+  [`referee-report-sharp-lower-bound-n12.md`](notes/proofs/referee-report-sharp-lower-bound-n12.md)).
+  Proved: 48 critical points in 12 classes; the levels m = 1, 2, 3 are norms; the lune lemma for
+  n = 12, no parity obstruction, the frozen-point lemma; modulo an exact computation, 40 critical
+  points are rigid from level 0; with certified relative certificates, finiteness below r_c reduces
+  to the 8 tight points (Theorems 5.1, 5.4, Corollary 4.2, Lemmas 3.1, 3.3, 6.2, 6.3). Refuted
+  (exact): the exact period-one inductive step from every starting level m₀ ≤ 3; whether it holds
+  from a deeper level is open. Conjectured: eventual period one through monotone growth of
+  first-return sets (§8; Proposition 8.1 there is not yet refereed).
 
 ### (c) Proved modulo a certified computation
 
 GG_n(r) is finite for every r ≤ r_*, r_*² = r_c² − δ, by the certificate theorem (refereed, not in
-Lean) applied to a cut-set certificate at r_* and group monotonicity. Each certificate below was
-generated by `tdcsg-orbit certify` and accepted by `tdcsg-orbit check-certificate`, a separate
-float-free checker sharing only the exact arithmetic layer, and the four deepest were regenerated
-byte for byte and re-checked in an independent verification. The checker is a tested program, not
-a kernel-checked proof; its correspondence with `TDCSG.ExistsCertificate` is by inspection of the
-definitions; and the Lean theorem linking certificates to finiteness takes the certificate theorem
-as the unproved hypothesis `CutSetCertificate`. Values are from
-[`notes/certificates.md`](notes/certificates.md), which records every run and checksum.
+Lean) applied to a certificate at r_* and group monotonicity. The ordinary cut-set certificates
+were generated by `tdcsg-orbit certify` and accepted by `tdcsg-orbit check-certificate`, a separate
+float-free checker sharing only the exact arithmetic layer; the four at δ = 1/55, 1/36, 1/47, 1/180
+were regenerated byte for byte and re-checked in an independent verification. The checkers are
+tested programs, not kernel-checked proofs; their correspondence with `TDCSG.ExistsCertificate` is
+by inspection of the definitions; and the Lean theorem linking certificates to finiteness takes the
+certificate theorem as the unproved hypothesis `CutSetCertificate`. Values are from
+[`notes/certificates.md`](notes/certificates.md) and
+[`notes/relative-certificates.md`](notes/relative-certificates.md) §10, which record every run and
+checksum.
 
-| n | r_c (proved in Lean to be an upper bound) | refereed r_* | certified r_* (δ) | open window r_c − r_* |
-|---|---|---|---|---|
-| 5 | √(3+φ) ≈ 2.148961 | 2.125567 (δ = 1/10) | 2.144727 (δ = 1/55) | 0.004235 |
-| 8 | √(10−5√2) ≈ 1.711412 | 1.669154 (δ = 1/7) | 1.703278 (δ = 1/36) | 0.008135 |
-| 10 | √(4−φ) ≈ 1.543362 | 1.522979 (δ = 1/16) | 1.536454 (δ = 1/47) | 0.006908 |
-| 12 | √(40−22√3) ≈ 1.376547 | 1.358264 (δ = 1/20) | 1.374528 (δ = 1/180) | 0.002019 |
+| n | r_c (proved in Lean to be an upper bound) | refereed r_* | best certified r_* (δ) | kind of certificate | open window r_c − r_* |
+|---|---|---|---|---|---|
+| 5 | √(3+φ) ≈ 2.148961 | 2.125567 (δ = 1/10) | 2.144727 (δ = 1/55) | ordinary cut-set certificate | 0.004235 |
+| 8 | √(10−5√2) ≈ 1.711412 | 1.669154 (δ = 1/7) | 1.705008 (δ = 547/25000 = 0.02188) | symmetry-reduced window-free closure, (C1)–(C4) checked by `check-relative-certificate` (ordinary certificate at δ = 1/36, r_* = 1.703278) | 0.006404 |
+| 10 | √(4−φ) ≈ 1.543362 | 1.522979 (δ = 1/16) | 1.536454 (δ = 1/47); 1.536455 (r² < ρ₁, δ ≈ 0.0212735) by the interval of validity | ordinary cut-set certificate, extended by the interval of validity | 0.006908 |
+| 12 | √(40−22√3) ≈ 1.376547 | 1.358264 (δ = 1/20) | 1.374528 (δ = 1/180); r² < ρ₁, δ ≈ 0.0055543, by the interval of validity | ordinary cut-set certificate, extended by the interval of validity | 0.002019 |
 
-All four are ordinary cut-set certificates. "Refereed r_*" is the range whose computation was
-reproduced during refereeing (by an independent implementation) and is the range of the Lean
-propositions `FiniteBelow…`. The open window (r_*, r_c) is open in every case. Since r_* > r_A(n)
-in all four cases, r_A < r_crit holds there modulo the same computations.
+"Refereed r_*" is the range whose computation was reproduced during refereeing (by an independent
+implementation) and is the range of the Lean propositions `FiniteBelow…`. The open window
+(r_*, r_c) is open in every case. Since r_* > r_A(n) in all four cases, r_A < r_crit holds there
+modulo the same computations. The best entries for n = 8, 10, 12 rest on arguments proved in
+`relative-certificates.md` and not refereed:
 
-For n = 5 one restricted (window-clipped) closure at r_c itself, for the largest window of
-`sharp-lower-bound-combined.md` Table 5.1, was certified by the referee's interval-arithmetic
-checker (outside the repository; `mpmath.iv` trusted). It gives a uniform excursion bound for all
-r < r_c (Theorem 5.2 there), not finiteness of any GG_5(r).
+- **n = 8.** The closure stores one circle per orbit of z ↦ ±z, ±z̄; the union of the listed arcs
+  and their images is an ordinary certificate because the system is invariant under these
+  symmetries (§§2, 7 there). It lies past the level-5 jump δ₅ ≈ 0.0272 of
+  `sharp-lower-bound-n8.md`, and gives the base (levels 4 and 5) of its Conjecture S for phases
+  θ* ≥ 0.80014 (the note's θ* = 4/5 puts r_5 at δ ≈ 0.0218762, just beyond it). It was checked by
+  the relative checker only, not re-checked independently.
+- **n = 10, 12.** `tdcsg-orbit validity-interval` computes the exact radius ρ₁ at which the symbolic
+  arcs of the δ = 1/47 and δ = 1/180 certificates stop being valid, so GG_n(r) is finite for every
+  r² < ρ₁ (§8 there). The same arcs moved to a radius just below ρ₁ were accepted by
+  `check-certificate`. The gain in δ is about 2·10⁻⁴ relative.
+
+**Relative certificates at r_c** (`tdcsg-orbit certify-relative` and
+`check-relative-certificate`; `relative-certificates.md` §§5–6). Restricted (window-clipped)
+closures at r_c itself, checked float-free from the file alone, including the critical points and
+the exact disjointness of the windows: for n = 5, windows 1–8 of `sharp-lower-bound-combined.md`
+Table 5.1, with circle and maximal-arc counts equal to that note's (window 9 was not run, for lack
+of memory); for n = 8 one window shape, for n = 10 two and for n = 12 four. Through the refereed
+Theorem 4.2 of the combined note (with the general-n bound 1 + 20nF of `relative-certificates.md`
+§2, not refereed) each gives a uniform bound on window-avoiding chains for all r < r_c, not
+finiteness of any GG_n(r). Exact coincidences (three circles through one point) are not confined
+to the windows: for one n = 5 window, 248 of 579 lie in the bulk; the theorem needs no hypothesis
+on them. The largest n = 5 window is also certified by the referee's interval-arithmetic
+checker (outside the repository; `mpmath.iv` trusted).
+
+**Theorem H** (`relative-certificates.md` §9; proved there, **not refereed**): a finite arc set
+containing both boundary circles and closed under the four rotations on non-degenerate components,
+with no tangency or endpoint condition, makes GG_n(r') finite for every r' < r; this makes a
+windowed storage of a cut set (a hybrid certificate) valid. A prototype hybrid generator saved at
+most about 2.5× in memory, not enough for n = 5 level two, and was not developed into a certificate
+format or checker.
 
 ### (d) Computed, not certified
 
 - **n = 5, level two.** The cut set at δ = (13 − 8φ)/10 (r ≈ 2.147664) closes in one C program
   with floating-point ordering and a hard-coded error bound, outside the repository; no
   independent check ([`sharp-lower-bound-n5.md`](notes/proofs/sharp-lower-bound-n5.md) §5).
-- **Restricted closures for n = 5** at the eight smaller windows of
-  `sharp-lower-bound-combined.md` Table 5.1: two by two independent floating-point programs, six by
-  one program only.
+- **n = 12 at δ = 1/250.** The symmetry-reduced window-free closure closes, with (C3) and (C4)
+  holding in the generator, but its check was stopped unfinished, so it is not certified
+  (`relative-certificates.md` §7). It lies between levels 2 and 3 of `sharp-lower-bound-n12.md`.
+- **Restricted closure for n = 5** at window 9 (the smallest) of `sharp-lower-bound-combined.md`
+  Table 5.1: one floating-point program (`rcut.c`) only.
 - **Single orbits.** The orbit of 0 for n = 5 is finite for r ≤ r_3 (r_c − r_3 ≈ 3.1·10⁻⁴), by an
   exact breadth-first search reproduced by the engine; this concerns one orbit, not the group.
 - **Group orders inside the continuation gap** (r_A, r_c): certified lower bounds from generic
@@ -204,12 +259,17 @@ r < r_c (Theorem 5.2 there), not finiteness of any GG_5(r).
 
 ### (e) Open problems and conjectures
 
-- **r_crit(n) equals the closed form for n = 5, 8, 10, 12** (finiteness on the open windows above).
-  Current reductions: for n = 5, finiteness below r_c is equivalent to termination of the cut-set
-  closure along non-norm radii r_j ↑ r_c (`sharp-lower-bound-n5.md`, Conjecture 8.1), and follows
-  from (R-bulk) together with (R-core) (`sharp-lower-bound-combined.md`, Proposition 6.3); for
-  n = 8 it follows from Conjecture S (`sharp-lower-bound-n8.md` §5.5). The literal "exact
-  rescaling" of the n = 5 core partition is refuted at levels 2 → 3.
+- **r_crit(n) equals the closed form for n = 5, 8, 10, 12** (finiteness on the open windows above):
+  open for all four n. Current reductions, from the sharp-lower-bound series in (b): for n = 5,
+  finiteness below r_c is equivalent to termination of the cut-set closure along non-norm radii
+  r_j ↑ r_c, and follows from (R-bulk-t) with (R-core-t), statements about the four tight points;
+  for n = 8 it follows from Conjecture S; for n = 12 it follows from statements about the 8 tight
+  points. The renormalization these need is not found: exact φ⁻³ matching is refuted for n = 5,
+  exact period one from levels m₀ ≤ 3 is refuted for n = 12, and period two (n = 5) and eventual
+  period one through monotone growth (n = 12) are conjectures. n = 10 has no note of its own; its relative certificates at r_c give the window reduction
+  through the general-n form of Theorem 4.2 (not refereed for n = 10).
+  [`notes/open-problem-critical-radius.md`](notes/open-problem-critical-radius.md) states the
+  problem for specialists, with questions.
 - **The paper's footnote 4**: whether the group is infinite at the group-level critical radius. The
   per-point version is proved (above); the group version is open.
 - **The rank conjecture**: the self-similarity is governed by the unit group of ℤ[ζ_n]⁺.
