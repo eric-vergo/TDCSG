@@ -152,6 +152,26 @@ and [`open-problem-critical-radius.md`](open-problem-critical-radius.md).
     only at $1\to3$, and level 5 only for starts whose excursions stay below $1.2 \cdot 10^8$ points
     (biased towards stable starts). A packed or disk-backed point store would allow the $2\to4$
     partition test (Conjecture M$_5$) and the capped level-5 starts.
+26. **Prove the chord-line model set.** At levels $0$–$4$ the orbit of $0$ meets $\mathbb RE$ in
+    exactly the cut-and-project set $\{sE: s\in2\mathbb Z+\mathbb Z\varphi,\ sE\in D_1\cup D_2,\
+    |\sigma s|\le T_k\}$ with $\delta_kT_k\to\varphi^7/10$
+    ([`proofs/sharp-bound-n5-orbit-of-zero.md`](proofs/sharp-bound-n5-orbit-of-zero.md) Conjecture D).
+    The inclusion "$\supseteq$" asks for explicit words reaching every window point (the chord passage
+    gives only $2\mathbb Z[\varphi]\cap[-1,1)$); the inclusion "$\subseteq$" is a conjugate bound on one
+    line and would be the first exact upper bound on part of an orbit below $r_c$ that is not a
+    finite computation.
+27. **A line graph for the orbit of $0$.** The chord-parallel lines met by $O_{r_k}(0)$ near the chord
+    are the same in rescaled offset $d/\delta_k$ at levels 1–4, with $\delta d'$ changing sign each
+    level. Tabulate each line's window in $(s,\delta s')$ and the letters connecting lines; a finite
+    line graph that repeats with period two would be a checkable renormalization statement for this
+    orbit, and with Theorem 11 of that note would bound $M_0$.
+28. **Why $\varepsilon\,O_{r_k}(0)$ sits inside $O_{r_{k+1}}(0)$ near $0$.** Every $y\in O_{r_k}(0)$ with
+    $|y|<1.07$ has $\varepsilon y\in O_{r_{k+1}}(0)$ ($k=0,1,2$). Find, for each generator $g$, a word
+    $W_g$ with $W_g(\varepsilon y)=\varepsilon g(y)$ at level $k+1$; the disk curvatures differ, so the
+    correspondence can only be partial; locate where it breaks.
+29. **Sharp passage constant on the chord.** For chord seeds the computed $\sup\delta L$ is about $1.05$
+    against the proved $\varphi^3=4.24$; a gap theorem for the union of the three holes (at $b_1$, $b_3$
+    and $1$) should give the sharp value.
 
 ## Formalization
 
