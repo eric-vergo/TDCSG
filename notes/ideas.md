@@ -35,40 +35,59 @@ not imposed. The interval $(r_A, r_c)$ measures that freedom.
 
 ## Finiteness below the closed forms
 
-Depends on: [`certificates.md`](certificates.md) (the exact generator and checker),
-[`proofs/sharp-lower-bound-n5.md`](proofs/sharp-lower-bound-n5.md),
-[`proofs/sharp-lower-bound-n8.md`](proofs/sharp-lower-bound-n8.md) and
-[`proofs/sharp-lower-bound-combined.md`](proofs/sharp-lower-bound-combined.md).
+Depends on: [`certificates.md`](certificates.md), [`relative-certificates.md`](relative-certificates.md),
+the sharp-lower-bound notes ([`proofs/sharp-lower-bound-n5.md`](proofs/sharp-lower-bound-n5.md),
+[`-n8`](proofs/sharp-lower-bound-n8.md), [`-combined`](proofs/sharp-lower-bound-combined.md),
+[`-limit-system`](proofs/sharp-lower-bound-limit-system.md), [`-n12`](proofs/sharp-lower-bound-n12.md))
+and [`open-problem-critical-radius.md`](open-problem-critical-radius.md).
 
-1. **The limiting straight-cut system.** In coordinates zoomed by $\varepsilon^{-k}$ about a critical
-   point, the collapsing faces converge to a piecewise isometry with straight cuts and a finite germ
-   set. Certify that this limit system has uniformly bounded orbits, and prove that from an explicit
-   level on the level-$k$ induced system coincides with it face by face
-   (`sharp-lower-bound-combined.md` §7, suggestion 4; Conjecture S (S2) of `sharp-lower-bound-n8.md`).
-2. **Hybrid certificates.** Combine one fixed bulk certificate at $r_c$ with a closure of the induced
-   system inside the windows at $r_k$, using the finite word set of Proposition 4.4 of
-   `sharp-lower-bound-combined.md`, to certify levels the full closure cannot reach.
-3. **Self-similarity of the critical system.** The annulus reduction of (R-bulk): compute the
-   first-return systems on consecutive annuli at $r_c$ and test whether their combinatorics stabilize
+1. **Monotone growth of first-return sets across levels.** For $n = 12$, first-return sets and core
+   orbit classes are observed only to grow with the level (`sharp-lower-bound-n12.md` §8). Prove it.
+   The natural argument, that the rescaled disks contain the previous ones so orbit monotonicity in
+   $r$ applies, fails: the rescaled generators rotate about different centres, so the level-$m$ and
+   level-$(m+1)$ systems are not one system at two radii. A proof would reduce (R-core-t₁₂) to a
+   bound on the classes of one limit relation.
+2. **Diophantine control of lune points uniform in the level.** Every observed change between
+   levels is preceded by a lune point (a lattice point where the circle test and its tangent-line
+   test disagree). The lune lemma controls them only at bounded zoomed internal radius; a bound
+   uniform in the level, or a count of lune points at growing internal radius, would control where
+   changes can occur.
+3. **Exact period one for $n = 12$ from a deeper level.** Exact period one is refuted from every
+   starting level $m_0 \le 3$; whether it holds from some $m_0 \ge 4$ is open, and the data fit both
+   answers; the smallest internal radius of a change grows with the level, so a test needs
+   deeper levels on samples of larger internal radius, or an argument.
+4. **Period-two test for $n = 8$ and $n = 10$.** The total-positivity rule predicts period two for
+   both (units of norm $-1$). $n = 8$ has only floating-point germ samples, $n = 10$ nothing; repeat
+   the exact tight-point tests of `sharp-lower-bound-limit-system.md` §5 for both.
+5. **The limit of the first-return maps.** The fixed-word straight-cut limit is trivial
+   (`sharp-lower-bound-limit-system.md` §3); the object to construct is the limit of the first-return
+   maps to the tight cores, whose words have unbounded length, with a proof that the level-$k$
+   system matches it (with the right period) from an explicit level. Conjecture S (S2) of
+   `sharp-lower-bound-n8.md` is the $n = 8$ form.
+6. **Self-similarity of the critical system.** The annulus reduction of (R-bulk): compute the
+   first-return systems on consecutive annuli at $r_c$, for instance from the face graph of a
+   certified relative closure, and test whether their combinatorics stabilize
    (`sharp-lower-bound-combined.md` §7, suggestion 3).
-4. **Renormalization of cut sets.** Compare $K(r)$ at $\delta$ and at $\delta/u$ ($u = \varphi^3$,
-   $1 + \sqrt2$, $2 + \sqrt3$) exactly near the critical points. For $n = 8$ the cut set itself has no
-   locally finite limit (`sharp-lower-bound-n8.md` §4), so the comparison is meaningful for the induced
-   pseudogroups, not for $K(r)$.
-5. **Certifying the n = 5 level two.** The level-two closure is computed by one program with
-   floating-point ordering; it needs the engine's checker with a symmetry-reduced or streaming mode, or
-   an error analysis and an independent checker (`sharp-lower-bound-n5.md` §5.1).
-6. **Interval of validity.** The symbolic arc set of $K(r)$ is the same on a whole interval of radii,
-   which ends only at an event (a tangency to $\partial D_p$, a triple point, or two endpoints changing
-   order) at an exact algebraic radius. The engine computes that interval (`tdcsg-orbit
-   validity-interval`); applied to the deepest certificates it would extend each certified range to its
-   next event without a larger closure.
-7. **Memory.** A packed arc store (fixed-width coefficients, as in `Store.lean`) would roughly
-   halve the generator's memory, which limits $n = 5$ below the jump at $\delta \approx 0.0181$.
+7. **Memory-efficient certificates.** $n = 5$ level two needs about $6.9 \cdot 10^7$ maximal arcs
+   modulo symmetry, some 39 GB in the symmetric generator; the hybrid (windowed) storage saves at most
+   about 2.5× (`relative-certificates.md` §9). Options: a packed arc store (fixed-width coefficients,
+   as in `Store.lean`), disk-backed or streaming closure and checking, or a coarser invariant
+   partition than the arc arrangement (for example by the set of available first-return germs). The
+   same applies to finishing the check of the $n = 12$, $\delta = 1/250$ closure (generated, check
+   stopped unfinished), to $n = 5$ window 9 at $r_c$, and to the window shapes for $n = 8$, $10$ that
+   did not close.
+8. **The face count $F$.** $\beta_W = 1 + 20nF$ and the word-length bound of Proposition 4.4 of
+   `sharp-lower-bound-combined.md` are not explicit, because $F$ (bounded faces of the complement of
+   a restricted closure) was never computed. It needs every crossing of two arcs, with exact
+   identification of points on three or more circles.
+9. **Refereeing Theorem H** and the other arguments of `relative-certificates.md` that are proved but
+   not refereed: Theorem H (§9), the general-$n$ bound $1 + 20nF$ (§2), the symmetric unfolding of a
+   window-free closure into an ordinary certificate (§7), and the interval-of-validity argument (§8).
 
 ## Formalization
 
-Depends on: `TDCSG/CriticalRadius/Certificate.lean` and [`certificates.md`](certificates.md) §7.
+Depends on: `TDCSG/CriticalRadius/Certificate.lean`, [`certificates.md`](certificates.md) §7 and
+[`relative-certificates.md`](relative-certificates.md) §11.
 
 1. **A verified checker.** The certificate checker as a Lean function on a certificate data type, with
    a soundness theorem `check cert = true → TDCSG.Certificate n r (arcs cert)`.
@@ -76,7 +95,17 @@ Depends on: `TDCSG/CriticalRadius/Certificate.lean` and [`certificates.md`](cert
    decomposition of a finite arc arrangement), which would make `TDCSG.finite_GG_of_certificate`
    applicable.
 3. **The non-norm lemma and the relative-certificate theorem in Lean.** Lemma 2.2 and Theorem 3.1 of
-   `sharp-lower-bound-n5.md`, and Theorem 4.2 of `sharp-lower-bound-combined.md`.
+   `sharp-lower-bound-n5.md`, and Theorem 4.2 of `sharp-lower-bound-combined.md` (with Theorem H of
+   `relative-certificates.md` as its window-free case).
 4. **A `FiniteBelowTen` proposition** for $n = 10$, matching the refereed Theorem B of
    [`proofs/critical-radius-n10.md`](proofs/critical-radius-n10.md), alongside the existing ones for
    $n = 5, 8, 12$.
+
+## Other open questions
+
+1. **The rank conjecture for $n = 7$.** The exact threshold data stop just short of a second period
+   of the origin's pattern; testing rank 2 needs deeper orbits (some $2 \cdot 10^9$ points) or a seed
+   whose orbit grows through many thresholds ([`rank-conjecture.md`](rank-conjecture.md)).
+2. **The large-$n$ table.** Whether the paper's large-$n$ critical radii are true critical radii or the
+   onset of very large finite orbits is undetermined; orbits at the paper's scale need a deeper
+   engine ([`large-n-table.md`](large-n-table.md)).
