@@ -220,6 +220,31 @@ and [`open-problem-critical-radius.md`](open-problem-critical-radius.md).
     $\kappa_0\delta$, whose zoomed return map is exactly $\varepsilon^2$-periodic. Compute the graph of
     boxes joined by connectors along an orbit, in zoomed coordinates, at two levels $\delta$ and
     $\varepsilon^2\delta$, and test whether it is the same finite graph up to $O(\delta)$.
+39. **Prove the token-edge transport for $w_3$.** In every orbit tested, the word
+    $w_3^{-1}w_2^{-1}w_3^{-1}w_1^{-1}w_3^{-1}$ acts at $\varepsilon X$ at defect $\varepsilon\delta$
+    wherever $w_3$ acts at $X$ at defect $\delta$
+    ([`proofs/sharp-bound-n5-component-graph.md`](proofs/sharp-bound-n5-component-graph.md) §4.8). This is a
+    containment of $\varepsilon U_3(r)$ in an intersection of 30 disks of radius $r'$. Prove it
+    as in Computation 1.2 of the chaining note, with a lune analysis at the tight corners. For
+    $w_1,w_2$ the transport word $w_3^{-1}w_1^{-1}w_3^{-1}$ (and its mirror) acts on only $54\%$ of
+    the domain: find the arcs that cut it, and test whether they are the boundary of the physical
+    success region $G$.
+40. **The success region $G$ of the $\varepsilon$-transport.** Whether $\varepsilon y$ lies in the
+    child orbit is a function of the physical position of $y$, up to a thin layer. The region contains
+    $|y|<1$ and $|y|\ge2.7$, and it fills $68\%$ of every large orbit. Describe $G$ by circles,
+    and test whether $G$ is the set where the transport words of the four generators act. That would
+    be the two-dimensional analogue of the one-line window and the natural domain for (R1).
+41. **Births in the component graph.** Each $\varepsilon$-step creates new large components within
+    1–2 connectors of the image of the previous level (component-graph note, Computation 4.6(5)). Find
+    where they come from: test whether every birth at $\varepsilon\delta$ is the $\varepsilon$-image of
+    a region of the parent that lies outside $G$, which would make (R2) a statement about $G$ alone.
+42. **A uniform diameter from the hub.** The hub's eccentricity is 3–5 on every named orbit and at
+    most 6 on 878 random ones. A non-additive version of Theorem 3 of the component-graph note would
+    give Conjecture A, not just (B): show that births at each step lie within a fixed distance of the
+    image of the hub, not just of some image.
+43. **Level 4 of the orbit of $0$.** It has $7.6\cdot10^7$ states, above the memory used here. The
+    level-3 marginal satellites (rescaled extent $1.53$) are the first test of whether births grow
+    into permanent satellites or merge into hubs.
 
 ## Formalization
 
