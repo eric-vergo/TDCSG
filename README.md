@@ -32,7 +32,7 @@ lake comparator
 bash scripts/check-comparator-negative.sh
 ```
 
-The final command alters the challenge statement in a disposable copy. It succeeds only when Comparator rejects the mismatch. Each published blueprint links its commit to the Linux run that checked this statement. [Release workflow](.github/workflows/blueprint.yml) · [Local blueprint build](blueprint/README.md)
+The final command makes two changes to the challenge, each in its own disposable copy: it weakens `r < radius` to `r ≤ radius`, and it changes the definition of `radius` to `√(4 + (1 + √5) / 2)`. It succeeds only when Comparator rejects both, the first as a mismatched statement and the second as a mismatched definition. Each published blueprint links its commit to the Linux run that checked this statement. [Release workflow](.github/workflows/blueprint.yml) · [Local blueprint build](blueprint/README.md)
 
 ## Layout
 

@@ -26,8 +26,8 @@ noncomputable def group (r : ℝ) : Subgroup (Equiv.Perm ℂ) := by
 /-- The fivefold threshold in radicals. -/
 noncomputable abbrev radius : ℝ := √(3 + (1 + √5) / 2)
 
-/-- The infimum of the radii giving an infinite group is the stated threshold. -/
-theorem critical_radius : sInf {r : ℝ | Infinite (group r)} = radius := by
+/-- The group is finite exactly below the threshold. -/
+theorem finite_iff (r : ℝ) : Finite (group r) ↔ r < radius := by
   sorry
 
 end FiveDisk

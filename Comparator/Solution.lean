@@ -47,9 +47,9 @@ private theorem group_eq (r : ℝ) : group r = TDCSG.GG 5 5 r r := by
     · obtain rfl := Set.mem_singleton_iff.mp h
       exact ⟨1, Set.mem_insert_of_mem _ (Set.mem_singleton _), fun _ ↦ rfl⟩
 
-/-- The infimum of the radii giving an infinite group is the stated threshold. -/
-theorem critical_radius : sInf {r : ℝ | Infinite (group r)} = radius := by
-  simp only [group_eq]
-  exact TDCSG.CriticalRadius.criticalRadius_five
+/-- The group is finite exactly below the threshold. -/
+theorem finite_iff (r : ℝ) : Finite (group r) ↔ r < radius := by
+  rw [group_eq]
+  exact TDCSG.CriticalRadius.finite_GG_five_iff r
 
 end FiveDisk
