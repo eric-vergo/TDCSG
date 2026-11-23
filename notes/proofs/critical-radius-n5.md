@@ -19,7 +19,7 @@ Together they give $r_{\rm crit}(5)=r_c$, the value conjectured in the paper fro
   - This is the refereed range. Like every certified range, it is proved modulo the computation and has no Lean counterpart. The deepest certified range is recorded in [`../certificates.md`](../certificates.md): the repository's Lean engine generates and independently checks a certificate at $\delta=1/55$, giving finiteness for $r\le2.144727$ ($r_c-r\approx0.004235$), modulo that computation.
 - **Proved elsewhere: (B) on $r_\ast<r<r_c$,** and hence the equality $r_{\rm crit}(5)=r_c$, by the integer-coordinate argument of [`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md); machine-checked, with headline Lean theorem `TDCSG.CriticalRadius.criticalRadius_five`. That argument uses no certificate.
   - §6 records the renormalization data (the scale unit $\varphi^3$, the exact self-similarity of the critical chord, threshold ratios).
-  - It states a certificate form of (B) (Conjecture R$^\ast$, which follows from (B), see §6.4) and a structural Conjecture R describing the expected mechanism of the cut set.
+  - It states a certificate form of (B) (Corollary R$^\ast$, which follows from (B), see §6.4) and a structural Conjecture R describing the expected mechanism of the cut set.
   - §7 explains why the most direct routes to (B) through the cut set fail as stated.
 - **Review.** The note has been independently refereed: `referee-report-critical-radius-n5.md` in this directory. §8 lists the referee's verdicts and what the referee did not check.
 
@@ -343,15 +343,15 @@ These are the precise objects a renormalization proof would use, recorded so tha
 - This argument excludes only conjugacy by similarities. It says nothing against other kinds of exact conjugacy.
 - Near the accumulation point, at depth $k$, the boundary is a circle that deviates from its tangent line by $O(\varphi^{-6k})$ across a region of size $\varphi^{-3k}$. So at best the 2-D renormalization is exact *combinatorially and asymptotically*. This matches the threshold ratios converging to $\varphi^3$ rather than being equal to it.
 
-**A certificate form of (B).** By Theorem 4.2 and group monotonicity, the following statement implies (B). At a general radius it is stronger than finiteness, because a finite cut set need not satisfy (C4) (§4.2). It holds: at the levels $r_k$, which are non-norm radii, finiteness of $GG_5(r_k)$ implies that the closure terminates with $K(r_k)$ satisfying (C1)–(C4) (Theorem 3.1 of [`sharp-lower-bound-n5.md`](sharp-lower-bound-n5.md)), and finiteness below $r_c$ is proved in [`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md).
+**A certificate form of (B).** By Theorem 4.2 and group monotonicity, the following statement implies (B). At a general radius it is stronger than finiteness, because a finite cut set need not satisfy (C4) (§4.2). It holds: at the levels $r_k$, which are non-norm radii by Lemma 2.2(3) of [`sharp-lower-bound-n5.md`](sharp-lower-bound-n5.md), finiteness of $GG_5(r_k)$ implies that the closure terminates with $K(r_k)$ satisfying (C1)–(C4) (Theorem 3.1 of [`sharp-lower-bound-n5.md`](sharp-lower-bound-n5.md)), and finiteness below $r_c$ is proved in [`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md).
 
-**Conjecture R$^\ast$.** Put $r_k^2=3+\varphi-\tfrac1{10}\varepsilon^{k}$ for $k\ge0$, with $\varepsilon=\varphi^{-3}$. Then for every $k\ge0$ the cut set $K(r_k)$ is a finite union of arcs satisfying (C3) and (C4).
+**Corollary R$^\ast$.** Put $r_k^2=3+\varphi-\tfrac1{10}\varepsilon^{k}$ for $k\ge0$, with $\varepsilon=\varphi^{-3}$. Then for every $k\ge0$ the cut set $K(r_k)$ is a finite union of arcs satisfying (C3) and (C4).
 
 **Why R$^\ast$ suffices, and what is already known.**
 - Since $r_k\uparrow r_c$, Theorem 4.2 and §2 give finiteness for every $r<r_c$, which is (B).
 - (C3) holds automatically at every $r_k$. We have $4\rho_k=12+4\varphi-\tfrac25\varepsilon^k$. Here $\varepsilon^k=\alpha+\beta\varphi$ is a unit of $\mathbb Z[\varphi]$, so $5$ does not divide both $\alpha$ and $\beta$. Hence $4\rho_k\notin\mathbb Z[\varphi]$, while every $|c-p|^2$ lies in $\mathbb Z[\varphi]$.
 - $k=0$ is Table 5.1 ($\delta=1/10$).
-- The content of R$^\ast$ is therefore that the closure terminates at every level, and that (C4) holds.
+- The content of R$^\ast$ is therefore that the closure terminates at every level, and that (C4) holds. Both follow from (B) by Theorem 3.1 of `sharp-lower-bound-n5.md`.
 
 **Conjecture R (structural mechanism).** There exist a compact region $U\ni E$ and $k_0$ with the following property. For each $k\ge k_0$, the combinatorial type of $K(r_k)$ inside the $\varepsilon^{k}$-scaled copy $E+\varepsilon^k(U-E)$ (and its images under the symmetries $z\mapsto-z$, $z\mapsto\bar z$) is the image under $z\mapsto E+\varepsilon(z-E)$ of the type of $K(r_{k-1})$ inside $E+\varepsilon^{k-1}(U-E)$.
 
@@ -387,7 +387,7 @@ Theorem 4.2 holds for any $n$ with the same proof. The algorithm of §5 generali
 
 1. **A simple window (approach (i)).** The internal-space images of orbits below $r_c$ are not filled by a fixed polygon or union of disks scaled with $\delta^{-1}$. The filling fraction of orbit points in the natural window decreases as $r\uparrow r_c$ (from $0.029$ to $0.012$ for $n=5$; [`../experiments.md`](../experiments.md) E4). The invariant set is fractal, so no describable window $W(r)$ was found. Lemma 4.1 still reduces (B) to the existence of *some* compact invariant window, and $K(r)$ is the finite combinatorial substitute used in §5.
 2. **Exact periodic renormalization (approach (ii)).** Only the 1-D chord map renormalizes exactly, and only at $r_c$. The 2-D cut set admits no exact similarity renormalization at any $r$, including $r_c$ (§6.4). And at $r_c$ the group is infinite, so a renormalization there would not by itself control $r<r_c$.
-3. **Direct certification along $r_k\uparrow r_c$ (approach (iii)).** It is carried out for finitely many $k$ (Table 5.1). It cannot be continued indefinitely without a uniform pattern such as Conjecture R$^\ast$, because the computation grows like a power of $\delta^{-1}$.
+3. **Direct certification along $r_k\uparrow r_c$ (approach (iii)).** It is carried out for finitely many $k$ (Table 5.1). It cannot be continued indefinitely without a uniform pattern such as Conjecture R, because the computation grows like a power of $\delta^{-1}$.
 4. **Literature (approach (iv)).** Cited from memory, except that the referee confirmed the bibliographic data and statement of Akiyama–Brunotte–Pethő–Steiner.
    - The closest proved results are global-stability theorems for single planar piecewise isometries or discretized rotations with quadratic rotation parameters, proved by self-similar domain-exchange renormalization:
      - Adler, Kitchens and Tresser (ETDS 2001), piecewise affine maps of the torus;
@@ -396,7 +396,7 @@ Theorem 4.2 holds for any $n$ with the same proof. The algorithm of §5 generali
      - Lowenstein, Hatjispyros and Vivaldi (Chaos 1997), the golden case of the round-off rotation;
      - Goetz and Poggiaspalla, and Lowenstein, Kouptsov and Vivaldi, for rotations by $\pi/7$.
    - None of these applies directly. They treat one map on a fixed polygonal domain at one parameter. $GG_5(r)$ is a two-generator group, gated by disks, in a one-parameter family whose boundaries are curved.
-   - The Akiyama–Brunotte–Pethő–Steiner method is the best template. One finds a finite set of polygonal "atoms" and an exact induced map that reproduces itself after scaling by the unit. The new ingredients needed here are control of the curvature correction uniformly in $k$ and global finiteness at each level (Conjecture R$^\ast$; §6).
+   - The Akiyama–Brunotte–Pethő–Steiner method is the best template. One finds a finite set of polygonal "atoms" and an exact induced map that reproduces itself after scaling by the unit. The new ingredients needed here are control of the curvature correction uniformly in $k$ and global finiteness at each level (known from (B); §6.4).
    - Reduction to the single map $ab^{-1}$, which the paper mentions, would not suffice for group finiteness in any case. Finiteness of the orbits of one element does not bound the orbits of the group.
 
 ---
@@ -412,11 +412,11 @@ The referee's verdicts are in `referee-report-critical-radius-n5.md`. The table 
 | Side fact: $r_c$ is where the lens corners are $\pm(\zeta-\zeta^{-1})$ (also $n=10$; not $n=8,12$) | proved; refereed correct |
 | Lemma 4.1 and Theorem 4.2 (cut-set certificate, a sufficient test) | proved; refereed correct after minor fixes |
 | Theorem B: finite for $r\le r_\ast$, so $r_\ast\le r_{\rm crit}(5)$ | **proved modulo the computation of §5**, refereed correct given the computation. The computation was reproduced by an independent implementation with identical arc sets. The original program and files are not archived in the repository (§5.1); the repository's Lean engine reproduces the certificate with an independent checker and certifies deeper ranges, down to $\delta=1/55$ ([`../certificates.md`](../certificates.md)) |
-| finite for $r_\ast<r<r_c$; $r_{\rm crit}(5)=r_c$ | **proved** by the integer-coordinate argument of [`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md) (refereed; machine-checked as `TDCSG.CriticalRadius.criticalRadius_five`), not by this note's certificates, which reach the range of `../certificates.md`; also supported numerically by orbit scans up to $\delta\approx4\cdot10^{-3}$ ([`../arithmetic.md`](../arithmetic.md) §3.2) and the paper's searches. Reductions: `sharp-lower-bound-n5.md`, `sharp-lower-bound-combined.md` |
-| Conjecture R$^\ast$ (implies (B)) | holds, as a consequence of (B) and Theorem 3.1 of `sharp-lower-bound-n5.md` (§6.4) |
+| finite for $r_\ast<r<r_c$; $r_{\rm crit}(5)=r_c$ | **proved** by the integer-coordinate argument of [`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md) (refereed in `referee-report-sharp-lower-bound-n5-pentagrid.md` and, for its conclusion and Lean coverage, in `referee-report-sharp-lower-bound-n5-pentagrid-conclusion.md`; machine-checked as `TDCSG.CriticalRadius.criticalRadius_five`), not by this note's certificates, which reach the range of `../certificates.md`; also supported numerically by orbit scans up to $\delta\approx4\cdot10^{-3}$ ([`../arithmetic.md`](../arithmetic.md) §3.2) and the paper's searches. Reductions: `sharp-lower-bound-n5.md`, `sharp-lower-bound-combined.md` |
+| Corollary R$^\ast$ (implies (B)) | holds, as a consequence of (B), Lemma 2.2(3) and Theorem 3.1 of `sharp-lower-bound-n5.md` (§6.4); deduction refereed in `referee-report-sharp-lower-bound-n5-pentagrid-conclusion.md` |
 | Conjecture R (structural) | conjecture, with the evidence of §6 |
 | infinite at $r_c=\sqrt{3+\varphi}$ | proved (this is the paper's Theorem 2). The paper's footnote 4, that the group is infinite at the critical radius, holds for $n=5$, since (B) gives $r_{\rm crit}(5)=r_c$ |
-| The sufficient-condition argument for the window (§4.1) and Conjecture R$^\ast$ with its remarks (§6) | written after refereeing; **not yet refereed** |
+| The sufficient-condition argument for the window (§4.1) and the remarks of §6 other than the deduction of Corollary R$^\ast$ | written after refereeing; **not yet refereed** |
 
 **Not checked by the referee:**
 - the measured renormalization data in §6.1 and the files they cite;
