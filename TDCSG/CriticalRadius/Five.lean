@@ -35,6 +35,8 @@ The written proofs are `notes/proofs/critical-radius-n5.md` (Part A) and
   `r < √(3 + φ)`.
 * `TDCSG.CriticalRadius.sSup_setOf_finite_GG_five`: the supremum of the radii with a finite
   group is `√(3 + φ)`.
+* `TDCSG.CriticalRadius.infinite_GG_five`: for `r ≥ √(3 + φ)` the group `GG 5 5 r r` is
+  infinite.
 * `TDCSG.CriticalRadius.infinite_orbit_zero_five`: for `r ≥ √(3 + φ)` the orbit of `0` is
   infinite.
 -/
@@ -58,6 +60,10 @@ theorem criticalRadius_five : criticalRadius 5 = √(3 + φ) :=
 theorem sSup_setOf_finite_GG_five : sSup {r : ℝ | Finite (GG 5 5 r r)} = √(3 + φ) := by
   rw [show {r : ℝ | Finite (GG 5 5 r r)} = Set.Iio √(3 + φ) from
     Set.ext finite_GG_five_iff, csSup_Iio]
+
+/-- For every `r ≥ √(3 + φ)` the group `GG 5 5 r r` is infinite. -/
+theorem infinite_GG_five {r : ℝ} (hr : √(3 + φ) ≤ r) : Infinite (GG 5 5 r r) :=
+  Five.infinite_GG hr
 
 /-- For every `r ≥ √(3 + φ)`, including the critical radius itself, the orbit of `0` under
 `GG 5 5 r r` is infinite. -/

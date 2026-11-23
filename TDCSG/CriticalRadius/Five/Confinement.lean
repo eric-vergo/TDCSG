@@ -69,31 +69,33 @@ theorem leaf_of_isGoodLevel (hr : 0 ≤ r) (hc : r < √(3 + φ)) {n : Label} {j
       by_contra hne
       exact hl k (fun hkj ↦ hne (by rw [hwe, hkj, add_sub_cancel_right])) (hwe ▸ hwin)
 
-/-- **Crossings end in leaves.** Let `lo` and `hi` be good levels of coordinate `j`. An edge
-from a label `a` with `lo < a_j ≤ hi` to a label `b` outside this slab has a leaf end. -/
+/-- If exactly one of `n` and `n + e_k` lies in the slab `lo < m_j ≤ hi`, then `k = j` and
+`n_j` is `lo` or `hi`. So if both of these levels are good, so is `n_j`. -/
+theorem isGoodLevel_of_crossing {j k : Fin 5} {lo hi : ℤ} (hlo : IsGoodLevel r x j lo)
+    (hhi : IsGoodLevel r x j hi) {n : Label}
+    (h : (lo < n j ∧ n j ≤ hi) ↔ ¬(lo < (n + basis k) j ∧ (n + basis k) j ≤ hi)) :
+    k = j ∧ IsGoodLevel r x j (n j) := by
+  simp only [Pi.add_apply, basis_apply] at h
+  split_ifs at h with hjk
+  · refine ⟨hjk.symm, ?_⟩
+    obtain hn | hn : n j = hi ∨ n j = lo := by omega
+    exacts [hn ▸ hhi, hn ▸ hlo]
+  · rw [add_zero] at h
+    exact (iff_not_self h).elim
+
+/-- **A crossing edge has a leaf end.** Let `lo` and `hi` be good levels of coordinate `j`. An
+edge from a label `a` with `lo < a_j ≤ hi` to a label `b` outside this slab has a leaf end. -/
 theorem leaf_of_crossing (hr : 0 ≤ r) (hc : r < √(3 + φ)) {j : Fin 5} {lo hi : ℤ}
     (hlo : IsGoodLevel r x j lo) (hhi : IsGoodLevel r x j hi) {a b : Label}
     (ha : lo < a j ∧ a j ≤ hi) (hb : ¬(lo < b j ∧ b j ≤ hi)) (hab : (centerGraph r x).Adj a b) :
     (∀ w, (centerGraph r x).Adj a w → w = b) ∨ (∀ w, (centerGraph r x).Adj b w → w = a) := by
   rcases centerGraph_adj.1 hab with he | he
   · obtain ⟨k, rfl⟩ := he.2.1
-    obtain rfl : k = j := by
-      by_contra hkj
-      simp only [Pi.add_apply, basis_apply, ite_eq_right (Ne.symm hkj), add_zero] at hb
-      exact hb ha
-    have : a k = hi := by
-      simp only [Pi.add_apply, basis_apply] at hb
-      omega
-    exact leaf_of_isGoodLevel hr hc he (this ▸ hhi)
+    obtain ⟨rfl, hm⟩ := isGoodLevel_of_crossing hlo hhi (iff_of_true ha hb)
+    exact leaf_of_isGoodLevel hr hc he hm
   · obtain ⟨k, rfl⟩ := he.2.1
-    obtain rfl : k = j := by
-      by_contra hkj
-      simp only [Pi.add_apply, basis_apply, ite_eq_right (Ne.symm hkj), add_zero] at ha
-      exact hb ha
-    have : b k = lo := by
-      simp only [Pi.add_apply, basis_apply] at ha
-      omega
-    exact (leaf_of_isGoodLevel hr hc he (this ▸ hlo)).symm
+    obtain ⟨rfl, hm⟩ := isGoodLevel_of_crossing hlo hhi (iff_of_false hb (not_not_intro ha))
+    exact (leaf_of_isGoodLevel hr hc he hm).symm
 
 /-- **Paths stay in a box.** Below the critical radius there is a bound `N` such that, for every
 window centre `x`, every label reachable in the centre graph has coordinates of absolute value
@@ -111,7 +113,7 @@ theorem exists_abs_le_of_centerReach (hr : 0 ≤ r) (hc : r < √(3 + φ)) :
     · rw [basis_apply]
       split_ifs <;> simp
   let S : Set Label := {v | -K - 3 + i < v j ∧ v j ≤ K + 3 + i'}
-  have hstart (y : Label) (he : (centerGraph r x).Adj s y) : y ∈ S := by
+  have hstart : (centerGraph r x).neighborSet s ⊆ S := fun y he ↦ by
     have := abs_le.1 (abs_sub_le_one_of_adj he j)
     simp only [S, Set.mem_ofPred_eq]
     omega
@@ -130,7 +132,7 @@ theorem exists_abs_le_of_centerReach (hr : 0 ≤ r) (hc : r < √(3 + φ)) :
 
 /-- **Finiteness below the threshold.** For every `r < √(3 + φ)` the group `GG 5 5 r r` is
 finite. -/
-theorem finite_GG_of_lt {r : ℝ} (hc : r < √(3 + φ)) : Finite (GG 5 5 r r) := by
+theorem finite_GG_of_lt (hc : r < √(3 + φ)) : Finite (GG 5 5 r r) := by
   rcases lt_or_ge r 0 with hr | hr
   · exact finite_GG_of_lt_one 5 (by linarith)
   obtain ⟨N, hN⟩ := exists_abs_le_of_centerReach hr hc

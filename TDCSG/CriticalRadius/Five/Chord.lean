@@ -68,7 +68,8 @@ theorem norm_embed_pointE_add_one_sq : ‖embed pointE + 1‖ ^ 2 = 3 + φ := by
 /-- The end point `E` of the critical chord is not `0`. -/
 theorem embed_pointE_ne_zero : embed pointE ≠ 0 := by
   have h : embed pointE = ζ * (1 - ζ) := by
-    simp [embed, pointE]
+    simp only [embed, pointE]
+    push_cast
     ring
   rw [h]
   exact mul_ne_zero (isPrimitiveRoot_zeta.ne_zero (by norm_num))
@@ -161,7 +162,7 @@ theorem exists_mem_orbit {r : ℝ} (hr : √(3 + φ) ≤ r) (k : ℕ) :
 /-- **Theorem A**, orbit form: for every `r ≥ √(3 + φ)` the orbit of `0` under `GG 5 5 r r` is
 infinite. -/
 theorem infinite_orbit_zero {r : ℝ} (hr : √(3 + φ) ≤ r) : (orbit 5 5 r r 0).Infinite := by
-  choose t m ht htm hmem using exists_mem_orbit hr
+  choose t m _ htm hmem using exists_mem_orbit hr
   refine Set.infinite_of_injective_forall_mem (f := fun k ↦ (t k : ℂ) * embed pointE)
     (fun k l hkl ↦ ?_) hmem
   have hkl' : t k = t l := by

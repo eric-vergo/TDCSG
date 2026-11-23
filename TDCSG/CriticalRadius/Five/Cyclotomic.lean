@@ -480,10 +480,10 @@ theorem Model.IsSound.applyWord_linePt {M : Model} {n : ℕ} (hM : M.IsSound n) 
   refine applyWord_line hlt hv' ?_ ?_ ht
   · rw [← embed_linePt, ← hM.embed_run, h₀, embed_linePt]
     push_cast
-    ring_nf
+    ring
   · rw [← embed_linePt, ← hM.embed_run, h₁, embed_linePt]
     push_cast
-    ring_nf
+    ring
 
 end Cyc
 

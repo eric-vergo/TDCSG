@@ -29,9 +29,8 @@ variable {V : Type*} {G : SimpleGraph V}
 `b ∉ S` has a leaf endpoint: `b` is the only neighbour of `a`, or `a` is the only neighbour of
 `b`. Then every vertex reachable from `s` lies in `S` or is adjacent to a vertex of `S`. -/
 theorem Reachable.mem_or_exists_adj_of_leaf {S : Set V} {s v : V} (hs : s ∈ S)
-    (hstart : ∀ y, G.Adj s y → y ∈ S)
-    (hcross : ∀ a b, a ∈ S → b ∉ S → G.Adj a b →
-      (∀ w, G.Adj a w → w = b) ∨ (∀ w, G.Adj b w → w = a))
+    (hstart : G.neighborSet s ⊆ S)
+    (hcross : ∀ a b, a ∈ S → b ∉ S → G.Adj a b → G.neighborSet a ⊆ {b} ∨ G.neighborSet b ⊆ {a})
     (h : G.Reachable s v) : v ∈ S ∨ ∃ w ∈ S, G.Adj w v := by
   rw [reachable_iff_reflTransGen] at h
   -- A vertex of `S` is anchored if it is `s` or has a neighbour in `S`.
@@ -49,8 +48,8 @@ theorem Reachable.mem_or_exists_adj_of_leaf {S : Set V} {s v : V} (hs : s ∈ S)
       · rcases hcross a b ha.1 hb he with hl | hl
         · exfalso
           rcases ha.2 with rfl | ⟨w, hw, hwa⟩
-          · exact hb (hstart b he)
-          · exact hb (hl w hwa.symm ▸ hw)
+          · exact hb (hstart he)
+          · exact hb (Set.mem_singleton_iff.1 (hl hwa.symm) ▸ hw)
         · exact .inr ⟨a, ha, he, hl⟩
     · exact .inl (hleaf _ he ▸ hu)
 

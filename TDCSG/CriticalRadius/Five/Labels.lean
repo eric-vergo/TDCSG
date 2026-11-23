@@ -112,18 +112,15 @@ theorem weight_apply (n : Label) : weight n = ∑ j, n j :=
 
 /-- A unit label projects to its direction. -/
 @[simp] theorem proj_basis (j : Fin 5) : proj (basis j) = dir j := by
-  classical
   simp [proj_apply, basis, Pi.single_apply]
 
 /-- A unit label has coordinate sum `1`. -/
 @[simp] theorem weight_basis (j : Fin 5) : weight (basis j) = 1 := by
-  classical
   simp [weight_apply, basis, Pi.single_apply]
 
 /-- The coordinates of a unit label. -/
-theorem basis_apply (j k : Fin 5) : basis j k = if k = j then 1 else 0 := by
-  classical
-  simp [basis, Pi.single_apply]
+theorem basis_apply (j k : Fin 5) : basis j k = if k = j then 1 else 0 :=
+  Pi.single_apply j 1 k
 
 end Label
 

@@ -121,7 +121,7 @@ theorem IsGoodLevel.leaf (hr : 0 ≤ r) (hc : r < √(3 + φ)) {j : Fin 5} {m : 
   · right
     have hqr : ‖q + 1‖ ≤ r / 2 := by rw [← hrot, hnorm]; exact hhi
     intro k hkj hwin
-    refine (lens hr hc (norm_dir (k - j)) (hk hkj) hqr ?_).not_ge ?_
+    refine (div_two_lt_norm_sub_of_le_re hr hc (norm_dir (k - j)) (hk hkj) hqr ?_).not_ge ?_
     · rw [add_re, one_re]
       linarith
     · rw [InWindow, ← hnorm, map_sub, proj_basis, sub_right_comm, sub_mul, hrot,
@@ -130,12 +130,32 @@ theorem IsGoodLevel.leaf (hr : 0 ≤ r) (hc : r < √(3 + φ)) {j : Fin 5} {m : 
   · left
     intro k hkj hwin
     have hneg : ‖-q‖ ≤ r / 2 := by rwa [norm_neg]
-    refine (lens hr hc (norm_dir (k - j)) (hk hkj) hneg ?_).not_ge ?_
+    refine (div_two_lt_norm_sub_of_le_re hr hc (norm_dir (k - j)) (hk hkj) hneg ?_).not_ge ?_
     · rw [neg_re]
       linarith
     · rw [InWindow, ← hnorm, map_add, proj_basis, add_sub_right_comm, add_mul,
         dir_mul_conj_dir, ← hq_def] at hwin
       rwa [← neg_add', norm_neg]
+
+/-- For an irrational rotation number `α / L` and every `η > 0` there is a bound `K` such that,
+for every offset `b` and every integer `z`, some `z + i` with `|i| ≤ K` puts the phase
+`α (z + i) + b` farther than `L / 2 - η` from every point of `L ℤ`. -/
+theorem exists_abs_le_forall_lt_abs_add_mul {L η α : ℝ} (hL : 0 < L) (hη : 0 < η)
+    (hirr : Irrational (α / L)) :
+    ∃ K : ℕ, ∀ (b : ℝ) (z : ℤ), ∃ i : ℤ, |i| ≤ K ∧
+      ∀ p : ℤ, L / 2 - η < |α * (z + i) + b + L * p| := by
+  obtain ⟨K, hK⟩ := hirr.exists_abs_le_lt_norm_zsmul_add hL hη
+  refine ⟨K, fun b z ↦ ?_⟩
+  obtain ⟨i, hiK, hi⟩ := hK ((z * α + b : ℝ) : AddCircle L)
+  refine ⟨i, hiK, fun p ↦ hi.trans_le ?_⟩
+  have hw : (((α * (z + i) + b + L * p : ℝ)) : AddCircle L) =
+      i • (α : AddCircle L) + ((z * α + b : ℝ) : AddCircle L) := by
+    rw [mul_comm L, ← zsmul_eq_mul, AddCircle.coe_add, AddCircle.coe_zsmul, AddCircle.coe_period,
+      smul_zero, add_zero, ← AddCircle.coe_zsmul, ← AddCircle.coe_add, zsmul_eq_mul]
+    congr 1
+    ring
+  rw [← hw]
+  exact QuotientAddGroup.norm_mk_le_norm
 
 /-- **Good levels recur.** Below the critical radius there is a bound `K` such that, for every
 window centre `x`, every coordinate `j` and every integer `z`, one of the levels `z + i` with
@@ -149,7 +169,7 @@ theorem exists_isGoodLevel (hr : 0 ≤ r) (hc : r < √(3 + φ)) :
   have hrot : (1 + φ / 2) / (φ - 1 / 2) = φ := by
     rw [div_eq_iff hL.ne']
     linear_combination (-1 : ℝ) * Real.goldenRatio_sq
-  obtain ⟨K, hK⟩ := Irrational.exists_abs_le_forall_lt_abs_add_mul hL hη
+  obtain ⟨K, hK⟩ := exists_abs_le_forall_lt_abs_add_mul hL hη
     (hrot ▸ Real.goldenRatio_irrational)
   refine ⟨K, fun x j z ↦ ?_⟩
   obtain ⟨i, hi, h⟩ := hK (1 / 2 - (x * (starRingEnd ℂ) (dir j)).re) z

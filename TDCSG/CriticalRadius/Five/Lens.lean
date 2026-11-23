@@ -19,7 +19,7 @@ does not reach real part `a - η`, where `η = (3 + φ - r²) / 16`.
 
 ## Main statements
 
-* `TDCSG.Five.lens`: the lens estimate.
+* `TDCSG.Five.div_two_lt_norm_sub_of_le_re`: the lens estimate.
 -/
 
 @[expose] public section
@@ -32,8 +32,8 @@ namespace TDCSG.Five
 /-- **The lens estimate.** Let `0 ≤ r < √(3 + φ)` and let `u` be a unit vector with real part
 `(φ - 1) / 2` or `-φ / 2`. If `|v| ≤ r / 2` and `Re v ≥ (2φ + 1) / 4 - (3 + φ - r²) / 16`, then
 `|v - u| > r / 2`. -/
-theorem lens {r : ℝ} (hr : 0 ≤ r) (hc : r < √(3 + φ)) {u v : ℂ} (hu : ‖u‖ = 1)
-    (hre : u.re = (φ - 1) / 2 ∨ u.re = -φ / 2) (hv : ‖v‖ ≤ r / 2)
+theorem div_two_lt_norm_sub_of_le_re {r : ℝ} (hr : 0 ≤ r) (hc : r < √(3 + φ)) {u v : ℂ}
+    (hu : ‖u‖ = 1) (hre : u.re = (φ - 1) / 2 ∨ u.re = -φ / 2) (hv : ‖v‖ ≤ r / 2)
     (hx : (2 * φ + 1) / 4 - (3 + φ - r ^ 2) / 16 ≤ v.re) : r / 2 < ‖v - u‖ := by
   by_contra! hnear
   have hφ := Real.goldenRatio_sq
@@ -44,17 +44,13 @@ theorem lens {r : ℝ} (hr : 0 ≤ r) (hc : r < √(3 + φ)) {u v : ℂ} (hu : �
   · -- The lens is symmetric about the bisector of `0` and `u`; compare with its tip
     -- `1 + t u`, which has real part `(2φ + 1) / 4` and lies at distance `√(3 + φ) / 2`
     -- from both `0` and `u`.
-    have hnorm (w : ℂ) : ‖w‖ ^ 2 = w.re ^ 2 + w.im ^ 2 := by
-      rw [Complex.sq_norm, normSq_apply]
-      ring
-    have hlen := hnorm u
+    have hlen := sq_norm_sub_sq_re u
     rw [hu, h] at hlen
     have h₁ : v.re ^ 2 + v.im ^ 2 ≤ (r / 2) ^ 2 := by
-      rw [← hnorm]
-      exact pow_le_pow_left₀ (norm_nonneg _) hv _
+      linarith [sq_norm_sub_sq_re v, pow_le_pow_left₀ (norm_nonneg _) hv 2]
     have h₂ : (v.re - u.re) ^ 2 + (v.im - u.im) ^ 2 ≤ (r / 2) ^ 2 := by
-      rw [← sub_re, ← sub_im, ← hnorm]
-      exact pow_le_pow_left₀ (norm_nonneg _) hnear _
+      rw [← sub_re, ← sub_im]
+      linarith [sq_norm_sub_sq_re (v - u), pow_le_pow_left₀ (norm_nonneg _) hnear 2]
     let t : ℝ := 1 / 2 - (φ - 1) / 2
     have ht : 0 ≤ t := by simp only [t]; linarith
     have ht' : 0 ≤ 1 - t := by simp only [t]; linarith

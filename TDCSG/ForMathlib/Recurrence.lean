@@ -14,14 +14,14 @@ In a compact additive topological group whose element `a` has dense multiples, e
 `y` returns to a fixed nonempty open set under a multiple `i • a` with `|i|` uniformly bounded:
 the open sets `-(i • a) + U` cover the group, and finitely many of them suffice.
 
-For an irrational rotation of the circle `ℝ / L ℤ` this says that, along every run of a fixed
-number of consecutive integers `m`, some phase `α m + b` is farther than `L / 2 - η` from every
-point of `L ℤ`.
+For an irrational rotation `y ↦ α + y` of the circle `ℝ / L ℤ` this says that every orbit
+enters the neighbourhood `{y | L / 2 - η < ‖y‖}` of the half period within a fixed number of
+steps, forwards or backwards.
 
 ## Main statements
 
 * `DenseRange.exists_natAbs_le_zsmul_add_mem`: bounded return times to a nonempty open set.
-* `Irrational.exists_abs_le_forall_lt_abs_add_mul`: the version for an irrational rotation of
+* `Irrational.exists_abs_le_lt_norm_zsmul_add`: the version for an irrational rotation of
   `ℝ / L ℤ` and a neighbourhood of the half period.
 -/
 
@@ -34,7 +34,6 @@ theorem DenseRange.exists_natAbs_le_zsmul_add_mem {G : Type*} [AddGroup G] [Topo
     [ContinuousAdd G] [CompactSpace G] {a : G} (ha : DenseRange fun i : ℤ ↦ i • a)
     {U : Set G} (hU : IsOpen U) (hne : U.Nonempty) :
     ∃ K : ℕ, ∀ y : G, ∃ i : ℤ, i.natAbs ≤ K ∧ i • a + y ∈ U := by
-  classical
   let V (i : ℤ) : Set G := (fun y ↦ i • a + y) ⁻¹' U
   have hV (i : ℤ) : IsOpen (V i) := hU.preimage (continuous_const.add continuous_id)
   have hcov : Set.univ ⊆ ⋃ i, V i := fun y _ ↦ by
@@ -47,29 +46,18 @@ theorem DenseRange.exists_natAbs_le_zsmul_add_mem {G : Type*} [AddGroup G] [Topo
   obtain ⟨i, his, hi⟩ := Set.mem_iUnion₂.1 (hs (Set.mem_univ y))
   exact ⟨i, Finset.le_sup (f := Int.natAbs) his, hi⟩
 
-/-- For an irrational rotation number `α / L` and every `η > 0` there is a bound `K` such that,
-for every offset `b` and every integer `z`, some `z + i` with `|i| ≤ K` puts the phase
-`α (z + i) + b` farther than `L / 2 - η` from every point of `L ℤ`. -/
-theorem Irrational.exists_abs_le_forall_lt_abs_add_mul {L η α : ℝ} (hL : 0 < L) (hη : 0 < η)
+/-- For an irrational rotation number `α / L` and every `η > 0` there is a bound `K` such that
+every point `y` of `ℝ / L ℤ` has a translate `i • α + y` with `|i| ≤ K` whose norm, its distance
+from `0`, exceeds `L / 2 - η`. -/
+theorem Irrational.exists_abs_le_lt_norm_zsmul_add {L η α : ℝ} (hL : 0 < L) (hη : 0 < η)
     (hirr : Irrational (α / L)) :
-    ∃ K : ℕ, ∀ (b : ℝ) (z : ℤ), ∃ i : ℤ, |i| ≤ K ∧
-      ∀ p : ℤ, L / 2 - η < |α * (z + i) + b + L * p| := by
+    ∃ K : ℕ, ∀ y : AddCircle L, ∃ i : ℤ, |i| ≤ K ∧ L / 2 - η < ‖i • (α : AddCircle L) + y‖ := by
   have : Fact (0 < L) := ⟨hL⟩
-  let U : Set (AddCircle L) := {y | L / 2 - η < ‖y‖}
-  have hU : IsOpen U := isOpen_lt continuous_const continuous_norm
-  have hne : U.Nonempty := ⟨((L / 2 : ℝ) : AddCircle L), by
-    simp only [U, Set.mem_ofPred_eq, AddCircle.norm_half_period_eq, abs_of_pos hL]
+  have hne : {y : AddCircle L | L / 2 - η < ‖y‖}.Nonempty := ⟨((L / 2 : ℝ) : AddCircle L), by
+    simp only [Set.mem_ofPred_eq, AddCircle.norm_half_period_eq, abs_of_pos hL]
     linarith⟩
   obtain ⟨K, hK⟩ := (AddCircle.denseRange_zsmul_coe_iff.2 hirr).exists_natAbs_le_zsmul_add_mem
-    hU hne
-  refine ⟨K, fun b z ↦ ?_⟩
-  obtain ⟨i, hiK, hi⟩ := hK ((z * α + b : ℝ) : AddCircle L)
-  refine ⟨i, by rw [← Int.natCast_natAbs]; exact_mod_cast hiK, fun p ↦ hi.trans_le ?_⟩
-  have hw : (((α * (z + i) + b + L * p : ℝ)) : AddCircle L) =
-      i • (α : AddCircle L) + ((z * α + b : ℝ) : AddCircle L) := by
-    rw [mul_comm L, ← zsmul_eq_mul, AddCircle.coe_add, AddCircle.coe_zsmul, AddCircle.coe_period,
-      smul_zero, add_zero, ← AddCircle.coe_zsmul, ← AddCircle.coe_add, zsmul_eq_mul]
-    congr 1
-    ring
-  rw [← hw]
-  exact QuotientAddGroup.norm_mk_le_norm
+    (isOpen_lt continuous_const continuous_norm) hne
+  refine ⟨K, fun y ↦ ?_⟩
+  obtain ⟨i, hiK, hi⟩ := hK y
+  exact ⟨i, by rw [← Int.natCast_natAbs]; exact_mod_cast hiK, hi⟩
