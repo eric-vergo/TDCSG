@@ -33,16 +33,13 @@ written `φ`. The infimum of a set of real numbers is `sInf`
 on the real numbers it is the usual infimum of a nonempty set bounded below, and Lean gives it the
 value $`0` on the empty set
 ([`Real.sInf_empty`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Algebra/Order/Archimedean/Real/Basic.html#Real.sInf_empty)).
-For a group, or any type, `G`, the statements
-[`Finite G`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Basic/Finite/Defs.html#Finite)
-and
-[`Infinite G`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Basic/Finite/Defs.html#Infinite)
-say that it has finitely or infinitely many elements; each is the negation of the other. For a
-set `S`, such as an orbit, the corresponding statement is
+As in Chapter 1, `Finite G` and `Infinite G` say that a group, or any type, `G` has finitely or
+infinitely many elements. For a set `S`, such as an orbit, the statement that `S` has infinitely
+many elements is
 [`S.Infinite`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Basic/Finite/Defs.html#Set.Infinite).
 
 ![Two overlapping closed disks of radius 1.5 centered at minus one and one. The left generator turns the origin clockwise through 72 degrees about minus one, to a of zero.](/figures/disks.svg)
-*Figure 2.* The closed disks of radius $`1.5` about $`-1` (blue) and $`1` (orange), and one step of the left generator $`a`: it turns the origin clockwise through $`72^\circ` about $`-1`, to $`a(0)=-1+\zeta^4` with $`\zeta=\exp(2\pi i/5)`. The origin lies in both disks, so both generators move it.
+*Figure 2.* The closed disks of radius $`1.5` about $`-1` (blue, labelled left disk) and $`1` (vermilion, labelled right disk), and one step of the left generator $`a`: it turns the origin clockwise through $`72^\circ` about $`-1`, to $`a(0)=-1+\zeta^4` with $`\zeta=\exp(2\pi i/5)`. The origin lies in both disks, so both generators move it.
 
 Choose a point in the plane. The left generator $`a` turns it clockwise through $`360/n`
 degrees about $`-1` if it belongs to the closed disk about $`-1`, including the boundary. Outside
@@ -108,16 +105,17 @@ bounded, so the finiteness criterion of Chapter 1 applies.
 
 :::theorem "disjoint_disks" (lean := "TDCSG.nonempty_mulEquiv_of_add_lt_two, TDCSG.card_GG_of_add_lt_two, TDCSG.finite_GG_of_lt_one") (uses := "disk_rotation, group_orbit, generated_by_two, ball_extension_facts, compound_disjoint")
 Let $`n_1,n_2\ne0` and $`0<r_1`, $`0<r_2` with $`r_1+r_2<2`. Then the two disks are disjoint
-and $`GG_{n_1,n_2}(r_1,r_2)` is isomorphic to $`C_{n_1}\times C_{n_2}`, of order $`n_1n_2`. In
-particular $`GG_n(r)` is finite for every $`r<1`.
+and $`GG_{n_1,n_2}(r_1,r_2)` is isomorphic to $`C_{n_1}\times C_{n_2}`, of order $`n_1n_2`.
+Moreover, for every $`n`, the group $`GG_n(r)` is finite for every $`r<1`.
 :::
 
 :::proof "disjoint_disks" (lean := "TDCSG.leftDisk_disjoint_rightDisk, TDCSG.orderOf_diskPerm, TDCSG.GG_eq_bot_of_eq_one, TDCSG.diskPerm_eq_one_of_nonpos")
 The centers are at distance $`2>r_1+r_2`, so the disks are disjoint, and the product theorem of
 Chapter 1 gives the product of the two cyclic groups. A disk rotation of positive radius has
-order exactly $`n`. For $`r<1` and $`r>0`, $`n\ne0`, this gives a group of order $`n^2`. For
-$`r\le0` each disk contains at most its center, both generators are the identity, and the group is
-trivial; for $`n=0` both generators are the identity as well.
+order exactly $`n`. For the second statement let $`r<1`. If $`r\le0`, each disk contains at most
+its center, both generators are the identity, and the group is trivial. If $`n=0`, both generators
+are the identity as well. Otherwise $`n\ne0` and $`0<r<1`, so the first statement with
+$`r_1=r_2=r` gives a group of order $`n^2`.
 :::
 
 :::definition "critical_radius_def" (lean := "TDCSG.infiniteRadii, TDCSG.criticalRadius") (uses := "group_orbit")
