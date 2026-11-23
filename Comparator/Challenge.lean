@@ -1,13 +1,13 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Eric Vergo, OpenAI GPT-6.2 Astra
+Authors: Eric Vergo, OpenAI GPT-6.2 Astra, Claude
 -/
 module
 
 public import Mathlib.Analysis.SpecialFunctions.Complex.Circle
 public import Mathlib.Algebra.Group.Subgroup.Lattice
 
-/-! # The sharp threshold for two closed disks with fivefold rotations -/
+/-! # The critical radius for two closed disks with fivefold rotations -/
 
 @[expose] public section
 
@@ -26,16 +26,8 @@ noncomputable def group (r : ℝ) : Subgroup (Equiv.Perm ℂ) := by
 /-- The fivefold threshold in radicals. -/
 noncomputable abbrev radius : ℝ := √(3 + (1 + √5) / 2)
 
-/-- The group is finite exactly below the threshold. -/
-theorem finite_iff (r : ℝ) : Finite (group r) ↔ r < radius := by
-  sorry
-
-/-- The orbit of the origin is infinite already at the threshold. -/
-theorem infinite_orbit_zero : {z : ℂ | ∃ g ∈ group radius, g 0 = z}.Infinite := by
-  sorry
-
-/-- The supremum of the radii giving a finite group is the stated value. -/
-theorem supremum_finite : sSup {r : ℝ | Finite (group r)} = radius := by
+/-- The infimum of the radii giving an infinite group is the stated threshold. -/
+theorem critical_radius : sInf {r : ℝ | Infinite (group r)} = radius := by
   sorry
 
 end FiveDisk

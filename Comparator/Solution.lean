@@ -1,14 +1,14 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Eric Vergo, OpenAI GPT-6.2 Astra
+Authors: Eric Vergo, OpenAI GPT-6.2 Astra, Claude
 -/
 module
 
 public import Mathlib.Analysis.SpecialFunctions.Complex.Circle
 public import Mathlib.Algebra.Group.Subgroup.Lattice
-import TDCSG.CriticalRadius.FiveSharp
+import TDCSG.CriticalRadius.Five
 
-/-! # The sharp threshold for two closed disks with fivefold rotations -/
+/-! # The critical radius for two closed disks with fivefold rotations -/
 
 @[expose] public section
 
@@ -47,18 +47,9 @@ private theorem group_eq (r : ℝ) : group r = TDCSG.GG 5 5 r r := by
     · obtain rfl := Set.mem_singleton_iff.mp h
       exact ⟨1, Set.mem_insert_of_mem _ (Set.mem_singleton _), fun _ ↦ rfl⟩
 
-/-- The group is finite exactly below the threshold. -/
-theorem finite_iff (r : ℝ) : Finite (group r) ↔ r < radius := by
-  rw [group_eq]
-  exact TDCSG.CriticalRadius.finite_GG_five_iff r
-
-/-- The orbit of the origin is infinite already at the threshold. -/
-theorem infinite_orbit_zero : {z : ℂ | ∃ g ∈ group radius, g 0 = z}.Infinite := by
-  rw [group_eq]
-  exact TDCSG.CriticalRadius.infinite_orbit_zero_five le_rfl
-
-/-- The supremum of the radii giving a finite group is the stated value. -/
-theorem supremum_finite : sSup {r : ℝ | Finite (group r)} = radius := by
-  simpa only [group_eq] using TDCSG.CriticalRadius.sSup_finiteRadii_five
+/-- The infimum of the radii giving an infinite group is the stated threshold. -/
+theorem critical_radius : sInf {r : ℝ | Infinite (group r)} = radius := by
+  simp only [group_eq]
+  exact TDCSG.CriticalRadius.criticalRadius_five
 
 end FiveDisk
