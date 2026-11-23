@@ -53,13 +53,13 @@ endpoints are the claimed translates, and the composite of rotations is the tran
 them. The kernel decides every check.
 :::
 
-:::theorem "endpoint_infinite" (lean := "TDCSG.Five.exists_mem_orbit, TDCSG.Five.infinite_orbit_zero, TDCSG.Five.infinite_GG") (uses := "word_action, infinite_of_orbit, generated_by_two")
+:::theorem "threshold_infinite" (lean := "TDCSG.Five.exists_mem_orbit, TDCSG.Five.infinite_orbit_zero, TDCSG.Five.infinite_GG") (uses := "word_action, infinite_of_orbit, generated_by_two")
 Let $`r\ge R`. For each natural number $`k` the orbit of zero contains a point $`t_kE` with
 $`-1\le t_k<1` and $`t_k\equiv k(2\varphi-2)\pmod{2}`. The orbit of zero is infinite, and so is
 $`GG_5(r)`.
 :::
 
-:::proof "endpoint_infinite"
+:::proof "threshold_infinite"
 Every letter of a word is a generator or the inverse of one, hence an element of $`GG_5(r)`, so
 each word maps the orbit of zero into itself. Start from $`t_0=0`. Given $`t_k`, apply the first word if $`t_k\le1-\varphi`, the second if
 $`1-\varphi<t_k<3-2\varphi`, and the third if $`t_k\ge3-2\varphi`. The result stays in $`[-1,1)`

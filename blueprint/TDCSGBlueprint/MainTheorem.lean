@@ -21,10 +21,10 @@ decide every radius, which is the {bpref "critical_radius_five"}[main theorem] s
 Chapter 2: $`GG_5(r)` is finite if and only if $`r<R`, and the critical radius of order five is
 exactly $`R`.
 
-:::proof "critical_radius_five" (uses := "subcritical, endpoint_infinite, critical_radius_of_iff")
+:::proof "critical_radius_five" (uses := "subcritical, threshold_infinite, critical_radius_of_iff")
 Let $`r` be real. If $`r<R`, the group $`GG_5(r)` is finite by the
 {bpref "subcritical"}[finite half]. If $`r\ge R`, it is infinite by the
-{bpref "endpoint_infinite"}[infinite half], so it is not finite. This is the equivalence. The
+{bpref "threshold_infinite"}[infinite half], so it is not finite. This is the equivalence. The
 radii with an infinite group are then exactly the closed half-line $`[R,\infty)`, whose infimum
 is $`R`, so the critical radius is $`R`.
 :::
@@ -33,7 +33,7 @@ The equivalence is the Lean theorem `TDCSG.CriticalRadius.finite_GG_five_iff`, a
 the critical radius is `TDCSG.CriticalRadius.criticalRadius_five`; both appear in the Lean panel
 of the main theorem. The library records three further consequences.
 
-:::corollary "five_corollaries" (lean := "TDCSG.CriticalRadius.sSup_setOf_finite_GG_five, TDCSG.CriticalRadius.infinite_GG_five, TDCSG.CriticalRadius.infinite_orbit_zero_five") (uses := "critical_radius_five, endpoint_infinite")
+:::corollary "five_corollaries" (lean := "TDCSG.CriticalRadius.sSup_setOf_finite_GG_five, TDCSG.CriticalRadius.infinite_GG_five, TDCSG.CriticalRadius.infinite_orbit_zero_five") (uses := "critical_radius_five, threshold_infinite")
 The supremum of the radii $`r` at which $`GG_5(r)` is finite is $`R`. For every $`r\ge R`,
 the critical radius included, the group $`GG_5(r)` is infinite and the orbit of zero is infinite.
 :::
