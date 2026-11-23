@@ -125,10 +125,11 @@ structure Setting (β : Type) where
   /-- Whether the margin `η` is wide enough to be drawn as a dimension line. -/
   showMargin : Bool
 
-/-- The items of a lens picture: the half-planes `Re v ≥ κ - η` (below `R`) and `Re v ≥ κ` with
-their boundaries (`κ - η` dashed), the real axis, the two disks and their lens, the foot of `u` on the real
-axis, the margin `η` between the cuts as a dimension line (when `showMargin`), a radius `r/2` of
-`|v| ≤ r/2`, the points `0`, `u`, `c`, the tip and `v*`, and their labels, each beside what it names. -/
+/-- The items of a lens picture: the half-planes `Re v ≥ κ - η` (below `R`) and `Re v ≥ κ`,
+outlined (`κ - η` dashed), the real axis, the two disks and their lens, the foot of `u` on the
+real axis, the margin `η` between the cuts as a dimension line (when `showMargin`), a radius `r/2`
+of `|v| ≤ r/2`, the points `0`, `u`, `c`, the tip and `v*`, and their labels, each beside what it
+names. -/
 def lensItems {β : Type} [RealValue β] (st : Setting β) : Array Item :=
   let kc := cut st.r2
   let foot : QSqrt5 × QSqrt5 := (cosine, ⟨0, 0⟩)
@@ -299,123 +300,5 @@ def tipReLe (ρ : Rat) : Bool :=
 
 -- `16κ - R² = 7φ + 1`, the constant of the threshold `r² - 8r + 7φ + 1 = 0`.
 #guard kappa * rat 16 - criticalSq == phi * rat 7 + rat 1
-
-/-- What `lensEstimate` draws, item for item, and why its records are right. The data are the
-half radius `r/2 = 9/10`, `c = Re ζ`, `s² = 1 - c²`, `h² = (r/2)² - 1/4`, the tip
-`(c/2 + √(h² s²), √(s²/4) - √(h² c²))`, `u = ζ` and its foot `(c, 0)`, `v* = (1 + ζ - ζ²)/2`, `κ`,
-`η` and the two half-planes as the rectangles `[a, 1.75] × [-1.1, 2.4]` of the shown box,
-outlined; the margin `η` between the two lines is drawn as a dimension line. The
-items are written out in drawing order. The records hold exactly: the tip lies on both circles
-(`tipFacts`: the cross terms of `|tip|²` and `|tip - u|²` cancel and the rest is `(r/2)²`) and
-left of `κ - η`; `|u|² = 1 > (9/10)²` puts `0` and `u` outside each other's disk; `v*` lies at
-distance `R/2 > r/2` from `0` and `u`, on `Re v = κ` and right of `κ - η`; the tip's real part is
-at most `κ - 2η`. Not stated: how the builders and modifiers draw, the layout, the lettering, the
-style's colour values and the pixels. -/
-theorem lensEstimate_spec :
-    tip (9 / 10) = ⟨{ base := cosine * rat (1 / 2), roots := [(1, hSq (9 / 10) * sineSq)] },
-      { roots := [(1, sineSq * rat (1 / 4)), (-1, hSq (9 / 10) * (cosine * cosine))] }⟩ ∧
-    cosine = (zeta 1).realPart ∧ sineSq = rat 1 - cosine * cosine ∧
-    vStar = ⟨Zeta5.ofInt 1 + zeta 1 - zeta 2, 2⟩ ∧
-    lensEstimate.items = #[
-      Plane.Exact.polygon (halfPlane (cut (rat (4 * (9 / 10) * (9 / 10))))) |>.faint |>.filled
-        |>.width 1 |>.dashed |>.fillOpacity 0.16 |>.named "the half-plane Re v ≥ κ − η"
-        |>.describedBy "where the lens estimate puts no point of the lens, at r = 1.8"
-        |>.declRef `TDCSG.Five.div_two_lt_norm_sub_of_le_re,
-      Plane.Exact.polygon (halfPlane kappa) |>.faint |>.filled |>.width 1 |>.fillOpacity 0.18
-        |>.named "the half-plane Re v ≥ κ"
-        |>.describedBy "κ = (2φ + 1)/4 = (1 + L)/2, L = φ − 1/2",
-      Plane.Exact.line origin rightCentre |>.faint |>.width 1 |>.named "the real axis",
-      Plane.Exact.disk origin (9 / 10 : Rat) |>.noFill |>.role "window"
-        |>.named "the circle |v| = r/2" |>.describedBy "the closed disk |v| ≤ r/2, r = 1.8",
-      Plane.Exact.disk (zeta 1) (9 / 10 : Rat) |>.noFill |>.role "window" |>.dashed
-        |>.named "the circle |v − u| = r/2"
-        |>.describedBy "the closed disk |v − u| ≤ r/2 about u = ζ, r = 1.8",
-      Plane.Exact.lens origin (zeta 1) (9 / 10 : Rat) (9 / 10 : Rat) |>.role "lens" |>.noOutline
-        |>.fillOpacity 0.12 |>.named "the lens",
-      Plane.Exact.segment uSurd ⟨Surd.ofQ cosine, Surd.ofQ ⟨0, 0⟩⟩ |>.faint |>.width 1
-        |>.dashed #[2, 3] |>.named "the foot of u on the real axis",
-      Plane.Exact.segment (cut (rat (4 * (9 / 10) * (9 / 10))), marginY) (kappa, marginY)
-        |>.width 1 |>.named "the margin η = (3 + φ − r²)/16 between the cuts κ − η and κ"
-        |>.declRef `TDCSG.Five.IsGoodLevel,
-      Plane.Exact.tickAt (cut (rat (4 * (9 / 10) * (9 / 10))), marginY) (cut (rat (4 * (9 / 10) * (9 / 10))), marginY)
-        (kappa, marginY),
-      Plane.Exact.tickAt (kappa, marginY) (cut (rat (4 * (9 / 10) * (9 / 10))), marginY) (kappa, marginY),
-      Plane.Exact.labelBeside "η" (cut (rat (4 * (9 / 10) * (9 / 10))), marginY) (kappa, marginY),
-      Plane.segment ⟨0, 0⟩ (radiusEnd (RealValue.toFloat (9 / 10 : Rat))) |>.role "window"
-        |>.width 1.5 |>.dashed |>.named "a radius r/2 of the disk |v| ≤ r/2",
-      Plane.labelBeside "r/2" ⟨0, 0⟩ (radiusEnd (RealValue.toFloat (9 / 10 : Rat)))
-        |>.role "window",
-      Plane.Exact.point origin |>.role "window" |>.named "0, the centre of |v| ≤ r/2"
-        |>.incident .inside "the circle |v| = r/2"
-        |>.incident (otherSide (rat (9 / 10 * (9 / 10)))).incidence "the circle |v − u| = r/2"
-        |>.incident (Side.lens .inside (otherSide (rat (9 / 10 * (9 / 10))))).incidence
-          "the lens",
-      Plane.Exact.point (zeta 1) |>.role "window" |>.named "u = ζ, the centre of |v − u| ≤ r/2"
-        |>.incident .inside "the circle |v − u| = r/2"
-        |>.incident (otherSide (rat (9 / 10 * (9 / 10)))).incidence "the circle |v| = r/2"
-        |>.incident (Side.lens .inside (otherSide (rat (9 / 10 * (9 / 10))))).incidence
-          "the lens",
-      Plane.Exact.point ((cosine, ⟨0, 0⟩) : QSqrt5 × QSqrt5) |>.faint |>.size 3
-        |>.named "c = Re u = (φ − 1)/2 on the real axis" |>.incident .on "the real axis",
-      Plane.Exact.point (tip (9 / 10)) |>.size 5
-        |>.named "the tip of the lens: its corner of largest real part"
-        |>.incident .on "the circle |v| = r/2" |>.incident .on "the circle |v − u| = r/2"
-        |>.incident .on "the lens" |>.incident .outside "the half-plane Re v ≥ κ − η"
-        |>.incident .outside "the half-plane Re v ≥ κ",
-      Plane.Exact.point vStar
-        |>.named "v∗ = 1 + t u, t = 1/2 − c, at distance R/2 from 0 and u"
-        |>.incident .outside "the circle |v| = r/2" |>.incident .outside "the circle |v − u| = r/2"
-        |>.incident .outside "the lens" |>.incident .on "the half-plane Re v ≥ κ"
-          |>.incident .inside "the half-plane Re v ≥ κ − η",
-      Plane.Exact.label "v∗" vStar .auto,
-      Plane.Exact.label "0" origin .auto |>.role "window",
-      Plane.Exact.label "u = ζ" (zeta 1) .auto |>.role "window",
-      Plane.Exact.label "c" ((cosine, ⟨0, 0⟩) : QSqrt5 × QSqrt5) .auto,
-      Plane.label "tip" (PlanePoint.toPoint (tip (9 / 10))) .auto,
-      Plane.Exact.label "lens" ((rat (1 / 10), rat (11 / 20)) : QSqrt5 × QSqrt5) |>.role "lens",
-      Plane.Exact.label "|v| ≤ r/2" ((rat (3 / 10), rat (-11 / 20)) : QSqrt5 × QSqrt5)
-        |>.role "window",
-      Plane.Exact.label "|v − u| ≤ r/2" ((rat (9 / 20), rat (3 / 2)) : QSqrt5 × QSqrt5)
-        |>.role "window",
-      Plane.Exact.label "Re v ≥ κ" ((kappa, cutLabelY) : QSqrt5 × QSqrt5) .right,
-      Plane.Exact.label "Re v ≥ κ − η →"
-        ((cut (rat (4 * (9 / 10) * (9 / 10))), cutLabelY) : QSqrt5 × QSqrt5) .left] ∧
-    tipFacts (9 / 10) = true ∧ tipReLe (9 / 10) = true ∧
-    (otherSide (rat (9 / 10 * (9 / 10))) == .outside) = true ∧
-    (vStar.normSq == criticalSq * rat (1 / 4)) = true ∧
-    ((vStar - ZetaFrac.ofZeta (zeta 1)).normSq == criticalSq * rat (1 / 4)) = true ∧
-    (vStar.realPart == kappa) = true ∧
-    QSqrt.lt (rat (9 / 10 * (9 / 10))) (criticalSq * rat (1 / 4)) = true ∧
-    QSqrt.lt (cut (rat (4 * (9 / 10) * (9 / 10)))) kappa = true := by
-  refine ⟨rfl, rfl, rfl, rfl, rfl, ?_⟩
-  repeat' apply And.intro
-  all_goals decide +kernel
-
-figure_proves lensEstimate lensEstimate_spec
-
-/-- What `lensRadius` shows. It is the slider of `sliderFrames`: the lens picture `frameAt ρ` at
-the half radii `ρ = 9/10, 1, 26/25, 53/50` (`r = 1.8, 2, 2.08, 2.12`), then `frameCritical` at
-`R`. At every radius below `R` the tip lies on both circles and left of `κ - η` (`tipFacts`), its
-real part is at most `κ - 2η` (`tipReLe`), and `v*` lies outside both disks; at `R` the tip is
-`v*`, on both circles of radius `R/2` with real part `κ`, where `η = 0`. The disk `|v| ≤ r/2`
-stays left of `κ - η` at the first three radii and crosses it at `2.12`. Not stated: the items of
-each frame (built by `lensItems` from these data), the layout and the pixels. -/
-theorem lensRadius_spec :
-    lensRadius = Plane.slider "r" sliderFrames ∧
-    sliderFrames = (sliderRadii.map fun (ρ, t) => (t, frameAt ρ t (ρ == 9 / 10) false)).push
-      ("R", frameCritical) ∧
-    sliderRadii = #[(9 / 10, "1.8"), (1, "2"), (26 / 25, "2.08"), (53 / 50, "2.12")] ∧
-    sliderRadii.all (fun (ρ, _) => tipFacts ρ && tipReLe ρ &&
-      QSqrt.lt (rat (ρ * ρ)) (criticalSq * rat (1 / 4))) = true ∧
-    (vStar.normSq == criticalSq * rat (1 / 4)) = true ∧
-    ((vStar - ZetaFrac.ofZeta (zeta 1)).normSq == criticalSq * rat (1 / 4)) = true ∧
-    (vStar.realPart == kappa) = true ∧ (margin criticalSq == rat 0) = true ∧
-    (sliderRadii.map fun (ρ, _) => QSqrt.lt (rat ρ) (cut (rat (4 * ρ * ρ)))) =
-      #[true, true, true, false] := by
-  refine ⟨rfl, rfl, rfl, ?_⟩
-  repeat' apply And.intro
-  all_goals decide +kernel
-
-figure_proves lensRadius lensRadius_spec
 
 end TDCSGFigures.Lens

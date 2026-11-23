@@ -73,6 +73,15 @@ name = "TDCSGFigures"
 name = "tdcsg-figure-preview"
 root = "TDCSGFigures.Preview"
 
+# The blueprint's page of the figures' theorems. It sits at the repository root so that the
+# source links of the theorems, which PILean derives from module names, name the right file.
+[[lean_lib]]
+name = "TDCSGFigureTheorems"
+
+[lean_lib.leanOptions]
+weak.linter.mathlibStandardSet = false
+weak.linter.style.longLine = false
+
 [[lean_lib]]
 name = "TDCSGBlueprint"
 srcDir = "blueprint"
