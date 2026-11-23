@@ -7,10 +7,10 @@ import VersoBlueprint
 import VersoBlueprint.Commands.Graph
 import VersoBlueprint.Commands.Summary
 import TDCSGBlueprint.Figures
-import TDCSGBlueprint.Disks
+import TDCSGBlueprint.TwoDisks
 import TDCSGBlueprint.Lift
 import TDCSGBlueprint.Lens
-import TDCSGBlueprint.Walls
+import TDCSGBlueprint.Levels
 import TDCSGBlueprint.Confinement
 import TDCSGBlueprint.Chord
 import TDCSGBlueprint.OtherOrders
@@ -37,10 +37,10 @@ establishes finiteness throughout the open range below it.
 
 {ref "disks"}[Start the geometric proof] · {ref "verification"}[Inspect the independent statement]
 
-{include 0 TDCSGBlueprint.Disks}
+{include 0 TDCSGBlueprint.TwoDisks}
 {include 0 TDCSGBlueprint.Lift}
 {include 0 TDCSGBlueprint.Lens}
-{include 0 TDCSGBlueprint.Walls}
+{include 0 TDCSGBlueprint.Levels}
 {include 0 TDCSGBlueprint.Confinement}
 {include 0 TDCSGBlueprint.Chord}
 {include 0 TDCSGBlueprint.OtherOrders}
