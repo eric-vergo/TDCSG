@@ -20,8 +20,8 @@ depend on the starting point. With the description of orbit points by labels, th
 orbit by one number, and the finiteness criterion of Chapter 1 makes $`GG_5(r)` finite for every
 $`r<R`, where $`R=\sqrt{3+\varphi}`.
 
-![The 18 labels of the example component drawn at their projections inside the circular window, with the edges of the center graph.](/figures/component.svg)
-*Figure 8.* The component of the label $`0` in the center graph for $`x=1/2` and $`r=1.95`: 18 labels, each drawn at its projection $`P(n)` inside the window $`|w-x|\le r/2`, blue for weight zero (the left centers) and vermilion for weight one (the right centers), as in the legend. The labels $`0` and $`e_0` of the two initial centers project to $`0` and $`1`. Each edge joins a weight-zero label $`n` to some $`n+e_j`; segments that cross in the drawing do not meet in the graph.
+![The 18 labels of the example component drawn at their projections inside the circular window, with the edges of the center graph.](/plates/component.svg)
+*Figure 9.* The component of the label $`0` in the center graph for $`x=1/2` and $`r=1.95`: 18 labels, each drawn at its projection $`P(n)` inside the window $`|w-x|\le r/2`, blue for weight zero (the left centers) and vermilion for weight one (the right centers), as in the legend. The labels $`0` and $`e_0` of the two initial centers project to $`0` and $`1`. Each edge joins a weight-zero label $`n` to some $`n+e_j`; segments that cross in the drawing do not meet in the graph.
 
 Here the window is $`x=1/2` and $`r=1.95`. Starting at zero, enumerate the integer labels
 of every retained neighbor until each has been visited. There are 18 labels in this component.

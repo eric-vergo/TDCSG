@@ -38,8 +38,8 @@ infinitely many elements. For a set `S`, such as an orbit, the statement that `S
 many elements is
 [`S.Infinite`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Basic/Finite/Defs.html#Set.Infinite).
 
-![Two overlapping closed disks of radius 1.5 centered at minus one and one. The left generator turns the origin clockwise through 72 degrees about minus one, to a of zero.](/figures/disks.svg)
-*Figure 2.* The closed disks of radius $`1.5` about $`-1` (blue, labelled left disk) and $`1` (vermilion, labelled right disk), and one step of the left generator $`a`: it turns the origin clockwise through $`72^\circ` about $`-1`, to $`a(0)=-1+\zeta^4` with $`\zeta=\exp(2\pi i/5)`. The origin lies in both disks, so both generators move it.
+![Two overlapping closed disks of radius 1.5 centered at minus one and one. The left generator turns the origin clockwise through 72 degrees about minus one, to a of zero.](/plates/disks.svg)
+*Figure 3.* The closed disks of radius $`1.5` about $`-1` (blue, labelled left disk) and $`1` (vermilion, labelled right disk), and one step of the left generator $`a`: it turns the origin clockwise through $`72^\circ` about $`-1`, to $`a(0)=-1+\zeta^4` with $`\zeta=\exp(2\pi i/5)`. The origin lies in both disks, so both generators move it.
 
 Choose a point in the plane. The left generator $`a` turns it clockwise through $`360/n`
 degrees about $`-1` if it belongs to the closed disk about $`-1`, including the boundary. Outside

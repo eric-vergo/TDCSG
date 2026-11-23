@@ -6,6 +6,8 @@ import VersoManual
 import VersoBlueprint
 import VersoBlueprint.Commands.Graph
 import VersoBlueprint.Commands.Summary
+import PILeanVerso
+import TDCSGFigures
 import TDCSGBlueprint.Figures
 import TDCSGBlueprint.CompoundSymmetry
 import TDCSGBlueprint.TwoDisks
@@ -20,7 +22,7 @@ import TDCSGBlueprint.MainTheorem
 import TDCSGBlueprint.OtherOrders
 import TDCSGBlueprint.Verification
 
-open Verso.Genre Verso.Genre.Manual Informal
+open Verso.Genre Verso.Genre.Manual Informal PILeanVerso
 
 #doc (Manual) "The critical radius of fivefold disk rotations" =>
 
@@ -28,8 +30,15 @@ open Verso.Genre Verso.Genre.Manual Informal
 authors := ["Eric Vergo", "OpenAI GPT-6.2 Astra"]
 %%%
 
-![Two closed disks of radius the square root of three plus phi, centered at minus one and one. The chord from minus E on the right circle to E on the left circle passes through zero.](/figures/critical-chord.svg)
-*Figure 1.* The two closed disks at the critical radius $`R=\sqrt{3+\varphi}\approx2.149`, centered at $`-1` (blue, labelled left disk) and $`1` (vermilion, labelled right disk). The chord from $`-E` to $`E`, where $`E=\zeta-\zeta^2` and $`\zeta=\exp(2\pi i/5)`, passes through $`0`. Notice that $`E` lies on the boundary of the left disk, since $`|E+1|^2=3+\varphi`, and $`-E` on the boundary of the right disk; the two circles cross at $`\pm(\zeta-\zeta^4)`.
+:::figure TDCSGFigures.criticalChord (label := "critical-chord") (inline := true) (proves := TDCSGFigures.criticalChord_spec) (alt := "Two closed disks of radius the square root of three plus phi, centered at minus one and one, drawn as circles, with their overlap shaded. The chord from minus E on the right circle to E on the left circle passes through zero in three colored pieces numbered 1, 2 and 3. The circles cross at zeta minus zeta to the fourth and its negative.")
+The two closed disks at the critical radius $`R=\sqrt{3+\varphi}\approx2.149`, centered at $`-1`
+(blue, the left disk) and $`1` (vermilion, the right disk), and the lens they share. The chord from
+$`-E` to $`E`, where $`E=\zeta-\zeta^2` and $`\zeta=\exp(2\pi i/5)`, passes through $`0`; its
+pieces 1, 2 and 3 are the ones the three words of chapter 3 move. The point $`E` lies on the left
+circle, since $`|E+1|^2=3+\varphi`, and $`-E` on the right circle; the circles cross at
+$`\pm(\zeta-\zeta^4)`. Every point is exact in $`\mathbb{Z}[\zeta]` and the theorem under the
+picture states what it draws.
+:::
 
 Place two closed disks of radius $`r` in the plane, centered at $`-1` and $`1`. One move turns
 the left disk clockwise through a fifth of a full turn, carrying the points inside it along and
@@ -60,6 +69,14 @@ Lean declarations that prove it.
   only by stepping onto a dead end and back. So every walk stays in a box whose size does not
   depend on the starting point, every orbit has a bounded number of points, and the group is
   finite.
+
+:::figure_explorer TDCSGFigures.orbitRadius (label := "orbit-radius") (alt := "Two closed disks about minus one and one whose radius grows from 1.2 to the critical radius, with the orbit of zero drawn as dots: a few points for small radii, more and more near the critical radius.")
+The orbit of $`0` under the two moves as the radius $`r` grows, computed exactly in
+$`\mathbb{Z}[\zeta]` at each radius. Below the critical radius it is finite: 9 points up to
+$`r=1.9`, then 71, 151, 773 and 801 points at $`r=1.95`, $`2.05`, $`2.08` and $`2.1`. At
+$`r=R` it is infinite; the last frame shows only its first 800 points, in the order a
+breadth-first search finds them.
+:::
 
 *How to read it.* Chapters 1 and 2 set up the objects and state the theorem; they also introduce
 the Lean notation for readers new to Lean.
@@ -109,3 +126,5 @@ is the written proof of the finite half.
 {blueprint_graph}
 
 {blueprint_summary}
+
+{figure_list}

@@ -19,8 +19,8 @@ $`R=\sqrt{3+\varphi}`. This is the half of the main theorem that holds at and ab
 threshold, and it shows that the finiteness of Part II cannot extend to $`R` itself. Write
 $`\zeta=\exp(2\pi i/5)`.
 
-![Four copies of the chord from minus E to E, one per step, each marking the current point. Dashed cuts divide the chord into the pieces of the three words.](/figures/chord.svg)
-*Figure 3.* The returns $`t_0E,\ldots,t_3E` of the orbit of zero to the chord, one row per step, on the parameter line $`t\mapsto tE` from $`-E` (on the right circle) to $`E` (on the left circle). The dashed cuts at $`t=1-\varphi` and $`t=3-2\varphi` separate the pieces of the three words; the word named between two rows is the one applied to the upper point. Each step adds $`2\varphi-2` modulo two.
+![Four copies of the chord from minus E to E, one per step, each marking the current point. Dashed cuts divide the chord into the pieces of the three words.](/plates/chord.svg)
+*Figure 4.* The returns $`t_0E,\ldots,t_3E` of the orbit of zero to the chord, one row per step, on the parameter line $`t\mapsto tE` from $`-E` (on the right circle) to $`E` (on the left circle). The dashed cuts at $`t=1-\varphi` and $`t=3-2\varphi` separate the pieces of the three words; the word named between two rows is the one applied to the upper point. Each step adds $`2\varphi-2` modulo two.
 
 Set $`E=\zeta-\zeta^2` and write points on the chord as $`tE` with $`-1\le t\le1`.
 The picture shows successive returns to the chord, one entire word per step. Intermediate

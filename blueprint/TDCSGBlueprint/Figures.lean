@@ -8,9 +8,10 @@ import PILean.Trust.Sha256
 /-!
 # Figures of the blueprint
 
-Eight plates for the fivefold critical radius, written as SVG. Every coordinate is computed in
-floating point from the definitions it illustrates (the disks, the generators, the label
-projection, the good levels and the chord words); floating point is used for illustration only.
+Seven plates for the fivefold critical radius, written as SVG; the front page's figures are
+drawn by PILean in `TDCSGFigures`. Every coordinate is computed in floating point from the
+definitions it illustrates (the disks, the generators, the label projection, the good levels and
+the chord words); floating point is used for illustration only.
 Where a figure shows a particular instance (a component, a good level, a terminal crossing), the
 instance is recomputed here and the build stops if it no longer has the property the caption
 states.
@@ -329,40 +330,7 @@ private def plate (title desc : String) (h : Float) (checks : Array (String × B
       el "desc" #[] #[.text desc], Svg.rect 0 0 width h (some paper) #[("rx", "8")]] ++ xs)
 
 
-/-! ### Figure 1: the critical chord -/
-
-/-- Two disks of radius `R` about `∓1`, the chord from `−E` to `E` with `E = ζ − ζ²`, and the
-crossing points `±(ζ − ζ⁴)` of the two circles. -/
-private def opening : Except String String := Id.run do
-  let mut checks : Array (String × Bool) := #[]
-  let f : Frame := ⟨⟨240, 168⟩, 62⟩
-  let l : Point := ⟨-1, 0⟩
-  let r : Point := ⟨1, 0⟩
-  -- `E = ζ − ζ²`; `|E + 1|² = 3 + φ`, so `E` lies on the left circle and `−E` on the right one.
-  let e := zpow 1 - zpow 2
-  -- `ζ − ζ⁴ = 2i sin 72°`: `|±(ζ − ζ⁴) ∓ 1|² = 1 + 4 sin² 72° = 3 + φ`, so the circles cross there.
-  let top := zpow 1 - zpow 4
-  checks := checks.push ("E and ζ − ζ⁴ lie on the circles of radius √(3+φ)", (((e - l).norm - critical).abs < 1e-9 && ((top - r).norm - critical).abs < 1e-9))
-  let spoke := l + critical * cis (1.2 * pi)
-  return plate "The critical chord between two closed disks"
-    "Two disks of radius √(3+φ) about −1 and +1. The chord from −E to E passes through 0; E lies on the left circle and −E on the right circle."
-    345 checks #[
-    circle f l critical leftC (tint leftC 26), circle f r critical rightC (tint rightC 26),
-    labelAt f ⟨-2.0, 1.0⟩ 0 0 (txt "left disk") leftC,
-    labelAt f ⟨2.0, 1.0⟩ 0 0 (txt "right disk") rightC,
-    seg f l spoke leftC 1.5 "5 4", labelAt f (Point.mid l spoke) (-10) (-6) (math "R") leftC,
-    seg f ((-1 : Float) * e) e ink 3,
-    dot f l leftC, dot f r rightC, dot f ⟨0, 0⟩, dot f e leftC 5.5, dot f ((-1 : Float) * e) rightC 5.5,
-    dot f top ink 3.5, dot f ((-1 : Float) * top) ink 3.5,
-    labelAt f l 0 (-12) (math "−1") leftC, labelAt f r 0 24 (math "+1") rightC,
-    labelAt f ⟨0, 0⟩ 6 24 (math "0"), labelAt f e 9 (-9) (math "E") leftC .start,
-    labelAt f ((-1 : Float) * e) (-9) 22 (math "−E") rightC .finish,
-    -- Inside the lens, clear of both circles, which cross at the two marked points.
-    labelAt f top 0 40 (math "ζ − ζ⁴") ink,
-    labelAt f ((-1 : Float) * top) 0 (-30) (math "ζ⁴ − ζ") ink,
-    label ⟨240, 333⟩ (math s!"R = √(3 + φ) ≈ {dec critical}")]
-
-/-! ### Figure 2: one generator step -/
+/-! ### Figure 3: one generator step -/
 
 /-- The disks of radius `1.5` about `∓1`, the origin and its image `a(0)` under the left
 generator, a clockwise turn by `72°` about `−1`. -/
@@ -394,7 +362,7 @@ private def disks : Except String String := Id.run do
       labelAt f z 8 (-10) (math "0") ink .start,
       labelAt f a (-9) 21 (math "a(0)") leftC .finish])
 
-/-! ### Figure 3: the chord words -/
+/-! ### Figure 4: the chord words -/
 
 /-- The word used at parameter `t` and the parameter it moves `tE` to (`TDCSG.Five.word₁`,
 `word₂`, `word₃`): the first two add `2φ − 2`, the third adds `2φ − 4`. -/
@@ -450,7 +418,7 @@ private def chord : Except String String := Id.run do
     "Four copies of the chord from −E to E, one per step. Each step applies the word of the piece containing the current point and moves it by 2φ − 2 modulo 2."
     360 checks xs
 
-/-! ### Figure 4: the five possible centre changes -/
+/-! ### Figure 5: the five possible centre changes -/
 
 /-- From the current left centre `0`, the five candidate right centres `ζʲ` and the window
 `|w − x| ≤ r/2` that decides which of them can act, at `x = 1/2`, `r = 1.95`. -/
@@ -483,7 +451,7 @@ private def moving : Except String String := Id.run do
     "From the current center 0, the five unit steps ζ^j. Those ending inside the window of radius r/2 about x (1, ζ, ζ⁴) can act; ζ² and ζ³ cannot."
     380 checks nodes
 
-/-! ### Figure 5: the lens estimate -/
+/-! ### Figure 6: the lens estimate -/
 
 /-- Plate points of the lens `|v| ≤ a`, `|v − u| ≤ a` (convex), ordered around its centre. -/
 private def lensPts (f : Frame) (u : Point) (a : Float) : Array Point := Id.run do
@@ -530,7 +498,7 @@ private def lenses : Except String String := Id.run do
     "Two disks of radius r/2 about 0 and u = ζ and their lens. At r = √(3+φ) the tip of the lens lies on the cut Re v = κ; at r = 1.8 it lies strictly left of the moved cut Re v = κ − η."
     395 checks nodes
 
-/-! ### Figure 6: a terminal crossing -/
+/-! ### Figure 7: a terminal crossing -/
 
 /-- The window, radius and label of the terminal crossing: `r = 2.12`, `x = 0.472`, direction
 `j = 0`, and `n = (4, −3, 1, 1, −3)`, of weight zero, with `P(n) = 7 − 4φ`. The level `n₀ = 4`
@@ -589,7 +557,7 @@ private def terminal : Except String String := Id.run do
     "At r = 2.12 and x = 0.472 the label n = (4, −3, 1, 1, −3) sits at the good level n₀ = 4. Its edge to n + e₀ ends beyond the cut Re w = Re x + κ − η, so the four other candidate neighbors n + e₀ − e_k of n + e₀ lie outside the window and n + e₀ is a leaf."
     385 checks xs
 
-/-! ### Figure 7: good levels -/
+/-! ### Figure 8: good levels -/
 
 /-- The phases of the levels `m = −13, …, 9` of coordinate `0` at `x = 0.87`, `r = 1.8`, the
 good bands `|phase| > L/2 − η`, and the two good levels the confinement proof uses. -/
@@ -642,7 +610,7 @@ private def wallLevels : Except String String := Id.run do
     "For r = 1.8, x = 0.87 and coordinate 0, the phase of each level m from −13 to 9 reduced modulo L. Levels in the shaded bands are good: −10, −2 and 3. The proof uses −10 and 3; −2 lies in the range |m| ≤ 2 where it does not search."
     455 checks xs
 
-/-! ### Figure 8: a component of the centre graph -/
+/-! ### Figure 9: a component of the centre graph -/
 
 /-- The component of the label `0` in the centre graph at `x = 1/2`, `r = 1.95`, enumerated in
 label space from the window test, and the number of labels found (`0` if the search did not
@@ -692,12 +660,12 @@ private def component : Except String String := Id.run do
     "The 18 labels reachable from 0 at x = 1/2 and r = 1.95, drawn at their projections inside the window of radius r/2, with the edges of the center graph."
     450 checks xs
 
-/-- Writes the eight plates and their SHA-256 manifest to `dest`. The generator runs this before
+/-- Writes the seven plates and their SHA-256 manifest to `dest`. The generator runs this before
 Verso copies its site assets. -/
 def write (dest : System.FilePath) : IO Unit := do
   IO.FS.createDirAll dest
   let mut sums := ""
-  for (name, svg) in [("critical-chord", opening), ("disks", disks), ("moving", moving),
+  for (name, svg) in [("disks", disks), ("moving", moving),
       ("lens", lenses), ("levels", wallLevels), ("terminal", terminal), ("component", component),
       ("chord", chord)] do
     let file := name ++ ".svg"

@@ -1,6 +1,7 @@
-/* A figure and its caption share one paragraph of the prose column: the image, centred and never
-   wider than the column, then the numbered caption text. */
-img[src*="figures/"] {
+/* A hand-drawn plate and its caption share one paragraph of the prose column: the image, centred
+   and never wider than the column, then the numbered caption text. The figures drawn by PILean
+   carry their own styles and a dark theme of their own. */
+img[src*="plates/"] {
   display: block;
   width: min(100%, 34rem);
   max-width: 100%;
@@ -9,17 +10,18 @@ img[src*="figures/"] {
   border-radius: .5rem;
 }
 
-p:has(> img[src*="figures/"]) {
+p:has(> img[src*="plates/"]) {
   font-size: .92em;
   line-height: 1.45;
 }
 
-html[data-theme="dark"] img[src*="figures/"] {
+/* The hand-drawn plates have no dark rendition: dark mode inverts them. */
+html[data-theme="dark"] img[src*="plates/"] {
   filter: invert(.9) hue-rotate(180deg);
 }
 
 @media (prefers-color-scheme: dark) {
-  html:not([data-theme="light"]) img[src*="figures/"] {
+  html:not([data-theme="light"]) img[src*="plates/"] {
     filter: invert(.9) hue-rotate(180deg);
   }
 }
