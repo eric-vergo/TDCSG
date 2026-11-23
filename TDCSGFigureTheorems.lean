@@ -31,7 +31,7 @@ on no axiom beyond `propext`, `Classical.choice` and `Quot.sound`.
 
 The theorems are not statements of the proof, and they are not nodes of the dependency graph.
 
-# The front page
+# The figures of the front page
 
 %%%
 tag := "theorems-front"
@@ -129,7 +129,7 @@ The slider of the orbit of zero, {figref "orbit-radius"}[], has no theorem of it
 frames are computed by the exact orbit engine `TDCSGCompute`, and every point records the sides
 of the disks that the engine decided.
 
-# Chapter 1, Compound symmetry
+# The figures of chapter 1
 
 %%%
 tag := "theorems-compound"
@@ -282,7 +282,7 @@ figure_proves disjointDisks disjointDisks_spec
 end TDCSGFigures
 ```
 
-# Chapter 2, Two disks and the critical radius
+# The figures of chapter 2
 
 %%%
 tag := "theorems-disks"
@@ -419,7 +419,7 @@ figure_proves wordSteps wordSteps_spec
 end TDCSGFigures
 ```
 
-# Part I
+# The figure of Part I
 
 %%%
 tag := "theorems-part-one"
@@ -482,7 +482,7 @@ figure_proves radiusLineInfinite radiusLineInfinite_spec
 end TDCSGFigures
 ```
 
-# Chapter 3, The chord and its three words
+# The figures of chapter 3
 
 %%%
 tag := "theorems-chord"
@@ -742,7 +742,7 @@ figure_proves chordOrbit chordOrbit_spec
 end TDCSGFigures
 ```
 
-# Part II
+# The figure of Part II
 
 %%%
 tag := "theorems-part-two"
@@ -805,7 +805,7 @@ figure_proves radiusLineFinite radiusLineFinite_spec
 end TDCSGFigures
 ```
 
-# Chapter 4, Lift to integer labels
+# The figures of chapter 4
 
 %%%
 tag := "theorems-lift"
@@ -925,7 +925,7 @@ figure_proves changeOfFrame changeOfFrame_spec
 end TDCSGFigures.Lift
 ```
 
-# Chapter 5, The lens estimate
+# The figures of chapter 5
 
 %%%
 tag := "theorems-lens"
@@ -1074,7 +1074,7 @@ figure_proves lensRadius lensRadius_spec
 end TDCSGFigures.Lens
 ```
 
-# Chapter 6, Good levels
+# The figures of chapter 6
 
 %%%
 tag := "theorems-levels"
@@ -1232,13 +1232,13 @@ open PILean PILean.Plane PILean.Exact TDCSGFigures
 
 /-- What `levelPhases` plots, and why. Its one panel holds two series of markers, in this order:
 the levels of `-13, …, 9` that are not good, in grey, and the good ones, in green; each marker is
-at `(m, phaseAt m)`, the rational ball centre at
-precision `64` of the exact reduced phase `t - ⌊t + 1/2⌋`, `t = phase/L` in `ℚ(√5)`, decided
-for every level drawn. The good levels among them are exactly `-10`, `-2`, `3`, by the exact test
-`isGoodLevel` (`TDCSG.Five.IsGoodLevel`); `-10` is the only good level from `-13` to `-3` and `3`
-the only one from `3` to `9`, so they are the candidates for `lo` and `hi` in the range drawn, and
-`-2` lies in the gap between the search ranges `m ≤ -3` and `m ≥ 3`. Not stated: the bands,
-lines and texts (`notes`), the axes, the layout and the pixels. -/
+at `(m, phaseAt m)`, the rational ball centre at precision `64` of the exact reduced phase
+`t - ⌊t + 1/2⌋`, `t = phase/L` in `ℚ(√5)`, decided for every level drawn. The good levels among
+them are exactly `-10`, `-2`, `3`, by the exact test `isGoodLevel` (`TDCSG.Five.IsGoodLevel`);
+`-10` is the only good level from `-13` to `-3` and `3` the only one from `3` to `9`, so they are
+the candidates for `lo` and `hi` in the range drawn, and `-2` lies in the gap between the search
+ranges `m ≤ -3` and `m ≥ 3`. Not stated: the bands, lines and texts (`notes`), the axes, the
+layout and the pixels. -/
 theorem levelPhases_spec :
     levelPhases.panels.map (·.series) = #[#[
       .scatterOfSamples "not good" (notGood.map sample) (some notGoodGrey) (radius := some 3),
@@ -1261,7 +1261,7 @@ figure_proves levelPhases levelPhases_spec
 end TDCSGFigures.Levels
 ```
 
-# Chapter 7, Confinement
+# The figures of chapter 7
 
 %%%
 tag := "theorems-confinement"
@@ -1387,7 +1387,7 @@ figure_proves walkToLeaf walkToLeaf_spec
 end TDCSGFigures.Confinement
 ```
 
-# Chapter 9, Other orders
+# The figures of chapter 9
 
 %%%
 tag := "theorems-other-orders"
