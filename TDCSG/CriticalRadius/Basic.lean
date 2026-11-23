@@ -33,6 +33,9 @@ infinite-orbit constructions of `notes/proofs/critical-radius-n5.md` and its com
 * `TDCSG.one_le_of_mem_infiniteRadii`: the group is finite for every radius below `1`.
 * `TDCSG.criticalRadius_le`, `TDCSG.finite_GG_of_lt_criticalRadius`,
   `TDCSG.infinite_GG_of_criticalRadius_lt`: the critical radius separates finite from infinite.
+* `TDCSG.le_criticalRadius_of_forall_finite`, `TDCSG.criticalRadius_eq_of_forall_finite_iff`:
+  finiteness below a radius bounds the critical radius from below, and finiteness exactly below
+  `r₀` makes `r₀` the critical radius.
 * `TDCSG.infinite_GG_of_infinite_orbit`: an infinite orbit forces an infinite group.
 * `TDCSG.applyWord_mem_orbit`: words map orbits into themselves.
 * `TDCSG.applyWord_segment`: a word valid on a segment acts on it as its global rotation.
@@ -134,6 +137,22 @@ theorem infinite_GG_of_criticalRadius_lt {n : ℕ} (hne : (infiniteRadii n).None
 theorem one_le_criticalRadius {n : ℕ} (hne : (infiniteRadii n).Nonempty) :
     1 ≤ criticalRadius n :=
   le_csInf hne fun _ ↦ one_le_of_mem_infiniteRadii
+
+/-- If the group is finite for every radius `r ≤ r₀` and infinite for some radius, then
+`r₀ ≤ criticalRadius n`. -/
+theorem le_criticalRadius_of_forall_finite {n : ℕ} (hne : (infiniteRadii n).Nonempty) {r₀ : ℝ}
+    (h : ∀ r ≤ r₀, Finite (GG n n r r)) : r₀ ≤ criticalRadius n := by
+  refine le_csInf hne fun r hr ↦ ?_
+  by_contra hlt
+  exact not_finite_iff_infinite.2 hr (h r (not_le.1 hlt).le)
+
+/-- If the group is finite exactly at the radii below `r₀`, the critical radius is `r₀`. -/
+theorem criticalRadius_eq_of_forall_finite_iff {n : ℕ} {r₀ : ℝ}
+    (h : ∀ r, Finite (GG n n r r) ↔ r < r₀) : criticalRadius n = r₀ := by
+  have : infiniteRadii n = Set.Ici r₀ := by
+    ext r
+    rw [mem_infiniteRadii, ← not_finite_iff_infinite, h, not_lt, Set.mem_Ici]
+  rw [criticalRadius, this, csInf_Ici]
 
 /-- An infinite orbit forces an infinite group. -/
 theorem infinite_GG_of_infinite_orbit {n₁ n₂ : ℕ} {r₁ r₂ : ℝ} {p : ℂ}

@@ -4,29 +4,21 @@ Authors: Eric Vergo, Claude, OpenAI GPT-6.2 Astra
 -/
 module
 
-public import TDCSG.CriticalRadius.Certificate
 public import TDCSG.CriticalRadius.Eight
-public import TDCSG.CriticalRadius.FiveStatements
 public import TDCSG.CriticalRadius.Ten
 public import TDCSG.CriticalRadius.Twelve
 
 /-!
 # Critical radii: statements
 
-This file collects, in compact form, what is known about the critical radius
-`TDCSG.criticalRadius n` of the equal-radius family `GG n n r r` for `n = 5, 8, 10, 12`. The
-written sources are `notes/proofs/critical-radius-n5.md`, `critical-radius-n8.md`,
-`critical-radius-n10.md` and `critical-radius-n12.md`.
+This file collects, in compact form, what is proved about the critical radius
+`TDCSG.criticalRadius n` of the equal-radius family `GG n n r r` for `n = 8, 10, 12`. The
+written sources are `notes/proofs/critical-radius-n8.md`, `critical-radius-n10.md` and
+`critical-radius-n12.md`. The exact value for `n = 5` is
+`TDCSG.CriticalRadius.criticalRadius_five`.
 
-The declarations below include propositions used by later modules. The module
-`TDCSG.CriticalRadius.FiveSharp` proves the fivefold closed form from these definitions.
-The initial certificate ranges for orders eight and twelve rely on external computations.
+## Main statements
 
-## Proved
-
-* `criticalRadius_five_le`, `infinite_GG_five`, `infinite_orbit_zero_five`: `GG₅(r)` is
-  infinite for every `r ≥ √(3 + φ)`, through an infinite orbit of `0`; hence
-  `1 ≤ criticalRadius 5 ≤ √(3 + φ)`.
 * `criticalRadius_ten_le`, `infinite_GG_ten`, `infinite_orbit_zero_ten`: `GG₁₀(r)` is
   infinite for every `r ≥ √(4 - φ)`, through an infinite orbit of `0`; hence
   `1 ≤ criticalRadius 10 ≤ √(4 - φ)`.
@@ -41,21 +33,10 @@ The initial certificate ranges for orders eight and twelve rely on external comp
 * `pStar_eight_mem_sphere`, `mem_orbit_pStar_eight`; `pStar_twelve_mem_sphere`,
   `mem_orbit_pStar_twelve`: the critical points for `n = 8, 12` lie on the boundary circle at
   the conjectured critical radius, and the seed words reach the first point of their orbits.
-* `finiteBelowFive_of_certificate`, `le_criticalRadius_five_of_finiteBelow` and their analogues
-  for `n = 8, 12`: conditional theorems. The propositions `CutSetCertificate n` and
-  `ExistsCertificate n r` imply `FiniteBelow…`, which implies the corresponding lower bound on
-  the critical radius.
-* `criticalRadiusEqFive_of_finiteBelowClosedFormFive`: finiteness below `√(3 + φ)` gives the
-  exact value `criticalRadius 5 = √(3 + φ)`. The hypothesis and the equality are theorems
-  `finiteBelowClosedFormFive` and `criticalRadius_five_eq` in `FiveSharp`.
 * `infinite_GG_of_le`, `finite_GG_of_lt`, `infinite_GG_of_lt`, `finite_GG_of_lt_one`: the
   basic properties of the critical radius, for every `n`.
 
-## Not proved (propositions)
-
-* `CutSetCertificate n`, `ExistsCertificate n r` (in `TDCSG.CriticalRadius.Certificate`).
-* `FiniteBelowEight`, `FiniteBelowTwelve`.
-* `CriticalRadiusEqEight`, `CriticalRadiusEqTen`, `CriticalRadiusEqTwelve`: the open exact values.
+Whether the critical radii for `n = 8, 10, 12` equal these upper bounds is open.
 -/
 
 @[expose] public section
@@ -193,74 +174,6 @@ theorem criticalRadius_twelve_le : criticalRadius 12 ≤ √(40 - 22 * √3) :=
 
 theorem one_le_criticalRadius_twelve : 1 ≤ criticalRadius 12 :=
   TDCSG.one_le_criticalRadius ⟨_, infinite_GG_twelve le_rfl⟩
-
-/-! ### Finiteness on an initial range -/
-
-/-- The initial fivefold certificate range, also covered by the theorem
-`finiteBelowClosedFormFive` in `FiveSharp`. -/
-def FiniteBelowFive : Prop :=
-  ∀ r : ℝ, r ≤ √(3 + φ - 1 / 10) → Finite (GG 5 5 r r)
-
-/-- **Not proved.** `critical-radius-n8.md`, Theorem B: `GG₈(r)` is finite for every
-`r ≤ √(10 - 5√2 - 1/7)`. -/
-def FiniteBelowEight : Prop :=
-  ∀ r : ℝ, r ≤ √(10 - 5 * √2 - 1 / 7) → Finite (GG 8 8 r r)
-
-/-- **Not proved.** `critical-radius-n12.md`, Theorem B: `GG₁₂(r)` is finite for every
-`r ≤ √(40 - 22√3 - 1/20)`. -/
-def FiniteBelowTwelve : Prop :=
-  ∀ r : ℝ, r ≤ √(40 - 22 * √3 - 1 / 20) → Finite (GG 12 12 r r)
-
-theorem one_lt_sqrt_of_one_lt {x : ℝ} (hx : 1 < x) : 1 < √x := by
-  rw [Real.lt_sqrt (by norm_num)]
-  simpa using hx
-
-/-- The certificate theorem and a certificate at `√(3 + φ - 1/10)` give Theorem B for
-`n = 5`. -/
-theorem finiteBelowFive_of_certificate (hthm : CutSetCertificate 5)
-    (hcert : ExistsCertificate 5 √(3 + φ - 1 / 10)) : FiniteBelowFive :=
-  fun _ hr ↦ finite_GG_of_certificate hthm
-    (one_lt_sqrt_of_one_lt (by linarith [Real.one_lt_goldenRatio])) hcert hr
-
-/-- The certificate theorem and a certificate at `√(10 - 5√2 - 1/7)` give Theorem B for
-`n = 8`. -/
-theorem finiteBelowEight_of_certificate (hthm : CutSetCertificate 8)
-    (hcert : ExistsCertificate 8 √(10 - 5 * √2 - 1 / 7)) : FiniteBelowEight := by
-  have hs : √2 < 1.5 := by rw [Real.sqrt_lt' (by norm_num)]; norm_num
-  exact fun _ hr ↦ finite_GG_of_certificate hthm (one_lt_sqrt_of_one_lt (by linarith)) hcert hr
-
-/-- The certificate theorem and a certificate at `√(40 - 22√3 - 1/20)` give Theorem B for
-`n = 12`. -/
-theorem finiteBelowTwelve_of_certificate (hthm : CutSetCertificate 12)
-    (hcert : ExistsCertificate 12 √(40 - 22 * √3 - 1 / 20)) : FiniteBelowTwelve := by
-  have hs : √3 < 1.7321 := by rw [Real.sqrt_lt' (by norm_num)]; norm_num
-  exact fun _ hr ↦ finite_GG_of_certificate hthm (one_lt_sqrt_of_one_lt (by linarith)) hcert hr
-
-/-- Theorem B for `n = 5` gives the lower bound `√(3 + φ - 1/10) ≤ criticalRadius 5`. -/
-theorem le_criticalRadius_five_of_finiteBelow (h : FiniteBelowFive) :
-    √(3 + φ - 1 / 10) ≤ criticalRadius 5 :=
-  le_criticalRadius_of_forall_finite ⟨_, Five.infinite_GG le_rfl⟩ h
-
-/-- Theorem B for `n = 8` gives the lower bound `√(10 - 5√2 - 1/7) ≤ criticalRadius 8`. -/
-theorem le_criticalRadius_eight_of_finiteBelow (h : FiniteBelowEight) :
-    √(10 - 5 * √2 - 1 / 7) ≤ criticalRadius 8 :=
-  le_criticalRadius_of_forall_finite ⟨_, infinite_GG_eight le_rfl⟩ h
-
-/-- Theorem B for `n = 12` gives the lower bound `√(40 - 22√3 - 1/20) ≤ criticalRadius 12`. -/
-theorem le_criticalRadius_twelve_of_finiteBelow (h : FiniteBelowTwelve) :
-    √(40 - 22 * √3 - 1 / 20) ≤ criticalRadius 12 :=
-  le_criticalRadius_of_forall_finite ⟨_, infinite_GG_twelve le_rfl⟩ h
-
-/-! ### Open exact values of the critical radii -/
-
-/-- **Open.** The critical radius of `GG₈` is `√(10 - 5√2)`. -/
-def CriticalRadiusEqEight : Prop := criticalRadius 8 = √(10 - 5 * √2)
-
-/-- **Open.** The critical radius of `GG₁₀` is `√(4 - φ)`. -/
-def CriticalRadiusEqTen : Prop := criticalRadius 10 = √(4 - φ)
-
-/-- **Open.** The critical radius of `GG₁₂` is `√(40 - 22√3)`. -/
-def CriticalRadiusEqTwelve : Prop := criticalRadius 12 = √(40 - 22 * √3)
 
 end TDCSG.CriticalRadius
 
