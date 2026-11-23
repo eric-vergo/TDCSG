@@ -12,7 +12,7 @@ Together they give $r_{\rm crit}(5)=r_c$, the value conjectured in the paper fro
 - **Proved: (A).** $GG_5(r)$ is infinite for every $r\ge r_c$, so $r_{\rm crit}(5)\le r_c$.
   - At $r=r_c$ this is the paper's Theorem 2. Here every point, word and disk test of its proof is checked in exact arithmetic in $\mathbb Z[\zeta_5]$ (§3).
   - The extension to $r>r_c$ is direct: the disks only grow, so every disk test still passes and the same words act in the same way.
-  - **Proved in Lean** as `TDCSG.CriticalRadius.infinite_GG_five` and `infinite_orbit_zero_five` (`TDCSG/CriticalRadius/Five.lean`, stated in `TDCSG/CriticalRadius/Statements.lean`), which give `1 ≤ criticalRadius 5 ≤ √(3 + φ)`. The written proof below is kept.
+  - **Proved in Lean** as `TDCSG.CriticalRadius.infinite_GG_five` and `infinite_orbit_zero_five` (stated in `TDCSG/CriticalRadius/Five.lean`, proved in `TDCSG/CriticalRadius/Five/Chord.lean`), which give the upper bound in `TDCSG.CriticalRadius.criticalRadius_five`. The written proof below is kept.
 - **Proved modulo an exact computation, which was reproduced independently: finiteness on an initial range.** $GG_5(r)$ is a finite group for every $r\le r_\ast$, where $r_\ast^2=3+\varphi-1/10$, $r_\ast\approx2.12557$ and $r_c-r_\ast\approx0.0234$. Hence $r_\ast\le r_{\rm crit}(5)$.
   - This is the full group statement, which is stronger than "every orbit is finite".
   - It follows from a cut-set certificate (Theorem 4.2), verified by computer at $r_\ast$ (§5), together with the already-proved group monotonicity.
@@ -440,10 +440,10 @@ The referee's own orderings rest on a stated double-precision error bound rather
 
 ## 9. Lean formalization: what is done and what is not
 
-**Formalized** (`TDCSG/CriticalRadius/`; statements in `Statements.lean`):
-1. $\mathbb Z[\zeta_5]$ as integer vectors with the reduced multiplication, conjugation and the map to $\mathbb C$, with soundness lemmas linking the computable checks to $\mathbb C$ (`Five.lean`).
+**Formalized** (`TDCSG/CriticalRadius/`; the fivefold statements in `Five.lean`):
+1. $\mathbb Z[\zeta_5]$ as integer vectors with the reduced multiplication, conjugation and the map to $\mathbb C$, with soundness lemmas linking the computable checks to $\mathbb C$ (`Five/Cyclotomic.lean`).
 2. The generators as `Equiv.Perm ℂ` (`TDCSG.permA`, `TDCSG.permB`), words acting on segments, and the convexity lemma (`CriticalRadius/Basic.lean`).
-3. **Part A in full**: `TDCSG.CriticalRadius.infinite_orbit_zero_five` and `infinite_GG_five`, hence `criticalRadius_five_le` and `one_le_criticalRadius_five`. The word checks are plain `decide` on integer data, linked to the real generators by proved lemmas.
+3. **Part A in full**: `TDCSG.CriticalRadius.infinite_orbit_zero_five` and `infinite_GG_five` (proved in `Five/Chord.lean`), which give the upper bound in `criticalRadius_five`. The word checks are plain `decide` on integer data, linked to the real generators by proved lemmas.
 4. **Part B in full, by a different route**: finiteness of $GG_5(r)$ for every $r<r_c$ and `criticalRadius 5 = √(3 + φ)` (headline theorem `TDCSG.CriticalRadius.criticalRadius_five`), following the integer-coordinate argument of [`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md) (its §5 says what Lean covers). It does not use the certificates of this note.
 
 **Not formalized:**

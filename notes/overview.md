@@ -67,10 +67,10 @@ The four known closed forms are written throughout these notes as elements a + b
 
 The product forms show the scale units √2 − 1 = tan(π/8) and 2 − √3 = tan(π/12) as factors. The
 paper derived the closed forms for n = 8 and 12 from the assumption that a certain limit point lies
-on a disk boundary. For all four n, GG_n(r) is now proved infinite at and above the closed form, in
+on a disk boundary. For all four n, GG_n(r) is proved infinite at and above the closed form, in
 writing and in Lean. For n = 5, coordinate barriers bound all subcritical orbits uniformly, proving
 r_crit(5) = √(3+φ). For n = 8, 10, 12 the matching lower bounds remain open (§7).
-[Fivefold proof](proofs/sharp-lower-bound-n5-pentagrid.md) · [Lean theorem](../TDCSG/CriticalRadius/FiveSharp.lean)
+[Fivefold proof](proofs/sharp-lower-bound-n5-pentagrid.md) · [Lean theorem](../TDCSG/CriticalRadius/Five.lean)
 
 ## 1. Summary
 

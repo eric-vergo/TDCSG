@@ -2,7 +2,7 @@
 
 Authors: Eric Vergo, Claude and OpenAI GPT-6.2 Astra
 
-**Problem and status.** The exact fivefold threshold is $r_{\rm crit}(5)=\sqrt{3+\varphi}$. Lean proves finiteness at every smaller radius and an infinite orbit of zero at the threshold. The written proof also bounds conjugate translations by $O(1/(r_c^2-r^2))$. For $n=8,10,12$, infinitude at and above the proposed radii is machine-checked. Finiteness is proved modulo certified computations up to the radii in §3.2. The remaining problem is to close those three gaps. [Fivefold proof](proofs/sharp-lower-bound-n5-pentagrid.md) · [Independent review](proofs/referee-report-sharp-lower-bound-n5-pentagrid.md) · [Lean theorem](../TDCSG/CriticalRadius/FiveSharp.lean).
+**Problem and status.** The exact fivefold threshold is $r_{\rm crit}(5)=\sqrt{3+\varphi}$. Lean proves finiteness at every smaller radius and an infinite orbit of zero at the threshold. The written proof also bounds conjugate translations by $O(1/(r_c^2-r^2))$. For $n=8,10,12$, infinitude at and above the proposed radii is machine-checked. Finiteness is proved modulo certified computations up to the radii in §3.2. The remaining problem is to close those three gaps. [Fivefold proof](proofs/sharp-lower-bound-n5-pentagrid.md) · [Independent review](proofs/referee-report-sharp-lower-bound-n5-pentagrid.md) · [Lean theorem](../TDCSG/CriticalRadius/Five.lean).
 
 Status labels used throughout: **machine-checked** (Lean 4 / Mathlib, no `sorry`, standard axioms only); **refereed proof** (a written proof with an independent referee report); **proved modulo a certified computation**; **computed, not certified**; **conjecture**. Claims attributed to a referee's own computation or analysis, not yet independently checked, are marked as such.
 

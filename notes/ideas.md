@@ -164,7 +164,27 @@ Depends on: [`certificates.md`](certificates.md) §7, [`relative-certificates.md
 4. **The quantitative fivefold bounds.** The Lean proof of the fivefold threshold obtains its cut
    spacing by density and compactness. Formalize the explicit spacing $N \le 16\sqrt5/\delta$ from
    the Fibonacci return time and the conjugate bound $|\sigma(b)| \le 10N + 32$ (pentagrid note,
-   Lemma 4 and §4).
+   Lemma 4 and §4). The natural Lean form is a Fibonacci version of the good-level recurrence
+   `TDCSG.Five.exists_isGoodLevel`, with the explicit gap in place of the compactness bound; it
+   gives the $O(1/\delta)$ bound on the conjugate translations.
+5. **A ring structure on the model of $\mathbb Z[\zeta_5]$.** Give `TDCSG.Five.Cyc` a `CommRing`
+   instance and make `embed` a ring homomorphism to $\mathbb C$, so that the `embed_*` lemmas become
+   instances of `map_add`, `map_mul` and their companions. The same applies to the model
+   `TDCSG.CycQ` used for $n = 8, 12$.
+6. **Irrational rotations by piecewise translations.** A general lemma: if finitely many words act
+   on closed sub-intervals of a segment as translations that together realize an irrational circle
+   rotation, then the orbit of a point of the segment is infinite. The three-translation arguments
+   for $n = 5$ (`TDCSG.Five.infinite_orbit_zero`) and $n = 10$ (`TDCSG.Ten.infinite_orbit_zero`)
+   would then share one proof.
+7. **A scoped notation for $\zeta$.** `Five/Cyclotomic.lean`, `Five/Labels.lean`,
+   `Five/Chord.lean` and `Ten.lean` each declare a local notation for $\zeta = \exp(2\pi i/5)$;
+   one scoped notation in `TDCSG.Five` would replace them.
+8. **Mathlib candidates.** The two `TDCSG/ForMathlib` files: bounded return times of a dense cyclic
+   subgroup of a compact group (`DenseRange.exists_natAbs_le_zsmul_add_mem`, with its irrational
+   rotation form `Irrational.exists_abs_le_lt_norm_zsmul_add`), and walks that cross a cut only
+   through leaves (`SimpleGraph.Reachable.mem_or_exists_adj_of_leaf`). Upstream, the first could
+   instead be phrased through an `AddAction.IsMinimal` instance for a dense cyclic subgroup, which
+   would reduce it to `IsCompact.exists_finite_cover_vadd`.
 
 ## Other open questions
 
