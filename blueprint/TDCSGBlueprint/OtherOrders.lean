@@ -21,8 +21,8 @@ open. None of it is used in the proof of the main theorem.
 The chord construction suggests searching for new infinite orbits when the disks rotate through
 an eighth, tenth or twelfth turn. All three orders have proved upper bounds. Finiteness on the
 whole range below each bound is open. Certificates prove finiteness on initial ranges through a
-refereed written theorem and a computer check, neither of them in Lean, as described at the end
-of this chapter.
+written theorem, with an independent referee report in the repository, and a computer check,
+neither of them in Lean, as described at the end of this chapter.
 
 :::theorem "other_upper" (lean := "TDCSG.CriticalRadius.criticalRadius_eight_le, TDCSG.CriticalRadius.criticalRadius_ten_le, TDCSG.CriticalRadius.criticalRadius_twelve_le, TDCSG.CriticalRadius.infinite_orbit_zero_ten, TDCSG.CriticalRadius.infinite_orbit_pStar_eight, TDCSG.CriticalRadius.infinite_orbit_pStar_twelve, TDCSG.CriticalRadius.pStar_eight_mem_sphere, TDCSG.CriticalRadius.pStar_twelve_mem_sphere") (uses := "critical_radius_def, infinite_of_orbit, generated_by_two")
 The critical radii for orders 8, 10 and 12 are at most
@@ -67,11 +67,16 @@ smaller-radius group is finite.
 :::
 
 :::proof "radius_monotonicity"
-A word that reached a point can change its action after a disk is enlarged. To retain the old
-path, note that on the smaller disk its rotation agrees with the rotation of the larger disk,
-and off it the smaller rotation fixes the point. Omitting the letters that fixed the current
-point leaves active steps that still act in the enlarged disks. For the group statement, the
-orbit sizes of the finite larger group are at most its order.
+Let the radii $`r_1\le r_1'` and $`r_2\le r_2'` be given, and let $`O` be the orbit of a point
+$`p` under the group at the larger radii. Each generator at the smaller radii is the rotation of
+a smaller disk extended by the identity. On the smaller disk it agrees with the generator of the
+larger group for the same center, because both act there as the same rotation, and off the
+smaller disk it is the identity. So it maps $`O` into $`O`, and so does its inverse. By the
+monotonicity lemma of Chapter 1 the whole group at the smaller radii maps $`O` into itself, and
+the orbit of $`p` at the smaller radii, which contains $`p`, lies in $`O`. For the group
+statement, the orbits of the finite larger group have at most as many points as the group has
+elements. So the orbits of the finitely generated smaller group are uniformly bounded, and it is
+finite.
 :::
 
 # Computing a single orbit
@@ -93,18 +98,19 @@ in a controlled way: no carrying circle is tangent to a boundary circle, and eve
 on a boundary circle is also the endpoint of an arc that enters that disk. The certificate theorem, Theorem 4.2 of the
 [written proof](https://github.com/eric-vergo/TDCSG/blob/main/notes/proofs/critical-radius-n5.md),
 says that such a certificate at radius $`r` makes the group finite at $`r`, and by monotonicity
-at every smaller radius. Its proof is refereed, holds for every order, and has no Lean
-counterpart: the library contains neither the theorem nor a definition of a certificate.
+at every smaller radius. The theorem holds for every order, and its written proof has an
+independent referee report in the repository. It has no Lean counterpart: the library contains
+neither the theorem nor a definition of a certificate.
 
 The search and verification programs are separate. The checker reads a finished certificate
 and tests its closure conditions using exact arithmetic without floating point. The
 [certificate records](https://github.com/eric-vergo/TDCSG/blob/main/notes/certificates.md)
 give input radii, commands and file checksums. The certified finiteness ranges for orders 8,
-10 and 12, and the certified initial ranges at order five, are therefore proved modulo that
-computation, not in Lean.
+10 and 12 are therefore proved modulo that computation, not in Lean. At order five no certificate
+is needed: finiteness on the whole range $`r<R` is proved in Lean, in Part II.
 
 The [relative certificates](https://github.com/eric-vergo/TDCSG/blob/main/notes/relative-certificates.md)
 use smaller windows or symmetry to bring additional cases within reach. Window-avoiding
 chain bounds control a restricted class of paths. The order-five classification on this site
-instead uses integer-coordinate confinement and the endpoint word construction, and every step
+instead uses integer-coordinate confinement and the chord construction of Part I, and every step
 of it is checked in Lean.
