@@ -10,6 +10,8 @@ markup, Lean links that land on an element of an existing page, and it runs PILe
 (every inline picture is the body of a file the manifest lists, with the theme rules the
 manifest records) and a fresh render compared with the folder (`--check-figures`, through the
 site's generator). Plates and PILean figures share one numbering, 1 to N in document order.
+With `--release` it also checks the hosted verification record, the source links at the verified
+commit, and that the site's kernel replay accepted every node and calls each judged theorem proved.
 """
 import hashlib
 import json
@@ -330,6 +332,15 @@ if "--release" in sys.argv[2:]:
     assert record["theorems"] == json.loads(Path("comparator.json").read_text())["theorem_names"]
     assert record["kernels"] == ["Lean kernel"]
     check_source_links(record["commit"], record["theorems"])
+    # The site's kernel replay: both checkers of the toolchain (`con-leche`, `con-ron`) accepted
+    # an export that covers every node, and the headline calls each judged theorem proved.
+    stats = (site / "Project-Stats" / "index.html").read_text()
+    state = re.findall(r'class="bp_project_stats[^"]*"[^>]*data-bp-replay-state="(\w+)"', stats)
+    assert state == ["accepted"], \
+        f"the kernel replay with con-leche and con-ron did not accept the whole site: {state}"
+    verdicts = re.findall(r'class="bp_stats_replay_note[^"]*" data-bp-replay="(\w+)"', stats)
+    assert verdicts == ["proved"] * len(record["theorems"]), \
+        f"the headline does not call every judged theorem proved: {verdicts}"
     # The PILean files and the source lines under the figures name the verified commit.
     for entry in pilean_manifest["files"]:
         assert entry.get("repo") == repo_url and entry.get("commit") == record["commit"], entry

@@ -82,6 +82,10 @@ jobs:
           lake exe tdcsg-figure-preview --out "$RUNNER_TEMP/figure-previews"
 
       - name: Build and check the illustrated blueprint
+        env:
+          # The kernel replay runs the toolchain's con-leche and con-ron one after the other; each
+          # peaks near 3 GiB on this project, and the default cap is a quarter of the memory.
+          VERSO_BLUEPRINT_KERNEL_REPLAY_MEMORY_MB: "8192"
         run: |
           lake exe vbp build
           lake exe vbp check | tee "$RUNNER_TEMP/blueprint-check.log"
@@ -94,8 +98,9 @@ jobs:
              --arg toolchain "$(cat lean-toolchain)" \
              '{status:"passed", $commit, $run_url, $toolchain, theorems:.theorem_names, kernels:["Lean kernel"]}' \
              comparator.json > _out/site/html-multi/verification.json
-          # Also runs PILean's checks of the figures: pilean-verify, the inline-picture check and
-          # a fresh render compared with the site's figures folder.
+          # Also requires the kernel replay to have accepted the whole site, and runs PILean's
+          # checks of the figures: pilean-verify, the inline-picture check and a fresh render
+          # compared with the site's figures folder.
           python3 scripts/check-pages.py _out/site/html-multi --release
 
       - name: Upload the verified site
