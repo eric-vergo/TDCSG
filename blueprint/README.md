@@ -15,9 +15,32 @@ site, sidebar, searchable Lean panels, dependency graph and Project Stats page.
 The Pages deployment serves the same directory under the repository prefix.
 
 The entry point is `BlueprintMain.lean`. The chapter sequence lives in
-`blueprint/TDCSGBlueprint.lean`. Each geometric chapter begins with an SVG
-generated from `blueprint/TDCSGBlueprint/Figures.lean` by the PILean revision
-in the Blueprint dependency manifest. The file `figures/SHA256SUMS` in the site
+`blueprint/TDCSGBlueprint.lean`, one module per chapter in
+`blueprint/TDCSGBlueprint/`:
+
+| Chapter | Module |
+|---|---|
+| 1 Compound symmetry | `CompoundSymmetry` |
+| 2 Two disks and the critical radius (statement of the main theorem) | `TwoDisks` |
+| Part I, Infinite at the threshold | `PartOne` |
+| 3 The chord and its three words | `Chord` |
+| Part II, Finite below the threshold | `PartTwo` |
+| 4 Lift to integer labels | `Lift` |
+| 5 The lens estimate | `Lens` |
+| 6 Good levels | `Levels` |
+| 7 Confinement | `Confinement` |
+| 8 Proof of the main theorem | `MainTheorem` |
+| 9 Other orders | `OtherOrders` |
+| 10 Verification | `Verification` |
+
+The two parts are unnumbered pages between the chapters, so the chapters keep
+one numbering throughout. The main theorem is stated in `TwoDisks`; its
+`:::proof` block is in `MainTheorem`, which imports `TwoDisks`, and Blueprint
+merges the two into one node.
+
+The front page and the geometric chapters show SVG figures generated from
+`blueprint/TDCSGBlueprint/Figures.lean` by the PILean revision in the Blueprint
+dependency manifest. The file `figures/SHA256SUMS` in the site
 records the bytes of the generated figures. The geometry runs in Lean using
 floating-point drawing coordinates. The proof uses exact real, complex and
 integer arithmetic in the linked declarations.

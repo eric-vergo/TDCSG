@@ -8,11 +8,15 @@ import TDCSG.Finiteness
 
 open Verso.Genre Verso.Genre.Manual Informal
 
-#doc (Manual) "Other orders and the exact orbit engine" =>
+#doc (Manual) "Other orders" =>
 
 %%%
 tag := "other-orders"
 %%%
+
+The main theorem is proved in Chapter 8. This chapter places it among the other rotation orders:
+what the Lean library proves for orders 8, 10 and 12, what holds for every order, and what is
+open. None of it is used in the proof of the main theorem.
 
 The chord construction suggests searching for new infinite orbits when the disks rotate through
 an eighth, tenth or twelfth turn. All three orders have proved upper bounds. Finiteness on the
@@ -20,7 +24,7 @@ whole range below each bound is open. Certificates prove finiteness on initial r
 refereed written theorem and a computer check, neither of them in Lean, as described at the end
 of this chapter.
 
-:::theorem "other_upper" (lean := "TDCSG.CriticalRadius.criticalRadius_eight_le, TDCSG.CriticalRadius.criticalRadius_ten_le, TDCSG.CriticalRadius.criticalRadius_twelve_le, TDCSG.CriticalRadius.infinite_orbit_zero_ten, TDCSG.CriticalRadius.infinite_orbit_pStar_eight, TDCSG.CriticalRadius.infinite_orbit_pStar_twelve, TDCSG.CriticalRadius.pStar_eight_mem_sphere, TDCSG.CriticalRadius.pStar_twelve_mem_sphere") (uses := "critical_radius_def, infinite_of_orbit")
+:::theorem "other_upper" (lean := "TDCSG.CriticalRadius.criticalRadius_eight_le, TDCSG.CriticalRadius.criticalRadius_ten_le, TDCSG.CriticalRadius.criticalRadius_twelve_le, TDCSG.CriticalRadius.infinite_orbit_zero_ten, TDCSG.CriticalRadius.infinite_orbit_pStar_eight, TDCSG.CriticalRadius.infinite_orbit_pStar_twelve, TDCSG.CriticalRadius.pStar_eight_mem_sphere, TDCSG.CriticalRadius.pStar_twelve_mem_sphere") (uses := "critical_radius_def, infinite_of_orbit, generated_by_two")
 The critical radii for orders 8, 10 and 12 are at most
 $`\sqrt{10-5\sqrt2}`, $`\sqrt{4-\varphi}`, and $`\sqrt{40-22\sqrt3}` respectively.
 At order ten the witness is the orbit of zero. At orders eight and twelve the witness is a
@@ -37,7 +41,13 @@ infinite orbit forces an infinite group, and the critical radius is at most ever
 an infinite group.
 :::
 
-:::theorem "crystallographic" (lean := "TDCSG.finite_GG") (uses := "group_orbit, uniform_orbits")
+*What is open.* Whether these three bounds are equalities is open. Equality would need the
+group to be finite at every radius below the bound, the counterpart of Part II for these orders;
+the certificates described below prove finiteness only on initial ranges. Whether, for a general
+order, the group is infinite at the critical radius itself is also open; for order five the main
+theorem settles it.
+
+:::theorem "crystallographic" (lean := "TDCSG.finite_GG") (uses := "group_orbit, two_disk_finite")
 For two possibly unequal orders, the group is finite at every pair of radii if the least
 common multiple of the orders is one of 1, 2, 3, 4 or 6.
 :::
@@ -50,7 +60,7 @@ and a discrete lattice has finitely many bounded points. The orbits are therefor
 bounded, and the group is finite.
 :::
 
-:::theorem "radius_monotonicity" (lean := "TDCSG.orbit_mono, TDCSG.finite_GG_of_le") (uses := "group_orbit, uniform_orbits")
+:::theorem "radius_monotonicity" (lean := "TDCSG.orbit_mono, TDCSG.finite_GG_of_le") (uses := "group_orbit, generated_by_two, compound_monotone")
 Enlarging either disk can only enlarge each point orbit. If the larger-radius group is finite,
 the uniform bound on its orbit sizes also bounds every orbit at the smaller radii, so the
 smaller-radius group is finite.

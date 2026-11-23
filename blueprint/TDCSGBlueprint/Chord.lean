@@ -8,11 +8,16 @@ import TDCSG.CriticalRadius.Five
 
 open Verso.Genre Verso.Genre.Manual Informal
 
-#doc (Manual) "An infinite orbit at the endpoint" =>
+#doc (Manual) "The chord and its three words" =>
 
 %%%
 tag := "chord"
 %%%
+
+This chapter makes up Part I. It proves that $`GG_5(r)` is infinite for every $`r\ge R`, where
+$`R=\sqrt{3+\varphi}`. This is the half of the main theorem that holds at and above the
+threshold, and it shows that the finiteness of Part II cannot extend to $`R` itself. Write
+$`\zeta=\exp(2\pi i/5)`.
 
 ![Four successive marked positions on copies of the chord from minus E to E. The points follow a rotation modulo two, starting at zero.](/figures/chord.svg)
 
@@ -47,30 +52,20 @@ endpoints are the claimed translates, and the composite of rotations is the tran
 them. The kernel decides every check.
 :::
 
-:::theorem "endpoint_infinite" (lean := "TDCSG.Five.exists_mem_orbit, TDCSG.Five.infinite_orbit_zero, TDCSG.Five.infinite_GG") (uses := "word_action, infinite_of_orbit")
+:::theorem "endpoint_infinite" (lean := "TDCSG.Five.exists_mem_orbit, TDCSG.Five.infinite_orbit_zero, TDCSG.Five.infinite_GG") (uses := "word_action, infinite_of_orbit, generated_by_two")
 Let $`r\ge R`. For each natural number $`k` the orbit of zero contains a point $`t_kE` with
 $`-1\le t_k<1` and $`t_k\equiv k(2\varphi-2)\pmod{2}`. The orbit of zero is infinite, and so is
 $`GG_5(r)`.
 :::
 
 :::proof "endpoint_infinite"
-Start from $`t_0=0`. Given $`t_k`, apply the first word if $`t_k\le1-\varphi`, the second if
+Every letter of a word is a generator or the inverse of one, hence an element of $`GG_5(r)`, so
+each word maps the orbit of zero into itself. Start from $`t_0=0`. Given $`t_k`, apply the first word if $`t_k\le1-\varphi`, the second if
 $`1-\varphi<t_k<3-2\varphi`, and the third if $`t_k\ge3-2\varphi`. The result stays in $`[-1,1)`
 and changes $`t_k` by $`2\varphi-2` modulo two. If $`t_k=t_l`, then $`(k-l)(2\varphi-2)` is an even integer, which
 forces $`k=l` because $`\varphi` is irrational. The points $`t_kE` are distinct since $`E\ne0`.
 An infinite orbit forces an infinite group.
 :::
 
-:::theorem "critical_radius_five" (lean := "TDCSG.CriticalRadius.criticalRadius_five, TDCSG.CriticalRadius.finite_GG_five_iff, TDCSG.CriticalRadius.sSup_setOf_finite_GG_five, TDCSG.CriticalRadius.infinite_GG_five, TDCSG.CriticalRadius.infinite_orbit_zero_five") (uses := "critical_radius_of_iff, subcritical, endpoint_infinite")
-The critical radius of the fivefold family is $`R=\sqrt{3+\varphi}`. More precisely, $`GG_5(r)` is
-finite exactly for $`r<R`. Consequently, the supremum of the radii with a finite group is $`R`,
-and for every $`r\ge R`, the critical radius included, the group is infinite and the orbit of
-zero is infinite.
-:::
-
-:::proof "critical_radius_five"
-The group is finite below $`R` by the integer-coordinate confinement and infinite at and above
-$`R` by the chord construction. This is the equivalence. The radii with an infinite group then
-form $`[R,\infty)`, whose infimum is $`R`. The radii with a finite group form the open
-half-line below $`R`, whose supremum is $`R`.
-:::
+This proves the infinite half of the main theorem. Chapter 8 combines it with the finite half of
+Part II.

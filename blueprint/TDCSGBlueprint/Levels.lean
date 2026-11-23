@@ -8,16 +8,23 @@ import TDCSG.CriticalRadius.Five
 
 open Verso.Genre Verso.Genre.Manual Informal
 
-#doc (Manual) "A crossing with nowhere to go" =>
+#doc (Manual) "Good levels" =>
 
 %%%
-tag := "walls"
+tag := "levels"
 %%%
+
+This chapter of Part II uses the lens estimate of Chapter 5 to build barriers for the walks of
+Chapter 4. A good level of a coordinate, defined below, is an integer value of that coordinate at
+which every edge of the center graph that raises the coordinate from that value by one has an
+endpoint with no other neighbor. Good levels recur within a bounded distance, uniformly in the
+window, and Chapter 7 uses one good level below and one above the starting labels, in every
+coordinate, to confine the walks.
 
 ![Four candidate unit edges from the rust leaf end outside the blue window. The horizontal edge leads to the only retained neighbor.](/figures/terminal.svg)
 
-A wall is a good level of an integer coordinate, not a line in the projected disk. Crossing the
-$`j`th wall changes $`n_j` by one. The figure isolates the local effect: one endpoint has only
+A good level acts as a wall in the integer coordinates, not as a line in the projected disk.
+Crossing a wall in the $`j`th coordinate changes $`n_j` by one. The figure isolates the local effect: one endpoint has only
 the crossing edge left. In this illustration $`x=0.87` and $`r=1.8`. Gray spokes mark rejected
 candidates. In this window the drawn edge is not at a good level; the lemma below shows that at
 a good level a crossing must end this way. The theorem chooses walls for arbitrary windows and

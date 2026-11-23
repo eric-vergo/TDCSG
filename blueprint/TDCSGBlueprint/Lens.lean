@@ -8,11 +8,15 @@ import TDCSG.CriticalRadius.Five
 
 open Verso.Genre Verso.Genre.Manual Informal
 
-#doc (Manual) "Where the lens stops" =>
+#doc (Manual) "The lens estimate" =>
 
 %%%
 tag := "lens"
 %%%
+
+This chapter of Part II is where the threshold $`\sqrt{3+\varphi}` enters the finite half. Its
+lemma is an estimate on the overlap of two disks, sharp exactly at the
+threshold; Chapter 6 turns its margin into barriers for the walks of Chapter 4.
 
 ![At the critical radius the rightmost intersection of two disks lies on the vertical cut. At radius 1.8 the rightmost intersection lies strictly to its left.](/figures/lens.svg)
 
@@ -40,4 +44,5 @@ $`0\le r<R`.
 
 At equality the two circles meet at $`v=1+t u` with real part $`\kappa`. Shrinking the circles opens
 a gap even after the vertical cut moves left by $`(3+\varphi-r^2)/16`. This gap supplies the
-room needed to choose integer-coordinate walls.
+room needed to choose the good levels of Chapter 6. At $`r=R` the margin is zero, which is why
+the argument stops at the threshold.
