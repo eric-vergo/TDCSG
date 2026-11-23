@@ -3,9 +3,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo, OpenAI GPT-6.2 Astra, Claude
 -/
 import VersoBlueprint
+import TDCSGBlueprint.RepoFile
 import Comparator.Solution
 
-open Verso.Genre Verso.Genre.Manual Informal
+open Verso.Genre Verso.Genre.Manual Informal TDCSGBlueprint
 
 #doc (Manual) "Verification" =>
 
@@ -60,20 +61,26 @@ both, the first as a mismatched statement and the second as a mismatched definit
 
 *Independent replay*
 
-Each successful hosted build provides a verification record identifying the commit, Actions run,
-toolchain, kernel checks and theorem names. The [site home](/index.html) and the
-[Actions history](https://github.com/eric-vergo/TDCSG/actions) are available independently.
-A local preview can be viewed without a hosted verdict. The Project Stats page describes what the blueprint
-inspected in its compiled declarations. The release workflow separately runs the comparator
-on Linux and publishes its verdict with the site.
+The published site is built and checked by GitHub Actions, which runs Comparator on Linux and
+publishes the site only if the check succeeds. Each published version carries a verification
+record, a file published beside the [site home](/index.html) that names the commit, the Actions run, the
+toolchain, the kernel checks and the theorem names; the line below this paragraph reports it, with
+links to the commit and to the run. Every run, with its full log, is listed in the repository's
+[Actions history](https://github.com/eric-vergo/TDCSG/actions). A copy of the site built on
+another computer has no verification record, and the line below says so. The Project Stats page
+lists what the blueprint found in the compiled declarations.
 
-Read the [standalone challenge](https://github.com/eric-vergo/TDCSG/blob/main/Comparator/Challenge.lean),
-[solution](https://github.com/eric-vergo/TDCSG/blob/main/Comparator/Solution.lean), and
-[allowed axioms](https://github.com/eric-vergo/TDCSG/blob/main/comparator.json). The challenge
+Read the {repoFile "Comparator/Challenge.lean"}[standalone challenge],
+{repoFile "Comparator/Solution.lean"}[solution], and
+{repoFile "comparator.json"}[allowed axioms] at the commit this site was built from. The challenge
 compares formal statements. Checking how those statements express the intended mathematical
 problem also requires reading their definitions.
 
 # Software and typeface credits
+
+%%%
+number := false
+%%%
 
 Verso and the cited Verso Blueprint modules credit Lean FRO LLC and their respective
 authors under the [Apache License 2.0](/Apache-2.0.txt). The

@@ -4,6 +4,7 @@ Authors: Eric Vergo, OpenAI GPT-6.2 Astra, Claude
 -/
 import VersoManual
 import VersoBlueprint
+import TDCSGBlueprint.RepoFile
 import VersoBlueprint.Commands.Graph
 import VersoBlueprint.Commands.Summary
 import TDCSGBlueprint.Figures
@@ -20,7 +21,7 @@ import TDCSGBlueprint.MainTheorem
 import TDCSGBlueprint.OtherOrders
 import TDCSGBlueprint.Verification
 
-open Verso.Genre Verso.Genre.Manual Informal
+open Verso.Genre Verso.Genre.Manual Informal TDCSGBlueprint
 
 #doc (Manual) "The critical radius of fivefold disk rotations" =>
 
@@ -90,7 +91,7 @@ published version of this site links its commit to the run that checked it.
 
 The groups were introduced, and the fivefold closed form proposed, in the
 [original paper](https://arxiv.org/abs/2302.12950). The
-[integer-coordinate proof](https://github.com/eric-vergo/TDCSG/blob/main/notes/proofs/sharp-lower-bound-n5-pentagrid.md)
+{repoFile "notes/proofs/sharp-lower-bound-n5-pentagrid.md"}[integer-coordinate proof]
 is the written proof of the finite half.
 
 {include 0 TDCSGBlueprint.CompoundSymmetry}
