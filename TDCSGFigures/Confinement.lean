@@ -11,8 +11,9 @@ import TDCSGFigures.Style
 
 * `componentOfZero`: the 18 labels reachable from `0` in the centre graph at `r = 1.95`,
   `x = 1/2`, each drawn at its projection `P(n)` (a dot for weight zero, a square for weight one),
-  with the edges of the graph, the window, and for each coordinate `j` the good levels nearest the
-  gap `|m| ≤ 2`, the candidates for the walls `lo` and `hi` of the confinement proof.
+  with the edges of the graph and the window. For each coordinate `j` the good levels nearest the
+  gap `|m| ≤ 2`, the candidates for the walls `lo` and `hi` of the confinement proof, are computed
+  (`nearestWalls`) and stated with the figure, for its caption.
 * `walkToLeaf`: a stepper along a path of the centre graph at `r = 2.13`, `x = 1/5`, found by a
   breadth-first search from `0`: it lowers the coordinate `n₂` from `0` to `-4`, crosses the good
   level `-5` into the label `n = (0, 3, -5, 4, -2)`, whose other candidates `n + eₖ` all lie
@@ -88,11 +89,10 @@ def wallText (j : Nat) : String :=
 
 /-- The 18 labels reachable from 0 in the centre graph at r = 1.95, x = 1/2, at their projections:
 dots for weight 0 (left centres), squares for weight 1 (right centres), with the edges, the
-window, and the good levels nearest the gap |m| ≤ 2 in each coordinate. -/
+window and its centre. -/
 @[figure]
 def componentOfZero : Plane.Figure where
   width := figureWidth
-  height := some 600
   narrowWidth := some narrowWidth
   padding := 16
   style := partTwoStyle
@@ -113,14 +113,7 @@ def componentOfZero : Plane.Figure where
       |>.role leftRole,
     Plane.Exact.label "squares: weight 1 (right centres)" ((1 / 2 : Rat), (-5 / 4 : Rat))
       |>.role rightRole,
-    Plane.Exact.label "good levels lo ≤ −3, hi ≥ 3 nearest 0:" ((1 / 2 : Rat), (-11 / 8 : Rat))
-      |>.role goodRole |>.declRef `TDCSG.Five.exists_abs_le_of_centerReach,
-    Plane.Exact.label s!"{wallText 0}   {wallText 1}   {wallText 2}"
-      ((1 / 2 : Rat), (-3 / 2 : Rat)) |>.role goodRole,
-    Plane.Exact.label s!"{wallText 3}   {wallText 4}" ((1 / 2 : Rat), (-13 / 8 : Rat))
-      |>.role goodRole,
-    Plane.Exact.label "every coordinate here is −1, 0 or 1" ((1 / 2 : Rat), (-7 / 4 : Rat)),
-    Plane.Exact.label "×: the window centre x = 1/2" ((1 / 2 : Rat), (-15 / 8 : Rat))
+    Plane.Exact.label "×: the window centre x = 1/2" ((1 / 2 : Rat), (-11 / 8 : Rat))
       |>.role windowRole]
   info := { title := "The component of 0 in the centre graph at r = 1.95, x = 1/2" }
 
@@ -153,7 +146,7 @@ def walkSide (n : Label) : Incidence :=
   if inWindow walkRadiusSq walkX n then .inside else .outside
 
 /-- The world box of the walk's frames. -/
-def walkView : Box := ⟨-1.0, -1.65, 2.3, 1.3⟩
+def walkView : Box := ⟨-1.0, -1.95, 2.3, 1.3⟩
 
 /-- The frame of `walkToLeaf` that draws the first `k` labels of the path, numbered in the order
 of the walk, with the candidates `n + eₖ` of the leaf when `candidates`, and the step back when
@@ -196,18 +189,21 @@ def walkFrame (k : Nat) (candidates back : Bool) (title : String) : Plane.Figure
           |>.named "the only step from n: back to n + e₂"
           |>.declRef `SimpleGraph.Reachable.mem_or_exists_adj_of_leaf] else #[]) ++ #[
       Plane.Exact.label "0" origin (.toward (Plane.deg 200)) |>.role leftRole,
-      Plane.Exact.label "x = 1/5" ((walkX, 0) : Rat × Rat) .auto |>.role windowRole,
       Plane.Exact.label "window" ((rat (1 / 5), rat (23 / 20)) : QSqrt5 × QSqrt5)
         |>.role windowRole,
-      Plane.Exact.label "dots: weight 0   squares: weight 1"
-        ((rat (2 / 5), rat (-3 / 2)) : QSqrt5 × QSqrt5)] ++
+      Plane.Exact.label "dots: weight 0 (left centres)"
+        ((rat (2 / 5), rat (-29 / 20)) : QSqrt5 × QSqrt5) |>.role leftRole,
+      Plane.Exact.label "squares: weight 1 (right centres)"
+        ((rat (2 / 5), rat (-8 / 5)) : QSqrt5 × QSqrt5) |>.role rightRole,
+      Plane.Exact.label "×: the window centre x = 1/5"
+        ((rat (2 / 5), rat (-7 / 4)) : QSqrt5 × QSqrt5) |>.role windowRole] ++
       (ps.toArray.mapIdx fun i n => if i == 0 || n == leafN || n == beforeLeaf then #[] else
         #[Plane.Exact.label s!"{i}" (proj n) .auto |>.size 11]).flatten ++
       (if k ≥ path.length - 1 then #[Plane.Exact.label "n + e₂" (proj beforeLeaf) .auto
         |>.role rightRole] else #[]) ++
       (if k ≥ path.length then #[Plane.Exact.label "n" (proj leafN) .auto |>.role leftRole,
         Plane.Exact.label "n₂ = −5 at n: a good level"
-          ((rat (2 / 5), rat (-13 / 8)) : QSqrt5 × QSqrt5) |>.role goodRole] else #[]) ++
+          ((rat (2 / 5), rat (-19 / 10)) : QSqrt5 × QSqrt5) |>.role goodRole] else #[]) ++
       (if candidates then (List.range 5).toArray.filterMap fun j =>
         if j == 2 then none else
           some (Plane.Exact.label s!"n + e{sub j}" (proj (shift leafN j 1)) .auto |>.faint)
@@ -262,12 +258,12 @@ def walkToLeaf : Explorer := Plane.stepper walkFrames
 set_option maxHeartbeats 4000000 in
 /-- What `componentOfZero` draws, and why its records are right. The items are the window, then
 an edge `edgeItem n m` for each edge of `compEdges`, a point `labelPoint n` for each label of
-`compLabels`, the window centre and the labels, in this order; the builders' definitions are
-stated. The component of `0` found by the exact search (`component`, every window test decided
+`compLabels`, the window centre and the labels with the legend, in this order; the builders'
+definitions are stated. The component of `0` found by the exact search (`component`, every window test decided
 in `ℚ(√5)`) is the list of 18 labels written out, and its edges are the 18 written out, each
 from a weight-zero label `n` to `n + eⱼ`; every label lies inside the window, so each point's
 record holds. Every coordinate of every label is `-1`, `0` or `1`, and in each coordinate `j` the
-good levels nearest the gap `|m| ≤ 2` are those the labels show (`wallText`), with every label
+good levels nearest the gap `|m| ≤ 2` are those the caption states (`wallText`), with every label
 strictly inside the slab `lo < nⱼ ≤ hi` they bound. Not stated: how the builders and modifiers
 draw, the layout, the lettering, the style's colour values and the pixels. -/
 theorem componentOfZero_spec :
@@ -297,15 +293,7 @@ theorem componentOfZero_spec :
         |>.role "left",
       Plane.Exact.label "squares: weight 1 (right centres)" ((1 / 2 : Rat), (-5 / 4 : Rat))
         |>.role "right",
-      Plane.Exact.label "good levels lo ≤ −3, hi ≥ 3 nearest 0:"
-        ((1 / 2 : Rat), (-11 / 8 : Rat)) |>.role "good"
-        |>.declRef `TDCSG.Five.exists_abs_le_of_centerReach,
-      Plane.Exact.label s!"{wallText 0}   {wallText 1}   {wallText 2}"
-        ((1 / 2 : Rat), (-3 / 2 : Rat)) |>.role "good",
-      Plane.Exact.label s!"{wallText 3}   {wallText 4}" ((1 / 2 : Rat), (-13 / 8 : Rat))
-        |>.role "good",
-      Plane.Exact.label "every coordinate here is −1, 0 or 1" ((1 / 2 : Rat), (-7 / 4 : Rat)),
-      Plane.Exact.label "×: the window centre x = 1/2" ((1 / 2 : Rat), (-15 / 8 : Rat))
+      Plane.Exact.label "×: the window centre x = 1/2" ((1 / 2 : Rat), (-11 / 8 : Rat))
         |>.role "window"] ∧
     compLabels = [#[0, 0, 0, 0, 0], #[1, 0, 0, 0, 0], #[0, 1, 0, 0, 0], #[0, 0, 0, 0, 1],
       #[0, 0, 0, -1, 1], #[0, 0, 1, -1, 1], #[0, -1, 1, -1, 1], #[1, -1, 1, -1, 1],

@@ -52,7 +52,7 @@ def extensionJumpItems : Array Item := #[
     |>.incident .inside "the disk B",
   Plane.Exact.label "c" origin .auto |>.role leftRole,
   Plane.Exact.label "p" nearInside .above |>.role leftRole,
-  Plane.Exact.label "q, fixed" nearOutside .auto,
+  Plane.Exact.label "q, fixed" nearOutside .belowRight,
   Plane.Exact.label "image of p" nearInsideImage .auto |>.role leftRole,
   Plane.Exact.label "72°" origin (.toward (-deg 36)) (some 42) |>.role leftRole,
   Plane.Exact.label "disk B" ((-6 : Rat), (-5 : Rat)) |>.role leftRole]
@@ -162,7 +162,7 @@ theorem extensionJump_spec :
         |>.incident .inside "the disk B",
       Plane.Exact.label "c" origin .auto |>.role leftRole,
       Plane.Exact.label "p" nearInside .above |>.role leftRole,
-      Plane.Exact.label "q, fixed" nearOutside .auto,
+      Plane.Exact.label "q, fixed" nearOutside .belowRight,
       Plane.Exact.label "image of p" nearInsideImage .auto |>.role leftRole,
       Plane.Exact.label "72°" origin (.toward (-deg 36)) (some 42) |>.role leftRole,
       Plane.Exact.label "disk B" ((-6 : Rat), (-5 : Rat)) |>.role leftRole] ∧

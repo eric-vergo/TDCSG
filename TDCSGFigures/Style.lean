@@ -21,9 +21,16 @@ values lightened for the dark page. The style keeps PILean's default light colou
 (`Style.light`) beside its roles, so it has a dark twin (`Style.darkTwin?`) and inline pictures
 follow the page's theme.
 
+Each object has one colour in every figure: the left disk and the weight-zero labels blue, the
+right disk and the weight-one labels vermilion, the lens violet, the window (the disk `|w - x| ≤
+r/2` of Part II and the window tests of the lens estimate) dark slate, the good levels bluish
+green.
+
 ## Main definitions
 
 * `houseStyle`, the role names `leftRole`, `rightRole`, `lensRole`, `pieceRole`.
+* `partTwoStyle`, with the roles `windowRole` and `goodRole` of the figures of Part II.
+* `radiusStyle`, with the roles `finiteRole` and `infiniteRole` of the radius line.
 * `figureWidth`, `narrowWidth`: the page widths of a figure and of its narrow rendition.
 -/
 

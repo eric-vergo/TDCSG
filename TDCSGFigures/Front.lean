@@ -189,12 +189,12 @@ figure_proves criticalChord criticalChord_spec
 
 /-- The radii of the slider below the critical radius, with their labels. -/
 def sliderRadii : Array (String × Rat) :=
-  #[("1.2", 6 / 5), ("1.5", 3 / 2), ("1.9", 19 / 10), ("1.95", 39 / 20), ("2", 2),
-    ("2.05", 41 / 20),    ("2.07", 207 / 100), ("2.08", 52 / 25), ("2.1", 21 / 10)]
+  #[("1.2", 6 / 5), ("1.9", 19 / 10), ("1.95", 39 / 20), ("2.05", 41 / 20)]
 
 /-- The most points of the orbit of zero drawn at the critical radius, where the orbit is
-infinite: the first ones the breadth-first search finds. -/
-def criticalCap : Nat := 800
+infinite: the first ones the breadth-first search finds. The cap keeps the page that shows every
+frame inline small. -/
+def criticalCap : Nat := 500
 
 /-- The house style for orbits: markers without the ring of background colour, since the many
 orbit points are drawn without halos. -/
@@ -249,8 +249,8 @@ def sliderFrames : Array (String × Plane.Figure) :=
     ("R", frame critical RadiusSq.critical "R = √(3 + φ)" criticalCap)
 
 /-- The orbit of 0 under the two generators for radii from 1.2 to the critical radius R: finite
-below R, with 9, 71, 151, 773 and 801 points, and infinite at R, where its first 800 points are
-drawn. -/
+below R, with 9, 9, 71 and 151 points at r = 1.2, 1.9, 1.95 and 2.05, and infinite at R, where
+its first 500 points are drawn. -/
 @[figure]
 def orbitRadius : Explorer := Plane.slider "r" sliderFrames
 

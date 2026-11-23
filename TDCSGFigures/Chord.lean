@@ -217,24 +217,36 @@ def chordOrbitFrame : Array Item :=
     Plane.Exact.tickAt (tPoint (p 0) axisY) (tPoint (p 0) axisY) (tPoint (p 3) axisY),
     Plane.Exact.tickAt (tPoint (p 1) axisY) (tPoint (p 0) axisY) (tPoint (p 3) axisY),
     Plane.Exact.tickAt (tPoint (p 2) axisY) (tPoint (p 0) axisY) (tPoint (p 3) axisY),
-    Plane.Exact.tickAt (tPoint (rat 0) axisY) (tPoint (p 0) axisY) (tPoint (p 3) axisY),
     Plane.Exact.tickAt (tPoint (p 3) axisY) (tPoint (p 0) axisY) (tPoint (p 3) axisY),
-    Plane.Exact.label "−1" (tPoint (p 0) axisY) .below,
-    Plane.Exact.label "1 − φ" (tPoint (p 1) axisY) .below,
-    Plane.Exact.label "3 − 2φ" (tPoint (p 2) axisY) .below,
-    Plane.Exact.label "0" (tPoint (rat 0) axisY) .below,
-    Plane.Exact.label "1" (tPoint (p 3) axisY) .below,
+    Plane.Exact.label "−1" (tPoint (p 0) axisY) .below |>.size 13,
+    Plane.Exact.label "1 − φ" (tPoint (p 1) axisY) .belowLeft |>.size 13,
+    Plane.Exact.label "3 − 2φ" (tPoint (p 2) axisY) .belowRight |>.size 13,
+    Plane.Exact.label "1" (tPoint (p 3) axisY) .below |>.size 13,
     Plane.Exact.label "t, the point tE of the chord" (tPoint (rat 0) (axisY - rat (3 / 20)))
-      .below,
-    Plane.Exact.label "k = 0" (tPoint (rat (-1)) (rowY 0)) .left,
-    Plane.Exact.label s!"k = {orbitSteps}" (tPoint (rat (-1)) (rowY orbitSteps)) .left]
+      .below]
+
+/-- The abscissa of the axis of steps, left of the bands. -/
+def stepAxisX : QSqrt5 := rat (-11 / 10)
+
+/-- The steps `k` with a tick on the axis of steps. -/
+def stepTicks : List Nat := [0, 6, 12, 18, 24]
+
+/-- The axis of steps left of the bands: the step number `k` downwards, from row `0` to row
+`orbitSteps`, with ticks at `stepTicks` and its name. -/
+def stepAxis : Array Item :=
+  let top := tPoint stepAxisX (rowY 0)
+  let bottom := tPoint stepAxisX (rowY orbitSteps)
+  #[Plane.Exact.segment top bottom |>.named "the step number k, one row per step"] ++
+    (stepTicks.toArray.map fun k => Plane.Exact.tickAt (tPoint stepAxisX (rowY k)) top bottom) ++
+    (stepTicks.toArray.map fun k => Plane.Exact.label s!"{k}" (tPoint stepAxisX (rowY k)) .left) ++
+    #[Plane.Exact.label "step k" (tPoint (stepAxisX - rat (1 / 5)) (rowY 12)) .left]
 
 /-- The items of `chordOrbit`. -/
 def chordOrbitItems : Array Item :=
-  chordOrbitFrame ++ (chordRows orbitSteps).mapIdx fun k (w, t) => rowPoint k w t
+  chordOrbitFrame ++ stepAxis ++ (chordRows orbitSteps).mapIdx fun k (w, t) => rowPoint k w t
 
 /-- The orbit of 0 along the chord at the critical radius: the parameters t₀ = 0, t₁, …, t₂₄ of
-the points tₖE, one row per step from the top, each point in the colour of the piece that holds
+the points tₖE, one row per step k from the top, each point in the colour of the piece that holds
 it, which is the word applied next; above, the three pieces of [−1, 1). Each step adds 2φ − 2
 modulo 2. -/
 @[figure]
@@ -372,8 +384,9 @@ figure_proves wordTrace wordTrace_spec
 
 /-- What `chordOrbit` draws, item for item, and why. The items are the frame (`chordOrbitFrame`,
 written out: the bands of the three pieces, the pieces of `[-1, 1]` with their labels, the end `-1`
-in the range and the end `1` not, the axis with ticks at `-1, 1 - φ, 3 - 2φ, 0, 1` and its name,
-and the names of the first and last row), then one point per row `k = 0, …, 24` at `(t_k, -k/20)`
+in the range and the end `1` not, the axis with ticks at `-1, 1 - φ, 3 - 2φ, 1` and its name),
+the axis of steps (`stepAxis`, written out: the step number `k` downwards, ticks at
+`k = 0, 6, 12, 18, 24` and its name), then one point per row `k = 0, …, 24` at `(t_k, -k/20)`
 (`rowPoint`, written out), in the colour of word `w_k` and recording that it lies in the band of
 piece `w_k` and outside the other two. The rows are written out: `t_k = a + b√5` with the word
 applied next. The facts hold exactly in `ℚ(√5)`: every `t_k` lies in `[-1, 1)` and in the piece
@@ -429,21 +442,25 @@ theorem chordOrbit_spec :
         (tPoint pieceEnds[0]! axisY) (tPoint pieceEnds[3]! axisY),
       Plane.Exact.tickAt (tPoint pieceEnds[2]! axisY)
         (tPoint pieceEnds[0]! axisY) (tPoint pieceEnds[3]! axisY),
-      Plane.Exact.tickAt (tPoint (rat 0) axisY)
-        (tPoint pieceEnds[0]! axisY) (tPoint pieceEnds[3]! axisY),
       Plane.Exact.tickAt (tPoint pieceEnds[3]! axisY)
         (tPoint pieceEnds[0]! axisY) (tPoint pieceEnds[3]! axisY),
-      Plane.Exact.label "−1" (tPoint pieceEnds[0]! axisY) .below,
-      Plane.Exact.label "1 − φ" (tPoint pieceEnds[1]! axisY) .below,
-      Plane.Exact.label "3 − 2φ" (tPoint pieceEnds[2]! axisY) .below,
-      Plane.Exact.label "0" (tPoint (rat 0) axisY) .below,
-      Plane.Exact.label "1" (tPoint pieceEnds[3]! axisY) .below,
+      Plane.Exact.label "−1" (tPoint pieceEnds[0]! axisY) .below |>.size 13,
+      Plane.Exact.label "1 − φ" (tPoint pieceEnds[1]! axisY) .belowLeft |>.size 13,
+      Plane.Exact.label "3 − 2φ" (tPoint pieceEnds[2]! axisY) .belowRight |>.size 13,
+        Plane.Exact.label "1" (tPoint pieceEnds[3]! axisY) .below |>.size 13,
       Plane.Exact.label "t, the point tE of the chord" (tPoint (rat 0) (axisY - rat (3 / 20)))
-        .below,
-      Plane.Exact.label "k = 0" (tPoint (rat (-1)) (rowY 0)) .left,
-      Plane.Exact.label s!"k = {orbitSteps}" (tPoint (rat (-1)) (rowY orbitSteps)) .left] ∧
-    chordOrbit.items =
-      chordOrbitFrame ++ (chordRows orbitSteps).mapIdx (fun k (w, t) => rowPoint k w t) ∧
+        .below] ∧
+    stepAxisX = rat (-11 / 10) ∧ stepTicks = [0, 6, 12, 18, 24] ∧
+    stepAxis = #[
+      Plane.Exact.segment (tPoint stepAxisX (rowY 0)) (tPoint stepAxisX (rowY orbitSteps))
+        |>.named "the step number k, one row per step"] ++
+      (stepTicks.toArray.map fun k => Plane.Exact.tickAt (tPoint stepAxisX (rowY k))
+        (tPoint stepAxisX (rowY 0)) (tPoint stepAxisX (rowY orbitSteps))) ++
+      (stepTicks.toArray.map fun k =>
+        Plane.Exact.label s!"{k}" (tPoint stepAxisX (rowY k)) .left) ++
+      #[Plane.Exact.label "step k" (tPoint (stepAxisX - rat (1 / 5)) (rowY 12)) .left] ∧
+    chordOrbit.items = chordOrbitFrame ++ stepAxis ++
+      (chordRows orbitSteps).mapIdx (fun k (w, t) => rowPoint k w t) ∧
     chordRows 24 = #[(3, ⟨0, 0⟩), (1, ⟨-3, 1⟩), (3, ⟨-4, 2⟩), (2, ⟨-7, 3⟩), (3, ⟨-8, 4⟩),
       (3, ⟨-11, 5⟩), (2, ⟨-14, 6⟩), (3, ⟨-15, 7⟩), (3, ⟨-18, 8⟩), (1, ⟨-21, 9⟩), (3, ⟨-22, 10⟩),
       (2, ⟨-25, 11⟩), (3, ⟨-26, 12⟩), (3, ⟨-29, 13⟩), (1, ⟨-32, 14⟩), (3, ⟨-33, 15⟩),
@@ -458,7 +475,8 @@ theorem chordOrbit_spec :
       (chordRows 24)[k + 1]!.2 ==
         t + phi * rat 2 - (if w == 3 then rat 4 else rat 2)) = true ∧
     ((chordRows 24).map (phiForm ·.2)).toList.eraseDups.length = 25 := by
-  refine ⟨rfl, rfl, fun _ => rfl, rfl, rfl, fun _ => rfl, fun _ _ _ => rfl, rfl, rfl, ?_⟩
+  refine ⟨rfl, rfl, fun _ => rfl, rfl, rfl, fun _ => rfl, fun _ _ _ => rfl, rfl, rfl, rfl, rfl,
+    rfl, ?_⟩
   repeat' apply And.intro
   all_goals decide +kernel
 

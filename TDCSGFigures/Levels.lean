@@ -237,10 +237,10 @@ def terminalCrossing : Plane.Figure where
     Plane.Exact.label "n" (proj crossN) (.toward (Plane.deg 100)) (some 10) |>.role leftRole
       |>.italic,
     Plane.Exact.label "n₀ = 4 → 5" ((rat (21 / 20), rat (2 / 25)) : QSqrt5 × QSqrt5),
-    Plane.Exact.label "window, x = 0.472" ((rat (-1 / 20), rat (5 / 4)) : QSqrt5 × QSqrt5)
+    Plane.Exact.label "window" ((rat 0, rat (6 / 5)) : QSqrt5 × QSqrt5)
       |>.role windowRole,
-    Plane.Exact.label "Re w ≥ x + κ − η" ((rat (27 / 10), rat (-5 / 4)) : QSqrt5 × QSqrt5)
-      .left |>.size 12]
+    Plane.Exact.label "Re w ≥ Re x + κ − η" ((crossCut, rat (5 / 4)) : QSqrt5 × QSqrt5) .right
+      |>.size 12]
   info := { title := "A crossing at the good level n₀ = 4 ends in the leaf n + e₀" }
 
 /-! ### The enlargement near the leaf -/
@@ -284,8 +284,9 @@ def terminalZoom : Plane.Figure where
     Plane.Exact.label "n + e₀ (leaf)" leafQ .above |>.role rightRole,
     Plane.Exact.label "0.005" ((rat (15185 / 10000), rat (-5 / 1000)) : QSqrt5 × QSqrt5) .above,
     Plane.Exact.label "edge from n" ((rat (1518 / 1000), rat 0) : QSqrt5 × QSqrt5) .below,
-    Plane.Exact.label "cut" ((crossCut, rat (1 / 200)) : QSqrt5 × QSqrt5) .right,
-    Plane.Exact.label "Re w = x + κ − η" ((crossCut, rat (1 / 200)) : QSqrt5 × QSqrt5) .left,
+    Plane.Exact.label "the cut" ((crossCut, rat (11 / 2000)) : QSqrt5 × QSqrt5) .left,
+    Plane.Exact.label "Re w = Re x + κ − η" ((crossCut, rat (2 / 625)) : QSqrt5 × QSqrt5) .left
+      |>.size 13,
     Plane.Exact.label "window edge" ((rat (15322 / 10000), rat (-1 / 200)) :
       QSqrt5 × QSqrt5) .right |>.role windowRole]
   info := { title := "Near the leaf, enlarged: the cut, the leaf and the window's edge" }
@@ -393,10 +394,10 @@ theorem terminalCrossing_spec :
       Plane.Exact.label "n" (proj crossN) (.toward (Plane.deg 100)) (some 10) |>.role "left"
         |>.italic,
       Plane.Exact.label "n₀ = 4 → 5" ((rat (21 / 20), rat (2 / 25)) : QSqrt5 × QSqrt5),
-      Plane.Exact.label "window, x = 0.472" ((rat (-1 / 20), rat (5 / 4)) : QSqrt5 × QSqrt5)
+      Plane.Exact.label "window" ((rat 0, rat (6 / 5)) : QSqrt5 × QSqrt5)
         |>.role "window",
-      Plane.Exact.label "Re w ≥ x + κ − η" ((rat (27 / 10), rat (-5 / 4)) : QSqrt5 × QSqrt5)
-        .left |>.size 12] ∧
+      Plane.Exact.label "Re w ≥ Re x + κ − η" ((crossCut, rat (5 / 4)) : QSqrt5 × QSqrt5) .right
+        |>.size 12] ∧
     weight crossN = 0 ∧ isGoodLevel crossRadiusSq crossX 0 4 = some true ∧
     (windowSide crossN == .inside && windowSide leaf == .inside) = true ∧
     [1, 2, 3, 4].all (fun k => windowSide (shift crossN k 1) == .inside) = true ∧
@@ -435,8 +436,9 @@ theorem terminalZoom_spec :
       Plane.Exact.label "0.005" ((rat (15185 / 10000), rat (-5 / 1000)) : QSqrt5 × QSqrt5)
         .above,
       Plane.Exact.label "edge from n" ((rat (1518 / 1000), rat 0) : QSqrt5 × QSqrt5) .below,
-      Plane.Exact.label "cut" ((crossCut, rat (1 / 200)) : QSqrt5 × QSqrt5) .right,
-      Plane.Exact.label "Re w = x + κ − η" ((crossCut, rat (1 / 200)) : QSqrt5 × QSqrt5) .left,
+      Plane.Exact.label "the cut" ((crossCut, rat (11 / 2000)) : QSqrt5 × QSqrt5) .left,
+      Plane.Exact.label "Re w = Re x + κ − η" ((crossCut, rat (2 / 625)) : QSqrt5 × QSqrt5) .left
+        |>.size 13,
       Plane.Exact.label "window edge" ((rat (15322 / 10000), rat (-1 / 200)) :
         QSqrt5 × QSqrt5) .right |>.role "window"] ∧
     QSqrt.lt (rat (45 / 10000)) ((proj leaf).realPart - crossCut) = true ∧

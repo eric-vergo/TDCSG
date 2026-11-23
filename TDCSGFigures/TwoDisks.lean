@@ -108,7 +108,7 @@ def stepBase : Array Item := #[
 
 /-- Frame `k` of the stepper: the base, the points `z₀, …, z_{k-1}` faint, the point `z_k`, and for
 `k ≥ 1` the turn of letter `k` as an arc from `z_{k-1}` to `z_k` about its centre, or, when the
-letter fixes the point, a note saying so. -/
+letter fixes the point, a note saying so beside the point. -/
 def stepFrame (k : Nat) : Plane.Figure :=
   let pts := stepPoints
   let z := pts.getD k origin
@@ -120,8 +120,8 @@ def stepFrame (k : Nat) : Plane.Figure :=
       let z₀ := pts.getD k origin
       let role := if l.centre == leftCentre then leftRole else rightRole
       if z₀ == z then
-        #[Plane.Exact.label s!"{stepName (k + 1)} = {stepName k}: {l.text} fixes it"
-            ((-13 / 5 : Rat), (11 / 5 : Rat)) |>.role role]
+        #[Plane.Exact.label s!"{stepName (k + 1)} = {stepName k}: {l.text} fixes it" z .left
+            |>.role role]
       else
         let θ := angleFrom l.centre z₀
         #[Plane.Exact.arc l.centre (SqrtOf.mk (z₀ - l.centre).normSq) θ (θ - deg 72)
