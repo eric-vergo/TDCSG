@@ -34,12 +34,14 @@ class Resources(HTMLParser):
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
         classes = attrs.get("class", "").split()
-        if tag == "div":
+        # Statement declarations render as `div.bp_decl_source` panels, declarations attached to a
+        # proof as `li.bp_external_decl_item` entries; both carry the declaration and its range.
+        if tag in ("div", "li"):
             panel = self.source_panels[-1] if self.source_panels else None
-            if "bp_decl_source" in classes:
+            if {"bp_decl_source", "bp_external_decl_item"} & set(classes):
                 panel = (attrs["data-lean-decl"], attrs["data-lean-source"])
             self.source_panels.append(panel)
-        if tag == "a" and "bp_decl_source_path" in classes:
+        if tag == "a" and {"bp_decl_source_path", "bp_external_decl_source_path"} & set(classes):
             panel = self.source_panels[-1]
             assert panel, f"Source link outside a Lean declaration panel in {page}"
             source_links.add((*panel, attrs["href"]))
@@ -67,7 +69,7 @@ class Resources(HTMLParser):
 
 
     def handle_endtag(self, tag):
-        if tag == "div":
+        if tag in ("div", "li"):
             self.source_panels.pop()
         if tag == "a":
             self.anchor = None
