@@ -20,6 +20,25 @@ name = "VersoBlueprint"
 git = "https://github.com/eric-vergo/verso-blueprint.git"
 rev = "9fa92b2bf1d3bf2071963157e077b011666c435d"
 
+# PILean draws the figures; the Verso adapter puts them in the site, the LeAnTeX adapter typesets
+# their labels. The root pin of `pilean` overrides the older one Verso Blueprint requires.
+[[require]]
+name = "pilean"
+git = "https://github.com/eric-vergo/PILean"
+rev = "f55e4e6aa5f5206bbebf2185ec35c32000051aea"
+
+[[require]]
+name = "pilean-verso"
+git = "https://github.com/eric-vergo/PILean"
+rev = "f55e4e6aa5f5206bbebf2185ec35c32000051aea"
+subDir = "verso"
+
+[[require]]
+name = "pilean-leantex"
+git = "https://github.com/eric-vergo/PILean"
+rev = "f55e4e6aa5f5206bbebf2185ec35c32000051aea"
+subDir = "leantex"
+
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4"
