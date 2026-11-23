@@ -16,8 +16,8 @@ passes to smaller radii (`TDCSG.finite_GG_of_le`). This is Theorem 3.1 and Theor
 ## Main statements
 
 * `TDCSG.orbit_mono`: `orbit n₁ n₂ r₁ r₂ p ⊆ orbit n₁ n₂ r₁' r₂' p` when `r₁ ≤ r₁'`, `r₂ ≤ r₂'`.
-* `TDCSG.finite_of_encard_orbit_le`: the group is finite as soon as its orbits are uniformly
-  bounded.
+* `TDCSG.finite_of_encard_orbit_le`, `TDCSG.finite_of_orbit_subset_insert_image`: the group is
+  finite as soon as its orbits are uniformly bounded.
 * `TDCSG.finite_GG_of_le`: if the group is finite at larger radii, it is finite at smaller ones.
 
 ## Implementation notes
@@ -52,6 +52,17 @@ theorem finite_of_encard_orbit_le {n₁ n₂ : ℕ} {r₁ r₂ : ℝ} (N : ℕ)
   MulAction.finite_of_encard_orbit_le (X := ℂ) N fun p ↦ by
     rw [mulAction_orbit_eq]
     exact h p
+
+/-- The two-disk group is finite if every orbit consists of its base point and images of one
+fixed finite set `T`, under a map that may depend on the base point. -/
+theorem finite_of_orbit_subset_insert_image {n₁ n₂ : ℕ} {r₁ r₂ : ℝ} {ι : Type*} {T : Set ι}
+    (hT : T.Finite) (f : ℂ → ι → ℂ) (h : ∀ p, orbit n₁ n₂ r₁ r₂ p ⊆ insert p (f p '' T)) :
+    Finite (GG n₁ n₂ r₁ r₂) :=
+  finite_of_encard_orbit_le (T.ncard + 1) fun p ↦ calc
+    _ ≤ (insert p (f p '' T)).encard := Set.encard_le_encard (h p)
+    _ ≤ (f p '' T).encard + 1 := Set.encard_insert_le _ _
+    _ ≤ T.encard + 1 := by gcongr; exact Set.encard_image_le _ _
+    _ = ((T.ncard + 1 : ℕ) : ℕ∞) := by rw [← hT.cast_ncard_eq]; push_cast; rfl
 
 /-- A finite group has orbits of size at most its order. -/
 theorem encard_orbit_le_card (n₁ n₂ : ℕ) (r₁ r₂ : ℝ) [Finite (GG n₁ n₂ r₁ r₂)] (p : ℂ) :
