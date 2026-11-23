@@ -18,10 +18,11 @@ weak.linter.style.header = false
 [[require]]
 name = "VersoBlueprint"
 git = "https://github.com/eric-vergo/verso-blueprint.git"
-rev = "9fa92b2bf1d3bf2071963157e077b011666c435d"
+rev = "d4984e261d0a4cb0a984c41b3b98625fae27e8aa"
 
 # PILean draws the figures; the Verso adapter puts them in the site, the LeAnTeX adapter typesets
-# their labels. The root pin of `pilean` overrides the older one Verso Blueprint requires.
+# their labels. The figures library imports PILean directly, so `pilean` is required here rather
+# than reached only through Verso Blueprint; both pin the same revision.
 [[require]]
 name = "pilean"
 git = "https://github.com/eric-vergo/PILean"
