@@ -87,6 +87,7 @@ depends only on `propext`, `Classical.choice` and `Quot.sound`.
   infinite group, is √(3+φ);
 - `finite_GG_five_iff`: GG_5(r) is finite if and only if r < √(3+φ);
 - `sSup_setOf_finite_GG_five`: the supremum of the radii with a finite group is √(3+φ);
+- `infinite_GG_five`: for every r ≥ √(3+φ) the group GG_5(r) is infinite;
 - `infinite_orbit_zero_five`: for every r ≥ √(3+φ) the orbit of 0 is infinite.
 
 Below the threshold, integer labels for the active disk centers meet coordinate levels whose
@@ -127,8 +128,10 @@ Theorem names are in the namespaces `TDCSG.Statements` (file `TDCSG/Statements.l
   many pairwise disjoint balls the group is the product of the `H i` (`mulEquivPi`,
   `natCard_compoundSymmetryGroup`).
 - **Monotonicity.** Orbits grow with the radii (`orbit_mono`); finiteness of the group passes to
-  smaller radii (`finite_GG_of_le`; also `infinite_GG_of_le`, `finite_GG_of_lt`,
-  `infinite_GG_of_lt`).
+  smaller radii (`finite_GG_of_le`); in `TDCSG/CriticalRadius/Basic.lean`, infinitude passes to
+  larger radii (`TDCSG.infinite_GG_of_le`) and the critical radius separates finite from
+  infinite groups (`TDCSG.finite_GG_of_lt_criticalRadius`,
+  `TDCSG.infinite_GG_of_criticalRadius_lt`).
 - **The omitted half of Theorem 1.** If lcm(n₁, n₂) ∈ {1, 2, 3, 4, 6}, the orbits are uniformly
   bounded (`exists_encard_orbit_le`) and the group is finite for all radii, equal or unequal
   (`finite_GG`). The bounds are stated as existing; the written proof gives them explicitly.
@@ -140,7 +143,7 @@ Theorem names are in the namespaces `TDCSG.Statements` (file `TDCSG/Statements.l
   circle or accumulates on one from inside (`boundary_depth`,
   `touchesBoundary_or_accumulatesInside`, `of_not_touchesBoundary`).
 - **Small radii.** For r₁, r₂ ≤ 1 every orbit is finite (`finite_orbit_of_le_one`); for equal
-  radii r < 1 the group is finite (`finite_GG_of_lt_one`).
+  radii r < 1 the group is finite (`TDCSG.finite_GG_of_lt_one`, `TDCSG/CriticalRadius/Basic.lean`).
 - **Disjoint disks.** For r₁ + r₂ < 2 the group is isomorphic to C_{n₁} × C_{n₂} and has order
   n₁n₂ (`nonempty_mulEquiv_of_add_lt_two`, `card_GG_of_add_lt_two`).
 - **Infinitude at the closed forms for n = 8, 10, 12.** GG_n(r) is infinite for every r at or

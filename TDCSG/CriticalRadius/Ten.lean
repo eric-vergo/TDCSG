@@ -28,8 +28,8 @@ the orbit of `0` contains infinitely many distinct points `s_k u`.
 
 ## Main statements
 
-* `TDCSG.Ten.normSq_pointW_add_one`: `|W + 1|² = 4 - φ`, so `W` lies on the boundary circle of
-  the left disk at the critical radius.
+* `TDCSG.Ten.norm_embed_pointW_add_one_sq`: `|W + 1|² = 4 - φ`, so `W` lies on the boundary
+  circle of the left disk at the critical radius.
 * `TDCSG.Ten.infinite_orbit_zero`: for `r ≥ √(4 - φ)` the orbit of `0` is infinite.
 * `TDCSG.Ten.infinite_GG`: for `r ≥ √(4 - φ)` the group `GG 10 10 r r` is infinite.
 * `TDCSG.Ten.criticalRadius_le`, `TDCSG.Ten.one_le_criticalRadius`:
@@ -74,6 +74,7 @@ def rotInv (v : Cyc) : Cyc := (-1 : ℤ) • mulZetaInv (mulZetaInv v)
 /-- The model of the generators of `GG 10 10 r r`, with disk tests at radius `√(4 - φ)`. -/
 def model : Model := ⟨4, -1, rot, rotInv⟩
 
+/-- The rotations of `TDCSG.Ten.model`, by `-ζ²` and `-ζ³`, are the rotations of order `10`. -/
 theorem model_isSound : model.IsSound 10 where
   embed_rot v := by
     rw [show model.rot v = rot v from rfl, rot, embed_smul, embed_mulZeta, embed_mulZeta,
@@ -86,6 +87,7 @@ theorem model_isSound : model.IsSound 10 where
     push_cast
     linear_combination (-ζ ^ 3 * embed v) * zeta_pow_five
 
+/-- Every `r ≥ √(4 - φ)` is at least the radius of the model. -/
 theorem sqrt_model_le {r : ℝ} (hr : √(4 - φ) ≤ r) : √(model.α + model.β * φ) ≤ r := by
   convert hr using 2
   simp only [model, Int.cast_ofNat, Int.reduceNeg, Int.cast_neg, Int.cast_one]
@@ -96,9 +98,11 @@ theorem sqrt_model_le {r : ℝ} (hr : √(4 - φ) ≤ r) : √(model.α + model.
 /-- The direction `u = ζ² = exp (4πi / 5)` of the critical chord. -/
 def dirU : Cyc := ⟨0, 0, 1, 0⟩
 
+/-- `U` represents `ζ²`. -/
 theorem embed_dirU : embed dirU = ζ ^ 2 := by
   simp [embed, dirU]
 
+/-- `U` is not `0`. -/
 theorem embed_dirU_ne_zero : embed dirU ≠ 0 := by
   rw [embed_dirU]
   exact pow_ne_zero 2 (isPrimitiveRoot_zeta.ne_zero (by norm_num))
@@ -106,6 +110,7 @@ theorem embed_dirU_ne_zero : embed dirU ≠ 0 := by
 /-- The end point `W = √5 u` of the critical chord. -/
 def pointW : Cyc := ⟨0, 2, 1, 2⟩
 
+/-- `W = √5 U`. -/
 theorem embed_pointW : embed pointW = ((√5 : ℝ) : ℂ) * embed dirU := by
   rw [show pointW = linePt dirU (-1) 2 by decide, embed_linePt]
   congr 2
@@ -115,7 +120,7 @@ theorem embed_pointW : embed pointW = ((√5 : ℝ) : ℂ) * embed dirU := by
 
 /-- `|W + 1|² = 4 - φ`: at radius `√(4 - φ)` the point `W` lies on the boundary circle of the
 left disk. -/
-theorem normSq_pointW_add_one : ‖embed pointW + 1‖ ^ 2 = 4 - φ := by
+theorem norm_embed_pointW_add_one_sq : ‖embed pointW + 1‖ ^ 2 = 4 - φ := by
   have h := norm_embed_sq (v := pointW - left) (by decide) (by decide)
   rw [embed_sub, show embed left = -1 by simp [embed, left]] at h
   rw [show embed pointW + 1 = embed pointW - -1 by ring, h]

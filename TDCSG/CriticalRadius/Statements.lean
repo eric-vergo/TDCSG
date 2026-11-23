@@ -15,7 +15,8 @@ This file collects, in compact form, what is proved about the critical radius
 `TDCSG.criticalRadius n` of the equal-radius family `GG n n r r` for `n = 8, 10, 12`. The
 written sources are `notes/proofs/critical-radius-n8.md`, `critical-radius-n10.md` and
 `critical-radius-n12.md`. The exact value for `n = 5` is
-`TDCSG.CriticalRadius.criticalRadius_five`.
+`TDCSG.CriticalRadius.criticalRadius_five`, and the properties of the critical radius for every
+`n` are in `TDCSG.CriticalRadius.Basic`.
 
 ## Main statements
 
@@ -33,8 +34,6 @@ written sources are `notes/proofs/critical-radius-n8.md`, `critical-radius-n10.m
 * `pStar_eight_mem_sphere`, `mem_orbit_pStar_eight`; `pStar_twelve_mem_sphere`,
   `mem_orbit_pStar_twelve`: the critical points for `n = 8, 12` lie on the boundary circle at
   the conjectured critical radius, and the seed words reach the first point of their orbits.
-* `infinite_GG_of_le`, `finite_GG_of_lt`, `infinite_GG_of_lt`, `finite_GG_of_lt_one`: the
-  basic properties of the critical radius, for every `n`.
 
 Whether the critical radii for `n = 8, 10, 12` equal these upper bounds is open.
 -/
@@ -46,26 +45,6 @@ open scoped Real goldenRatio
 
 namespace TDCSG.CriticalRadius
 
-/-! ### Basic properties of the critical radius -/
-
-/-- Infinitude of the group passes to larger radii. -/
-theorem infinite_GG_of_le {n : ℕ} {r r' : ℝ} (h : r ≤ r') (hr : Infinite (GG n n r r)) :
-    Infinite (GG n n r' r') :=
-  TDCSG.infinite_GG_of_le h hr
-
-/-- Below the critical radius the group is finite. -/
-theorem finite_GG_of_lt {n : ℕ} {r : ℝ} (hr : r < criticalRadius n) : Finite (GG n n r r) :=
-  TDCSG.finite_GG_of_lt_criticalRadius hr
-
-/-- Above the critical radius the group is infinite, if it is infinite for some radius. -/
-theorem infinite_GG_of_lt {n : ℕ} (hne : ∃ r, Infinite (GG n n r r)) {r : ℝ}
-    (hr : criticalRadius n < r) : Infinite (GG n n r r) :=
-  TDCSG.infinite_GG_of_criticalRadius_lt hne hr
-
-/-- The group is finite for every radius below `1`. -/
-theorem finite_GG_of_lt_one (n : ℕ) {r : ℝ} (hr : r < 1) : Finite (GG n n r r) :=
-  TDCSG.finite_GG_of_lt_one n hr
-
 /-! ### `n = 10` -/
 
 /-- `GG₁₀(r)` is infinite for every `r ≥ √(4 - φ)` (`critical-radius-n10.md`, Theorem A). -/
@@ -76,9 +55,11 @@ theorem infinite_GG_ten {r : ℝ} (hr : √(4 - φ) ≤ r) : Infinite (GG 10 10 
 theorem infinite_orbit_zero_ten {r : ℝ} (hr : √(4 - φ) ≤ r) : (orbit 10 10 r r 0).Infinite :=
   Ten.infinite_orbit_zero hr
 
+/-- The critical radius for `n = 10` is at most `√(4 - φ)`. -/
 theorem criticalRadius_ten_le : criticalRadius 10 ≤ √(4 - φ) :=
   Ten.criticalRadius_le
 
+/-- The critical radius for `n = 10` is at least `1`. -/
 theorem one_le_criticalRadius_ten : 1 ≤ criticalRadius 10 :=
   Ten.one_le_criticalRadius
 
@@ -147,9 +128,11 @@ theorem infinite_orbit_pStar_eight {r : ℝ} (hr : √(10 - 5 * √2) ≤ r) :
 theorem infinite_GG_eight {r : ℝ} (hr : √(10 - 5 * √2) ≤ r) : Infinite (GG 8 8 r r) :=
   infinite_GG_of_infinite_orbit (infinite_orbit_pStar_eight hr)
 
+/-- The critical radius for `n = 8` is at most `√(10 - 5√2)`. -/
 theorem criticalRadius_eight_le : criticalRadius 8 ≤ √(10 - 5 * √2) :=
   TDCSG.criticalRadius_le (infinite_GG_eight le_rfl)
 
+/-- The critical radius for `n = 8` is at least `1`. -/
 theorem one_le_criticalRadius_eight : 1 ≤ criticalRadius 8 :=
   TDCSG.one_le_criticalRadius ⟨_, infinite_GG_eight le_rfl⟩
 
@@ -169,9 +152,11 @@ theorem infinite_orbit_pStar_twelve {r : ℝ} (hr : √(40 - 22 * √3) ≤ r) :
 theorem infinite_GG_twelve {r : ℝ} (hr : √(40 - 22 * √3) ≤ r) : Infinite (GG 12 12 r r) :=
   infinite_GG_of_infinite_orbit (infinite_orbit_pStar_twelve hr)
 
+/-- The critical radius for `n = 12` is at most `√(40 - 22√3)`. -/
 theorem criticalRadius_twelve_le : criticalRadius 12 ≤ √(40 - 22 * √3) :=
   TDCSG.criticalRadius_le (infinite_GG_twelve le_rfl)
 
+/-- The critical radius for `n = 12` is at least `1`. -/
 theorem one_le_criticalRadius_twelve : 1 ≤ criticalRadius 12 :=
   TDCSG.one_le_criticalRadius ⟨_, infinite_GG_twelve le_rfl⟩
 
