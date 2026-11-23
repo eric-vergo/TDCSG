@@ -1,0 +1,27 @@
+# A small Lake workspace that builds and renders the figures library `TDCSGFigures` alone, without
+# Mathlib and Verso: it needs only PILean (from the main checkout's package folder) and the orbit
+# engine `TDCSGCompute`. See `blueprint/README.md`, "Drawing figures in a worktree".
+name = "tdcsg-figures"
+defaultTargets = ["TDCSGFigures"]
+
+[leanOptions]
+autoImplicit = false
+relaxedAutoImplicit = false
+
+[[require]]
+name = "pilean"
+path = "../.lake/packages/pilean"
+
+[[lean_lib]]
+name = "TDCSGCompute"
+srcDir = ".."
+
+[[lean_lib]]
+name = "TDCSGFigures"
+srcDir = ".."
+
+# Renders figures to SVG and PNG, light, dark and narrow, and prints their layout problems.
+[[lean_exe]]
+name = "tdcsg-figure-preview"
+srcDir = ".."
+root = "TDCSGFigures.Preview"
