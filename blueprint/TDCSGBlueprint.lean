@@ -8,7 +8,6 @@ import VersoBlueprint.Commands.Graph
 import VersoBlueprint.Commands.Summary
 import PILeanVerso
 import TDCSGFigures
-import TDCSGBlueprint.Figures
 import TDCSGBlueprint.CompoundSymmetry
 import TDCSGBlueprint.TwoDisks
 import TDCSGBlueprint.PartOne
@@ -21,6 +20,7 @@ import TDCSGBlueprint.Confinement
 import TDCSGBlueprint.MainTheorem
 import TDCSGBlueprint.OtherOrders
 import TDCSGBlueprint.Verification
+import TDCSGFigureTheorems
 
 open Verso.Genre Verso.Genre.Manual Informal PILeanVerso
 
@@ -32,7 +32,7 @@ authors := ["Eric Vergo", "OpenAI GPT-6.2 Astra", "Claude"]
 
 :::figure TDCSGFigures.criticalChord (label := "critical-chord") (inline := true) (proves := TDCSGFigures.criticalChord_spec) (alt := "Two closed disks of radius the square root of three plus phi, centered at minus one and one, drawn as circles, with their overlap shaded. The chord from minus E on the right circle to E on the left circle passes through zero in three colored pieces numbered 1, 2 and 3. The circles cross at zeta minus zeta to the fourth and its negative.")
 The two closed disks at the critical radius $`R=\sqrt{3+\varphi}\approx2.149`, centered at $`-1`
-(blue, the left disk) and $`1` (vermilion, the right disk), and the lens they share. The chord from
+(labelled left disk) and $`1` (labelled right disk), and the lens they share. The chord from
 $`-E` to $`E`, where $`E=\zeta-\zeta^2` and $`\zeta=\exp(2\pi i/5)`, passes through $`0`; its
 pieces 1, 2 and 3 are the ones the three words of chapter 3 move. The point $`E` lies on the left
 circle, since $`|E+1|^2=3+\varphi`, and $`-E` on the right circle; the circles cross at
@@ -72,9 +72,9 @@ Lean declarations that prove it.
 
 :::figure_explorer TDCSGFigures.orbitRadius (label := "orbit-radius") (alt := "Two closed disks about minus one and one whose radius grows from 1.2 to the critical radius, with the orbit of zero drawn as dots: a few points for small radii, more and more near the critical radius.")
 The orbit of $`0` under the two moves as the radius $`r` grows, computed exactly in
-$`\mathbb{Z}[\zeta]` at each radius. Below the critical radius it is finite: 9 points up to
-$`r=1.9`, then 71, 151, 773 and 801 points at $`r=1.95`, $`2.05`, $`2.08` and $`2.1`. At
-$`r=R` it is infinite; the last frame shows only its first 800 points, in the order a
+$`\mathbb{Z}[\zeta]` at each radius. Below the critical radius it is finite: 9 points at $`r=1.2`
+and $`r=1.9`, then 71 and 151 points at $`r=1.95` and $`2.05` (and 801 at $`r=2.1`, not drawn).
+At $`r=R` it is infinite; the last frame shows only its first 500 points, in the order a
 breadth-first search finds them.
 :::
 
@@ -122,6 +122,7 @@ is the written proof of the finite half.
 {include 0 TDCSGBlueprint.MainTheorem}
 {include 0 TDCSGBlueprint.OtherOrders}
 {include 0 TDCSGBlueprint.Verification}
+{include 0 TDCSGFigureTheorems}
 
 {blueprint_graph}
 

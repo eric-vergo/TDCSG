@@ -4,9 +4,11 @@ Authors: Eric Vergo, OpenAI GPT-6.2 Astra, Claude
 -/
 import VersoManual
 import VersoBlueprint
+import PILeanVerso
+import TDCSGFigureTheorems
 import TDCSG.CriticalRadius.Five
 
-open Verso.Genre Verso.Genre.Manual Informal
+open Verso.Genre Verso.Genre.Manual Informal PILeanVerso
 
 #doc (Manual) "Confinement" =>
 
@@ -20,12 +22,21 @@ depend on the starting point. With the description of orbit points by labels, th
 orbit by one number, and the finiteness criterion of Chapter 1 makes $`GG_5(r)` finite for every
 $`r<R`, where $`R=\sqrt{3+\varphi}`.
 
-![The 18 labels of the example component drawn at their projections inside the circular window, with the edges of the center graph.](/plates/component.svg)
-*Figure 9.* The component of the label $`0` in the center graph for $`x=1/2` and $`r=1.95`: 18 labels, each drawn at its projection $`P(n)` inside the window $`|w-x|\le r/2`, blue for weight zero (the left centers) and vermilion for weight one (the right centers), as in the legend. The labels $`0` and $`e_0` of the two initial centers project to $`0` and $`1`. Each edge joins a weight-zero label $`n` to some $`n+e_j`; segments that cross in the drawing do not meet in the graph.
+:::figure TDCSGFigures.Confinement.componentOfZero (label := "component-of-zero") (inline := true) (proves := TDCSGFigures.Confinement.componentOfZero_spec) (alt := "Eighteen labels inside a circular window joined by edges into a star-shaped cycle: dots for weight zero, squares for weight one; the labels 0 and e0 lie on the horizontal axis through the window centre.")
+The component of the label $`0` in the center graph for $`x=1/2` and $`r=1.95`: 18 labels, each
+drawn at its projection $`P(n)` inside the window $`|w-x|\le r/2`, dots for weight zero (the left
+centers) and squares for weight one (the right centers); hovering over a label shows its integer
+vector. The labels $`0` and $`e_0` of the two initial centers project to $`0` and $`1`; each edge
+joins a weight-zero label $`n` to some $`n+e_j`, and segments that cross in the drawing do not meet
+in the graph. Every label of the component has all coordinates in $`\{-1,0,1\}`. For each
+coordinate $`j` the good levels $`lo\le-3` and $`hi\ge3` nearest $`0` are $`(lo,hi)=(-4,4)` for
+$`n_0`, $`(-3,10)` for $`n_1`, $`(-7,6)` for $`n_2` and $`n_3`, and $`(-3,10)` for $`n_4`, so every
+label lies strictly inside every slab $`lo<n_j\le hi`.
+:::
 
 Here the window is $`x=1/2` and $`r=1.95`. Starting at zero, enumerate the integer labels
 of every retained neighbor until each has been visited. There are 18 labels in this component.
-The weight-zero labels (blue) are left centers and the weight-one labels (vermilion) are right
+The weight-zero labels (dots) are left centers and the weight-one labels (squares) are right
 centers; every edge joins one of each. A line crossing away from a marked vertex does not create
 an edge in the label graph. The window tests and the enumeration generate this picture. The theorem must also control every other starting point.
 
@@ -68,6 +79,22 @@ within $`K` of $`-K-3` and a good level $`hi` within $`K` of $`K+3`. Adjacent la
 at most one in each coordinate, so the starting label, $`0` or $`e_0`, and its neighbors lie in
 the slab $`lo<n_j\le hi`. By the two preceding lemmas, every reachable label lies in the slab or
 next to it. Hence $`|n_j|\le 2K+4`, so $`D=2K+4` is a bound.
+:::
+
+In {figref "component-of-zero"}[] no edge crosses a good level, and the same holds for the
+component of $`0` at the window of {figref "terminal-crossing"}[] ($`r=2.12`, $`x=0.472`, 440 labels)
+and at the window of {figref "level-phases"}[] ($`r=1.8`, $`x=0.87`): there the walks from $`0` never
+meet a wall at all. To watch a walk from $`0` meet a wall, {figref "walk-to-leaf"}[] uses another
+window, $`r=2.13` and $`x=1/5`, where the component of $`0` has 131 labels and two of its edges cross
+a good level; it follows one of them.
+
+:::figure_explorer TDCSGFigures.Confinement.walkToLeaf (label := "walk-to-leaf") (proves := TDCSGFigures.Confinement.walkToLeaf_spec) (alt := "A numbered path of labels inside a circular window. Its last step reaches the label n on the window's edge; the other candidates of n lie outside the window and the walk can only step back.")
+A path of the center graph at $`r=2.13`, $`x=1/5`, found by a breadth-first search from $`0`,
+drawn step by step (labels numbered along the path, dots for weight zero, squares for weight one).
+It lowers the coordinate $`n_2` from $`0` to $`-4`, then crosses the good level $`-5` into the label
+$`n=(0,3,-5,4,-2)` at the window's edge. The other candidates $`n+e_k`, $`k\ne2`, lie outside the
+window (open rings at the ends of dashed spokes), so $`n` is a leaf and the walk can only step back
+to $`n+e_2`, as the one-step lemma requires.
 :::
 
 :::lemma_ "box_finite" (lean := "TDCSG.finite_of_orbit_subset_insert_image") (uses := "group_orbit, two_disk_finite")

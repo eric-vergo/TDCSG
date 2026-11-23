@@ -3,10 +3,12 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo, OpenAI GPT-6.2 Astra, Claude
 -/
 import VersoBlueprint
+import PILeanVerso
+import TDCSGFigureTheorems
 import TDCSG.CriticalRadius.Statements
 import TDCSG.Finiteness
 
-open Verso.Genre Verso.Genre.Manual Informal
+open Verso.Genre Verso.Genre.Manual Informal PILeanVerso
 
 #doc (Manual) "Other orders" =>
 
@@ -39,6 +41,30 @@ $`\sqrt2-1` or $`2-\sqrt3`, carries the critical point to infinitely many distin
 its orbit. Every disk test holds at the stated radius and hence at every larger one. An
 infinite orbit forces an infinite group, and the critical radius is at most every radius with
 an infinite group.
+:::
+
+:::figure TDCSGFigures.orderEight (label := "order-eight") (inline := true) (proves := TDCSGFigures.orderEight_spec) (alt := "Order eight: two closed disks about minus one and one, a critical point p-star on the left circle at the bottom of the lens, a vertical chord through it, and two orbit points q0 and q1 above it on the chord.")
+Order 8, at the radius $`r_8=\sqrt{10-5\sqrt2}`: the closed disks about $`-1` and $`1`, their lens,
+and the critical point $`p^*=1-2\zeta+\zeta^2-\zeta^3`, $`\zeta=\exp(2\pi i/8)`, on the left circle
+and inside the right disk. On the vertical chord through $`p^*` lie the points
+$`q_k=p^*+4i(\sqrt2-1)^{k+1}` of its orbit, drawn for $`k=0,1`; they accumulate at $`p^*`, so the
+orbit is infinite.
+:::
+
+:::figure TDCSGFigures.orderTen (label := "order-ten") (inline := true) (proves := TDCSGFigures.orderTen_spec) (alt := "Order ten: two closed disks about minus one and one and a chord through zero from minus W on the right circle to W on the left circle, cut into three pieces numbered 1, 2, 3; the three words are written below.")
+Order 10, at the radius $`r_{10}=\sqrt{4-\varphi}`: the closed disks about $`-1` and $`1`, their
+lens, and the chord through $`0` from $`-W` on the right circle to $`W=\sqrt5\,u` on the left
+circle, $`u=\exp(4\pi i/5)`. The cuts $`-\varphi^{-1}u` and $`u` divide it into the pieces numbered
+1, 2 and 3, on which the words written below act as translations, together a rotation of the
+chord by $`2\varphi^{-1}u` modulo $`2\sqrt5\,u`; the orbit of $`0` is infinite.
+:::
+
+:::figure TDCSGFigures.orderTwelve (label := "order-twelve") (inline := true) (proves := TDCSGFigures.orderTwelve_spec) (alt := "Order twelve: two closed disks about minus one and one, a critical point p-star on the left circle at the lower right of the lens, the chord through it, and the orbit point q0 next to it on the chord.")
+Order 12, at the radius $`r_{12}=\sqrt{40-22\sqrt3}`: the closed disks about $`-1` and $`1`, their
+lens, and the critical point $`p^*=-2\zeta+4\zeta^2-3\zeta^3`, $`\zeta=\exp(2\pi i/12)`, on the left
+circle and inside the right disk. The chord through $`p^*` runs in the direction
+$`V=\zeta^5+\zeta^6`; on it lies the first orbit point $`q_0=p^*+(14-8\sqrt3)V`, and the points
+$`p^*+2(2-\sqrt3)^{k+2}V` that follow accumulate at $`p^*`, too close to draw apart.
 :::
 
 *What is open.* Whether these three bounds are equalities is open. Equality would need the

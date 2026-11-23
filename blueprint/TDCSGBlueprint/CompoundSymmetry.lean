@@ -4,9 +4,11 @@ Authors: Eric Vergo, Claude
 -/
 import VersoManual
 import VersoBlueprint
+import PILeanVerso
+import TDCSGFigureTheorems
 import TDCSG.CriticalRadius.Five
 
-open Verso.Genre Verso.Genre.Manual Informal
+open Verso.Genre Verso.Genre.Manual Informal PILeanVerso
 
 #doc (Manual) "Compound symmetry" =>
 
@@ -156,6 +158,15 @@ circle move, while points just outside it stay fixed. So the extensions do not l
 isometry group of $`X`, and the only common home for all of them is the group of all bijections
 of $`X`. The metric is used only to say what the balls are and which maps of a ball are allowed.
 
+:::figure TDCSGFigures.extensionJump (label := "extension-jump") (inline := true) (proves := TDCSGFigures.extensionJump_spec) (alt := "A closed disk B of radius 10 about c. A point p just inside the boundary is turned 72 degrees clockwise to a far point; a point q just outside the boundary stays where it is.")
+A closed disk $`B` of radius 10 about $`c=0`, turned clockwise through $`72^\circ` and extended by
+the identity: the extension $`\hat h` turns the point $`p=9`, just inside $`B`, to
+$`\hat h(p)=9\zeta^4` (labelled image of p), and fixes the point $`q=11`, just outside. Before the
+turn $`p` and $`q` are 2 apart; afterwards they are $`\sqrt{301-99\varphi}\approx11.9` apart. However
+close to the boundary $`p` and $`q` are taken, the jump stays, so $`\hat h` is not continuous and is
+no isometry of the plane.
+:::
+
 *Empty balls and empty families.* Radii are arbitrary real numbers. A ball of negative radius is
 empty, its only isometry is the identity, and its extension is the identity of $`X`, so it
 contributes nothing to the group. With no balls at all, $`\iota` empty, the supremum of the empty
@@ -226,6 +237,14 @@ permutations of $`X`, and its image is the compound symmetry group. It is inject
 the product acts as $`\hat h_i`, because the other factors fix $`B_i`, so a product equal to
 the identity has every $`\hat h_i` trivial, and then every $`h_i` trivial by injectivity of the
 extension.
+:::
+
+:::figure TDCSGFigures.disjointDisks (label := "disjoint-disks") (inline := true) (proves := TDCSGFigures.disjointDisks_spec) (alt := "Two disjoint closed disks, of radius 4/5 about minus one and 7/10 about one, with a gap between them. In each disk one point is turned 72 degrees clockwise about its centre.")
+Two disjoint closed disks, $`B_1` of radius $`4/5` about $`-1` and $`B_2` of radius $`7/10` about
+$`1`, each turned clockwise through $`72^\circ` by its own generator. The turn $`a` of $`B_1` moves
+$`x` to $`a(x)` and fixes every point outside $`B_1`, such as $`y`; the turn $`b` of $`B_2` moves
+$`y` to $`b(y)` and fixes $`x`. Since $`4/5+7/10<2` the dashed gap separates the disks, the turns
+move disjoint sets of points and commute, and the group they generate is $`C_5\times C_5`.
 :::
 
 :::lemma_ "uniform_orbits" (lean := "MulAction.finite_of_encard_orbit_le")
