@@ -2,7 +2,7 @@
 
 Authors: Eric Vergo, Claude
 
-**Status.** Let $r_c=\sqrt{3+\varphi}$. Infiniteness of $GG_5(r)$ for $r\ge r_c$ is proved and Lean-checked (`critical-radius-n5.md`, Theorem A). **The converse, (B): $GG_5(r)$ finite for every $r<r_c$, is still open, so $r_{\rm crit}(5)=\sqrt{3+\varphi}$ is not proved by this note. Nor is the corresponding equality for $n=8,10,12$.** The note has been independently refereed: `referee-report-sharp-lower-bound-combined.md`. Its verdicts are recorded in §8. What the note adds:
+**Status.** Let $r_c=\sqrt{3+\varphi}$. Infiniteness of $GG_5(r)$ for $r\ge r_c$ is proved and Lean-checked (`critical-radius-n5.md`, Theorem A). **The converse, (B): $GG_5(r)$ finite for every $r<r_c$, is proved by a different argument in [`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md); this note does not prove it, and its results below do not depend on that proof. The corresponding equality for $n=8,10,12$ is open.** The note has been independently refereed: `referee-report-sharp-lower-bound-combined.md`. Its verdicts are recorded in §8. What the note adds:
 
 1. **A bound on excursions, uniform in $r$ (proved, conditional on computations).**
    - Let $W$ be a union of small closed windows about the 38 lattice points of $\partial D_1\cup\partial D_2$ at $r_c$, each bounded by four arcs of radius $r_c$.
@@ -418,7 +418,7 @@ The referee's verdicts (`referee-report-sharp-lower-bound-combined.md`) are reco
 | (R-core), and its uniform form | open; exact evidence in Table 6.1, levels 1–2 reproduced by the referee |
 | Exact level-independence of the normalized core partition | **refuted** at levels $2\to3$; counterexample confirmed exactly by three implementations, including the repository engine |
 | Agreement percentages; the 126-point lune-regime agreement; Table 6.1 level 3 | computed; evidence, not reproduced |
-| (B), i.e. $r_{\rm crit}(5)=\sqrt{3+\varphi}$ | **open** |
+| (B), i.e. $r_{\rm crit}(5)=\sqrt{3+\varphi}$ | **proved** in [`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md), not by this note's route |
 
 **Not checked by the referee:**
 - `rcut.c` was not re-run, and no closure was reproduced from scratch. Only the $(0,2,-1,0)$ certificate was verified.
@@ -430,7 +430,7 @@ The referee's verdicts (`referee-report-sharp-lower-bound-combined.md`) are reco
 - `mpmath.iv` and the referee's own code are trusted, not formally verified.
 
 **Gaps and caveats.**
-1. (B) is open. The sufficient strategy is (R-bulk) together with (R-core) (§6.1).
+1. This note's sufficient strategy for (B) is (R-bulk) together with (R-core) (§6.1); both remain open. (B) itself is proved by a different argument ([`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md)).
 2. Rows 1–8 of Table 5.1 are certified without floating point by the Lean engine's generator and separate checker ([`../relative-certificates.md`](../relative-certificates.md)). Row 9 is computed, not certified.
 3. $F$, hence $\beta_W$ and the word-length bound of Proposition 4.4, is not computed.
 4. The programs and certificates are outside the repository, in a scratch directory (§5.1). A reboot or routine cleanup can clear them.

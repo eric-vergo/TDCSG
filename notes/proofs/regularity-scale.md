@@ -34,10 +34,11 @@ in $\mathcal C$ is constant. Then:
    - For the other $n$ it rests on the paper's computed table of $r_c$.
 4. **For $n=5$ the window is narrow.** All bump-class thresholds lie in
    $[\,2\sqrt{4-\sqrt5},\ 3.662\,]=[2.656,\,3.662]$, while $r_A=1.236$ and $r_c(5)\le2.149$.
-   - Lower bounds on $r_c(5)$ are proved only modulo computations: $r_c(5)\ge2.12557$ by the
-     refereed Theorem B of `critical-radius-n5.md`, and $r_c(5)\ge2.144727$ by the certificate
-     recorded in [`../certificates.md`](../certificates.md).
-   - Finiteness of $GG_5(r)$ on $(r_\ast,\sqrt{3+\varphi})$ is open there.
+   - The exact value $r_c(5)=\sqrt{3+\varphi}$ is proved, with finiteness below it in
+     [`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md) (machine-checked).
+     Weaker lower bounds are proved modulo computations: $r_c(5)\ge2.12557$ by the refereed
+     Theorem B of `critical-radius-n5.md`, and $r_c(5)\ge2.144727$ by the certificate recorded in
+     [`../certificates.md`](../certificates.md).
    - Nothing below uses the lower bound.
 
 So, for the classes treated here (classes with unique continuation, Denjoy–Carleman classes and bump
@@ -851,9 +852,9 @@ referee. The computation is specified in §5.3; it is not in the repository.
 - All island searches and coverage tests in §6, and the $n=12$ corner orbit of §4.
 - $d_n>r_c(n)$ for $n\notin\{5,8,10,12\}$, which rests on the paper's table. For $n=5,8,10,12$ the
   upper bound on $r_c(n)$ is proved (Theorem A of the four critical-radius notes, and in Lean).
-- For $n=5$, the lower bound $r_c(5)\ge2.12557$ is proved in `critical-radius-n5.md` modulo a
-  computation, and $r_c(5)\ge2.144727$ modulo the certificate of `../certificates.md`; finiteness
-  on the remaining window below $\sqrt{3+\varphi}$ is open. Only the upper bound is used here.
+- For $n=5$, the lower bound is proved as well, so $r_c(5)=\sqrt{3+\varphi}$
+  ([`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md)). Only the upper bound
+  is used here.
 
 **Classical results used.**
 - Denjoy–Carleman, both directions, in Rudin's normalization: **[classical, confirmed]** in the

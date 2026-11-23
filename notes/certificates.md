@@ -292,8 +292,10 @@ programs; by group monotonicity GG_n(r) is then finite for every r ≤ r_* (subj
 | 10 | 4 − φ | 1.543362 | 1/47 | 1.536454 | 0.006908 | δ = 1/16, r_c − r = 0.020383 |
 | 12 | 40 − 22√3 | 1.376547 | 1/180 | 1.374528 | 0.002019 | δ = 1/50, r_c − r = 0.007284 |
 
-The remaining gap is open in every case: no single computation reaches r_c, and the window
-(r_*, r_c) needs the renormalization argument of the notes. A symmetry-reduced window-free closure
+No single computation reaches r_c. For n = 8, 10, 12 the window (r_*, r_c) is open. For n = 5 it
+is closed by the integer-coordinate proof
+([`proofs/sharp-lower-bound-n5-pentagrid.md`](proofs/sharp-lower-bound-n5-pentagrid.md)), which
+uses no certificate. A symmetry-reduced window-free closure
 (`certify-relative --window 0 --symmetric`, checked with (C1)–(C4) by
 `check-relative-certificate`) certifies n = 8 at δ = 547/25000 ≈ 0.02188
 (r_c − r_* ≈ 0.006404), and exact intervals of validity extend the n = 10 and n = 12 rows slightly;

@@ -218,7 +218,7 @@ $$r^2=\rho_n:=1+4\sin^2(2\pi/n)=3-2\cos(4\pi/n).$$
 For $n=5$, $\rho_5=3+\varphi$; for $n=10$, $\rho_{10}=3-2\cos72^\circ=4-\varphi$. In both cases the proved mechanism (the $n=5$ note §3, and §3 here) has every word passing through a lens corner, and the mechanism switches on exactly at $\rho_n$.
 2. For every odd $m$, $\rho_{2m}=3-2\cos(2\pi/m)$ and $\rho_m=3-2\cos(4\pi/m)$ are Galois conjugate, by the automorphism $\zeta_m\mapsto\zeta_m^2$ of $\mathbb Q(\zeta_m)=\mathbb Q(\zeta_{2m})$. For $m=5$ this automorphism is $\sqrt5\mapsto-\sqrt5$, and it maps $3+\varphi$ to $4-\varphi$.
 
-So the conjugacy follows from the formula $r_c(n)^2=\rho_n$, which holds for $n=5$ and $n=10$ in the sense of Part A (and of the paper's conjecture for (B)).
+So the conjugacy follows from the formula $r_c(n)^2=\rho_n$, which holds for $n=5$ and $n=10$ in the sense of Part A; for $n=5$ it is the exact critical radius ([`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md)), and for $n=10$ that is the paper's conjecture (B).
 
 **What is not explained.** Why $\rho_n$ is the critical radius for $n=5$ and $10$, and for no other $n$ in the paper's table. For $m=7$: $\rho_7=3-2\cos(4\pi/7)\approx3.445$ against $r_c(7)^2\approx1.6236^2\approx2.636$, and $\rho_{14}\approx1.753$ against $r_c(14)^2\approx1.1966^2\approx1.432$; for $n=8,9,12$ also $\rho_n>r_c(n)^2$. So in these cases $\rho_n$ exceeds the table value of $r_c(n)^2$, and the equality $r_c(n)^2=\rho_n$ is special to $n=5,10$.
 
@@ -293,8 +293,8 @@ The verdicts are those of the independent referee (`referee-report-critical-radi
 3. **Part A in full**: the three words with their disk tests and translation identities, checked by `decide` on integer data; the irrational rotation; `TDCSG.CriticalRadius.infinite_orbit_zero_ten` (for $r\ge\sqrt{4-\varphi}$ the orbit of $0$ is infinite) and `infinite_GG_ten`, hence `criticalRadius_ten_le` and `one_le_criticalRadius_ten`.
 
 **Not formalized:**
-1. Theorem 4.1 (the cell decomposition of a finite arc arrangement): it is the unproved proposition `TDCSG.CutSetCertificate 10`.
-2. The link between a certificate file and `TDCSG.ExistsCertificate 10 r`: the engine's checker is a tested program, not a kernel-checked proof. Unlike $n=5,8,12$, there is no `FiniteBelowTen` proposition and no `finiteBelowTen_of_certificate` reduction in Lean; the general `TDCSG.finite_GG_of_certificate` applies to $n=10$ as to every $n$.
+1. Theorem 4.1, the certificate theorem (its main cost is the cell decomposition of a finite arc arrangement): it is a refereed written result with no Lean counterpart, and the library has no certificate predicate.
+2. The link between a certificate file and the hypotheses (C1)–(C4): the engine's checker is a tested program, not a kernel-checked proof. Hence Theorem B is proved modulo the computation, not in Lean.
 3. **Part B, full.** Conjecture R₁₀ first, then an induction on the level with explicit control of the curvature correction.
 
 ---
