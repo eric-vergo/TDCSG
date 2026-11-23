@@ -35,3 +35,16 @@
 :is(p, li) > a > code:not([class]) {
   overflow-wrap: anywhere;
 }
+
+/* A heading's permalink sits just after its last word, outside the heading's box. On a narrow
+   screen the heading keeps room for it at the end of the line, so that it does not reach past the
+   side gutter; the centred title of the front page keeps the same room on both sides. */
+@media (max-width: 40rem) {
+  :is(h1, h2, h3, h4, h5, h6):has(> .permalink-widget.inline) {
+    padding-inline-end: 2rem;
+  }
+
+  .titlepage h1:has(> .permalink-widget.inline) {
+    padding-inline-start: 2rem;
+  }
+}
