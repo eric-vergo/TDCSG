@@ -189,8 +189,8 @@ figure_proves criticalChord criticalChord_spec
 
 /-- The radii of the slider below the critical radius, with their labels. -/
 def sliderRadii : Array (String × Rat) :=
-  #[("1.2", 6 / 5), ("1.5", 3 / 2), ("1.9", 19 / 10), ("1.95", 39 / 20), ("2", 2), ("2.05", 41 / 20),
-    ("2.07", 207 / 100), ("2.08", 52 / 25), ("2.1", 21 / 10)]
+  #[("1.2", 6 / 5), ("1.5", 3 / 2), ("1.9", 19 / 10), ("1.95", 39 / 20), ("2", 2),
+    ("2.05", 41 / 20),    ("2.07", 207 / 100), ("2.08", 52 / 25), ("2.1", 21 / 10)]
 
 /-- The most points of the orbit of zero drawn at the critical radius, where the orbit is
 infinite: the first ones the breadth-first search finds. -/

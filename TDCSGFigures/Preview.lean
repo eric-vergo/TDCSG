@@ -12,8 +12,8 @@ is named) to `DIR` (`out` by default) for an author to look at: for each figure,
 an explorer, an SVG and a PNG in the light style, in its dark twin, and at the narrow width in
 both, named `NAME[-frame-K][-narrow][-dark].{svg,png}`. It prints every layout problem the
 figure's checks report (`PILean.Plane.Check`) at both widths, whatever the figure's checks level,
-and exits with status 1 if there is one. The site build renders the same figures with the files, fingerprints
-and manifest of `PILeanVerso.withFigures`; these previews are only for looking.
+and exits with status 1 if there is one. The site build renders the same figures with the files,
+fingerprints and manifest of `PILeanVerso.withFigures`; these previews are only for looking.
 -/
 
 namespace TDCSGFigures.Preview
@@ -53,7 +53,8 @@ def render (dir : System.FilePath) (stem : String) (fig : Plane.Figure) : IO (Ar
   return fig.problems.map (·.message) ++ narrow
 
 /-- The command-line options: the output folder and the names asked for. -/
-def parse : List String → System.FilePath × Array String → Except String (System.FilePath × Array String)
+def parse : List String → System.FilePath × Array String →
+    Except String (System.FilePath × Array String)
   | [], acc => .ok acc
   | "--out" :: dir :: rest, (_, ns) => parse rest (dir, ns)
   | "--out" :: [], _ => .error "--out needs a folder"
@@ -67,7 +68,8 @@ def main (args : List String) : IO UInt32 := do
   let (dir, names) ← IO.ofExcept (parse args ("out", #[]))
   let unknown := names.filter fun n => !previews.any (·.1 == n)
   if !unknown.isEmpty then
-    IO.eprintln s!"unknown figures: {", ".intercalate unknown.toList}; known: {", ".intercalate (previews.map (·.1)).toList}"
+    let known := ", ".intercalate (previews.map (·.1)).toList
+    IO.eprintln s!"unknown figures: {", ".intercalate unknown.toList}; known: {known}"
     return 2
   IO.FS.createDirAll dir
   let mut problems := 0

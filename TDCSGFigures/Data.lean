@@ -201,9 +201,6 @@ def RadiusSq.ofRat (r : Rat) : RadiusSq := ⟨#[r.num * r.num, 0, 0, 0], r.den *
 /-- The squared critical radius `3 + φ = 3 - ζ² - ζ³`. -/
 def RadiusSq.critical : RadiusSq := ⟨#[3, 0, -1, -1], 1⟩
 
-/-- The squared radius in `ℚ(√5)`. -/
-def RadiusSq.value (r2 : RadiusSq) : QSqrt5 := (Zeta5.reduce r2.num).realPart * rat (1 / (r2.den : Rat))
-
 /-- Where a point stands relative to a closed disk, as the engine decides it. -/
 inductive Side where
   /-- Strictly inside. -/

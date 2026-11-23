@@ -17,8 +17,9 @@ everything that belongs to it (its centre, its radius, the points on its circle,
 labels) take the role `left`; the right disk and what belongs to it take `right`. The two are the
 Okabe–Ito blue and vermilion, a pair that stays apart under the common colour-vision deficiencies;
 the light values are darkened enough for labels on white and on the tint of the lens, the dark
-values lightened for the dark page. The style keeps PILean's default light colours (`Style.light`) beside its roles, so it has
-a dark twin (`Style.darkTwin?`) and inline pictures follow the page's theme.
+values lightened for the dark page. The style keeps PILean's default light colours
+(`Style.light`) beside its roles, so it has a dark twin (`Style.darkTwin?`) and inline pictures
+follow the page's theme.
 
 ## Main definitions
 
