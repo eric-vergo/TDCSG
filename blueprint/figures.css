@@ -32,3 +32,13 @@ html[data-theme="dark"] img[src*="figures/"] {
 .license-info {
   overflow-wrap: anywhere;
 }
+
+/* Build metadata on the front page: full commit hashes wrap instead of widening a narrow screen. */
+.bp_build_metadata {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.bp_build_metadata_commit {
+  word-break: break-all;
+}
