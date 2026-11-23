@@ -24,7 +24,8 @@ integer arithmetic in the linked declarations.
 
 The graph uses the dependency labels of the chapter statements. Set
 `(lean := "...")` to the declaration being described and `(uses := "...")` to
-the mathematical prerequisites. The generator enables the fork's side-by-side
+the nodes whose declarations its Lean proof uses. Helper lemmas of a proof go in
+`(lean := "...")` on its `:::proof` block. The generator enables the fork's side-by-side
 source view. The challenge and solution declare the same constants and must be
 elaborated separately. The verification chapter imports only the solution.
 
