@@ -4,7 +4,7 @@ Authors: Eric Vergo, Claude
 -/
 module
 
-public import TDCSG.CriticalRadius.Five
+public import TDCSG.CriticalRadius.Five.Cyclotomic
 
 /-!
 # `GG₁₀(r)` is infinite for every `r ≥ √(4 - φ)`
@@ -116,7 +116,7 @@ theorem embed_pointW : embed pointW = ((√5 : ℝ) : ℂ) * embed dirU := by
 /-- `|W + 1|² = 4 - φ`: at radius `√(4 - φ)` the point `W` lies on the boundary circle of the
 left disk. -/
 theorem normSq_pointW_add_one : ‖embed pointW + 1‖ ^ 2 = 4 - φ := by
-  have h := norm_sq_embed (v := pointW - left) (by decide) (by decide)
+  have h := norm_embed_sq (v := pointW - left) (by decide) (by decide)
   rw [embed_sub, show embed left = -1 by simp [embed, left]] at h
   rw [show embed pointW + 1 = embed pointW - -1 by ring, h]
   have : (mul (pointW - left) (conj (pointW - left))) = ⟨4, 0, 1, 1⟩ := by decide
@@ -141,7 +141,7 @@ theorem applyWord_word₁ {r : ℝ} (hr : √(4 - φ) ≤ r) {s : ℝ}
     applyWord 10 r word₁ (s * embed dirU) = ((s + (2 * φ - 2) : ℝ) : ℂ) * embed dirU := by
   have := model_isSound.applyWord_linePt (p₀ := 1) (q₀ := -2) (p₁ := 1) (q₁ := -1) (dp := -2)
     (dq := 2) (V := dirU) (w := word₁) (sqrt_model_le hr) (by decide)
-    (by push_cast; linarith [one_lt_phi]) (t := s)
+    (by push_cast; linarith [Real.one_lt_goldenRatio]) (t := s)
     (by push_cast; constructor <;> linarith [hs.1, hs.2])
   rw [this]
   push_cast
@@ -152,7 +152,7 @@ theorem applyWord_word₂ {r : ℝ} (hr : √(4 - φ) ≤ r) {s : ℝ} (hs : s �
     applyWord 10 r word₂ (s * embed dirU) = ((s + (2 * φ - 2) : ℝ) : ℂ) * embed dirU := by
   have := model_isSound.applyWord_linePt (p₀ := 1) (q₀ := -1) (p₁ := 1) (q₁ := 0) (dp := -2)
     (dq := 2) (V := dirU) (w := word₂) (sqrt_model_le hr) (by decide)
-    (by push_cast; linarith [one_lt_phi]) (t := s)
+    (by push_cast; linarith [Real.one_lt_goldenRatio]) (t := s)
     (by push_cast; constructor <;> linarith [hs.1, hs.2])
   rw [this]
   push_cast
@@ -163,7 +163,7 @@ theorem applyWord_word₃ {r : ℝ} (hr : √(4 - φ) ≤ r) {s : ℝ} (hs : s �
     applyWord 10 r word₃ (s * embed dirU) = ((s + -2 * φ : ℝ) : ℂ) * embed dirU := by
   have := model_isSound.applyWord_linePt (p₀ := 1) (q₀ := 0) (p₁ := -1) (q₁ := 2) (dp := 0)
     (dq := -2) (V := dirU) (w := word₃) (sqrt_model_le hr) (by decide)
-    (by push_cast; linarith [one_lt_phi]) (t := s)
+    (by push_cast; linarith [Real.one_lt_goldenRatio]) (t := s)
     (by push_cast; constructor <;> linarith [hs.1, hs.2])
   rw [this]
   push_cast
@@ -178,11 +178,11 @@ theorem exists_mem_orbit {r : ℝ} (hr : √(4 - φ) ≤ r) (k : ℕ) :
       s = k * (2 * φ - 2) + m * (4 * φ - 2) ∧ (s : ℂ) * embed dirU ∈ orbit 10 10 r r 0 := by
   induction k with
   | zero =>
-    refine ⟨0, 0, ⟨by linarith [one_lt_phi], by linarith [one_lt_phi]⟩, by simp, ?_⟩
-    simp [mem_orbit_self]
+    have h1 := Real.one_lt_goldenRatio
+    exact ⟨0, 0, ⟨by linarith, by linarith⟩, by simp, by simp [mem_orbit_self]⟩
   | succ k ih =>
     obtain ⟨s, m, ⟨hs₀, hs₁⟩, hsm, hmem⟩ := ih
-    have h1 := one_lt_phi
+    have h1 := Real.one_lt_goldenRatio
     rcases le_or_gt s (1 - φ) with h | h
     · refine ⟨s + (2 * φ - 2), m, ⟨by linarith, by linarith⟩, by rw [hsm]; push_cast; ring, ?_⟩
       rw [← applyWord_word₁ hr ⟨hs₀, h⟩]
