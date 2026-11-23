@@ -1,10 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Eric Vergo, OpenAI GPT-6.2 Astra
+Authors: Eric Vergo, OpenAI GPT-6.2 Astra, Claude
 -/
 import VersoManual
 import VersoBlueprint
-import TDCSG.CriticalRadius.FiveSharp
+import TDCSG.CriticalRadius.Five
 
 open Verso.Genre Verso.Genre.Manual Informal
 
@@ -18,43 +18,82 @@ tag := "confinement"
 
 Here the window is $`x=1/2` and $`r=1.95`. Starting at zero, enumerate the integer labels
 of every retained neighbor until each has been visited. There are 18 labels in this component.
-Blue vertices have weight zero and rust vertices have weight one. A line crossing away from a marked vertex does not create an edge in the label graph. The window tests and the
-enumeration generate this picture. The theorem must also control every other starting point.
+Blue vertices have weight zero and rust vertices have weight one. A line crossing away from a
+marked vertex does not create an edge in the label graph. The window tests and the enumeration generate this picture. The theorem must also control every other starting point.
 
-:::lemma_ "one_step" (lean := "TDCSG.Five.Walls.confined") (uses := "terminal_crossing")
-Suppose each edge crossing out of a region has a terminal endpoint and the start and its
-neighbors lie inside. Every reachable vertex is inside or immediately adjacent to the inside.
+:::lemma_ "one_step" (lean := "SimpleGraph.Reachable.mem_or_exists_adj_of_leaf")
+In a simple graph, let $`S` be a set of vertices that contains a vertex $`s` and all its
+neighbors. Suppose that every edge from $`a\in S` to $`b\notin S` has a leaf endpoint: $`b` is
+the only neighbor of $`a`, or $`a` is the only neighbor of $`b`. Then every vertex reachable
+from $`s` lies in $`S` or is adjacent to a vertex of $`S`.
 :::
 
 :::proof "one_step"
-Follow a path until it first leaves. Its inside endpoint already has a neighbor inside, so
-the outside endpoint must be the leaf. The next step can only return along the same edge.
+Call a vertex of $`S` anchored if it is $`s` or has a neighbor in $`S`. Follow a walk from
+$`s`. While it stays in $`S`, each vertex it visits is anchored. Suppose it first steps from an
+anchored $`a` to $`b\notin S`. Then $`a` has a neighbor in $`S`, or is $`s`, whose neighbors lie
+in $`S`. So $`b` is not the only neighbor of $`a`, and $`b` is the leaf. The next step can only
+return along the same edge.
 :::
 
-:::theorem "label_box" (lean := "TDCSG.Five.Walls.CenterBox, TDCSG.Five.Walls.centerBox_of_walls") (uses := "all_walls, one_step")
-Apply confinement between the two walls of each coordinate. Adding one to the common bound
-contains all reachable labels in one finite integer box, uniformly over the permitted windows.
+:::lemma_ "slab_crossing" (lean := "TDCSG.Five.leaf_of_crossing") (uses := "active_graph, terminal_crossing")
+Let $`0\le r<R`, and let $`lo` and $`hi` be good levels of coordinate $`j`. Every edge of the
+center graph from a label $`a` with $`lo<a_j\le hi` to a label outside this slab has a leaf
+endpoint.
 :::
 
-:::lemma_ "uniform_orbits" (lean := "MulAction.finite_of_encard_orbit_le")
+:::proof "slab_crossing" (lean := "TDCSG.Five.isGoodLevel_of_crossing, TDCSG.Five.leaf_of_isGoodLevel")
+An edge joins a weight-zero label $`n` to $`n+e_k`, so it changes only the coordinate $`k`, by
+one. To leave the slab it must have $`k=j` and $`n_j\in\{lo,hi\}`, a good level. The crossing
+lemma then removes every other neighbor of one endpoint.
+:::
+
+:::theorem "label_box" (lean := "TDCSG.Five.exists_abs_le_of_centerReach") (uses := "all_walls, slab_crossing, one_step")
+Let $`0\le r<R`. There is a bound $`N` such that, for every window center $`x`, every label
+reachable in the center graph has all coordinates of absolute value at most $`N`.
+:::
+
+:::proof "label_box" (lean := "TDCSG.Five.abs_sub_le_one_of_adj")
+Take $`K` from the recurrence of good levels. In coordinate $`j`, choose a good level $`lo`
+within $`K` of $`-K-3` and a good level $`hi` within $`K` of $`K+3`. Adjacent labels differ by
+at most one in each coordinate, so the starting label, $`0` or $`e_0`, and its neighbors lie in
+the slab $`lo<n_j\le hi`. By the two preceding lemmas, every reachable label lies in the slab or
+next to it. Hence $`|n_j|\le 2K+4`.
+:::
+
+:::lemma_ "uniform_orbits" (lean := "MulAction.finite_of_encard_orbit_le, TDCSG.finite_of_encard_orbit_le")
 A finitely generated group acting faithfully on a set is finite if the sizes of all point
-orbits share one finite bound.
+orbits share one finite bound. In particular $`GG_n(r)` is finite once its orbits are uniformly
+bounded.
 :::
 
-:::theorem "box_finite" (lean := "TDCSG.Five.Walls.finite_GG_of_centerBox") (uses := "label_box, group_orbit, uniform_orbits")
-The label, one of five orientations, and a choice of left or right center determine the orbit
-point in the moving frame. For $`r\le4` the uniform box bounds every orbit's size.
-This uniform bound implies finiteness of the two-generator permutation group.
+:::proof "uniform_orbits"
+Number the points of an orbit $`O` as $`1,\ldots,|O|`. The action on $`O` is then a homomorphism
+to the symmetric group on $`|O|` letters, determined by the images of the generators. With
+$`|O|` bounded there are only finitely many such homomorphisms. Map the group to the product
+of the symmetric groups indexed by the homomorphisms that occur. An element of the kernel fixes
+every point, so it is the identity by faithfulness. The group $`GG_n(r)` is generated by $`a`
+and $`b` and acts faithfully on the plane.
+:::
+
+:::lemma_ "box_finite" (lean := "TDCSG.finite_of_orbit_subset_insert_image") (uses := "group_orbit, uniform_orbits")
+Let $`T` be a finite set, and for each point $`p` let $`f_p` be a map from $`T` to the plane. If
+the orbit of every point $`p` lies in $`\{p\}\cup f_p(T)`, then $`GG_n(r)` is finite.
 :::
 
 :::proof "box_finite"
-The orbit of any point outside both disks is a singleton. For a point inside, there are at
-most ten frames per label. A finitely generated group has only finitely many permutation
-actions on sets of bounded cardinality up to relabeling. The action on the plane is faithful,
-so the product of these finite actions detects each group element.
+Every orbit then has at most $`|T|+1` points. Uniformly bounded orbits give a finite group.
 :::
 
-:::theorem "subcritical" (lean := "TDCSG.CriticalRadius.finiteBelowClosedFormFive") (uses := "all_walls, box_finite")
-The group is finite for every $`r<R`. The wall argument covers $`0\le r<R`; at negative
-radius both closed disks are empty.
+:::theorem "subcritical" (lean := "TDCSG.Five.finite_GG_of_lt") (uses := "label_box, words_walks, box_finite")
+The group $`GG_5(r)` is finite for every $`r<R`.
+:::
+
+:::proof "subcritical" (lean := "TDCSG.finite_GG_of_lt_one")
+For $`r<0` both closed disks are empty and the group is trivial. For $`0\le r<R` take the bound
+$`N` of the label box. Let $`T` consist of the triples $`(c,j,n)` with $`c=\pm1`, a direction
+$`j` and a label $`n` with $`|n_k|\le N`, and put $`f_z(c,j,n)=c+2((z+1)/2-P(n))/\zeta^j`. A
+point outside both disks is fixed by the whole group. A point inside one disk keeps its whole
+orbit inside the two disks, and the passage from words to walks writes each orbit point as $`f_z` of a triple
+whose label is reachable and hence lies in the box.
 :::

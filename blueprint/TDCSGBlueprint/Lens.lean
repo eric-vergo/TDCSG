@@ -1,10 +1,10 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Eric Vergo, OpenAI GPT-6.2 Astra
+Authors: Eric Vergo, OpenAI GPT-6.2 Astra, Claude
 -/
 import VersoManual
 import VersoBlueprint
-import TDCSG.CriticalRadius.FiveSharp
+import TDCSG.CriticalRadius.Five
 
 open Verso.Genre Verso.Genre.Manual Informal
 
@@ -22,16 +22,20 @@ $`r/2`, centered at 0 and a unit vector $`u`. The shaded overlap is the lens. Th
 horizontal components of $`u` are $`c=(\varphi-1)/2` and $`d=-\varphi/2`. The drawing uses the
 tighter case $`u=\zeta`, with real part $`c`.
 
-:::lemma_ "sharp_lens" (lean := "TDCSG.Five.Walls.lens") (uses := "active_graph")
-Put $`L=c-d` and $`a=(1+L)/2`. If $`0\le r<R`, $`|v|\le r/2`, and
+:::lemma_ "sharp_lens" (lean := "TDCSG.Five.div_two_lt_norm_sub_of_le_re")
+Put $`L=c-d=\varphi-1/2` and $`a=(1+L)/2=(2\varphi+1)/4`. Let $`0\le r<R` and let $`u` be a
+unit vector with real part $`c` or $`d`. If $`|v|\le r/2` and
 $`\operatorname{Re}(v)\ge a-(3+\varphi-r^2)/16`, then $`|v-u|>r/2`.
 :::
 
 :::proof "sharp_lens"
-For real part $`c`, take a weighted sum of the two squared disk inequalities, with weights
-$`1-t` and $`t`, where $`t=1/2-c`. Completing squares gives the bound on the horizontal
-coordinate. For real part $`d`, the horizontal distance from the second center already
-exceeds the available radius. The strict margin is positive exactly below $`R`.
+Suppose also $`|v-u|\le r/2`. For real part $`c`, put $`t=1/2-c` and $`v_*=1+tu`. Then
+$`\operatorname{Re}(v_*)=a` and $`|v_*|^2=|v_*-u|^2=(3+\varphi)/4`. Expanding about $`v_*` gives
+$`(1-t)|v|^2+t|v-u|^2=(3+\varphi)/4+2(\operatorname{Re}(v)-a)+|v-v_*|^2`. Both moduli are at most
+$`r/2`, so $`\operatorname{Re}(v)\le a-(3+\varphi-r^2)/8`, which contradicts the hypothesis
+because $`r<R`. For real part $`d`, the second disk alone gives
+$`\operatorname{Re}(v)\le r/2+d`, which lies below $`a-(3+\varphi-r^2)/16` for every
+$`0\le r<R`.
 :::
 
 At equality the two circles meet at $`v=1+t u` with real part $`a`. Shrinking the circles opens
