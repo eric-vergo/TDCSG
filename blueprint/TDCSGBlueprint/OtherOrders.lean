@@ -47,7 +47,7 @@ the certificates described below prove finiteness only on initial ranges. Whethe
 order, the group is infinite at the critical radius itself is also open; for order five the main
 theorem settles it.
 
-:::theorem "crystallographic" (lean := "TDCSG.finite_GG") (uses := "group_orbit, two_disk_finite")
+:::theorem "crystallographic" (lean := "TDCSG.finite_GG") (uses := "group_orbit, generated_by_two, two_disk_support, two_disk_finite")
 For two possibly unequal orders, the group is finite at every pair of radii if the least
 common multiple of the orders is one of 1, 2, 3, 4 or 6.
 :::

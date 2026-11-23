@@ -106,7 +106,7 @@ The group is finitely generated, it acts faithfully on the plane, and its orbits
 bounded, so the finiteness criterion of Chapter 1 applies.
 :::
 
-:::theorem "disjoint_disks" (lean := "TDCSG.nonempty_mulEquiv_of_add_lt_two, TDCSG.card_GG_of_add_lt_two, TDCSG.finite_GG_of_lt_one") (uses := "group_orbit, generated_by_two, compound_disjoint")
+:::theorem "disjoint_disks" (lean := "TDCSG.nonempty_mulEquiv_of_add_lt_two, TDCSG.card_GG_of_add_lt_two, TDCSG.finite_GG_of_lt_one") (uses := "disk_rotation, group_orbit, generated_by_two, ball_extension_facts, compound_disjoint")
 Let $`n_1,n_2\ne0` and $`0<r_1`, $`0<r_2` with $`r_1+r_2<2`. Then the two disks are disjoint
 and $`GG_{n_1,n_2}(r_1,r_2)` is isomorphic to $`C_{n_1}\times C_{n_2}`, of order $`n_1n_2`. In
 particular $`GG_n(r)` is finite for every $`r<1`.
