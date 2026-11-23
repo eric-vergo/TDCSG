@@ -21,8 +21,6 @@ omits; the written proof is `notes/proofs/theorem1-converse.md`, Theorem 5.1.
 
 * `TDCSG.lcm_mem_iff`: `lcm n₁ n₂ ∈ {1, 2, 3, 4, 6}` holds exactly when `n₁, n₂` both divide `4`
   or both divide `6`.
-* `TDCSG.apply_eq_of_notMem_diskUnion`, `TDCSG.apply_mem_diskUnion`: every element of the group
-  fixes the complement of the union of the disks and maps the union into itself.
 * `TDCSG.exists_affine`: at each point, every element of the group acts as `z ↦ u * z + t` with
   `u`, `t` in a lattice `ℤ + ℤ η` closed under multiplication.
 * `TDCSG.exists_encard_orbit_le`: under the arithmetic hypothesis the orbits are uniformly
@@ -35,6 +33,9 @@ The written proof works in the ring `ℤ[ω]`, `ω = exp (-2πi / lcm n₁ n₂)
 Gaussian integers `ℤ + ℤ i` when `n₁, n₂ ∣ 4`, and the Eisenstein integers `ℤ + ℤ ζ₆`,
 `ζ₆ = exp (-2πi / 6)`, when `n₁, n₂ ∣ 6`. Each contains the corresponding `ℤ[ω]`, so the bound
 on the translation parts is the same argument with a possibly larger, still finite, count.
+That bound uses `TDCSG.apply_eq_of_notMem_diskUnion` and `TDCSG.apply_mem_diskUnion` from
+`TDCSG.DiskUnion`: every element of the group fixes the complement of the union of the disks and
+maps the union into itself.
 -/
 
 @[expose] public section

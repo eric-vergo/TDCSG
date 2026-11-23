@@ -200,7 +200,7 @@ theorem inWindow_of_two_mul_sub_proj {y p : ℂ} {n : Label} {j : Fin 5}
   linarith
 
 /-- The left generator preserves frames: if it acts, the left centre is unchanged and the
-direction index moves down by one. -/
+direction index `j` becomes `j + 1`. -/
 theorem Framed.genA {y : ℂ} (hf : Framed r x y) : Framed r x (TDCSG.genA 5 r y) := by
   obtain ⟨n, j, hn, h, hL, hR⟩ := hf
   by_cases hy : y ∈ closedBall leftCenter r
@@ -214,7 +214,7 @@ theorem Framed.genA {y : ℂ} (hf : Framed r x y) : Framed r x (TDCSG.genA 5 r y
     exact ⟨n, j, hn, h, hL, hR⟩
 
 /-- The right generator preserves frames: if it acts, the right centre is unchanged, the
-direction index moves down by one, and the left centre moves to the other end of the edge. -/
+direction index `j` becomes `j + 1`, and the left centre moves to the other end of the edge. -/
 theorem Framed.genB {y : ℂ} (hf : Framed r x y) : Framed r x (TDCSG.genB 5 r y) := by
   obtain ⟨n, j, hn, h, hL, hR⟩ := hf
   by_cases hy : y ∈ closedBall rightCenter r
@@ -232,7 +232,7 @@ theorem Framed.genB {y : ℂ} (hf : Framed r x y) : Framed r x (TDCSG.genB 5 r y
     exact ⟨n, j, hn, h, hL, hR⟩
 
 /-- Every point is framed for its own normalized base point, by the label `0` and the
-direction `1`. -/
+direction index `0`, whose direction is `ζ⁰ = 1`. -/
 theorem framed_self (r : ℝ) (z : ℂ) : Framed r ((z + 1) / 2) z := by
   refine ⟨0, 0, map_zero _, ?_, fun _ ↦ ⟨0, .inl rfl, .rfl⟩, fun _ ↦ ?_⟩
   · rw [map_zero, sub_zero, dir_zero, one_mul]
