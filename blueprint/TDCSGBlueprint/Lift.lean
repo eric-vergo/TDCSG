@@ -18,11 +18,12 @@ tag := "lift"
 
 The transformation $`x=(z+1)/2` sends the two original centers to 0 and 1 and halves all distances.
 Follow the rotations in a moving frame. Its orientation has just five possibilities. A change of
-active center moves one unit in a direction $`\zeta^j`, where $`\zeta=\exp(2\pi i/5)`. Now $`x`
-stays fixed. To decide whether a center can act, ask whether it lies within $`r/2` of $`x`.
+active center moves one unit in a direction $`\zeta^j`, where $`\zeta=\exp(2\pi i/5)`. The point
+$`x` stays fixed. To decide whether a center can act, ask whether it lies within $`r/2` of $`x`.
 
 :::definition "center_projection" (lean := "TDCSG.Five.dir, TDCSG.Five.Label, TDCSG.Five.Label.basis, TDCSG.Five.Label.proj, TDCSG.Five.Label.weight")
-Record a center by an integer vector $`n=(n_0,\ldots,n_4)`, its label. Its position is
+Record a center by an integer vector $`n=(n_0,\ldots,n_4)`, its label. Its position in the
+halved starting frame is
 $`P(n)=\sum_j n_j\zeta^j` and its weight is $`\sum_j n_j`; both are additive in $`n`. Write
 $`e_j` for the coordinate vectors. Keep the integer vector: a bounded region of the physical
 plane alone does not bound its integer coordinates.

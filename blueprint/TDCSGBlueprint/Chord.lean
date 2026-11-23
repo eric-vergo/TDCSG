@@ -18,11 +18,12 @@ tag := "chord"
 
 Set $`E=\zeta-\zeta^2` and write points on the chord as $`tE` with $`-1\le t\le1`.
 The picture shows successive returns to the chord, one entire word per step. Intermediate
-rotations within a word may leave the chord. At $`R` three words fit the closed disks exactly.
+rotations within a word may leave the chord. At $`R` every disk test of the three words holds, some with equality.
 They continue to work at every larger radius.
 
 :::definition "chord_check" (lean := "TDCSG.Five.pointE, TDCSG.Five.word₁, TDCSG.Five.word₂, TDCSG.Five.word₃")
-Partition the chord at $`1-\varphi` and $`3-2\varphi`. Each of the three resulting subsegments
+Cut the parameter range $`[-1,1]` at $`t=1-\varphi` and $`t=3-2\varphi`, that is, the chord at
+the points $`(1-\varphi)E` and $`(3-2\varphi)E`. Each of the three resulting subsegments
 uses its own finite word in the generators $`a` and $`b`.
 In order from the left piece to the right piece, the words are
 $`a^{-1}a^{-1}b^{-1}a^{-1}b^{-1}`, $`ababb`, and $`abab^{-1}a^{-1}b^{-1}`.
@@ -53,9 +54,9 @@ $`GG_5(r)`.
 :::
 
 :::proof "endpoint_infinite"
-Start from $`t_0=0`. Given $`t_k`, apply the word of the piece that contains it; at a common
-endpoint either valid piece will do. The result stays in $`[-1,1)` and changes $`t_k` by
-$`2\varphi-2` modulo two. If $`t_k=t_l`, then $`(k-l)(2\varphi-2)` is an even integer, which
+Start from $`t_0=0`. Given $`t_k`, apply the first word if $`t_k\le1-\varphi`, the second if
+$`1-\varphi<t_k<3-2\varphi`, and the third if $`t_k\ge3-2\varphi`. The result stays in $`[-1,1)`
+and changes $`t_k` by $`2\varphi-2` modulo two. If $`t_k=t_l`, then $`(k-l)(2\varphi-2)` is an even integer, which
 forces $`k=l` because $`\varphi` is irrational. The points $`t_kE` are distinct since $`E\ne0`.
 An infinite orbit forces an infinite group.
 :::

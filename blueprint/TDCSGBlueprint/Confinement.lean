@@ -23,28 +23,29 @@ marked vertex does not create an edge in the label graph. The window tests and t
 
 :::lemma_ "one_step" (lean := "SimpleGraph.Reachable.mem_or_exists_adj_of_leaf")
 In a simple graph, let $`S` be a set of vertices that contains a vertex $`s` and all its
-neighbors. Suppose that every edge from $`a\in S` to $`b\notin S` has a leaf endpoint: $`b` is
-the only neighbor of $`a`, or $`a` is the only neighbor of $`b`. Then every vertex reachable
+neighbors. Suppose that every edge from $`p\in S` to $`q\notin S` has a leaf endpoint: $`q` is
+the only neighbor of $`p`, or $`p` is the only neighbor of $`q`. Then every vertex reachable
 from $`s` lies in $`S` or is adjacent to a vertex of $`S`.
 :::
 
 :::proof "one_step"
-Call a vertex of $`S` anchored if it is $`s` or has a neighbor in $`S`. Follow a walk from
-$`s`. While it stays in $`S`, each vertex it visits is anchored. Suppose it first steps from an
-anchored $`a` to $`b\notin S`. Then $`a` has a neighbor in $`S`, or is $`s`, whose neighbors lie
-in $`S`. So $`b` is not the only neighbor of $`a`, and $`b` is the leaf. The next step can only
-return along the same edge.
+Call a vertex of $`S` anchored if it is $`s` or has a neighbor in $`S`. Along a walk from $`s`,
+every vertex in $`S` is anchored, because the walk reached it from $`s` or from a neighbor in
+$`S`. Suppose the walk steps from an anchored $`p` to $`q\notin S`. Then $`p\ne s`, since all
+neighbors of $`s` lie in $`S`. So $`p` has a neighbor in $`S`, which differs from $`q`, and the
+hypothesis makes $`p` the only neighbor of $`q`. The next step returns to the anchored vertex
+$`p`. Hence every vertex of the walk lies in $`S` or is a leaf hanging off a vertex of $`S`.
 :::
 
-:::lemma_ "slab_crossing" (lean := "TDCSG.Five.leaf_of_crossing") (uses := "active_graph, terminal_crossing")
+:::lemma_ "slab_crossing" (lean := "TDCSG.Five.leaf_of_crossing") (uses := "active_graph, good_level, terminal_crossing")
 Let $`0\le r<R`, and let $`lo` and $`hi` be good levels of coordinate $`j`. Every edge of the
-center graph from a label $`a` with $`lo<a_j\le hi` to a label outside this slab has a leaf
+center graph from a label $`n` with $`lo<n_j\le hi` to a label outside this slab has a leaf
 endpoint.
 :::
 
 :::proof "slab_crossing" (lean := "TDCSG.Five.isGoodLevel_of_crossing, TDCSG.Five.leaf_of_isGoodLevel")
-An edge joins a weight-zero label $`n` to $`n+e_k`, so it changes only the coordinate $`k`, by
-one. To leave the slab it must have $`k=j` and $`n_j\in\{lo,hi\}`, a good level. The crossing
+An edge joins a weight-zero label $`m` to $`m+e_k`, so it changes only the coordinate $`k`, by
+one. To leave the slab it must have $`k=j` and $`m_j\in\{lo,hi\}`, a good level. The crossing
 lemma then removes every other neighbor of one endpoint.
 :::
 
@@ -61,7 +62,7 @@ the slab $`lo<n_j\le hi`. By the two preceding lemmas, every reachable label lie
 next to it. Hence $`|n_j|\le 2K+4`.
 :::
 
-:::lemma_ "uniform_orbits" (lean := "MulAction.finite_of_encard_orbit_le, TDCSG.finite_of_encard_orbit_le")
+:::lemma_ "uniform_orbits" (lean := "MulAction.finite_of_encard_orbit_le, TDCSG.finite_of_encard_orbit_le") (uses := "group_orbit")
 A finitely generated group acting faithfully on a set is finite if the sizes of all point
 orbits share one finite bound. In particular $`GG_n(r)` is finite once its orbits are uniformly
 bounded.

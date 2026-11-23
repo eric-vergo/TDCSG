@@ -30,12 +30,14 @@ $`b` are the disk rotations about $`-1` and $`1`.
 :::definition "group_orbit" (lean := "TDCSG.GG, TDCSG.GG_eq_closure, TDCSG.orbit") (uses := "disk_rotation")
 The generators $`a` and $`b` generate a group $`GG_n(r)` of permutations of the whole plane.
 The orbit of $`z` consists of the images of $`z` under all finite words in $`a`, $`b` and their
-inverses.
+inverses. More generally $`GG_{n_1,n_2}(r_1,r_2)` uses order $`n_1` and radius $`r_1` on the
+left disk and $`n_2`, $`r_2` on the right.
 :::
 
 :::definition "critical_radius_def" (lean := "TDCSG.infiniteRadii, TDCSG.criticalRadius") (uses := "group_orbit")
 The critical radius of order $`n` is the infimum of the radii $`r` at which $`GG_n(r)` is
-infinite.
+infinite. When the group is finite at every radius, as for $`n=1,2,3,4,6`, the infimum of the
+empty set is taken to be $`0`.
 :::
 
 :::lemma_ "critical_radius_of_iff" (lean := "TDCSG.criticalRadius_eq_of_forall_finite_iff") (uses := "critical_radius_def")
@@ -48,7 +50,7 @@ is $`r_0`.
 :::
 
 :::lemma_ "infinite_of_orbit" (lean := "TDCSG.infinite_GG_of_infinite_orbit") (uses := "group_orbit")
-If some point has an infinite orbit, the group is infinite.
+If a point $`p` has an infinite orbit, the group is infinite.
 :::
 
 :::proof "infinite_of_orbit"
@@ -57,6 +59,6 @@ group is finite.
 :::
 
 At order five, let $`R=\sqrt{3+\varphi}`, where $`\varphi=(1+\sqrt5)/2`. The radius in the
-picture lies below $`R`. Every word then belongs to a finite group. At $`R` itself, even the single
+picture lies below $`R`. The group is then finite. At $`R` itself, even the single
 point zero has an infinite orbit. The next four chapters explain how the finiteness proof finds
 a uniform bound. The last geometric chapter shows why that bound stops at exactly $`R`.

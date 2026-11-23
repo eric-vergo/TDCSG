@@ -16,14 +16,16 @@ tag := "other-orders"
 
 The chord construction suggests searching for new infinite orbits when the disks rotate through
 an eighth, tenth or twelfth turn. All three orders have proved upper bounds. Finiteness on the
-whole range below each bound is open. Certificates prove finiteness on initial ranges, modulo a
-computation, as described at the end of this chapter.
+whole range below each bound is open. Certificates prove finiteness on initial ranges through a
+refereed written theorem and a computer check, neither of them in Lean, as described at the end
+of this chapter.
 
-:::theorem "other_upper" (lean := "TDCSG.CriticalRadius.criticalRadius_eight_le, TDCSG.CriticalRadius.criticalRadius_ten_le, TDCSG.CriticalRadius.criticalRadius_twelve_le") (uses := "critical_radius_def, infinite_of_orbit")
+:::theorem "other_upper" (lean := "TDCSG.CriticalRadius.criticalRadius_eight_le, TDCSG.CriticalRadius.criticalRadius_ten_le, TDCSG.CriticalRadius.criticalRadius_twelve_le, TDCSG.CriticalRadius.infinite_orbit_zero_ten, TDCSG.CriticalRadius.infinite_orbit_pStar_eight, TDCSG.CriticalRadius.infinite_orbit_pStar_twelve, TDCSG.CriticalRadius.pStar_eight_mem_sphere, TDCSG.CriticalRadius.pStar_twelve_mem_sphere") (uses := "critical_radius_def, infinite_of_orbit")
 The critical radii for orders 8, 10 and 12 are at most
 $`\sqrt{10-5\sqrt2}`, $`\sqrt{4-\varphi}`, and $`\sqrt{40-22\sqrt3}` respectively.
-At order ten the witness is the orbit of zero. At orders eight and twelve a distinguished
-point on the left disk boundary has an infinite orbit.
+At order ten the witness is the orbit of zero. At orders eight and twelve the witness is a
+lattice point that lies on the boundary circle of the left disk at the stated radius, and its
+orbit is infinite at that radius and every larger one.
 :::
 
 :::proof "other_upper"
@@ -76,15 +78,16 @@ commands and exact radius syntax.
 # What a certificate adds
 
 A cut-set certificate is a finite union of arcs of circles of radius $`r` that contains both
-boundary circles, is mapped into itself by both generators and their inverses, and satisfies two transversality
-conditions where it meets the boundary circles. The certificate theorem, Theorem 4.2 of the
+boundary circles, is mapped into itself by both generators and their inverses, and meets the boundary circles
+in a controlled way: no carrying circle is tangent to a boundary circle, and every arc endpoint
+on a boundary circle is also the endpoint of an arc that enters that disk. The certificate theorem, Theorem 4.2 of the
 [written proof](https://github.com/eric-vergo/TDCSG/blob/main/notes/proofs/critical-radius-n5.md),
 says that such a certificate at radius $`r` makes the group finite at $`r`, and by monotonicity
 at every smaller radius. Its proof is refereed, holds for every order, and has no Lean
 counterpart: the library contains neither the theorem nor a definition of a certificate.
 
 The search and verification programs are separate. The checker reads a finished certificate
-and tests its closure conditions using exact integer arithmetic. The
+and tests its closure conditions using exact arithmetic without floating point. The
 [certificate records](https://github.com/eric-vergo/TDCSG/blob/main/notes/certificates.md)
 give input radii, commands and file checksums. The certified finiteness ranges for orders 8,
 10 and 12, and the certified initial ranges at order five, are therefore proved modulo that
