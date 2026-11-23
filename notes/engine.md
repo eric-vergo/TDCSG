@@ -206,8 +206,8 @@ tdcsg-orbit scan -n 33 --r2 touch --terms 4 --cap 3000000                  # man
 `certify` computes the cut set K(r), the closure of the two boundary circles under a^{±1}, b^{±1},
 as a finite union of circular arcs, and exports it as a certificate for the theorem that
 (C1)–(C4) imply finiteness of GG_n(r) (Theorem 4.2 of
-[`proofs/critical-radius-n5.md`](proofs/critical-radius-n5.md); stated, not proved, as
-`TDCSG.CutSetCertificate` in `TDCSG/CriticalRadius/Certificate.lean`). `check-certificate` reads
+[`proofs/critical-radius-n5.md`](proofs/critical-radius-n5.md), a refereed written result with no
+Lean counterpart). `check-certificate` reads
 such a file and verifies (C1)–(C4) from scratch. The format, all runs, and what they establish
 are in [`certificates.md`](certificates.md).
 
@@ -250,10 +250,11 @@ window-clipped closures at a norm radius, symmetry-reduced closures, and interva
 they are described, with all runs, in [`relative-certificates.md`](relative-certificates.md).
 
 **What is established.** A certificate that passes `check-certificate` satisfies (C1)–(C4) as
-checked by a compiled, tested Lean program; it is not a kernel-checked proof. Its link to the Lean
-proposition `TDCSG.Certificate` is by correspondence of definitions (explained in the docstring of
-`CertCheck.lean`), not by a proof that the checker is sound; and the certificate theorem itself
-(`TDCSG.CutSetCertificate`) is proved on paper and refereed, not in Lean.
+checked by a compiled, tested Lean program; it is not a kernel-checked proof. Its link to the
+hypotheses of the certificate theorem is by correspondence of the checks with the conditions
+([`certificates.md`](certificates.md) §2), not by a proof that the checker is sound; and the
+certificate theorem itself is a refereed written result with no Lean counterpart. The certified
+ranges are therefore proved modulo the computation.
 
 ## Tests
 
@@ -447,4 +448,5 @@ one statement corrected is the remark in E1c that the orbit at r₁ jumps past 6
    the events of GG_n(r) toward r_c.
 4. Prove the membership argument in Lean against Mathlib's definitions of the disks.
 5. A verified certificate checker: the checker written as a Lean function with a proof that
-   acceptance implies `TDCSG.Certificate n r arcs` (see [`certificates.md`](certificates.md)).
+   acceptance implies (C1)–(C4) for a Lean definition of a certificate, together with a Lean proof
+   of the certificate theorem (see [`certificates.md`](certificates.md) §7).

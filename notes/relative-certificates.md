@@ -503,8 +503,11 @@ not arc closures.
 | 10 | 1.543362 | `1/47` (`ρ₁`: `δ ≈ 0.0212735`) | 1.536454 (1.536455) | 0.006908 | ordinary certificate; interval of validity | `1/47` |
 | 12 | 1.376547 | `1/180` (`ρ₁`: `δ ≈ 0.0055543`) | 1.374528 (1.374528) | 0.002019 | ordinary certificate; interval of validity | `1/180` |
 
-The remaining windows `(r_*, r_c)` are open in every case; level 2 for `n = 5` is still only the
-floating-point computation of `sharp-lower-bound-n5.md`.
+For `n = 8, 10, 12` the remaining windows `(r_*, r_c)` are open. For `n = 5` finiteness on the
+whole window is proved by a different argument
+([`proofs/sharp-lower-bound-n5-pentagrid.md`](proofs/sharp-lower-bound-n5-pentagrid.md)), which
+uses no certificate; as a certificate, level 2 for `n = 5` is only the floating-point computation
+of `sharp-lower-bound-n5.md`.
 
 ## 11. What is established and what is not
 
@@ -519,7 +522,7 @@ floating-point computation of `sharp-lower-bound-n5.md`.
   and is refereed correct in
   [`proofs/referee-report-relative-certificates.md`](proofs/referee-report-relative-certificates.md)),
   the uniform bound on window-avoiding chains (Theorem 5.2 there) for the windows marked VALID:
-  for those windows the note's Theorem 5.2 does not depend on floating-point ordering. (R-bulk), (R-core) and (B) remain open; a relative certificate says
+  for those windows the note's Theorem 5.2 does not depend on floating-point ordering. (R-bulk) and (R-core) remain open; a relative certificate says
   nothing about finiteness at any particular `r < r_c` by itself.
 - **Finiteness ranges** in §10 rest on the refereed certificate theorem where (C1)–(C4) were
   checked, and on Theorem H (§9; proved here, refereed correct after minor fixes; it is
@@ -533,7 +536,8 @@ floating-point computation of `sharp-lower-bound-n5.md`.
   tests, and on the Lean compiler and runtime (and, for the generator's float filter, on IEEE 754
   arithmetic). The link between the checker's acceptance and the theorems' hypotheses is by
   inspection of the definitions. Theorem 4.2, Theorem H and the §8 argument are proved and refereed
-  on paper only; none is kernel-checked. The face count `F`, and hence the constant
+  on paper only; none has a Lean counterpart, so the certified ranges are proved modulo the
+  computation. The face count `F`, and hence the constant
   `β_W = 1 + 20nF`, was not computed: it
   needs every crossing of two arcs of `K'` (a quadratic enumeration with exact identification of
   points on three or more circles), and no conclusion here uses its value, only its finiteness.

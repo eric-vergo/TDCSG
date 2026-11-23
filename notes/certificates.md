@@ -21,11 +21,9 @@ finite union K of non-degenerate closed arcs of circles of radius r satisfies
   there,
 
 then GG_n(r) is finite, and by the refereed group monotonicity so is GG_n(r') for every r' ≤ r.
-In Lean, `TDCSG/CriticalRadius/Certificate.lean` defines `TDCSG.Arc` (a centre and two angles
-θ₁ < θ₂ ≤ θ₁ + 2π), `TDCSG.Certificate n r arcs` (non-degeneracy and (C1)–(C4) for the union of
-`arcs`, with (C4) in a local form), the theorem as the proposition `TDCSG.CutSetCertificate n`
-(stated, **not proved** in Lean), and proves the reduction `TDCSG.finite_GG_of_certificate`:
-the theorem plus `TDCSG.ExistsCertificate n r₀` give finiteness for all r ≤ r₀.
+The certificate theorem is a refereed written result with no Lean counterpart: the Lean library
+contains neither the theorem nor a certificate predicate. Every certified range in this note is
+therefore proved modulo the computation.
 
 The natural candidate for K is the cut set K(r), the closure of ∂D_L ∪ ∂D_R under a^{±1}, b^{±1}.
 `certify` computes it; when the closure terminates, no carrying circle is tangent to a boundary
@@ -77,14 +75,14 @@ only the exact layer (`Field`, `Ball`, `Tower`, `CirclePoint`: arithmetic in ℤ
 order of points, tangency signs, the rotations). Parsing, clipping, containment, maximality and the
 (C1)–(C4) logic are separate code, and the checker uses no floating point at all.
 
-**Relation to `TDCSG.Certificate`.** An `arc` record on centre c is the `TDCSG.Arc` with centre the
-complex value of c, θ₁ the angle of its initial point and θ₂ = θ₁ + (counterclockwise angle to the
-final point); a `full` record has θ₂ = θ₁ + 2π. With r = √(r²) the checks above are the conjuncts of
-`TDCSG.Certificate n r arcs`: non-degeneracy, (C1), (C2) for `permA`, `permA⁻¹`, `permB`, `permB⁻¹`
-(the rotations by ζ^{∓1} on the closed disks, the identity elsewhere), (C3) as `dist c p ≠ 2r`, and
-(C4) in the local form of the Lean statement (an arc that starts at (p, −) or ends at (p, +) runs
-into D_p, and an interior point of an arc on ∂D_p is a crossing). This correspondence is by
-inspection of the definitions.
+**Relation to (C1)–(C4).** An `arc` record on centre c is the arc of the circle of radius r about
+the complex value of c from the angle θ₁ of its initial point to θ₂ = θ₁ + (counterclockwise angle
+to the final point); a `full` record has θ₂ = θ₁ + 2π. With r = √(r²) the checks above are the
+hypotheses of the certificate theorem for the union of the arcs: non-degeneracy, (C1), (C2) for
+a^{±1} and b^{±1} (the rotations by ζ^{∓1} on the closed disks, the identity elsewhere), (C3) as
+|c − p| ≠ 2r, and (C4) in a local form (an arc that starts at (p, −) or ends at (p, +) runs into
+D_p, and an interior point of an arc on ∂D_p is a crossing). This correspondence is by inspection
+of the checker against the statement of the theorem.
 
 ## 3. The certificate format
 
@@ -294,8 +292,10 @@ programs; by group monotonicity GG_n(r) is then finite for every r ≤ r_* (subj
 | 10 | 4 − φ | 1.543362 | 1/47 | 1.536454 | 0.006908 | δ = 1/16, r_c − r = 0.020383 |
 | 12 | 40 − 22√3 | 1.376547 | 1/180 | 1.374528 | 0.002019 | δ = 1/50, r_c − r = 0.007284 |
 
-The remaining gap is open in every case: no single computation reaches r_c, and the window
-(r_*, r_c) needs the renormalization argument of the notes. A symmetry-reduced window-free closure
+No single computation reaches r_c. For n = 8, 10, 12 the window (r_*, r_c) is open. For n = 5 it
+is closed by the integer-coordinate proof
+([`proofs/sharp-lower-bound-n5-pentagrid.md`](proofs/sharp-lower-bound-n5-pentagrid.md)), which
+uses no certificate. A symmetry-reduced window-free closure
 (`certify-relative --window 0 --symmetric`, checked with (C1)–(C4) by
 `check-relative-certificate`) certifies n = 8 at δ = 547/25000 ≈ 0.02188
 (r_c − r_* ≈ 0.006404), and exact intervals of validity extend the n = 10 and n = 12 rows slightly;
@@ -389,17 +389,18 @@ All certificates of §§4–5 (n, δ, maximal arcs, size in bytes, SHA-256):
 - **Not established by a proof.** The checker is a program, not a kernel-checked proof: its
   correctness rests on the arguments in its docstrings, on the tests, and on the Lean compiler and
   runtime (and for the generator's float filter, on IEEE 754 arithmetic; the checker does not use
-  floats). The link between "the checker accepts" and the Lean proposition
-  `TDCSG.ExistsCertificate n r` is by correspondence of definitions (§2), not by a formal proof.
-  The certificate theorem itself, `TDCSG.CutSetCertificate n`, is proved on paper and refereed, but
-  not in Lean; so `TDCSG.finite_GG_of_certificate` cannot yet be applied formally.
+  floats). The link between "the checker accepts" and the hypotheses (C1)–(C4) of the certificate
+  theorem is by correspondence of the checks with the conditions (§2), not by a formal proof. The
+  certificate theorem itself is a refereed written result with no Lean counterpart, so the
+  certified ranges are proved modulo the computation and are not Lean theorems.
 - **What closing the gap would take.** (1) A checker written as a Lean function on a certificate
   data type (symbols as elements of a verified model of ℤ[ζ_n], e.g. `ℤ[X]/Φ_n` with a ring
-  isomorphism to `ℤ[ζ_n] ⊂ ℂ`), with a theorem `check cert = true → TDCSG.Certificate n r (arcs cert)`.
+  isomorphism to `ℤ[ζ_n] ⊂ ℂ`), together with a Lean definition of a certificate (a finite list of
+  arcs satisfying (C1)–(C4)) and a theorem that acceptance by the checker implies it.
   Its ingredients are the exact sign algorithm in quadratic towers (soundness of recursive squaring),
   the order of intersection points by cross products, clipping and containment of arcs, and the
-  correspondence of symbols with `TDCSG.Arc` angles. (2) Running it on a certificate of 10⁵–10⁶
+  correspondence of symbols with arc angles. (2) Running it on a certificate of 10⁵–10⁶
   arcs: kernel reduction (`decide`) is far out of reach at this size; `native_decide` would trust
   the compiler (as the present program does), so the gain would be the verified algorithm, not a
-  smaller trusted base. (3) A Lean proof of `TDCSG.CutSetCertificate` (the cell-decomposition
+  smaller trusted base. (3) A Lean proof of the certificate theorem (the cell-decomposition
   argument of Theorem 4.2).

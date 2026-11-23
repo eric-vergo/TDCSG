@@ -2,7 +2,7 @@
 
 Authors: Eric Vergo, Claude
 
-**Statement and status.** Let $r_c=\sqrt{3+\varphi}\approx2.1489611$ and $r_{\rm crit}(5)=\sup\{r:GG_5(r)\text{ finite}\}$. It is proved (`critical-radius-n5.md`, Theorem A, refereed and Lean-checked) that $GG_5(r)$ is infinite for every $r\ge r_c$. The target is the converse, **(B): $GG_5(r)$ is finite for every $r<r_c$**, which would give $r_{\rm crit}(5)=r_c$. **(B) is still open. This note does not prove $r_{\rm crit}(5)=\sqrt{3+\varphi}$.** What is new:
+**Statement and status.** Let $r_c=\sqrt{3+\varphi}\approx2.1489611$ and $r_{\rm crit}(5)=\sup\{r:GG_5(r)\text{ finite}\}$. It is proved (`critical-radius-n5.md`, Theorem A, refereed and Lean-checked) that $GG_5(r)$ is infinite for every $r\ge r_c$. The target is the converse, **(B): $GG_5(r)$ is finite for every $r<r_c$**, which gives $r_{\rm crit}(5)=r_c$. **(B) is proved by a different argument, in [`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md); this note does not prove it.** Its results below do not depend on that proof. What is new:
 
 1. **Certified range (not new here).** The best certified range is recorded in [`../certificates.md`](../certificates.md). It is generated and independently checked by the repository's exact Lean engine, whose checker uses no floating point. For $n=5$ it gives $GG_5(r)$ finite for $r^2\le3+\varphi-1/55$, that is $r\le2.144727$, $r_c-r\approx0.004235$. That range covers the level-one radius $\delta_1=\varepsilon/10$ ($r_c-r\approx0.0055$) and the radius $\delta_-=(18-11\varphi)/10$ treated below, since $1/55<\delta_-<\delta_1$. The level-one certificate has also been generated directly by the engine and found VALID by its checker, with an arc set identical to this note's (§5.3).
    **Computed, not certified: level two.** A new C program (§5) closes the cut set at the level-two radius $\delta_2=\varepsilon^2/10=(13-8\varphi)/10$ ($r\approx2.147664$, $r_c-r\approx0.0013$): 4.93 million canonical circles, 69.0 million canonical maximal arcs, (C2) and (C4) passed by its own re-check. This is one unrefereed program with floating-point ordering. Its angle error bound is hard-coded, not derived, and no independent program has read the output. It is therefore a computation awaiting certification, not part of what is proved (§5.1).
@@ -11,7 +11,7 @@ Authors: Eric Vergo, Claude
 4. **Proved: the Diophantine lune lemma** (Lemma 6.1) and the exact local renormalization it implies (Proposition 6.2). It applies asymptotically, from a level $k_0$ that grows with the normalized window: at the computed levels $0$–$2$ its hypothesis holds, in the tested window, only at $P$ itself (§6). Near a tight point $P$, for lattice points in a normalized window, the disk test at level $k$ coincides exactly with a half-plane test, and the substitution $y\mapsto P+\varepsilon(y-P)$, $\varepsilon=\varphi^{-3}$, carries level-$k$ membership to level-$(k+1)$ membership exactly. This is the mechanism that turns asymptotic self-similarity into exact self-similarity, but only for lattice points of bounded normalized internal coordinate.
 5. **Computed (exact arithmetic):** the orbit of $0$ at levels $k=0,\dots,3$ (finite, of sizes $1\,433$, $30\,165$, $400\,519$, $5\,673\,561$; the sizes and internal maxima were reproduced exactly by the engine during refereeing). The following are evidence only. Its internal hull is a round disk of radius $\approx6.49/\delta$. Its part near $0$ is exactly nested under $x\mapsto\varepsilon x$. Level-$(k+1)$ orbits near $0$ are exact unions of $\varepsilon$-scaled level-$k$ orbits (§7).
 
-**The remaining gap is one statement** (Conjecture 8.1, termination): *for a sequence of non-norm radii $r_j\uparrow r_c$, the closure $K(r_j)$ terminates.* By item 2 and group monotonicity this is equivalent to (B). It is certified for the levels $k=0,1$ (by the engine certificates of `../certificates.md`) and computed, uncertified, for $k=2$. The renormalization step that would prove it for all $k$ is not found (§8, §9).
+**The certificate form of (B) is one statement** (Corollary 8.1, termination): *for a sequence of non-norm radii $r_j\uparrow r_c$, the closure $K(r_j)$ terminates.* By item 2 and group monotonicity this is equivalent to (B), so it holds, by the proof of (B) in [`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md). By this note's own methods it is certified for the levels $k=0,1$ (by the engine certificates of `../certificates.md`) and computed, uncertified, for $k=2$. The renormalization step that would prove it for all $k$ is not found (§8, §9).
 
 Throughout, "verified exactly" means that equalities and signs in $\mathbb Q(\sqrt5)$ are decided with integers. The C programs of §5 also order distinct points along a circle in double precision, guarded at run time by a margin; that ordering is not certified (§5.1).
 
@@ -283,15 +283,15 @@ These are the lattice analogues of the "exact germ recursion" observed for $n=8$
 
 ---
 
-## 8. The remaining gap
+## 8. Termination along the levels
 
-**Conjecture 8.1 (termination).** There are non-norm radii $r_j\uparrow r_c$ (for instance the levels $r_k$) such that the closure $K(r_j)$ is a finite union of arcs for every $j$.
+**Corollary 8.1 (termination).** There are non-norm radii $r_j\uparrow r_c$ (for instance the levels $r_k$) such that the closure $K(r_j)$ is a finite union of arcs for every $j$.
 
-**Equivalence.** By Theorem 3.1 and group monotonicity, Conjecture 8.1 is *equivalent* to (B). It replaces Conjecture R$^\ast$ of `critical-radius-n5.md`, which also asked for (C3) and (C4): those are now theorems at non-norm radii. Certified for $k=0,1$ (`../certificates.md`; level one also directly by the engine, §5.3). Computed, not certified, for $k=2$ (§5).
+**Equivalence.** By Theorem 3.1 and group monotonicity, Corollary 8.1 is *equivalent* to (B). Since (B) is proved ([`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md)), Corollary 8.1 holds. It is Corollary R$^\ast$ of `critical-radius-n5.md` without (C3) and (C4), which hold automatically at non-norm radii. Certified for $k=0,1$ (`../certificates.md`; level one also directly by the engine, §5.3). Computed, not certified, for $k=2$ (§5).
 
-**Equivalent lattice form** (Theorem 4.1). For each $k$ there is $R_k$ with $|\sigma(t)|\le R_k$ for every word map at every lattice point, at radius $r_k$.
+**Equivalent lattice form** (Theorem 4.1). For each $k$ there is $R_k$ with $|\sigma(t)|\le R_k$ for every word map at every lattice point, at radius $r_k$. It holds, with $R_k\le(160\sqrt5+32r_c^2)/\delta_k$, $\delta_k=\varepsilon^k/10$ (Corollary of §4 of [`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md); written proof only).
 
-**What a proof must supply.** In the order a renormalization proof would need them:
+**What a renormalization proof would supply.** In the order a renormalization proof would need them:
 1. **(Exact local step)** Proposition 6.2, valid from a level $k_0\ge4$ that grows with the window (§6).
 2. **(Substitution)** a finite description of how level-$(k+1)$ orbits are assembled from rescaled level-$k$ orbits. That is a finite set of "merging" excursions, independent of $k$ for $k\ge k_0$, of the kind seen in §7(3).
 3. **(Bounded excursions)** a $k$-independent bound on how far a level-$(k+1)$ orbit wanders from the rescaled core before returning. §7(4) suggests it is uniform for a fixed core, but this is evidence only.
@@ -324,7 +324,7 @@ The verdicts are those of `referee-report-sharp-lower-bounds.md`, after its fixe
 | Level two ($r\le r_2$, $r_c-r_2\approx0.0013$) | **computed, not certified**: one C program, hard-coded error bound, no independent check |
 | Orbit of $0$ finite for $r\le r_3$ ($r_c-r_3\approx3.1\cdot10^{-4}$) | **proved modulo an exact BFS**; sizes and internal maxima reproduced exactly by the engine |
 | §5.2 growth data, §7 observations 1–4 | computed, exact; evidence only; not checked by the referee beyond the orbit sizes |
-| Conjecture 8.1 (termination) $\iff$ (B) $\iff$ $r_{\rm crit}(5)=\sqrt{3+\varphi}$ | **open**; the equivalence is refereed correct (a reformulation, not a reduction to an easier statement) |
+| Corollary 8.1 (termination) $\iff$ (B) $\iff$ $r_{\rm crit}(5)=\sqrt{3+\varphi}$ | **holds**, since (B) is proved in [`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md); the equivalence is refereed correct (a reformulation, not a reduction to an easier statement) |
 
 **Not checked by the referee:**
 - level two by any independent program;

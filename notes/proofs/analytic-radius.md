@@ -570,12 +570,13 @@ That is the precise form of "the group is finite although the germs it contains 
 analytic continuation, a dense group".
 
 **Whether the interval is non-empty.** This is the statement $r_A<r_c$.
-- For $n=5$ it is **proved modulo a certified computation**.
+- For $n=5$ it is **proved**: $r_c(5)=\sqrt{3+\varphi}\approx2.149$
+  ([`sharp-lower-bound-n5-pentagrid.md`](sharp-lower-bound-n5-pentagrid.md), machine-checked),
+  above $r_A(5)=1.236$. A smaller range already suffices, modulo a certified computation:
   - Theorem B of `critical-radius-n5.md` (refereed) proves $GG_5(r)$ finite for
     $r\le r_\ast\approx2.12557$, from an exact cut-set computation combined with group monotonicity.
     This is a radius above $r_A(5)=1.236$. Hence $r_c(5)>r_A(5)$.
-  - Theorem A of that note shows $GG_5(r)$ infinite for $r\ge\sqrt{3+\varphi}$. Finiteness just
-    below $\sqrt{3+\varphi}$ is open there.
+  - Theorem A of that note shows $GG_5(r)$ infinite for $r\ge\sqrt{3+\varphi}$.
 - For $n=8,10,12$ it is likewise **proved modulo certified computations**: the certificates recorded
   in [`../certificates.md`](../certificates.md) give finiteness at radii $1.70$, $1.53$, $1.37$, above
   $r_A=1.082$, $1.051$, $1.035$.
