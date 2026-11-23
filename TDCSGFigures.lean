@@ -26,5 +26,7 @@ PILean from exact data (`TDCSGFigures.Data`, `TDCSGFigures.Data.Early`,
 chapters 1 and 2, `TDCSGFigures.Parts` for the two part dividers, `TDCSGFigures.Chord` for
 chapter 3, `TDCSGFigures.Lift`, `TDCSGFigures.Lens`, `TDCSGFigures.Levels` and
 `TDCSGFigures.Confinement` for chapters 4 to 7, and `TDCSGFigures.OtherOrders` for chapter 9. The
-library needs neither Mathlib nor Verso.
+library needs neither Mathlib nor Verso. The specification theorem `<name>_spec` of each figure,
+which writes out what it draws, is stated and proved on the blueprint's page of the figures'
+theorems, `TDCSGFigureTheorems`, and attached to the figure there.
 -/

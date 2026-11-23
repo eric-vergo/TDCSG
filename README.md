@@ -46,6 +46,8 @@ The final command makes two changes to the challenge, each in its own disposable
 | `TDCSG/CriticalRadius/` | Also the critical radius `TDCSG.criticalRadius n` and the infinite orbits for n = 8, 10, 12, stated in `Statements.lean` |
 | `Comparator/` | The challenge statement and its solution |
 | `blueprint/` | The blueprint site: one chapter module per chapter in `blueprint/TDCSGBlueprint/`, build instructions in [`blueprint/README.md`](blueprint/README.md) |
+| `TDCSGFigures/` | The site's figures, drawn by [PILean](https://github.com/eric-vergo/PILean) from exact data (no Mathlib, no Verso); `figures/` is a small workspace that builds and previews them alone |
+| `TDCSGFigureTheorems.lean` | The site's page "Figures and their theorems": for every figure, the theorem that writes out what it draws |
 | `TDCSGCompute/` | The exact orbit engine and the `tdcsg-orbit` executable (core Lean, no Mathlib), including certificate generators and checkers; see [`notes/engine.md`](notes/engine.md) |
 | `certificates/` | Small finiteness certificates and relative certificates, with their SHA-256 sums; formats in [`notes/certificates.md`](notes/certificates.md) and [`notes/relative-certificates.md`](notes/relative-certificates.md) |
 | `notes/` | Research notes; start with [`overview.md`](notes/overview.md) and [`open-problem-critical-radius.md`](notes/open-problem-critical-radius.md) |

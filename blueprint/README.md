@@ -41,6 +41,7 @@ The entry point is `BlueprintMain.lean`. The chapter sequence lives in
 | 8 Proof of the main theorem | `MainTheorem` |
 | 9 Other orders | `OtherOrders` |
 | 10 Verification | `Verification` |
+| Figures and their theorems (unnumbered) | `TDCSGFigureTheorems`, at the repository root |
 
 The two parts are unnumbered pages between the chapters, so the chapters keep
 one numbering throughout. The main theorem is stated in `TwoDisks`; its
@@ -56,53 +57,66 @@ elaborated separately. The verification chapter imports only the solution.
 
 ## Figures
 
-Two kinds of figures share one numbering, 1 to N in document order.
+Every figure of the site is drawn by PILean: the value of a declaration with the attribute
+`@[figure]` in the library `TDCSGFigures` (`TDCSGFigures/`, one module per page or chapter, plus
+`Data` and `Data/`, the exact objects, and `Style`, the house style). The library imports PILean
+and the orbit engine `TDCSGCompute` only: no Mathlib, no Verso. The generator renders the figures
+the pages use with `PILeanVerso.withFigures` into `-verso-data/pilean-figures` with a manifest,
+fingerprints and the source record of each file, and fails the build when a figure with
+`checks := .fail` has a layout problem (at its full and its narrow width, in both themes).
 
-* **PILean figures** (the front page). Each is the value of a declaration with the attribute
-  `@[figure]` in the library `TDCSGFigures` (`TDCSGFigures/`, one module per page or chapter,
-  plus `Data`, the exact objects, and `Style`, the house style). The library imports PILean and
-  the orbit engine `TDCSGCompute` only: no Mathlib, no Verso. The generator renders the figures
-  a page uses with `PILeanVerso.withFigures` into `-verso-data/pilean-figures` with a manifest,
-  fingerprints and the source record of each file, and fails the build when a figure with
-  `checks := .fail` has a layout problem (at its full and its narrow width, in both themes).
-  Under each figure the page shows its number and caption, then a source line: the declaration,
-  its file and line linked to the repository at the build's commit, the fingerprint, and the
-  theorem that states what it draws. Links to Lean declarations, in the source line and on the
-  elements of an inline picture, lead to the declaration's row in the Lean panel of the
-  Blueprint entry that names it (`leanLinks := .site`); the build warns about a declaration
-  with no such place. The page `Figures` lists every figure.
-* **Hand-drawn plates** (chapters 2 to 7). `blueprint/TDCSGBlueprint/Figures.lean` writes them as
-  SVG in floating-point drawing coordinates to the site's `plates/` folder, with
-  `plates/SHA256SUMS`; a plate is the image of a paragraph whose text is its caption, starting
-  with `*Figure N.*`. Dark mode shows them inverted (`blueprint/figures.css`).
+A chapter shows a figure with `:::figure` (inline, so that the picture follows the page's theme
+and its elements link to Lean) or `:::figure_explorer` (a slider or stepper), with a label, a text
+alternative, the theorem it proves and the caption as the body. Figures are numbered as the
+Blueprint numbers its statements: "Figure 5.1" is the first figure of chapter 5, and the figures
+of the unnumbered pages (the front page and the two part pages) are numbered 1 to 4. Prose refers
+to a figure by its label, `{figref "lens-estimate"}[]`, which renders its current number.
 
-`scripts/check-pages.py` checks both kinds; for PILean figures it reads the manifest, requires a
-visible numbered caption and an accessible name, follows the Lean links, and runs
-`lake exe pilean-verify`, the inline-picture check of PILean's Verso adapter and a fresh render
-of the figures compared with the site's folder.
+Under each figure the page shows its number and caption, then a source line: the declaration,
+its file and line linked to the repository at the build's commit, the fingerprint, and the
+theorem that states what it draws. Links to Lean declarations, in the source line and on the
+elements of an inline picture, lead into the site (`leanLinks := .site`): to the declaration's
+row in the Lean panel of the Blueprint entry that names it, or, for the theorems of the figures,
+to the inline Lean block that defines it. The build warns about a declaration with no such place.
+The page Figures lists every figure.
+
+The theorems of the figures, `<name>_spec`, are stated and proved in Lean blocks of the page
+"Figures and their theorems", `TDCSGFigureTheorems.lean`, one section per page of the site, and
+attached to their figures there with `figure_proves`. Each writes out the figure's items and proves
+the facts its caption uses. The page lives at the repository root, in a library of its own,
+because PILean derives a theorem's source link from its module name. The theorems are not
+Blueprint statements, so they add no node to the dependency graph and are not part of the kernel
+replay; `lake build TDCSGBlueprint` checks them.
+
+`scripts/check-pages.py` reads the manifest, requires a visible numbered caption, an accessible
+name and gapless numbering, allows no other image in the pages, follows the Lean links, and runs
+`lake exe pilean-verify`, the inline-picture check of PILean's Verso adapter and a fresh render of
+the figures compared with the site's folder.
 
 ### Adding a figure
 
-1. Put the exact data it needs in `TDCSGFigures/Data.lean` (points of `ℤ[ζ₅]` as
-   `PILean.Exact.Zeta5`, reals of `ℚ(√5)` as `QSqrt5`, radii as `Rat` or `SqrtOf QSqrt5`, orbits
-   through `TDCSGFigures.orbit`), with a `#guard` for every property its caption states.
+1. Put the exact data it needs in `TDCSGFigures/Data.lean` or `TDCSGFigures/Data/` (points of
+   `ℤ[ζ₅]` as `PILean.Exact.Zeta5`, reals of `ℚ(√5)` as `QSqrt5`, radii as `Rat` or
+   `SqrtOf QSqrt5`, orbits through `TDCSGFigures.orbit`), with a `#guard` for every property its
+   caption states.
 2. Draw it in the module of its chapter (`TDCSGFigures/<Chapter>.lean`, imported by
    `TDCSGFigures.lean`) as a `Plane.Figure` (or an `Explorer` made with `Plane.slider` or
-   `Plane.stepper`) in `houseStyle`, with `checks := .fail`, `width := figureWidth` and
-   `narrowWidth := some narrowWidth`. Disks are outlines (`noFill`), the lens a region of its
-   own (`role lensRole`), the left disk and what belongs to it `role leftRole`, the right
-   `role rightRole`; every point, disk, centre, radius and region has a title (`named`) and a
-   label; a point near a curve records where it is (`incident`), decided exactly. Link elements
-   to the Lean declarations that state their facts with `declRef`, choosing declarations that
-   have a Blueprint entry.
-3. Mark it `@[figure]`, write its specification theorem `<name>_spec` with the item list written
-   out and the exact facts proved by `rfl` and `decide +kernel` (see
-   `TDCSGFigures.criticalChord_spec`), and attach it with `figure_proves`.
-4. Add it to `previews` in `TDCSGFigures/Preview.lean`, look at the previews (below), and put it
-   in its chapter with `:::figure TDCSGFigures.name (label := "…") (inline := true)
+   `Plane.stepper`) in `houseStyle` (`partTwoStyle`, `radiusStyle` for their roles), with
+   `checks := .fail`, `width := figureWidth` and `narrowWidth := some narrowWidth`. Disks are
+   outlines (`noFill`), the lens a region of its own (`role lensRole`), the left disk and what
+   belongs to it `role leftRole`, the right `role rightRole`, the window `role windowRole`, good
+   levels `role goodRole`; every point, disk, centre, radius and region has a title (`named`) and
+   a label beside it; a point near a curve records where it is (`incident`), decided exactly. Link
+   elements to the Lean declarations that state their facts with `declRef`, choosing declarations
+   that have a Blueprint entry.
+3. Mark it `@[figure]`, add it to `previews` in `TDCSGFigures/Preview.lean` and look at the
+   previews (below).
+4. Write its specification theorem `<name>_spec` in a Lean block of its page's section of
+   `TDCSGFigureTheorems.lean`, with the item list written out and the exact facts proved by `rfl`
+   and `decide +kernel` (see `TDCSGFigures.criticalChord_spec`), followed by `figure_proves`.
+5. Put it in its chapter with `:::figure TDCSGFigures.name (label := "…") (inline := true)
    (proves := TDCSGFigures.name_spec) (alt := "…")` or `:::figure_explorer`, the caption as the
-   body. Remove the plate it replaces from `Figures.lean` and from `expected` in
-   `scripts/check-pages.py`, and renumber the hand-written captions after it.
+   body; the chapter imports `TDCSGFigureTheorems`.
 
 ### Drawing figures in a worktree
 
@@ -126,7 +140,8 @@ The preview tool writes `out/NAME[-frame-K][-narrow][-dark].{svg,png}` (light, d
 narrow dark; each frame of an explorer as its slider shows it) and prints every layout problem
 of the figure at both widths, whatever its checks level; it exits with status 1 when there is
 one. The site build applies the same checks. `figures/lean-toolchain` must name the toolchain of
-the root `lean-toolchain`.
+the root `lean-toolchain`. The specification theorems are not part of this workspace: they live on
+the page `TDCSGFigureTheorems`, which needs Verso, and `lake build TDCSGBlueprint` checks them.
 
 ## Dependencies
 
