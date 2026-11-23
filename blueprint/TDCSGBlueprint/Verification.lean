@@ -78,7 +78,7 @@ problem also requires reading their definitions.
 Verso and the cited Verso Blueprint modules credit Lean FRO LLC and their respective
 authors under the [Apache License 2.0](/Apache-2.0.txt). The
 [Blueprint source](https://github.com/eric-vergo/verso-blueprint/tree/9fa92b2bf1d3bf2071963157e077b011666c435d)
-includes the individual file credits. PILean draws the geometric plates. LeAnTeX
+includes the individual file credits. PILean draws the figures. LeAnTeX
 typesets the formulas with glyph outlines from Antonis Tsolomitis’s New Computer Modern.
 The selected fonts carry the GUST Font License. See the
 [font package notice](/NewCM-license.txt) and the [LaTeX Project Public License](/LPPL-1.3c.txt).
