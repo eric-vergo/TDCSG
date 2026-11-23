@@ -159,8 +159,8 @@ theorem exists_mem_orbit {r : ℝ} (hr : √(3 + φ) ≤ r) (k : ℕ) :
       rw [← applyWord_word₃ hr ⟨h', ht₁.le⟩]
       exact applyWord_mem_orbit _ hmem
 
-/-- **Theorem A**, orbit form: for every `r ≥ √(3 + φ)` the orbit of `0` under `GG 5 5 r r` is
-infinite. -/
+/-- Theorem A of the note `notes/proofs/critical-radius-n5.md`, orbit form: for every
+`r ≥ √(3 + φ)` the orbit of `0` under `GG 5 5 r r` is infinite. -/
 theorem infinite_orbit_zero {r : ℝ} (hr : √(3 + φ) ≤ r) : (orbit 5 5 r r 0).Infinite := by
   choose t m _ htm hmem using exists_mem_orbit hr
   refine Set.infinite_of_injective_forall_mem (f := fun k ↦ (t k : ℂ) * embed pointE)
@@ -178,7 +178,8 @@ theorem infinite_orbit_zero {r : ℝ} (hr : √(3 + φ) ≤ r) : (orbit 5 5 r r 
   rw [eq_div_iff hd]
   linear_combination hkl' / 2
 
-/-- **Theorem A**: for every `r ≥ √(3 + φ)` the group `GG 5 5 r r` is infinite. -/
+/-- Theorem A of the note `notes/proofs/critical-radius-n5.md`: for every `r ≥ √(3 + φ)` the
+group `GG 5 5 r r` is infinite. -/
 theorem infinite_GG {r : ℝ} (hr : √(3 + φ) ≤ r) : Infinite (GG 5 5 r r) :=
   infinite_GG_of_infinite_orbit (infinite_orbit_zero hr)
 

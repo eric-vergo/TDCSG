@@ -26,9 +26,9 @@ $`u=\zeta` at $`r=1.8`, their lens, and the half-planes $`\operatorname{Re}v\ge\
 (lightly shaded strip with a dashed edge, together with everything to its right) and
 $`\operatorname{Re}v\ge\kappa` (darker), with $`\kappa=(2\varphi+1)/4`,
 $`\eta=(3+\varphi-r^2)/16` (the width of the strip, marked at the top) and
-$`c=\operatorname{Re}u=(\varphi-1)/2` (the foot of $`u` on the real axis). The tip of the lens, its
+$`c_1=\operatorname{Re}u=(\varphi-1)/2` (the foot of $`u` on the real axis). The tip of the lens, its
 point of largest real part, lies on both circles and left of both half-planes; its real part is at
-most $`\kappa-2\eta`. The point $`v_*=1+tu`, $`t=1/2-c`, lies on the line
+most $`\kappa-2\eta`. The point $`v_*=1+tu`, $`t=1/2-c_1`, lies on the line
 $`\operatorname{Re}v=\kappa` at distance $`R/2` from $`0` and $`u`, outside both disks. At this
 radius the whole disk $`|v|\le r/2` lies left of the dashed edge.
 :::
@@ -36,8 +36,8 @@ radius the whole disk $`|v|\le r/2` lies left of the dashed edge.
 Suppose two different center changes are possible. Rotate the coordinates so the crossing
 direction is horizontal. Their simultaneous tests put a vector $`v` in two disks of radius
 $`r/2`, centered at 0 and a unit vector $`u`. The shaded overlap in {figref "lens-estimate"}[] is the lens. The relevant
-horizontal components of $`u` are $`c_1=(\varphi-1)/2` and $`c_2=-\varphi/2`. The drawing uses
-the tighter case $`u=\zeta`, with real part $`c_1`.
+horizontal components of $`u` are $`c_1=(\varphi-1)/2` and $`c_2=-\varphi/2`. {figref "lens-estimate"}[]
+draws the tighter case $`u=\zeta`, with real part $`c_1`.
 
 :::lemma_ "sharp_lens" (lean := "TDCSG.Five.div_two_lt_norm_sub_of_le_re")
 Put $`L=c_1-c_2=\varphi-1/2` and $`\kappa=(1+L)/2=(2\varphi+1)/4`. Let $`0\le r<R` and let
@@ -55,8 +55,9 @@ $`\operatorname{Re}(v)\le r/2+c_2`, which lies below $`\kappa-(3+\varphi-r^2)/16
 $`0\le r<R`.
 :::
 
-At equality the two circles meet at $`v=1+t u` with real part $`\kappa`. Below $`R` the proof gives
-more than the lemma states: every point of the lens has real part at most $`\kappa-2\eta`, with
+At equality, $`r=R`, the two circles meet at the point $`v_*=1+tu` of the proof, where
+$`t=1/2-c_1=(2-\varphi)/2`; its real part is $`\kappa`. Below $`R` the proof gives more than the
+lemma states: every point of the lens has real part at most $`\kappa-2\eta`, with
 $`\eta=(3+\varphi-r^2)/16`, so the tip of the lens stays at least $`\eta` left of the line
 $`\operatorname{Re}v=\kappa-\eta`. The estimate is sharp in the sense that this bound on the tip
 holds with equality only at $`r=R`, where $`\eta=0` and the tip is $`v_*` on the line

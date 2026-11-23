@@ -12,9 +12,9 @@ import TDCSGFigures.Style
 Two closed disks of radius `r/2` about `0` and `u = ζ`, their lens, and the half-planes
 `Re v ≥ κ - η` (the hypothesis of the estimate) and `Re v ≥ κ`, with `κ = (2φ + 1)/4` and
 `η = (3 + φ - r²)/16`. The tip of the lens is its corner of largest real part,
-`u/2 + h (s, -c)` with `c = Re ζ = (φ - 1)/2`, `s = Im ζ` and `h = √(r²/4 - 1/4)`; at a rational
-radius its coordinates are `c/2 + √(h² s²)` and `√(s²/4) - √(h² c²)` (`Surd`s). The point
-`v* = (1 + ζ - ζ²)/2 = 1 + t u` (`t = 1/2 - c`) of the proof lies at distance `R/2` from `0` and
+`u/2 + h (s, -c₁)` with `c₁ = Re ζ = (φ - 1)/2`, `s = Im ζ` and `h = √(r²/4 - 1/4)`; at a rational
+radius its coordinates are `c₁/2 + √(h² s²)` and `√(s²/4) - √(h² c₁²)` (`Surd`s). The point
+`v* = (1 + ζ - ζ²)/2 = 1 + t u` (`t = 1/2 - c₁`) of the proof lies at distance `R/2` from `0` and
 from `u` and has real part `κ`.
 
 * `lensEstimate`: the picture at `r = 1.8`, every element labelled.
@@ -35,21 +35,21 @@ open PILean PILean.Plane PILean.Exact TDCSGFigures
 
 /-! ### The data -/
 
-/-- `c = Re ζ = (φ - 1)/2`. -/
+/-- `c₁ = Re ζ = (φ - 1)/2`. -/
 def cosine : QSqrt5 := (zeta 1).realPart
 
-/-- `s² = 1 - c²`, the square of `s = Im ζ = sin 72°`. -/
+/-- `s² = 1 - c₁²`, the square of `s = Im ζ = sin 72°`. -/
 def sineSq : QSqrt5 := rat 1 - cosine * cosine
 
 /-- `h² = (r/2)² - 1/4` at the half radius `ρ = r/2`. -/
 def hSq (ρ : Rat) : QSqrt5 := rat (ρ * ρ - 1 / 4)
 
-/-- The tip of the lens at the half radius `ρ`: `(c/2 + √(h² s²), √(s²/4) - √(h² c²))`. -/
+/-- The tip of the lens at the half radius `ρ`: `(c₁/2 + √(h² s²), √(s²/4) - √(h² c₁²))`. -/
 def tip (ρ : Rat) : SurdPoint :=
   ⟨{ base := cosine * rat (1 / 2), roots := [(1, hSq ρ * sineSq)] },
     { roots := [(1, sineSq * rat (1 / 4)), (-1, hSq ρ * (cosine * cosine))] }⟩
 
-/-- `u = ζ` with the coordinates `(c, √(s²))`. -/
+/-- `u = ζ` with the coordinates `(c₁, √(s²))`. -/
 def uSurd : SurdPoint := ⟨Surd.ofQ cosine, { roots := [(1, sineSq)] }⟩
 
 /-- The point `v* = (1 + ζ - ζ²)/2 = 1 + t u` of the proof, the tip at `R`. -/
@@ -90,8 +90,8 @@ def cutLabelY : QSqrt5 := rat (9 / 4)
 def radiusEnd (h : Float) : Point := ⟨-0.6 * h, -0.8 * h⟩
 
 /-- The decided relations of the tip at the half radius `ρ = r/2`: it lies on both circles
-(`|tip|² = |tip - u|² = ρ²`, from the radicands: `c² (h² s²) = 4 (s²/4)(h² c²)` makes the cross
-terms cancel, and `c²/4 + h² s² + s²/4 + h² c² = ρ²`), and its real part is less than `κ - η`. -/
+(`|tip|² = |tip - u|² = ρ²`, from the radicands: `c₁² (h² s²) = 4 (s²/4)(h² c₁²)` makes the cross
+terms cancel, and `c₁²/4 + h² s² + s²/4 + h² c₁² = ρ²`), and its real part is less than `κ - η`. -/
 def tipFacts (ρ : Rat) : Bool :=
   let A := hSq ρ * sineSq
   let B := sineSq * rat (1 / 4)
@@ -128,7 +128,7 @@ structure Setting (β : Type) where
 /-- The items of a lens picture: the half-planes `Re v ≥ κ - η` (below `R`) and `Re v ≥ κ`,
 outlined (`κ - η` dashed), the real axis, the two disks and their lens, the foot of `u` on the
 real axis, the margin `η` between the cuts as a dimension line (when `showMargin`), a radius `r/2`
-of `|v| ≤ r/2`, the points `0`, `u`, `c`, the tip and `v*`, and their labels, each beside what it
+of `|v| ≤ r/2`, the points `0`, `u`, `c₁`, the tip and `v*`, and their labels, each beside what it
 names. -/
 def lensItems {β : Type} [RealValue β] (st : Setting β) : Array Item :=
   let kc := cut st.r2
@@ -161,26 +161,26 @@ def lensItems {β : Type} [RealValue β] (st : Setting β) : Array Item :=
     Plane.segment ⟨0, 0⟩ (radiusEnd (RealValue.toFloat st.half)) |>.role windowRole |>.width 1.5
       |>.dashed |>.named "a radius r/2 of the disk |v| ≤ r/2",
     Plane.labelBeside "r/2" ⟨0, 0⟩ (radiusEnd (RealValue.toFloat st.half)) |>.role windowRole,
-    Plane.Exact.point origin |>.role windowRole |>.named "0, the centre of |v| ≤ r/2"
+    Plane.Exact.point origin |>.role windowRole |>.named "0, the center of |v| ≤ r/2"
       |>.incident .inside "the circle |v| = r/2"
       |>.incident st.other.incidence "the circle |v − u| = r/2"
       |>.incident (Side.lens .inside st.other).incidence "the lens",
-    Plane.Exact.point (zeta 1) |>.role windowRole |>.named "u = ζ, the centre of |v − u| ≤ r/2"
+    Plane.Exact.point (zeta 1) |>.role windowRole |>.named "u = ζ, the center of |v − u| ≤ r/2"
       |>.incident .inside "the circle |v − u| = r/2"
       |>.incident st.other.incidence "the circle |v| = r/2"
       |>.incident (Side.lens .inside st.other).incidence "the lens",
     Plane.Exact.point foot |>.faint |>.size 3
-      |>.named "c = Re u = (φ − 1)/2 on the real axis" |>.incident .on "the real axis",
+      |>.named "c₁ = Re u = (φ − 1)/2 on the real axis" |>.incident .on "the real axis",
     st.tipPt] ++
   (if st.showVStar then #[
-    Plane.Exact.point vStar |>.named "v∗ = 1 + t u, t = 1/2 − c, at distance R/2 from 0 and u"
+    Plane.Exact.point vStar |>.named "v∗ = 1 + t u, t = 1/2 − c₁, at distance R/2 from 0 and u"
       |>.incident .outside "the circle |v| = r/2" |>.incident .outside "the circle |v − u| = r/2"
       |>.incident .outside "the lens" |>.incident .on "the half-plane Re v ≥ κ"
       |>.incident .inside "the half-plane Re v ≥ κ − η",
     Plane.Exact.label "v∗" vStar .auto] else #[]) ++ #[
     Plane.Exact.label "0" origin .auto |>.role windowRole,
     Plane.Exact.label "u = ζ" (zeta 1) .auto |>.role windowRole,
-    Plane.Exact.label "c" foot .auto,
+    Plane.Exact.label "c₁" foot .auto,
     Plane.label (if st.critical then "tip = v∗" else "tip") st.tipXY .auto,
     Plane.Exact.label "lens" ((rat (1 / 10), rat (11 / 20)) : QSqrt5 × QSqrt5) |>.role lensRole,
     Plane.Exact.label "|v| ≤ r/2" ((rat (3 / 10), rat (-11 / 20)) : QSqrt5 × QSqrt5)
@@ -212,7 +212,7 @@ def tipItem (ρ : Rat) : Item :=
 half-plane `Re v ≥ κ`, where the cut `κ - η` is `κ`. -/
 def tipCritical : Item :=
   Plane.Exact.point vStar |>.size 5
-    |>.named "the tip of the lens at R: v∗ = 1 + t u, t = 1/2 − c"
+    |>.named "the tip of the lens at R: v∗ = 1 + t u, t = 1/2 − c₁"
     |>.incident .on "the circle |v| = r/2" |>.incident .on "the circle |v − u| = r/2"
     |>.incident .on "the lens" |>.incident .on "the half-plane Re v ≥ κ"
 
@@ -282,7 +282,7 @@ def lensRadius : Explorer := Plane.slider "r" sliderFrames
 -- Below `R`, `v*` lies outside both disks of radius `r/2`: `|v*|² = R²/4 > r²/4`.
 #guard sliderRadii.all fun (ρ, _) => QSqrt.lt (rat (ρ * ρ)) (criticalSq * rat (1 / 4))
 
-/-- The chapter's sharpness claim, exactly: the tip's real part `c/2 + √(h² s²)` is at most
+/-- The chapter's sharpness claim, exactly: the tip's real part `c₁/2 + √(h² s²)` is at most
 `κ - 2η`, so strictly below `κ - η` when `η > 0`. -/
 def tipReLe (ρ : Rat) : Bool :=
   let A := hSq ρ * sineSq
@@ -291,7 +291,7 @@ def tipReLe (ρ : Rat) : Bool :=
 
 #guard sliderRadii.all fun (ρ, _) => tipReLe ρ
 
--- At `R` the bound is an equality: `h² = s²` there, and `c/2 + s² = κ`.
+-- At `R` the bound is an equality: `h² = s²` there, and `c₁/2 + s² = κ`.
 #guard hSq 0 + criticalSq * rat (1 / 4) == sineSq && cosine * rat (1 / 2) + sineSq == kappa
 
 -- The disk `|v| ≤ r/2` stays left of `κ - η` at `r = 1.8, 2, 2.08` and crosses it at `2.12`.

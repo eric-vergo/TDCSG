@@ -2,9 +2,16 @@
    and licence notes on narrow screens. The figures drawn by PILean carry their own styles and dark
    theme. */
 
-.authors ~ p {
+/* The front-page prose, paragraphs and lists alike, keeps to one text column. */
+.authors ~ :is(p, ul, ol) {
   max-width: 78ch;
   margin-inline: auto;
+  box-sizing: border-box;
+}
+
+/* Lists take the text face of the paragraphs, as in the chapters, so that `ch` is the same unit. */
+.authors ~ :is(ul, ol) {
+  font-family: var(--verso-text-font-family);
 }
 
 .license-info {
@@ -21,7 +28,10 @@
   word-break: break-all;
 }
 
-/* Long Lean names in the front-page prose break rather than widen a narrow screen. */
-.titlepage p code {
+/* Long Lean names in the prose break rather than widen a narrow screen. Only inline code that
+   is a direct part of a paragraph or list item is affected; code blocks and the Lean panels, whose
+   code carries a class, keep their own layout. */
+:is(p, li) > code:not([class]),
+:is(p, li) > a > code:not([class]) {
   overflow-wrap: anywhere;
 }

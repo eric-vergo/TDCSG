@@ -111,16 +111,16 @@ def unitSteps : Plane.Figure where
     activeStep 0, activeStep 1, inactiveStep 2, inactiveStep 3, activeStep 4,
     activeEnd 0, activeEnd 1, inactiveEnd 2, inactiveEnd 3, activeEnd 4,
     Plane.Exact.point origin |>.role leftRole |>.size 5
-      |>.named "the current left centre P(0) = 0, label 0, weight 0"
+      |>.named "the current left center P(0) = 0, label 0, weight 0"
       |>.incident .inside "the window",
     Plane.Exact.point centrePoint |>.role windowRole |>.marker .cross
-      |>.named "the window centre x = 1/2" |>.incident .inside "the window"
+      |>.named "the window center x = 1/2" |>.incident .inside "the window"
       |>.incident .on "the step from 0 to 1 = P(e₀), ending in the window",
     endLabel 0 true, endLabel 1 true, endLabel 2 false, endLabel 3 false, endLabel 4 true,
     Plane.Exact.label "0" origin .auto |>.role leftRole,
     Plane.Exact.label "x = 1/2" centrePoint .auto |>.role windowRole,
     Plane.Exact.label "window |w − x| ≤ r/2" ((6 / 5 : Rat), (-11 / 10 : Rat)) |>.role windowRole]
-  info := { title := "The five unit steps from the left centre 0 and the window at x = 1/2" }
+  info := { title := "The five unit steps from the left center 0 and the window at x = 1/2" }
 
 /-! ### The change of frame -/
 
@@ -215,16 +215,16 @@ def halvedDisks : Array Item := #[
   Plane.Exact.disk rightCentre halfRadius |>.noFill |>.role rightRole
     |>.named "the right disk, halved"
     |>.describedBy "the closed disk |w − 1| ≤ r about 1, drawn as |w′ − 1| ≤ r/2 about 1",
-  Plane.Exact.point origin |>.role leftRole |>.named "the left centre −1, halved to 0"
+  Plane.Exact.point origin |>.role leftRole |>.named "the left center −1, halved to 0"
     |>.incident .inside "the left disk, halved" |>.incident .outside "the right disk, halved",
-  Plane.Exact.point rightCentre |>.role rightRole |>.named "the right centre 1, halved to 1"
+  Plane.Exact.point rightCentre |>.role rightRole |>.named "the right center 1, halved to 1"
     |>.incident .outside "the left disk, halved" |>.incident .inside "the right disk, halved",
   Plane.Exact.label "0" origin .left |>.role leftRole,
   Plane.Exact.label "1" rightCentre .right |>.role rightRole,
   Plane.Exact.label "the two disks, halved" ((1 / 2 : Rat), (27 / 20 : Rat)),
   Plane.Exact.label "the moving frame" ((centreX + shiftX : Rat), (27 / 20 : Rat)),
   Plane.Exact.label "grey: earlier points" ((1 / 2 : Rat), (-6 / 5 : Rat)) |>.faint,
-  Plane.Exact.label "grey: earlier centres" ((centreX + shiftX : Rat), (-6 / 5 : Rat)) |>.faint]
+  Plane.Exact.label "grey: earlier centers" ((centreX + shiftX : Rat), (-6 / 5 : Rat)) |>.faint]
 
 /-- A point of the halved frame with where it stands relative to both halved disks, decided
 exactly. -/
@@ -259,7 +259,7 @@ def frame (k : Nat) : Plane.Figure :=
       if p == pl || p == pr || acc.any (·.1 == p) then acc else acc.push (p, ())) #[]
     |>.mapIdx fun i (p, _) =>
       movedCentre p (Plane.Exact.point (moved p) |>.faint |>.size 3
-        |>.named s!"an earlier centre ({i + 1})")
+        |>.named s!"an earlier center ({i + 1})")
   { width := figureWidth
     padding := 16
     style := partTwoStyle
@@ -272,19 +272,19 @@ def frame (k : Nat) : Plane.Figure :=
         |>.named "the window" |>.describedBy "the closed disk |w − x| ≤ r/2 about x = 1/2"
         |>.declRef `TDCSG.Five.InWindow] ++
       (if bothIn then #[Plane.Exact.segment (moved pl) (moved pr) |>.width 2.5
-        |>.named s!"the edge from {labelText s.n} to {labelText right} of the centre graph"
+        |>.named s!"the edge from {labelText s.n} to {labelText right} of the center graph"
         |>.declRef `TDCSG.Five.centerGraph] else #[]) ++ pastCentres ++ #[
       let it := Plane.Exact.point movedX |>.role windowRole |>.marker .cross
-        |>.named "the window centre x = 1/2, fixed" |>.incident .inside "the window"
+        |>.named "the window center x = 1/2, fixed" |>.incident .inside "the window"
       -- At the start the edge from `0` to `e₀` runs along the real axis through `x = 1/2`.
       if bothIn && pl == origin && pr == rightCentre then it.incident .on
-        s!"the edge from {labelText s.n} to {labelText right} of the centre graph" else it,
+        s!"the edge from {labelText s.n} to {labelText right} of the center graph" else it,
       Plane.Exact.label "x = 1/2" movedX .auto |>.role windowRole,
       movedCentre pl (Plane.Exact.point (moved pl) |>.role leftRole |>.size 5
-        |>.named s!"the left centre P(n), n = {labelText s.n}, weight 0"
+        |>.named s!"the left center P(n), n = {labelText s.n}, weight 0"
         |>.declRef `TDCSG.Five.Label.proj),
       movedCentre pr (Plane.Exact.point (moved pr) |>.role rightRole |>.size 5
-        |>.named s!"the right centre P(n + e{s.j}), n + e{s.j} = {labelText right}, weight 1"),
+        |>.named s!"the right center P(n + e{s.j}), n + e{s.j} = {labelText right}, weight 1"),
       Plane.Exact.label "P(n)" (moved pl) .auto |>.role leftRole,
       Plane.Exact.label s!"P(n + e{["₀", "₁", "₂", "₃", "₄"].getD s.j ""})" (moved pr) .auto
         |>.role rightRole]

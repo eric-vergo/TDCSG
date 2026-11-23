@@ -40,7 +40,7 @@ infinitely many elements. For a set `S`, such as an orbit, the statement that `S
 many elements is
 [`S.Infinite`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Basic/Finite/Defs.html#Set.Infinite).
 
-:::figure TDCSGFigures.generatorStep (label := "generator-step") (inline := true) (proves := TDCSGFigures.generatorStep_spec) (alt := "Two overlapping closed disks of radius 1.5 centred at minus one and one, with their lens. The left generator turns the origin clockwise through 72 degrees about minus one, to a of zero.")
+:::figure TDCSGFigures.generatorStep (label := "generator-step") (inline := true) (proves := TDCSGFigures.generatorStep_spec) (alt := "Two overlapping closed disks of radius 1.5 centered at minus one and one, with their lens. The left generator turns the origin clockwise through 72 degrees about minus one, to a of zero.")
 The closed disks of radius $`1.5` about $`-1` (the left disk) and $`1` (the right disk), their
 lens, and one step of the left generator $`a`: it turns the origin clockwise through $`72^\circ`
 about $`-1`, along the dashed arc, to $`a(0)=-1+\zeta^4` with $`\zeta=\exp(2\pi i/5)`. The origin
@@ -49,8 +49,8 @@ lies in both disks, so both generators move it; $`a(0)` lies in the left disk on
 
 Choose a point in the plane. The left generator $`a` turns it clockwise through $`360/n`
 degrees about $`-1` if it belongs to the closed disk about $`-1`, including the boundary. Outside
-that disk the point stays put. The right generator $`b` uses the same rule about $`1`. In the
-picture $`n=5`, the radius is 1.5 and the marked point is zero. It belongs to both disks, so the
+that disk the point stays put. The right generator $`b` uses the same rule about $`1`. In
+{figref "generator-step"}[] $`n=5`, the radius is 1.5 and the marked point is zero. It belongs to both disks, so the
 choice of generator matters.
 
 :::definition "disk_rotation" (lean := "TDCSG.rotation, TDCSG.diskRotation, TDCSG.genA, TDCSG.genB, TDCSG.diskPerm, TDCSG.permA, TDCSG.permB")
@@ -115,7 +115,7 @@ $`N`, the group is finite.
 
 :::proof "two_disk_finite"
 The group is finitely generated, it acts faithfully on the plane, and its orbits are uniformly
-bounded, so the finiteness criterion of Chapter 1 applies.
+bounded, so the orbit-bound lemma of Chapter 1, {bpref "uniform_orbits"}[], applies.
 :::
 
 :::theorem "disjoint_disks" (lean := "TDCSG.nonempty_mulEquiv_of_add_lt_two, TDCSG.card_GG_of_add_lt_two, TDCSG.finite_GG_of_lt_one") (uses := "disk_rotation, group_orbit, generated_by_two, ball_extension_facts, compound_disjoint")
@@ -135,8 +135,10 @@ $`r_1=r_2=r` gives a group of order $`n^2`.
 
 :::definition "critical_radius_def" (lean := "TDCSG.infiniteRadii, TDCSG.criticalRadius") (uses := "group_orbit")
 The critical radius of order $`n` is the infimum of the radii $`r` at which $`GG_n(r)` is
-infinite. When the group is finite at every radius, as for $`n=1,2,3,4,6`, the infimum of the
-empty set is taken to be $`0`.
+infinite. When the group is finite at every radius, the set of these radii is empty, and the
+critical radius is $`0` by Lean's convention for the infimum of the empty set of real numbers,
+where a mathematician would expect $`+\infty`. By {bpref "crystallographic"}[] this is the case
+for $`n=1,2,3,4,6`.
 :::
 
 :::lemma_ "critical_radius_of_iff" (lean := "TDCSG.criticalRadius_eq_of_forall_finite_iff") (uses := "critical_radius_def")
@@ -176,4 +178,5 @@ The theorem has two halves, proved independently and joined in Chapter 8.
   the geometry of the disks puts barriers on every coordinate of the labels. The walks therefore
   stay in a box, which bounds every orbit uniformly and makes the group finite.
 
-The radius in the picture lies below $`R`, so the group drawn there is finite.
+The radii of {figref "generator-step"}[] and {figref "word-steps"}[], 1.5 and 2.1, lie below
+$`R`, so the groups drawn there are finite.

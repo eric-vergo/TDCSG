@@ -43,6 +43,12 @@ The entry point is `BlueprintMain.lean`. The chapter sequence lives in
 | 10 Verification | `Verification` |
 | Figures and their theorems (unnumbered) | `TDCSGFigureTheorems`, at the repository root |
 
+Prose links to files of this repository use the role
+`{repoFile "notes/engine.md"}[engine guide]` from `TDCSGBlueprint/RepoFile.lean`. It links to
+the file at the commit the site is built from, as the Lean source links do, and the release check
+in `scripts/check-pages.py` rejects any other link into the repository except the repository home,
+the Actions history and the run that built the release.
+
 The two parts are unnumbered pages between the chapters, so the chapters keep
 one numbering throughout. The main theorem is stated in `TwoDisks`; its
 `:::proof` block is in `MainTheorem`, which imports `TwoDisks`, and Blueprint

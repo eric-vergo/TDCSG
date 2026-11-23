@@ -142,7 +142,7 @@ def isGoodLevel (r2 : QSqrt5) (x : Rat) (j : Nat) (m : Int) : Option Bool := do
   let above := period * rat (k + 1) - a
   return QSqrt.lt bound below && QSqrt.lt bound above
 
-/-- The labels reachable from `0` in the centre graph (`TDCSG.Five.centerGraph`) at squared radius
+/-- The labels reachable from `0` in the center graph (`TDCSG.Five.centerGraph`) at squared radius
 `r2` and window centre `x`, found by a search of at most `fuel` labels; `none` if the search did
 not finish. Weight-zero labels gain `eⱼ`, weight-one labels lose it. -/
 def component (r2 : QSqrt5) (x : Rat) (fuel : Nat := 256) : Option (Array Label) := Id.run do
@@ -308,7 +308,7 @@ def orbit (r2 : RadiusSq) (start : Zeta5 := origin) (cap : Nat := 4000) : Except
     [1, 2, 3, 4].all (fun k => inWindow r2 x (shift n k 1)) &&
     [1, 2, 3, 4].all (fun k => !inWindow r2 x (shift leaf k (-1)))
 
--- The component of `0` in the centre graph at `r = 1.95`, `x = 1/2` has 18 labels.
+-- The component of `0` in the center graph at `r = 1.95`, `x = 1/2` has 18 labels.
 #guard (component (rat (39 / 20 * (39 / 20))) (1 / 2)).map (·.size) == some 18
 
 -- The first three returns of the orbit of zero to the chord stay in `[-1, 1)` and apply the words

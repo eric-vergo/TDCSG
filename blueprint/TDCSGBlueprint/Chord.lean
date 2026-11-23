@@ -93,7 +93,7 @@ belongs to the range and the end $`t=1` (open ring) does not; the rotation is ir
 points never repeat.
 :::
 
-The picture shows successive returns to the chord, one entire word per step.
+{figref "chord-orbit"}[] shows successive returns to the chord, one entire word per step.
 
 This proves the infinite half of the main theorem. Chapter 8 combines it with the finite half of
 Part II.

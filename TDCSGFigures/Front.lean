@@ -74,8 +74,8 @@ def items : Array Item := #[
   piece 1 (-chordEnd) firstCut `TDCSG.Five.word₁, pieceLabel 1 (-chordEnd) firstCut,
   piece 2 firstCut secondCut `TDCSG.Five.word₂, pieceLabel 2 firstCut secondCut,
   piece 3 secondCut chordEnd `TDCSG.Five.word₃, pieceLabel 3 secondCut chordEnd,
-  Plane.Exact.point leftCentre |>.role leftRole |>.named "the centre −1",
-  Plane.Exact.point rightCentre |>.role rightRole |>.named "the centre 1",
+  Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1",
+  Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1",
   Plane.Exact.point origin |>.named "0" |>.incident .on "the piece of word 3",
   pointE, pointNegE,
   crossingPoint crossing "ζ − ζ⁴", crossingPoint (-crossing) "ζ⁴ − ζ",
@@ -151,8 +151,8 @@ def orbitFrame {β : Type} [RealValue β] (r : β) (r2 : RadiusSq) (rText : Stri
         |>.fillOpacity 0.12 |>.named "the lens"] ++
       o.points.map (fun p => withSides (Plane.Exact.point p.z |>.size 1.5 |>.halo false)
         p.left p.right) ++
-      #[withSides (Plane.Exact.point leftCentre |>.role leftRole |>.named "the centre −1") ll lr,
-        withSides (Plane.Exact.point rightCentre |>.role rightRole |>.named "the centre 1") rl rr,
+      #[withSides (Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1") ll lr,
+        withSides (Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1") rl rr,
         Plane.Exact.label "−1" leftCentre .auto |>.role leftRole,
         Plane.Exact.label "+1" rightCentre .auto |>.role rightRole]
     info := { title := s!"The orbit of 0 at radius {rText}: " ++

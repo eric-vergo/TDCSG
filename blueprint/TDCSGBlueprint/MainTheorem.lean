@@ -4,10 +4,11 @@ Authors: Eric Vergo, Claude
 -/
 import VersoManual
 import VersoBlueprint
+import TDCSGBlueprint.RepoFile
 import TDCSG.CriticalRadius.Five
 import TDCSGBlueprint.TwoDisks
 
-open Verso.Genre Verso.Genre.Manual Informal
+open Verso.Genre Verso.Genre.Manual Informal TDCSGBlueprint
 
 #doc (Manual) "Proof of the main theorem" =>
 
@@ -46,8 +47,13 @@ supremum is $`R`. The other two statements are the infinite half.
 Both endpoints of the threshold are therefore settled: below $`R` every orbit is bounded by one
 number depending only on $`r`, and at $`R` a single orbit, that of zero, is already infinite. The
 Lean proof obtains the bound below $`R` from density and compactness, without an explicit value.
-The [written proof](https://github.com/eric-vergo/TDCSG/blob/main/notes/proofs/sharp-lower-bound-n5-pentagrid.md)
-makes the bound explicit. By its Lemma 4 and its proof, every $`M` consecutive levels contain a
-good level, for an $`M\le16\sqrt5/\delta` where $`\delta=R^2-r^2`; this $`M` plays the role of
-$`2K+1` for the recurrence bound $`K` of Chapter 6. Every orbit then has at most
-$`1+10(2M+7)^5` points. These explicit bounds are not part of the Lean development.
+The written proof of the finite half, the note
+{repoFile "notes/proofs/sharp-lower-bound-n5-pentagrid.md"}[Integer coordinate barriers for the fivefold disk rotations]
+(`notes/proofs/sharp-lower-bound-n5-pentagrid.md` in the repository), makes the bound explicit.
+Lemma 4 of that note, in its Section 3, “Integer cuts with only leaf edges”, says that every
+$`M` consecutive levels contain a good level (the note writes $`N` for $`M`). Its proof takes
+for $`M` a Fibonacci number at most $`2L/\eta`, and the last paragraph of Section 4, “Uniform
+confinement and the group”, evaluates this as $`M\le16\sqrt5/\delta`, where
+$`\delta=R^2-r^2`. This $`M` plays the role of $`2K+1` for the recurrence bound $`K` of
+Chapter 6. By the paragraph “Orbits are uniformly bounded” of Section 4, every orbit then has at
+most $`1+10(2M+7)^5` points. These explicit bounds are not part of the Lean development.

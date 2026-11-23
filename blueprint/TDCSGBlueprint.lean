@@ -4,6 +4,7 @@ Authors: Eric Vergo, OpenAI GPT-6.2 Astra, Claude
 -/
 import VersoManual
 import VersoBlueprint
+import TDCSGBlueprint.RepoFile
 import VersoBlueprint.Commands.Graph
 import VersoBlueprint.Commands.Summary
 import PILeanVerso
@@ -22,7 +23,7 @@ import TDCSGBlueprint.OtherOrders
 import TDCSGBlueprint.Verification
 import TDCSGFigureTheorems
 
-open Verso.Genre Verso.Genre.Manual Informal PILeanVerso
+open Verso.Genre Verso.Genre.Manual Informal PILeanVerso TDCSGBlueprint
 
 #doc (Manual) "The critical radius of fivefold disk rotations" =>
 
@@ -34,7 +35,7 @@ authors := ["Eric Vergo", "OpenAI GPT-6.2 Astra", "Claude"]
 The two closed disks at the critical radius $`R=\sqrt{3+\varphi}\approx2.149`, centered at $`-1`
 (labelled left disk) and $`1` (labelled right disk), and the lens they share. The chord from
 $`-E` to $`E`, where $`E=\zeta-\zeta^2` and $`\zeta=\exp(2\pi i/5)`, passes through $`0`; its
-pieces 1, 2 and 3 are the ones the three words of chapter 3 move. The point $`E` lies on the left
+pieces 1, 2 and 3 are the ones the three words of Chapter 3 move. The point $`E` lies on the left
 circle, since $`|E+1|^2=3+\varphi`, and $`-E` on the right circle; the circles cross at
 $`\pm(\zeta-\zeta^4)`. Every point is exact in $`\mathbb{Z}[\zeta]` and the theorem under the
 picture states what it draws.
@@ -57,8 +58,8 @@ Lean declarations that prove it.
 
 *Why it is true.* The proof has two halves, which meet at the threshold.
 
-* *At and above the threshold the group is infinite.* The picture shows a chord through zero
-  whose ends lie on the boundary circles exactly when $`r=\sqrt{3+\varphi}`. Three fixed
+* *At and above the threshold the group is infinite.* {figref "critical-chord"}[] shows a chord
+  through zero whose ends lie on the boundary circles exactly when $`r=\sqrt{3+\varphi}`. Three fixed
   sequences of moves each slide a piece of this chord along itself, and together they move points
   of the chord like a rotation of a circle by an irrational angle. Starting from zero, they reach
   infinitely many different points.
@@ -96,8 +97,11 @@ the Lean notation for readers new to Lean.
 * {ref "verification"}[Chapter 10, Verification]: the independent statement of the theorem and
   how it is checked.
 
-Each numbered statement opens beside the Lean declarations it describes, and the dependency graph
-at the end shows how the statements depend on each other.
+Each numbered statement opens beside the Lean declarations it describes. After the chapters come
+four pages. {ref "figure-theorems"}[Figures and their theorems] gives, for each figure, the Lean
+theorem that states what the figure draws; the dependency graph shows how the numbered statements
+depend on each other; the summary lists the statements and their status; and the page Figures
+lists every figure of the site with its caption, the declaration that draws it and its theorem.
 
 *How to check it.* A short challenge file states the theorem using Mathlib alone, with its own
 definitions of the two moves and of the number $`\sqrt{3+(1+\sqrt5)/2}`. Lake Comparator checks
@@ -107,7 +111,7 @@ published version of this site links its commit to the run that checked it.
 
 The groups were introduced, and the fivefold closed form proposed, in the
 [original paper](https://arxiv.org/abs/2302.12950). The
-[integer-coordinate proof](https://github.com/eric-vergo/TDCSG/blob/main/notes/proofs/sharp-lower-bound-n5-pentagrid.md)
+{repoFile "notes/proofs/sharp-lower-bound-n5-pentagrid.md"}[integer-coordinate proof]
 is the written proof of the finite half.
 
 {include 0 TDCSGBlueprint.CompoundSymmetry}

@@ -18,16 +18,16 @@ tag := "figure-theorems"
 number := false
 %%%
 
-Every figure of this site is the value of a Lean declaration of the library `TDCSGFigures`, drawn
-by PILean from exact data: points of $`\mathbb Z[\zeta]` and reals of $`\mathbb Q(\sqrt5)`, with
-every incidence a figure records decided exactly. Under each figure a source line names that
-declaration and the theorem stated here. Each theorem writes out the figure's items as the
-figure's code builds them, so a change to the figure that the theorem does not repeat breaks the
+Every figure of this site is the value of a Lean declaration of the library `TDCSGFigures`, drawn by
+PILean from exact data: points of $`\mathbb Z[\zeta]` and reals of $`\mathbb Q(\sqrt5)`, with every
+incidence a figure records decided exactly. Under each figure a source line names that declaration
+and, when the figure has one, the theorem stated here. Each theorem writes out the figure's items as
+the figure's code builds them, so a change to the figure that the theorem does not repeat breaks the
 build, and proves the facts the caption relies on, by `rfl` and `decide +kernel`. What a theorem
 does not state is said at the end of its doc string: how the builders draw, the layout, the
-lettering, the colour values and the pixels. PILean attaches each theorem to its figure with
-`figure_proves`, which accepts only a theorem whose statement names the figure and which depends
-on no axiom beyond `propext`, `Classical.choice` and `Quot.sound`.
+lettering, the color values and the pixels. PILean attaches each theorem to its figure with
+`figure_proves`, which accepts only a theorem whose statement names the figure and which depends on
+no axiom beyond `propext`, `Classical.choice` and `Quot.sound`.
 
 The theorems are not statements of the proof, and they are not nodes of the dependency graph.
 
@@ -84,8 +84,8 @@ theorem criticalChord_spec :
       Plane.Exact.segment secondCut chordEnd |>.role "piece3" |>.width 5
         |>.named "the piece of word 3" |>.declRef `TDCSG.Five.word₃,
       Plane.Exact.labelBeside "3" secondCut chordEnd |>.role "piece3",
-      Plane.Exact.point leftCentre |>.role "left" |>.named "the centre −1",
-      Plane.Exact.point rightCentre |>.role "right" |>.named "the centre 1",
+      Plane.Exact.point leftCentre |>.role "left" |>.named "the center −1",
+      Plane.Exact.point rightCentre |>.role "right" |>.named "the center 1",
       Plane.Exact.point origin |>.named "0" |>.incident .on "the piece of word 3",
       Plane.Exact.point chordEnd |>.role "left" |>.named "E" |>.incident .on "the left circle"
         |>.incident .on "the lens" |>.declRef `TDCSG.Five.norm_embed_pointE_add_one_sq,
@@ -174,7 +174,7 @@ theorem extensionJump_spec :
       Plane.label "2" ⟨21 / 2, 0⟩ .above,
       Plane.label "≈ 11.9" ((PlanePoint.toPoint nearInsideImage).lerp
         (PlanePoint.toPoint nearOutside) 0.62) (.toward (deg 136)) (some 4),
-      Plane.Exact.point origin |>.role leftRole |>.named "the centre c",
+      Plane.Exact.point origin |>.role leftRole |>.named "the center c",
       Plane.Exact.point nearInside |>.role leftRole |>.named "p" |>.incident .inside "the disk B"
         |>.declRef `TDCSG.ballPerm_apply_of_mem,
       Plane.Exact.point nearOutside |>.named "q = ĥ(q)" |>.incident .outside "the disk B"
@@ -236,8 +236,8 @@ theorem disjointDisks_spec :
         |>.width 1.5 |>.named "the turn a of B₁, 72° clockwise about −1" |>.declRef `TDCSG.genA,
       Plane.Exact.arc rightCentre phiInvReal (deg 144) (deg 72) |>.withArrow |>.role rightRole
         |>.width 1.5 |>.named "the turn b of B₂, 72° clockwise about 1" |>.declRef `TDCSG.genB,
-      Plane.Exact.point leftCentre |>.role leftRole |>.named "the centre −1",
-      Plane.Exact.point rightCentre |>.role rightRole |>.named "the centre 1",
+      Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1",
+      Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1",
       Plane.Exact.point leftSample |>.role leftRole |>.named "x" |>.incident .inside "the disk B₁"
         |>.incident .outside "the disk B₂",
       Plane.Exact.point (leftCentre + phiInv * zeta 1) |>.role leftRole |>.named "a(x)"
@@ -331,8 +331,8 @@ theorem generatorStep_spec :
       Plane.Exact.arc leftCentre (1 : Rat) (deg 0) (-deg 72) |>.withArrow |>.role leftRole
         |>.width 2 |>.dashed |>.named "a turns 0 through 72° clockwise about −1"
         |>.declRef `TDCSG.diskRotation,
-      Plane.Exact.point leftCentre |>.role leftRole |>.named "the centre −1",
-      Plane.Exact.point rightCentre |>.role rightRole |>.named "the centre 1",
+      Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1",
+      Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1",
       Plane.Exact.point origin |>.named "0" |>.incident .inside "the left circle"
         |>.incident .inside "the right circle" |>.incident .inside "the lens",
       Plane.Exact.point aZero |>.role leftRole |>.named "a(0) = −1 + ζ⁴"
@@ -399,9 +399,9 @@ theorem wordSteps_spec :
         |>.noOutline
         |>.fillOpacity 0.12 |>.named "the lens",
       withSidesStep leftCentre (Plane.Exact.point leftCentre |>.role leftRole
-        |>.named "the centre −1"),
+        |>.named "the center −1"),
       withSidesStep rightCentre
-        (Plane.Exact.point rightCentre |>.role rightRole |>.named "the centre 1"),
+        (Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1"),
       Plane.Exact.label "−1" leftCentre .auto |>.role leftRole,
       Plane.Exact.label "+1" rightCentre .auto |>.role rightRole,
       Plane.Exact.label "left disk, radius 2.1" ((-1 : Rat), (-5 / 2 : Rat)) |>.role leftRole,
@@ -530,8 +530,8 @@ theorem chordPieces_spec :
     Plane.Exact.segment cutG chordEnd |>.role (pieceRole 3) |>.width 5
       |>.named "the piece [(3 − 2φ)E, E] of word 3" |>.declRef `TDCSG.Five.applyWord_word₃,
     Plane.Exact.labelBeside "3" cutG chordEnd |>.role (pieceRole 3),
-    Plane.Exact.point leftCentre |>.role leftRole |>.named "the centre −1",
-    Plane.Exact.point rightCentre |>.role rightRole |>.named "the centre 1",
+    Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1",
+    Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1",
     Plane.Exact.point (-chordEnd) |>.role rightRole |>.named "−E"
       |>.incident .on "the right circle" |>.incident .on "the lens",
     Plane.Exact.point cutF |>.named "(1 − φ)E" |>.incident .inside "the lens",
@@ -860,10 +860,10 @@ theorem unitSteps_spec :
       activeStep 0, activeStep 1, inactiveStep 2, inactiveStep 3, activeStep 4,
       activeEnd 0, activeEnd 1, inactiveEnd 2, inactiveEnd 3, activeEnd 4,
       Plane.Exact.point origin |>.role "left" |>.size 5
-        |>.named "the current left centre P(0) = 0, label 0, weight 0"
+        |>.named "the current left center P(0) = 0, label 0, weight 0"
         |>.incident .inside "the window",
       Plane.Exact.point centrePoint |>.role "window" |>.marker .cross
-        |>.named "the window centre x = 1/2" |>.incident .inside "the window"
+        |>.named "the window center x = 1/2" |>.incident .inside "the window"
         |>.incident .on "the step from 0 to 1 = P(e₀), ending in the window",
       endLabel 0 true, endLabel 1 true, endLabel 2 false, endLabel 3 false, endLabel 4 true,
       Plane.Exact.label "0" origin .auto |>.role "left",
@@ -941,16 +941,16 @@ namespace TDCSGFigures.Lens
 open PILean PILean.Plane PILean.Exact TDCSGFigures
 
 /-- What `lensEstimate` draws, item for item, and why its records are right. The data are the
-half radius `r/2 = 9/10`, `c = Re ζ`, `s² = 1 - c²`, `h² = (r/2)² - 1/4`, the tip
-`(c/2 + √(h² s²), √(s²/4) - √(h² c²))`, `u = ζ` and its foot `(c, 0)`, `v* = (1 + ζ - ζ²)/2`, `κ`,
-`η` and the two half-planes as the rectangles `[a, 1.75] × [-1.1, 2.4]` of the shown box,
-outlined; the margin `η` between the two lines is drawn as a dimension line. The
-items are written out in drawing order. The records hold exactly: the tip lies on both circles
-(`tipFacts`: the cross terms of `|tip|²` and `|tip - u|²` cancel and the rest is `(r/2)²`) and
-left of `κ - η`; `|u|² = 1 > (9/10)²` puts `0` and `u` outside each other's disk; `v*` lies at
-distance `R/2 > r/2` from `0` and `u`, on `Re v = κ` and right of `κ - η`; the tip's real part is
-at most `κ - 2η`. Not stated: how the builders and modifiers draw, the layout, the lettering, the
-style's colour values and the pixels. -/
+half radius `r/2 = 9/10`, `c₁ = Re ζ`, `s² = 1 - c₁²`, `h² = (r/2)² - 1/4`, the tip
+`(c₁/2 + √(h² s²), √(s²/4) - √(h² c₁²))`, `u = ζ` and its foot `(c₁, 0)`,
+`v* = (1 + ζ - ζ²)/2`, `κ`, `η` and the two half-planes as the rectangles
+`[a, 1.75] × [-1.1, 2.4]` of the shown box, outlined; the margin `η` between the two lines is
+drawn as a dimension line. The items are written out in drawing order. The records hold exactly:
+the tip lies on both circles (`tipFacts`: the cross terms of `|tip|²` and `|tip - u|²` cancel
+and the rest is `(r/2)²`) and left of `κ - η`; `|u|² = 1 > (9/10)²` puts `0` and `u` outside
+each other's disk; `v*` lies at distance `R/2 > r/2` from `0` and `u`, on `Re v = κ` and right
+of `κ - η`; the tip's real part is at most `κ - 2η`. Not stated: how the builders and modifiers
+draw, the layout, the lettering, the style's colour values and the pixels. -/
 theorem lensEstimate_spec :
     tip (9 / 10) = ⟨{ base := cosine * rat (1 / 2), roots := [(1, hSq (9 / 10) * sineSq)] },
       { roots := [(1, sineSq * rat (1 / 4)), (-1, hSq (9 / 10) * (cosine * cosine))] }⟩ ∧
@@ -987,32 +987,32 @@ theorem lensEstimate_spec :
         |>.width 1.5 |>.dashed |>.named "a radius r/2 of the disk |v| ≤ r/2",
       Plane.labelBeside "r/2" ⟨0, 0⟩ (radiusEnd (RealValue.toFloat (9 / 10 : Rat)))
         |>.role "window",
-      Plane.Exact.point origin |>.role "window" |>.named "0, the centre of |v| ≤ r/2"
+      Plane.Exact.point origin |>.role "window" |>.named "0, the center of |v| ≤ r/2"
         |>.incident .inside "the circle |v| = r/2"
         |>.incident (otherSide (rat (9 / 10 * (9 / 10)))).incidence "the circle |v − u| = r/2"
         |>.incident (Side.lens .inside (otherSide (rat (9 / 10 * (9 / 10))))).incidence
           "the lens",
-      Plane.Exact.point (zeta 1) |>.role "window" |>.named "u = ζ, the centre of |v − u| ≤ r/2"
+      Plane.Exact.point (zeta 1) |>.role "window" |>.named "u = ζ, the center of |v − u| ≤ r/2"
         |>.incident .inside "the circle |v − u| = r/2"
         |>.incident (otherSide (rat (9 / 10 * (9 / 10)))).incidence "the circle |v| = r/2"
         |>.incident (Side.lens .inside (otherSide (rat (9 / 10 * (9 / 10))))).incidence
           "the lens",
       Plane.Exact.point ((cosine, ⟨0, 0⟩) : QSqrt5 × QSqrt5) |>.faint |>.size 3
-        |>.named "c = Re u = (φ − 1)/2 on the real axis" |>.incident .on "the real axis",
+        |>.named "c₁ = Re u = (φ − 1)/2 on the real axis" |>.incident .on "the real axis",
       Plane.Exact.point (tip (9 / 10)) |>.size 5
         |>.named "the tip of the lens: its corner of largest real part"
         |>.incident .on "the circle |v| = r/2" |>.incident .on "the circle |v − u| = r/2"
         |>.incident .on "the lens" |>.incident .outside "the half-plane Re v ≥ κ − η"
         |>.incident .outside "the half-plane Re v ≥ κ",
       Plane.Exact.point vStar
-        |>.named "v∗ = 1 + t u, t = 1/2 − c, at distance R/2 from 0 and u"
+        |>.named "v∗ = 1 + t u, t = 1/2 − c₁, at distance R/2 from 0 and u"
         |>.incident .outside "the circle |v| = r/2" |>.incident .outside "the circle |v − u| = r/2"
         |>.incident .outside "the lens" |>.incident .on "the half-plane Re v ≥ κ"
           |>.incident .inside "the half-plane Re v ≥ κ − η",
       Plane.Exact.label "v∗" vStar .auto,
       Plane.Exact.label "0" origin .auto |>.role "window",
       Plane.Exact.label "u = ζ" (zeta 1) .auto |>.role "window",
-      Plane.Exact.label "c" ((cosine, ⟨0, 0⟩) : QSqrt5 × QSqrt5) .auto,
+      Plane.Exact.label "c₁" ((cosine, ⟨0, 0⟩) : QSqrt5 × QSqrt5) .auto,
       Plane.label "tip" (PlanePoint.toPoint (tip (9 / 10))) .auto,
       Plane.Exact.label "lens" ((rat (1 / 10), rat (11 / 20)) : QSqrt5 × QSqrt5) |>.role "lens",
       Plane.Exact.label "|v| ≤ r/2" ((rat (3 / 10), rat (-11 / 20)) : QSqrt5 × QSqrt5)
@@ -1306,15 +1306,15 @@ theorem componentOfZero_spec :
       (compEdges.toArray.map fun (n, m) => edgeItem n m) ++
       (compLabels.toArray.map fun n => labelPoint n .inside "the window") ++ #[
       Plane.Exact.point ((compX, 0) : Rat × Rat) |>.role "window" |>.marker .cross
-        |>.named "the window centre x = 1/2" |>.incident .inside "the window"
+        |>.named "the window center x = 1/2" |>.incident .inside "the window"
         |>.incident .on "the edge from (0, 0, 0, 0, 0) to (1, 0, 0, 0, 0)",
       Plane.Exact.label "0" origin (.toward (Plane.deg 200)) |>.role "left",
       Plane.Exact.label "e₀" rightCentre .auto |>.role "right",
-      Plane.Exact.label "dots: weight 0 (left centres)" ((1 / 2 : Rat), (-9 / 8 : Rat))
+      Plane.Exact.label "dots: weight 0 (left centers)" ((1 / 2 : Rat), (-9 / 8 : Rat))
         |>.role "left",
-      Plane.Exact.label "squares: weight 1 (right centres)" ((1 / 2 : Rat), (-5 / 4 : Rat))
+      Plane.Exact.label "squares: weight 1 (right centers)" ((1 / 2 : Rat), (-5 / 4 : Rat))
         |>.role "right",
-      Plane.Exact.label "×: the window centre x = 1/2" ((1 / 2 : Rat), (-11 / 8 : Rat))
+      Plane.Exact.label "×: the window center x = 1/2" ((1 / 2 : Rat), (-11 / 8 : Rat))
         |>.role "window"] ∧
     compLabels = [#[0, 0, 0, 0, 0], #[1, 0, 0, 0, 0], #[0, 1, 0, 0, 0], #[0, 0, 0, 0, 1],
       #[0, 0, 0, -1, 1], #[0, 0, 1, -1, 1], #[0, -1, 1, -1, 1], #[1, -1, 1, -1, 1],
@@ -1433,8 +1433,8 @@ theorem orderEight_spec :
       Plane.Exact.labelBeside "r₈" (centre8 (-1)) pStar8 |>.role leftRole,
       Plane.Exact.line pStar8 q8₀ |>.faint |>.dashed
         |>.named "the chord p* + it, vertical through p*",
-      Plane.Exact.point (centre8 (-1)) |>.role leftRole |>.named "the centre −1",
-      Plane.Exact.point (centre8 1) |>.role rightRole |>.named "the centre 1",
+      Plane.Exact.point (centre8 (-1)) |>.role leftRole |>.named "the center −1",
+      Plane.Exact.point (centre8 1) |>.role rightRole |>.named "the center 1",
       sides8 pStar8 (Plane.Exact.point pStar8 |>.role leftRole |>.named "p* = 1 − 2ζ + ζ² − ζ³"
         |>.incident .on "the chord p* + it, vertical through p*"
         |>.declRef `TDCSG.CriticalRadius.pStar_eight_mem_sphere),
@@ -1519,8 +1519,8 @@ theorem orderTen_spec :
       Plane.Exact.segment cut10₂ w10 |>.role (pieceRole 3) |>.width 5
         |>.named "the piece [u, W] of word 3",
       Plane.Exact.labelBeside "3" cut10₂ w10 |>.role (pieceRole 3),
-      Plane.Exact.point (centre10 (-1)) |>.role leftRole |>.named "the centre −1",
-      Plane.Exact.point (centre10 1) |>.role rightRole |>.named "the centre 1",
+      Plane.Exact.point (centre10 (-1)) |>.role leftRole |>.named "the center −1",
+      Plane.Exact.point (centre10 1) |>.role rightRole |>.named "the center 1",
       sides10 w10 (Plane.Exact.point w10 |>.role leftRole
         |>.named "W = √5 u"),
       sides10 negW10 (Plane.Exact.point negW10 |>.role rightRole
@@ -1613,8 +1613,8 @@ theorem orderTwelve_spec :
       Plane.Exact.labelBeside "r₁₂" (centre12 (-1)) pStar12Conj |>.role leftRole,
       Plane.Exact.line pStar12 orbit12 |>.faint |>.dashed
         |>.named "the chord p* + uV, in the direction V = ζ⁵ + ζ⁶",
-      Plane.Exact.point (centre12 (-1)) |>.role leftRole |>.named "the centre −1",
-      Plane.Exact.point (centre12 1) |>.role rightRole |>.named "the centre 1",
+      Plane.Exact.point (centre12 (-1)) |>.role leftRole |>.named "the center −1",
+      Plane.Exact.point (centre12 1) |>.role rightRole |>.named "the center 1",
       sides12 pStar12 (Plane.Exact.point pStar12 |>.role leftRole |>.size 3
         |>.named "p* = −2ζ + 4ζ² − 3ζ³"
         |>.incident .on "the chord p* + uV, in the direction V = ζ⁵ + ζ⁶"

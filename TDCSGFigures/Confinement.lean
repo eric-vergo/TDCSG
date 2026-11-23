@@ -9,12 +9,12 @@ import TDCSGFigures.Style
 /-!
 # The figures of chapter 7, confinement
 
-* `componentOfZero`: the 18 labels reachable from `0` in the centre graph at `r = 1.95`,
+* `componentOfZero`: the 18 labels reachable from `0` in the center graph at `r = 1.95`,
   `x = 1/2`, each drawn at its projection `P(n)` (a dot for weight zero, a square for weight one),
   with the edges of the graph and the window. For each coordinate `j` the good levels nearest the
   gap `|m| ≤ 2`, the candidates for the walls `lo` and `hi` of the confinement proof, are computed
   (`nearestWalls`) and stated with the figure, for its caption.
-* `walkToLeaf`: a stepper along a path of the centre graph at `r = 2.13`, `x = 1/5`, found by a
+* `walkToLeaf`: a stepper along a path of the center graph at `r = 2.13`, `x = 1/5`, found by a
   breadth-first search from `0`: it lowers the coordinate `n₂` from `0` to `-4`, crosses the good
   level `-5` into the label `n = (0, 3, -5, 4, -2)`, whose other candidates `n + eₖ` all lie
   outside the window, and can only step back.
@@ -52,7 +52,7 @@ def labelPoint (n : Label) (rel : Incidence) (window : String) : Item :=
     |>.incident rel window
   if weight n == 0 then it.role leftRole else it.role rightRole |>.marker .square
 
-/-- The edge from `n` to `m`, linked to the centre graph. -/
+/-- The edge from `n` to `m`, linked to the center graph. -/
 def edgeItem (n m : Label) : Item :=
   Plane.Exact.segment (proj n) (proj m) |>.width 1.5
     |>.named s!"the edge from {labelText n} to {labelText m}"
@@ -87,7 +87,7 @@ def wallText (j : Nat) : String :=
   let (lo, hi) := nearestWalls j
   s!"n{sub j}: {(lo.map intText).getD "none"}, {(hi.map intText).getD "none"}"
 
-/-- The 18 labels reachable from 0 in the centre graph at r = 1.95, x = 1/2, at their projections:
+/-- The 18 labels reachable from 0 in the center graph at r = 1.95, x = 1/2, at their projections:
 dots for weight 0 (left centres), squares for weight 1 (right centres), with the edges, the
 window and its centre. -/
 @[figure]
@@ -105,17 +105,17 @@ def componentOfZero : Plane.Figure where
     (compEdges.toArray.map fun (n, m) => edgeItem n m) ++
     (compLabels.toArray.map fun n => labelPoint n .inside "the window") ++ #[
     Plane.Exact.point ((compX, 0) : Rat × Rat) |>.role windowRole |>.marker .cross
-      |>.named "the window centre x = 1/2" |>.incident .inside "the window"
+      |>.named "the window center x = 1/2" |>.incident .inside "the window"
       |>.incident .on "the edge from (0, 0, 0, 0, 0) to (1, 0, 0, 0, 0)",
     Plane.Exact.label "0" origin (.toward (Plane.deg 200)) |>.role leftRole,
     Plane.Exact.label "e₀" rightCentre .auto |>.role rightRole,
-    Plane.Exact.label "dots: weight 0 (left centres)" ((1 / 2 : Rat), (-9 / 8 : Rat))
+    Plane.Exact.label "dots: weight 0 (left centers)" ((1 / 2 : Rat), (-9 / 8 : Rat))
       |>.role leftRole,
-    Plane.Exact.label "squares: weight 1 (right centres)" ((1 / 2 : Rat), (-5 / 4 : Rat))
+    Plane.Exact.label "squares: weight 1 (right centers)" ((1 / 2 : Rat), (-5 / 4 : Rat))
       |>.role rightRole,
-    Plane.Exact.label "×: the window centre x = 1/2" ((1 / 2 : Rat), (-11 / 8 : Rat))
+    Plane.Exact.label "×: the window center x = 1/2" ((1 / 2 : Rat), (-11 / 8 : Rat))
       |>.role windowRole]
-  info := { title := "The component of 0 in the centre graph at r = 1.95, x = 1/2" }
+  info := { title := "The component of 0 in the center graph at r = 1.95, x = 1/2" }
 
 /-! ### A walk forced back at a leaf -/
 
@@ -128,7 +128,7 @@ def walkRadiusSq : QSqrt5 := rat (walkRadius * walkRadius)
 /-- The window centre `x = 1/5`. -/
 def walkX : Rat := 1 / 5
 
-/-- A path of the centre graph from `0` to `n = (0, 3, -5, 4, -2)`, as a breadth-first search
+/-- A path of the center graph from `0` to `n = (0, 3, -5, 4, -2)`, as a breadth-first search
 from `0` found it: each step adds `±eₖ`, and the coordinate `n₂` falls from `0` to `-5`. -/
 def path : List Label := [#[0, 0, 0, 0, 0], #[0, 1, 0, 0, 0], #[0, 1, -1, 0, 0],
   #[0, 1, -1, 1, 0], #[0, 1, -1, 1, -1], #[0, 1, -1, 2, -1], #[0, 1, -2, 2, -1],
@@ -166,7 +166,7 @@ def walkFrame (k : Nat) (candidates back : Bool) (title : String) : Plane.Figure
         |>.describedBy "the closed disk |w − x| ≤ r/2, r = 2.13, x = 1/5"
         |>.declRef `TDCSG.Five.InWindow,
       Plane.Exact.point ((walkX, 0) : Rat × Rat) |>.role windowRole |>.marker .cross
-        |>.named "the window centre x = 1/5" |>.incident .inside window] ++
+        |>.named "the window center x = 1/5" |>.incident .inside window] ++
       (steps.toArray.map fun (a, b) =>
         let last := b == leafN
         Plane.Exact.segment (proj a) (proj b) |>.width (if last then 3.5 else 1.5)
@@ -191,11 +191,11 @@ def walkFrame (k : Nat) (candidates back : Bool) (title : String) : Plane.Figure
       Plane.Exact.label "0" origin (.toward (Plane.deg 200)) |>.role leftRole,
       Plane.Exact.label "window" ((rat (1 / 5), rat (23 / 20)) : QSqrt5 × QSqrt5)
         |>.role windowRole,
-      Plane.Exact.label "dots: weight 0 (left centres)"
+      Plane.Exact.label "dots: weight 0 (left centers)"
         ((rat (2 / 5), rat (-29 / 20)) : QSqrt5 × QSqrt5) |>.role leftRole,
-      Plane.Exact.label "squares: weight 1 (right centres)"
+      Plane.Exact.label "squares: weight 1 (right centers)"
         ((rat (2 / 5), rat (-8 / 5)) : QSqrt5 × QSqrt5) |>.role rightRole,
-      Plane.Exact.label "×: the window centre x = 1/5"
+      Plane.Exact.label "×: the window center x = 1/5"
         ((rat (2 / 5), rat (-7 / 4)) : QSqrt5 × QSqrt5) |>.role windowRole] ++
       (ps.toArray.mapIdx fun i n => if i == 0 || n == leafN || n == beforeLeaf then #[] else
         #[Plane.Exact.label s!"{i}" (proj n) .auto |>.size 11]).flatten ++
@@ -213,7 +213,7 @@ def walkFrame (k : Nat) (candidates back : Bool) (title : String) : Plane.Figure
 /-- The steps of `walkToLeaf`, with their captions. -/
 def walkFrames : Array (String × Plane.Figure) := #[
   ("the walk from 0 lowers n₂ from 0 to −4", walkFrame (path.length - 1) false false
-    "A path of the centre graph from 0 to n + e₂ = (0, 3, −4, 4, −2)"),
+    "A path of the center graph from 0 to n + e₂ = (0, 3, −4, 4, −2)"),
   ("it crosses the good level n₂ = −5 into n", walkFrame path.length false false
     "The step into n = (0, 3, −5, 4, −2) crosses the good level −5 of n₂"),
   ("n is a leaf: its other candidates lie outside the window", walkFrame path.length true false
@@ -221,7 +221,7 @@ def walkFrames : Array (String × Plane.Figure) := #[
   ("the walk can only step back", walkFrame path.length true true
     "From the leaf n the only step leads back to n + e₂")]
 
-/-- A path of the centre graph at r = 2.13, x = 1/5 from 0 lowers n₂ to −4, crosses the good level
+/-- A path of the center graph at r = 2.13, x = 1/5 from 0 lowers n₂ to −4, crosses the good level
 −5 into a leaf and is forced back. -/
 @[figure]
 def walkToLeaf : Explorer := Plane.stepper walkFrames
@@ -241,7 +241,7 @@ def walkToLeaf : Explorer := Plane.stepper walkFrames
   [(some (-4), some 4), (some (-3), some 10), (some (-7), some 6), (some (-7), some 6),
     (some (-3), some 10)]
 
--- The path is a path of the centre graph at `r = 2.13`, `x = 1/5`: consecutive labels differ by
+-- The path is a path of the center graph at `r = 2.13`, `x = 1/5`: consecutive labels differ by
 -- one unit vector, the weights alternate, every label lies in the window.
 #guard path.all (fun n => inWindow walkRadiusSq walkX n) &&
   (path.zip path.tail).all (fun (a, b) => (List.range 5).any fun j =>

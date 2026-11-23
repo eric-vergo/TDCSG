@@ -28,8 +28,18 @@ repo_root = Path(__file__).resolve().parent.parent
 prefix = "/TDCSG/"
 repo_url = "https://github.com/eric-vergo/TDCSG"
 origin = "https://eric-vergo.github.io"
+repository = "eric-vergo/TDCSG"
+# In a release every link to this repository names the verified commit, except these links, which
+# are unpinned by nature: the repository home (the sidebar's "Source" link and the Project Stats
+# page) and the Actions history (Verification chapter). The run URL of the release is the third
+# exception and is added in `check_repository_links`.
+unpinned_repository_links = {
+    f"https://github.com/{repository}",
+    f"https://github.com/{repository}/actions",
+}
 linked_declarations = set()
 source_links = set()
+repository_links = set()
 verification_urls = set()
 pages = list(site.rglob("index.html"))
 assert site / "index.html" in pages
@@ -160,6 +170,10 @@ class Resources(HTMLParser):
             if not value or value.startswith("#"):
                 continue
             url = urlsplit(urljoin(self.base, value))
+            if url.hostname in ("github.com", "www.github.com", "raw.githubusercontent.com"):
+                owner_repo = "/".join(url.path.split("/")[1:3]).lower()
+                if owner_repo == repository.lower():
+                    repository_links.add((page.relative_to(site).as_posix(), url.geturl()))
             if url.scheme not in ("http", "https") or url.hostname != "eric-vergo.github.io":
                 continue
             assert url.path.startswith(prefix), (page, value, url.path)
@@ -204,6 +218,31 @@ def check_source_links(commit, theorems):
         seen.add(decl)
     assert seen == linked_declarations, f"Missing Lean source panels: {linked_declarations - seen}"
     assert set(theorems) <= seen, "Missing independent theorem source links"
+
+
+def check_repository_links(commit, run_id):
+    """Every link to this repository is pinned to `commit`, or is one of the listed exceptions."""
+    allowed = unpinned_repository_links | {f"https://github.com/{repository}/actions/runs/{run_id}"}
+    pinned = re.compile(rf"/{re.escape(repository)}/(blob|tree|raw|blame|commit)/{commit}(/.*)?")
+    raw = re.compile(rf"/{re.escape(repository)}/{commit}(/.*)")
+    failures = []
+    for page, href in sorted(repository_links):
+        url = urlsplit(href)
+        github = url.scheme == "https" and url.netloc == "github.com"
+        if github and not url.query and f"https://github.com{url.path}".rstrip("/") in allowed:
+            continue
+        if url.scheme == "https" and url.netloc == "raw.githubusercontent.com":
+            match = raw.fullmatch(url.path)
+        else:
+            match = github and pinned.fullmatch(url.path)
+        if not match:
+            failures.append(f"{page}: {href} is not pinned to the verified commit {commit}")
+            continue
+        path = unquote((match.groups()[-1] or "").lstrip("/"))
+        if path and subprocess.run(["git", "cat-file", "-e", f"{commit}:{path}"],
+                                   capture_output=True).returncode != 0:
+            failures.append(f"{page}: {href} names {path}, which is not in commit {commit}")
+    assert not failures, "\n".join(failures)
 
 
 for page in pages:
@@ -299,5 +338,6 @@ if "--release" in sys.argv[2:]:
         assert match, f"source link {href} does not name the verified commit"
         lines = source_at(record["commit"], match.group(1))
         assert 1 <= int(match.group(2)) <= len(lines), f"{href}: line outside the file"
+    check_repository_links(record["commit"], os.environ["GITHUB_RUN_ID"])
 print(f"Checked {len(pages)} pages and {len(pilean_figures)} PILean figures "
       f"({inline_pictures} inline pictures) under {prefix}.")

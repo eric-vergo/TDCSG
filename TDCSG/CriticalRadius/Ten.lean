@@ -200,8 +200,8 @@ theorem exists_mem_orbit {r : ℝ} (hr : √(4 - φ) ≤ r) (k : ℕ) :
       rw [← applyWord_word₃ hr ⟨h', hs₁.le⟩]
       exact applyWord_mem_orbit _ hmem
 
-/-- **Theorem A**, orbit form: for every `r ≥ √(4 - φ)` the orbit of `0` under `GG 10 10 r r`
-is infinite. -/
+/-- Theorem A of the note `notes/proofs/critical-radius-n10.md`, orbit form: for every
+`r ≥ √(4 - φ)` the orbit of `0` under `GG 10 10 r r` is infinite. -/
 theorem infinite_orbit_zero {r : ℝ} (hr : √(4 - φ) ≤ r) : (orbit 10 10 r r 0).Infinite := by
   choose s m hs hsm hmem using exists_mem_orbit hr
   refine Set.infinite_of_injective_forall_mem (f := fun k ↦ (s k : ℂ) * embed dirU)
@@ -216,7 +216,8 @@ theorem infinite_orbit_zero {r : ℝ} (hr : √(4 - φ) ≤ r) : (orbit 10 10 r 
   have : (k : ℤ) = l := by omega
   exact_mod_cast this
 
-/-- **Theorem A**: for every `r ≥ √(4 - φ)` the group `GG 10 10 r r` is infinite. -/
+/-- Theorem A of the note `notes/proofs/critical-radius-n10.md`: for every `r ≥ √(4 - φ)` the
+group `GG 10 10 r r` is infinite. -/
 theorem infinite_GG {r : ℝ} (hr : √(4 - φ) ≤ r) : Infinite (GG 10 10 r r) :=
   infinite_GG_of_infinite_orbit (infinite_orbit_zero hr)
 

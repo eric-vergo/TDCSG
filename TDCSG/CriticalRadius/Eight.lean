@@ -462,7 +462,7 @@ theorem embed_pModel : embed zeta pModel = pStar := by
 theorem embed_dirModel : embed zeta dirModel = I := by
   simp [embed, dirModel, zeta_sq]
 
-/-- **Theorem A** of `notes/proofs/critical-radius-n8.md`, orbit form: for every
+/-- Theorem A of the note `notes/proofs/critical-radius-n8.md`, orbit form: for every
 `r ≥ √(10 - 5√2)` and every `k`, the orbit of `p*` contains `p* + 4 i (√2 - 1)^(k+1)`. -/
 theorem mem_orbit_pStar_pow {r : ℝ} (hr : √(10 - 5 * s) ≤ r) (k : ℕ) :
     pStar + ((4 * (s - 1) ^ (k + 1) : ℝ) : ℂ) * I ∈ orbit 8 8 r r pStar := by

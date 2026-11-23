@@ -19,10 +19,10 @@ tag := "confinement"
 This chapter completes Part II. It combines the good levels of Chapter 6 with a lemma about
 graphs to show that every walk of Chapter 4 stays in a box of integer labels whose size does not
 depend on the starting point. With the description of orbit points by labels, this bounds every
-orbit by one number, and the finiteness criterion of Chapter 1 makes $`GG_5(r)` finite for every
-$`r<R`, where $`R=\sqrt{3+\varphi}`.
+orbit by one number, and the orbit-bound lemma, in its two-disk form {bpref "two_disk_finite"}[],
+makes $`GG_5(r)` finite for every $`r<R`, where $`R=\sqrt{3+\varphi}`.
 
-:::figure TDCSGFigures.Confinement.componentOfZero (label := "component-of-zero") (inline := true) (proves := TDCSGFigures.Confinement.componentOfZero_spec) (alt := "Eighteen labels inside a circular window joined by edges into a star-shaped cycle: dots for weight zero, squares for weight one; the labels 0 and e0 lie on the horizontal axis through the window centre.")
+:::figure TDCSGFigures.Confinement.componentOfZero (label := "component-of-zero") (inline := true) (proves := TDCSGFigures.Confinement.componentOfZero_spec) (alt := "Eighteen labels inside a circular window joined by edges into a star-shaped cycle: dots for weight zero, squares for weight one; the labels 0 and e0 lie on the horizontal axis through the window center.")
 The component of the label $`0` in the center graph for $`x=1/2` and $`r=1.95`: 18 labels, each
 drawn at its projection $`P(n)` inside the window $`|w-x|\le r/2`, dots for weight zero (the left
 centers) and squares for weight one (the right centers); hovering over a label shows its integer
@@ -37,8 +37,10 @@ label lies strictly inside every slab $`lo<n_j\le hi`.
 Here the window is $`x=1/2` and $`r=1.95`. Starting at zero, enumerate the integer labels
 of every retained neighbor until each has been visited. There are 18 labels in this component.
 The weight-zero labels (dots) are left centers and the weight-one labels (squares) are right
-centers; every edge joins one of each. A line crossing away from a marked vertex does not create
-an edge in the label graph. The window tests and the enumeration generate this picture. The theorem must also control every other starting point.
+centers; every edge joins one of each. Segments that cross in the drawing do not meet in the
+graph: their crossing point is not a label, and each edge joins only its two endpoints, a
+weight-zero label $`n` and a label $`n+e_j`. The window tests and the enumeration generate
+{figref "component-of-zero"}[]. The theorem must also control every other starting point.
 
 :::lemma_ "one_step" (lean := "SimpleGraph.Reachable.mem_or_exists_adj_of_leaf")
 In a simple graph, let $`S` be a set of vertices that contains a vertex $`s` and all its

@@ -45,7 +45,8 @@ and between $`0.0041` and $`0.0042` inside the window's edge $`x+r/2=1.532`. In
 :::
 
 A good level acts as a wall in the integer coordinates, not as a line in the projected disk.
-Crossing a wall in the $`j`th coordinate changes $`n_j` by one. The figure shows the local effect:
+Crossing a wall in the $`j`th coordinate changes $`n_j` by one. {figref "terminal-crossing"}[]
+shows the local effect:
 one endpoint of the crossing edge has no neighbor other than the other endpoint, and the dashed
 spokes ending in open rings mark the rejected candidates. The lemma below shows that every crossing at a good
 level ends this way.

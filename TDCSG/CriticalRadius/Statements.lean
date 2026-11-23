@@ -47,7 +47,8 @@ namespace TDCSG.CriticalRadius
 
 /-! ### `n = 10` -/
 
-/-- `GG₁₀(r)` is infinite for every `r ≥ √(4 - φ)` (`critical-radius-n10.md`, Theorem A). -/
+/-- `GG₁₀(r)` is infinite for every `r ≥ √(4 - φ)` (Theorem A of the note
+`notes/proofs/critical-radius-n10.md`). -/
 theorem infinite_GG_ten {r : ℝ} (hr : √(4 - φ) ≤ r) : Infinite (GG 10 10 r r) :=
   Ten.infinite_GG hr
 
@@ -92,14 +93,16 @@ theorem mem_orbit_pStar_twelve {r : ℝ} (hr : √(40 - 22 * √3) ≤ r) :
 
 /-! ### `n = 8` and `n = 12`: infinitude -/
 
-/-- `critical-radius-n8.md`, Theorem A, orbit form: for `r ≥ √(10 - 5√2)` the orbit of `p*`
-under `GG₈(r)` contains `p* + 4 i (√2 - 1)^(k+1)` for every `k`. -/
+/-- Theorem A of the note `notes/proofs/critical-radius-n8.md`, orbit form: for
+`r ≥ √(10 - 5√2)` the orbit of `p*` under `GG₈(r)` contains `p* + 4 i (√2 - 1)^(k+1)` for
+every `k`. -/
 theorem mem_orbit_pStar_eight_pow {r : ℝ} (hr : √(10 - 5 * √2) ≤ r) (k : ℕ) :
     Eight.pStar + ((4 * (√2 - 1) ^ (k + 1) : ℝ) : ℂ) * I ∈ orbit 8 8 r r Eight.pStar :=
   Eight.mem_orbit_pStar_pow hr k
 
-/-- `critical-radius-n12.md`, Theorem A, orbit form: for `r ≥ √(40 - 22√3)` the orbit of `p*`
-under `GG₁₂(r)` contains `p* + 2 (2 - √3)^(k+2) V` for every `k`. -/
+/-- Theorem A of the note `notes/proofs/critical-radius-n12.md`, orbit form: for
+`r ≥ √(40 - 22√3)` the orbit of `p*` under `GG₁₂(r)` contains `p* + 2 (2 - √3)^(k+2) V` for
+every `k`. -/
 theorem mem_orbit_pStar_twelve_pow {r : ℝ} (hr : √(40 - 22 * √3) ≤ r) (k : ℕ) :
     Twelve.pStar + ((2 * (2 - √3) ^ (k + 2) : ℝ) : ℂ) * Twelve.chordDir ∈
       orbit 12 12 r r Twelve.pStar :=
@@ -124,7 +127,8 @@ theorem infinite_orbit_pStar_eight {r : ℝ} (hr : √(10 - 5 * √2) ≤ r) :
     (ε := √2 - 1) (by norm_num) I_ne_zero (by linarith) (by linarith) 1) fun k ↦ ?_
   simpa using mem_orbit_pStar_eight_pow hr k
 
-/-- `GG₈(r)` is infinite for every `r ≥ √(10 - 5√2)` (`critical-radius-n8.md`, Theorem A). -/
+/-- `GG₈(r)` is infinite for every `r ≥ √(10 - 5√2)` (Theorem A of the note
+`notes/proofs/critical-radius-n8.md`). -/
 theorem infinite_GG_eight {r : ℝ} (hr : √(10 - 5 * √2) ≤ r) : Infinite (GG 8 8 r r) :=
   infinite_GG_of_infinite_orbit (infinite_orbit_pStar_eight hr)
 
@@ -148,7 +152,8 @@ theorem infinite_orbit_pStar_twelve {r : ℝ} (hr : √(40 - 22 * √3) ≤ r) :
     (ε := 2 - √3) (by norm_num) hV (by linarith) (by linarith) 2) fun k ↦ ?_
   simpa using mem_orbit_pStar_twelve_pow hr k
 
-/-- `GG₁₂(r)` is infinite for every `r ≥ √(40 - 22√3)` (`critical-radius-n12.md`, Theorem A). -/
+/-- `GG₁₂(r)` is infinite for every `r ≥ √(40 - 22√3)` (Theorem A of the note
+`notes/proofs/critical-radius-n12.md`). -/
 theorem infinite_GG_twelve {r : ℝ} (hr : √(40 - 22 * √3) ≤ r) : Infinite (GG 12 12 r r) :=
   infinite_GG_of_infinite_orbit (infinite_orbit_pStar_twelve hr)
 

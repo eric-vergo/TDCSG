@@ -50,8 +50,8 @@ def generatorStepItems : Array Item := #[
   Plane.Exact.arc leftCentre (1 : Rat) (deg 0) (-deg 72) |>.withArrow |>.role leftRole
     |>.width 2 |>.dashed |>.named "a turns 0 through 72° clockwise about −1"
     |>.declRef `TDCSG.diskRotation,
-  Plane.Exact.point leftCentre |>.role leftRole |>.named "the centre −1",
-  Plane.Exact.point rightCentre |>.role rightRole |>.named "the centre 1",
+  Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1",
+  Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1",
   Plane.Exact.point origin |>.named "0" |>.incident .inside "the left circle"
     |>.incident .inside "the right circle" |>.incident .inside "the lens",
   Plane.Exact.point aZero |>.role leftRole |>.named "a(0) = −1 + ζ⁴"
@@ -98,9 +98,9 @@ def stepBase : Array Item := #[
   Plane.Exact.lens leftCentre rightCentre (21 / 10 : Rat) (21 / 10 : Rat) |>.role lensRole
     |>.noOutline
     |>.fillOpacity 0.12 |>.named "the lens",
-  withSidesStep leftCentre (Plane.Exact.point leftCentre |>.role leftRole |>.named "the centre −1"),
+  withSidesStep leftCentre (Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1"),
   withSidesStep rightCentre
-    (Plane.Exact.point rightCentre |>.role rightRole |>.named "the centre 1"),
+    (Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1"),
   Plane.Exact.label "−1" leftCentre .auto |>.role leftRole,
   Plane.Exact.label "+1" rightCentre .auto |>.role rightRole,
   Plane.Exact.label "left disk, radius 2.1" ((-1 : Rat), (-5 / 2 : Rat)) |>.role leftRole,

@@ -43,7 +43,7 @@ def extensionJumpItems : Array Item := #[
   Plane.label "2" ⟨21 / 2, 0⟩ .above,
   Plane.label "≈ 11.9" ((PlanePoint.toPoint nearInsideImage).lerp
     (PlanePoint.toPoint nearOutside) 0.62) (.toward (deg 136)) (some 4),
-  Plane.Exact.point origin |>.role leftRole |>.named "the centre c",
+  Plane.Exact.point origin |>.role leftRole |>.named "the center c",
   Plane.Exact.point nearInside |>.role leftRole |>.named "p" |>.incident .inside "the disk B"
     |>.declRef `TDCSG.ballPerm_apply_of_mem,
   Plane.Exact.point nearOutside |>.named "q = ĥ(q)" |>.incident .outside "the disk B"
@@ -86,8 +86,8 @@ def disjointDisksItems : Array Item := #[
     |>.width 1.5 |>.named "the turn a of B₁, 72° clockwise about −1" |>.declRef `TDCSG.genA,
   Plane.Exact.arc rightCentre phiInvReal (deg 144) (deg 72) |>.withArrow |>.role rightRole
     |>.width 1.5 |>.named "the turn b of B₂, 72° clockwise about 1" |>.declRef `TDCSG.genB,
-  Plane.Exact.point leftCentre |>.role leftRole |>.named "the centre −1",
-  Plane.Exact.point rightCentre |>.role rightRole |>.named "the centre 1",
+  Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1",
+  Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1",
   Plane.Exact.point leftSample |>.role leftRole |>.named "x" |>.incident .inside "the disk B₁"
     |>.incident .outside "the disk B₂",
   Plane.Exact.point (leftCentre + phiInv * zeta 1) |>.role leftRole |>.named "a(x)"

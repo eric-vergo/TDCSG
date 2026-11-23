@@ -4,11 +4,12 @@ Authors: Eric Vergo, OpenAI GPT-6.2 Astra, Claude
 -/
 import VersoBlueprint
 import PILeanVerso
+import TDCSGBlueprint.RepoFile
 import TDCSGFigureTheorems
 import TDCSG.CriticalRadius.Statements
 import TDCSG.Finiteness
 
-open Verso.Genre Verso.Genre.Manual Informal PILeanVerso
+open Verso.Genre Verso.Genre.Manual Informal PILeanVerso TDCSGBlueprint
 
 #doc (Manual) "Other orders" =>
 
@@ -107,36 +108,52 @@ finite.
 
 # Computing a single orbit
 
+%%%
+number := false
+%%%
+
 The program `tdcsg-orbit` represents a cyclotomic integer by its coefficients in a power
 basis. Rotations operate on these integers and the disk test handles equality on the boundary.
 Breadth-first search starts from a specified point and applies both generators and their
 inverses. Exhausting the queue proves that this particular orbit has been fully enumerated
 by the algorithm. Reaching a search cap leaves its eventual size undetermined. Run
 `lake test` to exercise the engine's self-tests. See the
-[engine guide](https://github.com/eric-vergo/TDCSG/blob/main/notes/engine.md) for reproducible
+{repoFile "notes/engine.md"}[engine guide] for reproducible
 commands and exact radius syntax.
 
 # What a certificate adds
 
+%%%
+number := false
+%%%
+
 A cut-set certificate is a finite union of arcs of circles of radius $`r` that contains both
 boundary circles, is mapped into itself by both generators and their inverses, and meets the boundary circles
 in a controlled way: no carrying circle is tangent to a boundary circle, and every arc endpoint
-on a boundary circle is also the endpoint of an arc that enters that disk. The certificate theorem, Theorem 4.2 of the
-[written proof](https://github.com/eric-vergo/TDCSG/blob/main/notes/proofs/critical-radius-n5.md),
-says that such a certificate at radius $`r` makes the group finite at $`r`, and by monotonicity
-at every smaller radius. The theorem holds for every order, and its written proof has an
-independent referee report in the repository. It has no Lean counterpart: the library contains
+on a boundary circle is also the endpoint of an arc that enters that disk. The certificate
+theorem says that such a certificate at radius $`r` makes the group finite at $`r`, and by
+monotonicity at every smaller radius. It is Theorem 4.2, “finiteness certificate”, of the note
+{repoFile "notes/proofs/critical-radius-n5.md"}[Bounds on the critical radius of GG₅]
+(`notes/proofs/critical-radius-n5.md` in the repository), a written proof that is not part of
+this site. The theorem holds for every order, and the note has an independent referee report in
+the repository. It has no Lean counterpart: the library contains
 neither the theorem nor a definition of a certificate.
 
 The search and verification programs are separate. The checker reads a finished certificate
 and tests its closure conditions using exact arithmetic without floating point. The
-[certificate records](https://github.com/eric-vergo/TDCSG/blob/main/notes/certificates.md)
+{repoFile "notes/certificates.md"}[certificate records]
 give input radii, commands and file checksums. The certified finiteness ranges for orders 8,
 10 and 12 are therefore proved modulo that computation, not in Lean. At order five no certificate
 is needed: finiteness on the whole range $`r<R` is proved in Lean, in Part II.
 
-The [relative certificates](https://github.com/eric-vergo/TDCSG/blob/main/notes/relative-certificates.md)
-use smaller windows or symmetry to bring additional cases within reach. Window-avoiding
-chain bounds control a restricted class of paths. The order-five classification on this site
-instead uses integer-coordinate confinement and the chord construction of Part I, and every step
-of it is checked in Lean.
+The note on {repoFile "notes/relative-certificates.md"}[relative certificates] records a
+weaker kind of certificate, computed at the radius of the closed form itself. It fixes windows:
+small closed regions of the plane, one around each lattice point on the two boundary circles. A
+relative certificate is a finite union of arcs of circles of radius $`r` that contains the
+boundary circles and the boundaries of the windows, and is mapped into itself by the generators
+and their inverses outside the windows. It does not prove finiteness by itself. It bounds the
+number of points that can be reached from a given point by moves whose intermediate points stay
+outside the windows, for every smaller radius at once, and so reduces finiteness to bounding how
+many points of an orbit lie in the windows. None of this is needed at order five, where the classification on
+this site uses integer-coordinate confinement and the chord construction of Part I, and every
+step of it is checked in Lean.

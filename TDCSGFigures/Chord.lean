@@ -59,8 +59,8 @@ def chordPiecesItems : Array Item := criticalDisks ++ #[
   Plane.Exact.segment cutG chordEnd |>.role (pieceRole 3) |>.width 5
     |>.named "the piece [(3 − 2φ)E, E] of word 3" |>.declRef `TDCSG.Five.applyWord_word₃,
   Plane.Exact.labelBeside "3" cutG chordEnd |>.role (pieceRole 3),
-  Plane.Exact.point leftCentre |>.role leftRole |>.named "the centre −1",
-  Plane.Exact.point rightCentre |>.role rightRole |>.named "the centre 1",
+  Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1",
+  Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1",
   Plane.Exact.point (-chordEnd) |>.role rightRole |>.named "−E"
     |>.incident .on "the right circle" |>.incident .on "the lens",
   Plane.Exact.point cutF |>.named "(1 − φ)E" |>.incident .inside "the lens",
@@ -130,8 +130,8 @@ def traceFrame (i : Nat) : Plane.Figure :=
     items := criticalDisks ++
       #[Plane.Exact.segment (-chordEnd) chordEnd |>.faint |>.named "the chord from −E to E"] ++
       segs ++ labels ++ marks ++
-      #[Plane.Exact.point leftCentre |>.role leftRole |>.named "the centre −1",
-        Plane.Exact.point rightCentre |>.role rightRole |>.named "the centre 1",
+      #[Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1",
+        Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1",
         Plane.Exact.label "−1" leftCentre .auto |>.role leftRole,
         Plane.Exact.label "+1" rightCentre .auto |>.role rightRole,
         Plane.Exact.label s!"word {i}: {wordText i}" ((0 : Rat), (-12 / 5 : Rat))

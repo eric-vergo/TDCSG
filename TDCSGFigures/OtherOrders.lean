@@ -53,8 +53,8 @@ def orderEightItems : Array Item := #[
   Plane.Exact.labelBeside "r₈" (centre8 (-1)) pStar8 |>.role leftRole,
   Plane.Exact.line pStar8 q8₀ |>.faint |>.dashed
     |>.named "the chord p* + it, vertical through p*",
-  Plane.Exact.point (centre8 (-1)) |>.role leftRole |>.named "the centre −1",
-  Plane.Exact.point (centre8 1) |>.role rightRole |>.named "the centre 1",
+  Plane.Exact.point (centre8 (-1)) |>.role leftRole |>.named "the center −1",
+  Plane.Exact.point (centre8 1) |>.role rightRole |>.named "the center 1",
   sides8 pStar8 (Plane.Exact.point pStar8 |>.role leftRole |>.named "p* = 1 − 2ζ + ζ² − ζ³"
     |>.incident .on "the chord p* + it, vertical through p*"
     |>.declRef `TDCSG.CriticalRadius.pStar_eight_mem_sphere),
@@ -116,8 +116,8 @@ def orderTenItems : Array Item := #[
   Plane.Exact.segment cut10₂ w10 |>.role (pieceRole 3) |>.width 5
     |>.named "the piece [u, W] of word 3",
   Plane.Exact.labelBeside "3" cut10₂ w10 |>.role (pieceRole 3),
-  Plane.Exact.point (centre10 (-1)) |>.role leftRole |>.named "the centre −1",
-  Plane.Exact.point (centre10 1) |>.role rightRole |>.named "the centre 1",
+  Plane.Exact.point (centre10 (-1)) |>.role leftRole |>.named "the center −1",
+  Plane.Exact.point (centre10 1) |>.role rightRole |>.named "the center 1",
   sides10 w10 (Plane.Exact.point w10 |>.role leftRole
     |>.named "W = √5 u"),
   sides10 negW10 (Plane.Exact.point negW10 |>.role rightRole
@@ -180,8 +180,8 @@ def orderTwelveItems : Array Item := #[
   Plane.Exact.labelBeside "r₁₂" (centre12 (-1)) pStar12Conj |>.role leftRole,
   Plane.Exact.line pStar12 orbit12 |>.faint |>.dashed
     |>.named "the chord p* + uV, in the direction V = ζ⁵ + ζ⁶",
-  Plane.Exact.point (centre12 (-1)) |>.role leftRole |>.named "the centre −1",
-  Plane.Exact.point (centre12 1) |>.role rightRole |>.named "the centre 1",
+  Plane.Exact.point (centre12 (-1)) |>.role leftRole |>.named "the center −1",
+  Plane.Exact.point (centre12 1) |>.role rightRole |>.named "the center 1",
   sides12 pStar12 (Plane.Exact.point pStar12 |>.role leftRole |>.size 3
     |>.named "p* = −2ζ + 4ζ² − 3ζ³"
     |>.incident .on "the chord p* + uV, in the direction V = ζ⁵ + ζ⁶"
