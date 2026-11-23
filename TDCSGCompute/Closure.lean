@@ -13,9 +13,8 @@ boundary circles `∂D_L`, `∂D_R` (centres `-1`, `1`, radius `r`) and is mappe
 `A^{±1}` on `D_L` and `B^{±1}` on `D_R`, where `A`, `B` are the rotations by `ζ` about `-1` and
 `1`. When it terminates and the hypotheses hold, the resulting finite union of arcs is a
 certificate for the finiteness of `GG_n(r)`: conditions (C1)–(C4) of Theorem 4.2 of
-`notes/proofs/critical-radius-n5.md` (the Lean statement is `TDCSG.Certificate` in
-`TDCSG/CriticalRadius/Certificate.lean`). The certificate is checked again, independently, by
-`TDCSGCompute.CertCheck`.
+`notes/proofs/critical-radius-n5.md`, which has no Lean counterpart. The certificate is checked
+again, independently, by `TDCSGCompute.CertCheck`.
 
 ## Algorithm
 

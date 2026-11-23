@@ -10,8 +10,7 @@ import TDCSGCompute.CirclePoint
 
 `checkCertificate` reads a certificate file (format in `notes/certificates.md`) and verifies from
 scratch the hypotheses of the cut-set certificate theorem (Theorem 4.2 of
-`notes/proofs/critical-radius-n5.md`; `TDCSG.Certificate` in
-`TDCSG/CriticalRadius/Certificate.lean`) for the union `K` of the listed arcs:
+`notes/proofs/critical-radius-n5.md`) for the union `K` of the listed arcs:
 
 * the radius: `r² = R / q` is real and `r > 1`;
 * the arcs: every endpoint symbol names a point of its circle; on each circle the listed arcs are
@@ -37,15 +36,16 @@ of symbols, the exact order of points on a circle, tangency signs, the rotations
 clipping, containment and the (C1)–(C4) logic are written separately here, and **no
 floating-point number enters any decision**: the generator's float filter is not used.
 
-## Relation to the Lean statement
+## Relation to the written theorem
 
-Each `arc` record on centre `c` corresponds to `TDCSG.Arc` with `center` the complex value of `c`,
-`θ₁` the angle of the initial point about `c` and `θ₂ = θ₁ + ` the counterclockwise angle to the
-final point (in `(0, 2π)`); a `full` record has `θ₂ = θ₁ + 2π`. With `r = √ρ` the checks above
-are the conjuncts of `TDCSG.Certificate n r arcs`: non-degeneracy, (C1), (C2) for `permA`,
-`permA⁻¹`, `permB`, `permB⁻¹` (which act as the rotations by `ζ^{∓1}` on the closed disks and as
-the identity elsewhere), (C3) as `dist c p ≠ 2r`, and (C4) in the local form stated there. This
-correspondence is by inspection of the definitions; it is not a formal proof.
+Each `arc` record on centre `c` is the arc of the circle of radius `r = √ρ` about the complex
+value of `c` that runs counterclockwise from its initial point to its final point; a `full` record
+is the whole circle. The checks above are the hypotheses of Theorem 4.2 of
+`notes/proofs/critical-radius-n5.md` for this union of arcs: non-degeneracy, (C1), (C2) for `A`,
+`A⁻¹`, `B`, `B⁻¹` (which act as the rotations by `ζ^{∓1}` on the closed disks and as the identity
+elsewhere), (C3) as `|c - p| ≠ 2r`, and (C4) in the local form listed above. The theorem has no
+Lean counterpart, so the step from a passing check to the finiteness of `GG_n(r)` rests on the
+written proof.
 -/
 
 namespace TDCSGCompute
