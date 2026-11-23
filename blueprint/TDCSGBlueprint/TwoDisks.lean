@@ -100,7 +100,7 @@ $`N`, the group is finite.
 
 :::proof "two_disk_finite"
 The group is finitely generated, it acts faithfully on the plane, and its orbits are uniformly
-bounded, so the finiteness criterion of Chapter 1 applies.
+bounded, so the orbit-bound lemma of Chapter 1, {bpref "uniform_orbits"}[], applies.
 :::
 
 :::theorem "disjoint_disks" (lean := "TDCSG.nonempty_mulEquiv_of_add_lt_two, TDCSG.card_GG_of_add_lt_two, TDCSG.finite_GG_of_lt_one") (uses := "disk_rotation, group_orbit, generated_by_two, ball_extension_facts, compound_disjoint")
@@ -120,8 +120,10 @@ $`r_1=r_2=r` gives a group of order $`n^2`.
 
 :::definition "critical_radius_def" (lean := "TDCSG.infiniteRadii, TDCSG.criticalRadius") (uses := "group_orbit")
 The critical radius of order $`n` is the infimum of the radii $`r` at which $`GG_n(r)` is
-infinite. When the group is finite at every radius, as for $`n=1,2,3,4,6`, the infimum of the
-empty set is taken to be $`0`.
+infinite. When the group is finite at every radius, the set of these radii is empty, and the
+critical radius is $`0` by Lean's convention for the infimum of the empty set of real numbers,
+where a mathematician would expect $`+\infty`. By {bpref "crystallographic"}[] this is the case
+for $`n=1,2,3,4,6`.
 :::
 
 :::lemma_ "critical_radius_of_iff" (lean := "TDCSG.criticalRadius_eq_of_forall_finite_iff") (uses := "critical_radius_def")

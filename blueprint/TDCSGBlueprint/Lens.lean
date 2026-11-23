@@ -43,7 +43,8 @@ $`\operatorname{Re}(v)\le r/2+c_2`, which lies below $`\kappa-(3+\varphi-r^2)/16
 $`0\le r<R`.
 :::
 
-At equality the two circles meet at $`v=1+t u` with real part $`\kappa`. Shrinking the circles opens
+At equality, $`r=R`, the two circles meet at the point $`v_*=1+tu` of the proof, where
+$`t=1/2-c_1=(2-\varphi)/2`; its real part is $`\kappa`. Shrinking the circles opens
 a gap even after the vertical cut moves left by $`(3+\varphi-r^2)/16`. This gap supplies the
 room needed to choose the good levels of Chapter 6. At $`r=R` the margin is zero, which is why
 the argument stops at the threshold.

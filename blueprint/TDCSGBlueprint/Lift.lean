@@ -53,6 +53,7 @@ Fix the radius $`r` and the window center $`x`. A label $`n` lies in the window 
 $`|P(n)-x|\le r/2`. The center graph joins a weight-zero label $`n` to $`n+e_j` when both lie
 in the window. It is a simple graph, so paths may traverse an edge either way. A label is
 reachable when a path joins it to $`0` or $`e_0`, the labels of the two initial centers.
+Lean calls the center graph `TDCSG.Five.centerGraph`.
 :::
 
 :::theorem "words_walks" (lean := "TDCSG.Five.Framed, TDCSG.Five.framed_of_mem_orbit, TDCSG.Five.exists_centerReach_of_mem_orbit") (uses := "group_orbit, generated_by_two, active_graph, unit_step")
@@ -77,5 +78,5 @@ $`y` gives the formula.
 :::
 
 For the illustrated window $`x=1/2`, $`r=1.95`, three of the five neighbors of zero are inside.
-The active-center graph keeps precisely these three edges at zero. Which other edges survive
+The center graph keeps precisely these three edges at zero. Which other edges survive
 depends on their own centers. The next chapter studies a pair of simultaneous disk tests.

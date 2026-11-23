@@ -17,7 +17,8 @@ tag := "confinement"
 This chapter completes Part II. It combines the good levels of Chapter 6 with a lemma about
 graphs to show that every walk of Chapter 4 stays in a box of integer labels whose size does not
 depend on the starting point. With the description of orbit points by labels, this bounds every
-orbit by one number, and the finiteness criterion of Chapter 1 makes $`GG_5(r)` finite for every
+orbit by one number, and the orbit-bound lemma, in its two-disk form {bpref "two_disk_finite"}[],
+makes $`GG_5(r)` finite for every
 $`r<R`, where $`R=\sqrt{3+\varphi}`.
 
 ![The 18 labels of the example component drawn at their projections inside the circular window, with the edges of the center graph.](/figures/component.svg)
@@ -26,8 +27,10 @@ $`r<R`, where $`R=\sqrt{3+\varphi}`.
 Here the window is $`x=1/2` and $`r=1.95`. Starting at zero, enumerate the integer labels
 of every retained neighbor until each has been visited. There are 18 labels in this component.
 The weight-zero labels (blue) are left centers and the weight-one labels (vermilion) are right
-centers; every edge joins one of each. A line crossing away from a marked vertex does not create
-an edge in the label graph. The window tests and the enumeration generate this picture. The theorem must also control every other starting point.
+centers; every edge joins one of each. Segments that cross in the drawing do not meet in the
+graph: their crossing point is not a label, and each edge joins only its two endpoints, a
+weight-zero label $`n` and a label $`n+e_j`. The window tests and the enumeration generate
+this picture. The theorem must also control every other starting point.
 
 :::lemma_ "one_step" (lean := "SimpleGraph.Reachable.mem_or_exists_adj_of_leaf")
 In a simple graph, let $`S` be a set of vertices that contains a vertex $`s` and all its
