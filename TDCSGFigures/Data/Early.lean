@@ -330,9 +330,6 @@ instance : PlanePoint (CycPt 12) where
   re p k := QSqrt.ball p.coords12.1 k
   im p k := QSqrt.ball p.coords12.2 k
 
-/-- The integer `k` of `ℤ[ζₙ]`. -/
-def CycPt.ofInt (F : CycField) (n : Nat) (k : Int) : CycPt n := ⟨F.ofInt k⟩
-
 /-- The letter `l` applied by the engine at squared radius `r2`: its rotation (`CycField.rotCW`,
 clockwise, for `a` and `b`; `rotCCW` for the inverses) when the exact disk test
 (`DiskTest.exactDecide`) puts the point in the letter's closed disk; `none` when the test is not
@@ -404,8 +401,14 @@ def orbit8 (k : Nat) : CycPt 8 :=
   let pw := (List.range (k + 1)).foldl (fun s _ => field8.mul s e) field8.one
   ⟨field8.add pStar8.c (field8.smul 4 (field8.mul field8.pows[2]! pw))⟩
 
-/-- The centres `∓1` in `ℤ[ζ₈]`. -/
-def centre8 (k : Int) : CycPt 8 := CycPt.ofInt field8 8 k
+/-- The point `q₀ = p* + 4 (√2 - 1) i = 1 + 2ζ - 3ζ² + 3ζ³` (`orbit8 0`). -/
+def q8₀ : CycPt 8 := ⟨#[1, 2, -3, 3]⟩
+
+/-- The point `q₁ = p* + 4 (√2 - 1)² i = 1 - 10ζ + 13ζ² - 9ζ³` (`orbit8 1`). -/
+def q8₁ : CycPt 8 := ⟨#[1, -10, 13, -9]⟩
+
+/-- The integer `k` in `ℤ[ζ₈]`: the centres `∓1`. -/
+def centre8 (k : Int) : CycPt 8 := ⟨#[k, 0, 0, 0]⟩
 
 /-! ### Order 12 -/
 
@@ -421,24 +424,22 @@ def radiusTwelve : SqrtOf (QSqrt 3) := ⟨⟨40, -22⟩⟩
 /-- The critical point `p* = -2ζ + 4ζ² - 3ζ³` of order 12 (`TDCSG.Twelve.pStar`). -/
 def pStar12 : CycPt 12 := ⟨#[0, -2, 4, -3]⟩
 
-/-- The direction `V = ζ⁵ + ζ⁶` of the chord of order 12 (`TDCSG.Twelve.chordDir`). -/
-def chordDir12 : Elem := field12.add field12.pows[5]! field12.pows[6]!
+/-- The direction `V = ζ⁵ + ζ⁶ = -1 - ζ + ζ³` of the chord of order 12 (`TDCSG.Twelve.chordDir`). -/
+def chordDir12 : Elem := #[-1, -1, 0, 1]
 
 /-- The seed word `b a b b a a` of order 12 (`TDCSG.Twelve.seed`). -/
 def seed12 : List Letter := [.b, .a, .b, .b, .a, .a]
 
 /-- The point `q₀ = p* + (14 - 8√3) V = p* + 2 (2 - √3)² V` of the orbit of `p*`
-(`TDCSG.Twelve.applyWord_seed`). -/
-def orbit12 : CycPt 12 :=
-  ⟨field12.add pStar12.c (field12.mul (field12.sub (field12.ofInt 14) (field12.smul 8 sqrt3))
-    chordDir12)⟩
+(`TDCSG.Twelve.applyWord_seed`), `2 - 4ζ² + 3ζ³`. -/
+def orbit12 : CycPt 12 := ⟨#[2, 0, -4, 3]⟩
 
-/-- The mirror image `p̄*` of `p*` in the real axis, on the left circle as well: the end of the drawn
-radius of order 12. -/
-def pStar12Conj : CycPt 12 := ⟨field12.conj pStar12.c⟩
+/-- The mirror image `p̄*` of `p*` in the real axis, on the left circle as well: the end of the
+drawn radius of order 12. -/
+def pStar12Conj : CycPt 12 := ⟨#[4, -2, -4, 5]⟩
 
-/-- The centres `∓1` in `ℤ[ζ₁₂]`. -/
-def centre12 (k : Int) : CycPt 12 := CycPt.ofInt field12 12 k
+/-- The integer `k` in `ℤ[ζ₁₂]`: the centres `∓1`. -/
+def centre12 (k : Int) : CycPt 12 := ⟨#[k, 0, 0, 0]⟩
 
 /-! ### Order 10 -/
 
@@ -463,6 +464,24 @@ def cutTen₁ : Zeta5 := -(phiInv * dirU)
 
 /-- The cut `u` between the pieces of the second and the third word of order 10. -/
 def cutTen₂ : Zeta5 := dirU
+
+/-- The integer `k` in `ℤ[ζ₁₀]`: the centres `∓1`. -/
+def centre10 (k : Int) : CycPt 10 := ⟨#[k, 0, 0, 0]⟩
+
+/-- `W = -1 - ζ₁₀ + ζ₁₀² + ζ₁₀³` in `ℤ[ζ₁₀]` (`ofZeta5 pointW`). -/
+def w10 : CycPt 10 := ⟨#[-1, -1, 1, 1]⟩
+
+/-- `-W` in `ℤ[ζ₁₀]`. -/
+def negW10 : CycPt 10 := ⟨#[1, 1, -1, -1]⟩
+
+/-- The cut `-φ⁻¹ u = ζ₁₀ - ζ₁₀²` in `ℤ[ζ₁₀]` (`ofZeta5 cutTen₁`). -/
+def cut10₁ : CycPt 10 := ⟨#[0, 1, -1, 0]⟩
+
+/-- The cut `u = -1 + ζ₁₀ - ζ₁₀² + ζ₁₀³` in `ℤ[ζ₁₀]` (`ofZeta5 cutTen₂`). -/
+def cut10₂ : CycPt 10 := ⟨#[-1, 1, -1, 1]⟩
+
+/-- `0` in `ℤ[ζ₁₀]`. -/
+def zero10 : CycPt 10 := ⟨#[0, 0, 0, 0]⟩
 
 /-- The words of order 10 (`TDCSG.Ten.word₁`, `word₂`, `word₃`). -/
 def wordsTen : List (List Letter) :=
@@ -510,8 +529,8 @@ def piecesTen : List ((Zeta5 × Zeta5) × (Zeta5 × Zeta5)) :=
   Letter.a.covers r2ThreeHalves aZero && !Letter.b.covers r2ThreeHalves aZero &&
   (aZero - rightCentre).normSq == rat 7 - phi * rat 2
 
--- Chapter 2: at radius 21/10 the word `a b b a` moves `0` three times and leaves it fixed at the last
--- letter, the point being outside the left disk then; the five points are those listed.
+-- Chapter 2: at radius 21/10 the word `a b b a` moves `0` three times and leaves it fixed at the
+-- last letter, the point being outside the left disk then; the five points are those listed.
 #guard stepPoints.length == 5 &&
   stepPoints == [origin, aZero, rightCentre + (aZero - rightCentre) * zeta 4,
     rightCentre + (aZero - rightCentre) * zeta 3, rightCentre + (aZero - rightCentre) * zeta 3] &&
@@ -557,6 +576,20 @@ def piecesTen : List ((Zeta5 × Zeta5) × (Zeta5 × Zeta5)) :=
   (DiskTest.make field8 r2Eight).exactDecide pStar8.c (-1) == .exact true &&
   engineWord field8 r2Eight seed8 pStar8.c == some (true, (orbit8 0).c) &&
   (orbit8 0).coords8 == (⟨1, -1 / 2⟩, ⟨-3, 5 / 2⟩)
+
+-- Order 8: the drawn points are the engine's: `q₀`, `q₁` are `orbit8 0`, `orbit8 1`, and the
+-- centres are `∓1` of `ℤ[ζ₈]`.
+#guard q8₀.c == (orbit8 0).c && q8₁.c == (orbit8 1).c && (centre8 (-1)).c == field8.ofInt (-1) &&
+  (centre8 1).c == field8.ofInt 1
+
+-- Order 12 and 10: the drawn points are the engine's.
+#guard chordDir12 == field12.add field12.pows[5]! field12.pows[6]! &&
+  orbit12.c == field12.add pStar12.c (field12.mul (field12.sub (field12.ofInt 14)
+    (field12.smul 8 sqrt3)) chordDir12) &&
+  pStar12Conj.c == field12.conj pStar12.c && (centre12 1).c == field12.ofInt 1 &&
+  w10.c == (ofZeta5 pointW).c && negW10.c == (ofZeta5 (-pointW)).c &&
+  cut10₁.c == (ofZeta5 cutTen₁).c && cut10₂.c == (ofZeta5 cutTen₂).c &&
+  zero10.c == (ofZeta5 origin).c && (centre10 (-1)).c == field10.ofInt (-1)
 
 -- Order 8: the points `q₀, q₁, q₂` lie on the vertical chord through `p*`, above it, at
 -- `4(√2 - 1)^(k+1)`.
