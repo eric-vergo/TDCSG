@@ -41,6 +41,23 @@ the threshold and above it. The negative check `scripts/check-comparator-negativ
 mutations of the challenge, and Comparator must reject each: replacing $`<` by $`\le`, and
 changing the definition of the radius.
 
+*Running the check*
+
+From a checkout with [elan](https://github.com/leanprover/elan) and Linux bubblewrap with user
+namespaces available, run
+
+```
+bash scripts/get-mathlib-cache.sh
+lake build
+lake comparator
+bash scripts/check-comparator-negative.sh
+```
+
+The first command fetches the imported Mathlib modules and their dependencies, and the second
+builds the library. The third runs Comparator on the challenge and the solution. The last makes
+the two mutations, each in its own disposable copy, and succeeds only when Comparator rejects
+both, the first as a mismatched statement and the second as a mismatched definition.
+
 *Independent replay*
 
 Each successful hosted build provides a verification record identifying the commit, Actions run,
