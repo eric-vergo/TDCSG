@@ -99,13 +99,14 @@ Details in [`arithmetic.md`](arithmetic.md).
   the two rotations generate the translations by 2(1 − ζ)ℤ[ζ_n] together with the rotations by μ_n;
   GG_n(r) is the cut-down of that group to the two disks.
 - **Finiteness criterion** [proved]. An orbit is finite if and only if the Galois conjugates of its
-  translation parts stay bounded. For the group GG_5(r) the analogous criterion (the group is finite if and only
-  if the Galois conjugates σ(t), σ: ζ ↦ ζ², of the translation parts of all its elements are
-  bounded) is in Lean: `TDCSG.Five.finite_GG_iff_conjugatesBounded`
-  (`TDCSG/CriticalRadius/FiveConjugate.lean`), together with the affine form of group elements
-  (`TDCSG.Five.exists_affine`) and the reformulation of finiteness below √(3+φ) as bounded
-  conjugates (`TDCSG.Five.finiteBelowClosedFormFive_iff`). The engine prints the exact conjugates
-  of every orbit point with `orbit --format lines --conj-points` ([`engine.md`](engine.md)).
+  translation parts stay bounded. For the group, the set of word maps is finite if and only if
+  the Galois conjugates of all their translation parts are bounded, and finiteness of the word maps
+  implies finiteness of the group (refereed;
+  [`open-problem-critical-radius.md`](open-problem-critical-radius.md) §2). For n = 5 below √(3+φ)
+  the written fivefold proof bounds them explicitly: |σ(t)| ≤ 10N + 32 with σ: ζ ↦ ζ² and
+  N ≤ 16√5/(3 + φ − r²) ([`proofs/sharp-lower-bound-n5-pentagrid.md`](proofs/sharp-lower-bound-n5-pentagrid.md)
+  §4; written proof only, not in Lean). The engine prints the exact conjugates of every orbit point
+  with `orbit --format lines --conj-points` ([`engine.md`](engine.md)).
 - **The omitted half of Theorem 1** [proved]. If lcm(n₁, n₂) ∈ {1, 2, 3, 4, 6}, the ambient group is
   a discrete group of plane motions, so its cut-down to two disks is finite for every r. Refereed
   proof: [`proofs/theorem1-converse.md`](proofs/theorem1-converse.md); Lean:
@@ -217,24 +218,21 @@ Status of each item, as of the notes in this repository (details in the README's
    the conjecture is untested in that form.
 5. **Prove the closed forms for φ(n) = 4.** Infinitude at and above the closed forms is proved for
    n = 5, 8, 10, 12, in writing and in Lean, so the closed forms are upper bounds for the critical
-   radius. The fivefold value is exact by `TDCSG.CriticalRadius.criticalRadius_five_eq`.
+   radius. The fivefold value is exact by `TDCSG.CriticalRadius.criticalRadius_five`.
    The other three cases have certified gaps r_c − r_* of 0.006404, 0.006908 and 0.002019.
    [Certificates](certificates.md) · [Relative certificates](relative-certificates.md).
    The refereed sharp-lower-bound notes
    ([`proofs/sharp-lower-bound-n5.md`](proofs/sharp-lower-bound-n5.md),
    [`-n8`](proofs/sharp-lower-bound-n8.md), [`-combined`](proofs/sharp-lower-bound-combined.md),
    [`-limit-system`](proofs/sharp-lower-bound-limit-system.md),
-   [`-n12`](proofs/sharp-lower-bound-n12.md)) reduce it, through relative certificates at r_c, to
-   bounded returns to small windows at the tight critical points (n = 5, 12) and to Conjecture S
-   (n = 8); the renormalization step is
-   missing (exact φ⁻³ matching and unrestricted period two of first-return sets refuted for n = 5,
-   exact period one from levels m₀ ≤ 3 refuted for n = 12; monotone period-two growth of orbit
-   classes for n = 5 and eventual period one for n = 12 are conjectures). For n = 5 a second
-   series of twelve notes, eleven of them refereed, works in the Galois-conjugate coordinate and with
-   the chord words as tokens; the guide is [`sharp-bound-n5.md`](sharp-bound-n5.md). It proves
-   (T), that every token component has internal diameter O(1/δ), so finiteness below √(3+φ)
-   also follows by this route from a connector bound. A bound uniform in the radius is still
-   open (computed: at most 9 wherever measured).
+   [`-n12`](proofs/sharp-lower-bound-n12.md)) reduce the remaining cases, through relative
+   certificates at r_c, to bounded returns to small windows at the tight critical points (n = 12,
+   and the same reduction for n = 5) and to Conjecture S (n = 8); for n = 8, 10, 12 the
+   renormalization step is missing (exact period one from levels m₀ ≤ 3 refuted for n = 12, where
+   eventual period one is a conjecture; for n = 5, exact φ⁻³ matching and unrestricted period two
+   of first-return sets are refuted and monotone period-two growth of orbit classes is a
+   conjecture). For n = 5 the threshold does not depend on this route: it follows from the integer
+   coordinate barriers of the fivefold proof.
    [`open-problem-critical-radius.md`](open-problem-critical-radius.md) states the problem for
    specialists.
 6. **Compute the orbit-counting zeta function** and its poles for n = 5, 8, 12. Not started.
