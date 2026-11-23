@@ -25,7 +25,7 @@ open Verso.Genre Verso.Genre.Manual Informal
 #doc (Manual) "The critical radius of fivefold disk rotations" =>
 
 %%%
-authors := ["Eric Vergo", "OpenAI GPT-6.2 Astra"]
+authors := ["Eric Vergo", "OpenAI GPT-6.2 Astra", "Claude"]
 %%%
 
 ![Two closed disks of radius the square root of three plus phi, centered at minus one and one. The chord from minus E on the right circle to E on the left circle passes through zero.](/figures/critical-chord.svg)
