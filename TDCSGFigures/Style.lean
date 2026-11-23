@@ -70,3 +70,27 @@ def figureWidth : Float := 600
 def narrowWidth : Float := 340
 
 end TDCSGFigures
+
+/-! ### The roles of the radius line -/
+
+namespace TDCSGFigures
+
+open PILean PILean.Plane
+
+/-- The role of the radii at which `GG₅(r)` is finite. -/
+def finiteRole : String := "finite"
+
+/-- The role of the radii at which `GG₅(r)` is infinite. -/
+def infiniteRole : String := "infinite"
+
+/-- The roles of the radius line with their light and dark colours: a dark teal for the finite
+radii, a brick red for the infinite ones (apart in lightness as well as in hue). -/
+def radiusRoles : Array PlaneRole := #[
+  ⟨finiteRole, ⟨0, 102, 112, 255⟩, ⟨96, 204, 214, 255⟩⟩,
+  ⟨infiniteRole, ⟨178, 34, 34, 255⟩, ⟨250, 138, 128, 255⟩⟩]
+
+/-- The house style with the roles of the radius line. -/
+def radiusStyle : Style :=
+  { houseStyle with plane := { houseStyle.plane with roles := roles ++ radiusRoles } }
+
+end TDCSGFigures
