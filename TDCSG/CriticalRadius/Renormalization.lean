@@ -41,9 +41,11 @@ namespace TDCSG.Renormalization
 /-- The isometry `t ↦ t + c` of `ℝ` if `pos`, and `t ↦ c - t` otherwise. -/
 def ract (pos : Bool) (c t : ℝ) : ℝ := if pos then t + c else c - t
 
+/-- Rescaling commutes with the isometries `t ↦ ±t + c`. -/
 theorem ract_mul (pos : Bool) (ε c t : ℝ) : ract pos (ε * c) (ε * t) = ε * ract pos c t := by
   cases pos <;> simp only [ract, Bool.false_eq_true, ite_false, ite_true] <;> ring
 
+/-- The composite of two isometries `t ↦ ±t + c`. -/
 theorem ract_ract (p₁ p₂ : Bool) (c₁ c₂ t : ℝ) :
     ract p₂ c₂ (ract p₁ c₁ t) = ract (p₂ == p₁) ((if p₂ then c₁ else -c₁) + c₂) t := by
   cases p₁ <;> cases p₂ <;> simp [ract] <;> ring

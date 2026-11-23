@@ -56,8 +56,10 @@ namespace TDCSG.Twelve
 /-- `√3`, as a real number. -/
 local notation "t" => Real.sqrt 3
 
+/-- `(√3)² = 3`. -/
 theorem sqrt_three_sq : t ^ 2 = 3 := Real.sq_sqrt (by norm_num)
 
+/-- Decimal bounds for `√3`. -/
 theorem sqrt_three_bounds : 1.732 < t ∧ t < 1.7321 := by
   constructor
   · rw [Real.lt_sqrt (by norm_num)]
@@ -198,11 +200,13 @@ open CycQ Renormalization
 /-- The root of unity `ζ = exp (2πi / 12)`. -/
 noncomputable def zeta : ℂ := exp (2 * π * I / (12 : ℕ))
 
+/-- `ζ = (√3 + i) / 2`. -/
 theorem zeta_eq : zeta = ⟨t / 2, 1 / 2⟩ := by
   rw [zeta, show 2 * π * I / (12 : ℕ) = ((π / 6 : ℝ) : ℂ) * I by push_cast; ring, exp_mul_I,
     ← ofReal_cos, ← ofReal_sin, Real.cos_pi_div_six, Real.sin_pi_div_six]
   apply Complex.ext <;> simp
 
+/-- `ζ² = (1 + √3 i) / 2`. -/
 theorem zeta_sq : zeta ^ 2 = ⟨1 / 2, t / 2⟩ := by
   rw [zeta_eq, sq]
   apply Complex.ext
@@ -211,6 +215,7 @@ theorem zeta_sq : zeta ^ 2 = ⟨1 / 2, t / 2⟩ := by
   · simp only [mul_im]
     ring
 
+/-- `ζ³ = i`. -/
 theorem zeta_cube : zeta ^ 3 = I := by
   rw [pow_succ, zeta_sq, zeta_eq]
   apply Complex.ext
@@ -219,6 +224,7 @@ theorem zeta_cube : zeta ^ 3 = I := by
   · simp only [mul_im, I_im]
     nlinarith [sqrt_three_sq]
 
+/-- `ζ = exp (2πi / 12)` satisfies the relations of the model `CycQ 3`. -/
 theorem isRoot_zeta : IsRoot 12 3 zeta where
   exp_eq := rfl
   pow_four := by
@@ -494,27 +500,33 @@ theorem realizeOK_family :
 theorem closureOK_family : closureOK radicand₁ radicand₂ unit family pieces = true := by
   decide +kernel
 
+/-- The value of `radicand₁`. -/
 theorem toReal_radicand₁ : radicand₁.toReal = 572 - 330 * t := by
   simp [radicand₁, Quad.toReal]
   ring
 
+/-- The value of `radicand₂`. -/
 theorem toReal_radicand₂ : radicand₂.toReal = 580 - 334 * t := by
   simp [radicand₂, Quad.toReal]
   ring
 
+/-- The value of `radiusSq`. -/
 theorem toReal_radiusSq : radiusSq.toReal = 40 - 22 * t := by
   simp [radiusSq, Quad.toReal]
   ring
 
+/-- The value of `unit`. -/
 theorem toReal_unit : unit.toReal = 2 - t := by
   simp [unit, Quad.toReal]
   ring
 
+/-- `pModel` represents the critical point `p*`. -/
 theorem embed_pModel : embed zeta pModel = pStar := by
   simp only [embed, pModel]
   rw [zeta_cube, zeta_sq, zeta_eq]
   apply Complex.ext <;> simp [pStar] <;> ring
 
+/-- `dirModel` represents the chord direction `V`. -/
 theorem embed_dirModel : embed zeta dirModel = chordDir := by
   simp only [embed, dirModel]
   rw [zeta_cube, zeta_sq, zeta_eq]

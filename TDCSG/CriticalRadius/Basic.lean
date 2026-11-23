@@ -64,6 +64,7 @@ def infiniteRadii (n : ℕ) : Set ℝ := {r | Infinite (GG n n r r)}
 which the group is infinite. It is `0` if the group is finite for every radius. -/
 noncomputable def criticalRadius (n : ℕ) : ℝ := sInf (infiniteRadii n)
 
+/-- A radius lies in `infiniteRadii n` exactly when `GG n n r r` is infinite. -/
 theorem mem_infiniteRadii {n : ℕ} {r : ℝ} : r ∈ infiniteRadii n ↔ Infinite (GG n n r r) :=
   Iff.rfl
 
@@ -83,6 +84,7 @@ theorem GG_eq_bot_of_eq_one {n₁ n₂ : ℕ} {r₁ r₂ : ℝ} (hA : permA n₁
     (hB : permB n₂ r₂ = 1) : GG n₁ n₂ r₁ r₂ = ⊥ := by
   rw [GG_eq_closure, hA, hB, Set.pair_eq_singleton, Subgroup.closure_singleton_one]
 
+/-- A disk of nonpositive radius contains at most its centre, so its rotation is trivial. -/
 theorem diskPerm_eq_one_of_nonpos (n : ℕ) (c : ℂ) {r : ℝ} (hr : r ≤ 0) : diskPerm n c r = 1 :=
   Perm.ext fun z ↦ by
     by_cases hz : z ∈ closedBall c r
@@ -91,6 +93,7 @@ theorem diskPerm_eq_one_of_nonpos (n : ℕ) (c : ℂ) {r : ℝ} (hr : r ≤ 0) :
       simp [diskRotation_of_mem hz, rotation]
     · simp [diskRotation_of_notMem hz]
 
+/-- For `n = 0` the rotation factor is `1`, so the disk permutation is trivial. -/
 theorem diskPerm_zero (c : ℂ) (r : ℝ) : diskPerm 0 c r = 1 :=
   Perm.ext fun z ↦ by simp [diskRotation_zero]
 
@@ -113,6 +116,7 @@ theorem one_le_of_mem_infiniteRadii {n : ℕ} {r : ℝ} (hr : r ∈ infiniteRadi
   by_contra h
   exact not_finite_iff_infinite.2 hr (finite_GG_of_lt_one n (not_le.1 h))
 
+/-- The radii with an infinite group are bounded below, by `1`. -/
 theorem bddBelow_infiniteRadii (n : ℕ) : BddBelow (infiniteRadii n) :=
   ⟨1, fun _ ↦ one_le_of_mem_infiniteRadii⟩
 
@@ -201,18 +205,22 @@ noncomputable def factor (n : ℕ) : Letter → ℂ
 noncomputable def glob (n : ℕ) (l : Letter) (z : ℂ) : ℂ :=
   l.center + l.factor n * (z - l.center)
 
+/-- Each letter stands for an element of `GG n n r r`. -/
 theorem perm_mem_GG (n : ℕ) (r : ℝ) (l : Letter) : l.perm n r ∈ GG n n r r := by
   cases l
   exacts [permA_mem_GG n n r r, Subgroup.inv_mem _ (permA_mem_GG n n r r),
     permB_mem_GG n n r r, Subgroup.inv_mem _ (permB_mem_GG n n r r)]
 
+/-- The rotation factor `exp (2πi / n)` has norm `1`. -/
 theorem _root_.TDCSG.norm_exp_two_pi_I_div (n : ℕ) : ‖exp (2 * π * I / n)‖ = 1 := by
   rw [show 2 * π * I / n = ((2 * π / n : ℝ) : ℂ) * I by push_cast; ring]
   exact norm_exp_ofReal_mul_I _
 
+/-- The rotation factor of a letter has norm `1`. -/
 theorem norm_factor (n : ℕ) (l : Letter) : ‖l.factor n‖ = 1 := by
   cases l <;> simp only [factor, norm_exp_rotationAngle, norm_exp_two_pi_I_div]
 
+/-- The global rotation of a letter preserves the distance to its centre. -/
 theorem dist_glob (n : ℕ) (l : Letter) (z : ℂ) : dist (l.glob n z) l.center = dist z l.center := by
   simp [glob, dist_eq_norm, norm_factor]
 
@@ -266,7 +274,7 @@ theorem applyWord_mem_orbit {n : ℕ} {r : ℝ} {p : ℂ} (w : List Letter) {y :
     (hy : y ∈ orbit n n r r p) : applyWord n r w y ∈ orbit n n r r p := by
   induction w generalizing y with
   | nil => exact hy
-  | cons l w ih => exact ih (apply_mem_orbit (l.perm_mem_GG n r) hy)
+  | cons l _ ih => exact ih (apply_mem_orbit (l.perm_mem_GG n r) hy)
 
 /-- Validity passes to larger radii. -/
 theorem WordValid.mono {n : ℕ} {r r' : ℝ} (h : r ≤ r') {w : List Letter} {P Q : ℂ}
@@ -320,17 +328,21 @@ theorem applyWord_line {n : ℕ} {r : ℝ} {w : List Letter} {V : ℂ} {t₀ t�
 
 /-! ### Distances in coordinates -/
 
+/-- The squared distance of two complex numbers in coordinates. -/
 theorem dist_sq_eq_re_im (z w : ℂ) :
     dist z w ^ 2 = (z.re - w.re) ^ 2 + (z.im - w.im) ^ 2 := by
   rw [dist_eq_norm, ← normSq_eq_norm_sq, normSq_apply]
   simp only [sub_re, sub_im]
   ring
 
+/-- A point whose squared distance to `w` in coordinates is at most `r²` lies in the closed
+ball of radius `r ≥ 0` about `w`. -/
 theorem mem_closedBall_of_sq_le {z w : ℂ} {r : ℝ} (hr : 0 ≤ r)
     (h : (z.re - w.re) ^ 2 + (z.im - w.im) ^ 2 ≤ r ^ 2) : z ∈ closedBall w r := by
   rw [mem_closedBall, ← pow_le_pow_iff_left₀ dist_nonneg hr two_ne_zero, dist_sq_eq_re_im]
   exact h
 
+/-- If `√x ≤ r` for `x ≥ 0`, then `x ≤ r²`. -/
 theorem sq_le_of_sqrt_le {r x : ℝ} (hx : 0 ≤ x) (hr : √x ≤ r) : x ≤ r ^ 2 := by
   have := pow_le_pow_left₀ (Real.sqrt_nonneg x) hr 2
   rwa [Real.sq_sqrt hx] at this

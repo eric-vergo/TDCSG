@@ -57,8 +57,10 @@ namespace TDCSG.Eight
 /-- `√2`, as a real number. -/
 local notation "s" => Real.sqrt 2
 
+/-- `(√2)² = 2`. -/
 theorem sqrt_two_sq : s ^ 2 = 2 := Real.sq_sqrt (by norm_num)
 
+/-- Decimal bounds for `√2`. -/
 theorem sqrt_two_bounds : 1.414 < s ∧ s < 1.415 := by
   constructor
   · rw [Real.lt_sqrt (by norm_num)]
@@ -175,8 +177,10 @@ open CycQ Renormalization
 /-- The root of unity `ζ = exp (2πi / 8)`. -/
 noncomputable def zeta : ℂ := exp (2 * π * I / (8 : ℕ))
 
+/-- `ζ = (√2 + √2 i) / 2`. -/
 theorem zeta_eq : zeta = ⟨s / 2, s / 2⟩ := exp_two_pi_I_div_eight
 
+/-- `ζ² = i`. -/
 theorem zeta_sq : zeta ^ 2 = I := by
   rw [zeta_eq, sq]
   apply Complex.ext
@@ -184,6 +188,7 @@ theorem zeta_sq : zeta ^ 2 = I := by
   · simp only [mul_im, I_im]
     nlinarith [sqrt_two_sq]
 
+/-- `ζ = exp (2πi / 8)` satisfies the relations of the model `CycQ 2`. -/
 theorem isRoot_zeta : IsRoot 8 2 zeta where
   exp_eq := rfl
   pow_four := by
@@ -431,24 +436,29 @@ theorem realizeOK_family : realizeOK radiusSq radicand radicand pModel dirModel 
 theorem closureOK_family : closureOK radicand radicand unit family pieces = true := by
   decide +kernel
 
+/-- The value of `radicand`. -/
 theorem toReal_radicand : radicand.toReal = 38 - 20 * s := by
   simp [radicand, Quad.toReal]
   ring
 
+/-- The value of `radiusSq`. -/
 theorem toReal_radiusSq : radiusSq.toReal = 10 - 5 * s := by
   simp [radiusSq, Quad.toReal]
   ring
 
+/-- The value of `unit`. -/
 theorem toReal_unit : unit.toReal = s - 1 := by
   simp [unit, Quad.toReal]
   ring
 
+/-- `pModel` represents the critical point `p*`. -/
 theorem embed_pModel : embed zeta pModel = pStar := by
   have h3 : zeta ^ 3 = zeta * zeta ^ 2 := by ring
   simp only [embed, pModel, h3, zeta_sq]
   rw [zeta_eq]
   apply Complex.ext <;> simp [pStar] <;> ring
 
+/-- `dirModel` represents the chord direction `i`. -/
 theorem embed_dirModel : embed zeta dirModel = I := by
   simp [embed, dirModel, zeta_sq]
 

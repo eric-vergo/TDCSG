@@ -36,6 +36,7 @@ open Metric Equiv
 
 namespace TDCSG
 
+/-- The group is finitely generated, by `permA` and `permB`. -/
 instance (n₁ n₂ : ℕ) (r₁ r₂ : ℝ) : Group.FG (GG n₁ n₂ r₁ r₂) := by
   rw [GG_eq_closure]
   exact Group.closure_finite_fg _

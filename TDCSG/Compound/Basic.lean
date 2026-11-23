@@ -68,11 +68,15 @@ variable {α : Type*} [PseudoEMetricSpace α]
 
 /-- `IsometryEquiv.toEquiv` as a monoid homomorphism from the isometry group of `α` to the group
 of permutations of `α`. -/
-@[simps]
 def toPerm : (α ≃ᵢ α) →* Perm α where
   toFun e := e.toEquiv
   map_one' := rfl
   map_mul' _ _ := rfl
+
+/-- `IsometryEquiv.toPerm e` is the underlying permutation of `e`. -/
+@[simp]
+theorem toPerm_apply (e : α ≃ᵢ α) : toPerm e = e.toEquiv :=
+  rfl
 
 /-- The isometry group acts faithfully: `IsometryEquiv.toPerm` is injective. -/
 theorem toPerm_injective : Function.Injective (toPerm : (α ≃ᵢ α) →* Perm α) :=

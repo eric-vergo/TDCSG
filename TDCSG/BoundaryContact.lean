@@ -47,6 +47,8 @@ namespace TDCSG
 
 /-! ### Orbits that see the same disk membership -/
 
+/-- Disk rotations about `c` with radii `r` and `s` agree at every point that lies in both closed
+disks or in neither. -/
 theorem diskRotation_eq_of_iff {n : ℕ} {c z : ℂ} {r s : ℝ}
     (h : z ∈ closedBall c s ↔ z ∈ closedBall c r) :
     diskRotation n c s z = diskRotation n c r z := by
@@ -85,6 +87,7 @@ theorem orbit_eq_of_agree_of_eq_radii {n₁ n₂ : ℕ} {r s : ℝ} {p : ℂ}
     orbit n₁ n₂ s s p = orbit n₁ n₂ r r p :=
   orbit_eq_of_agree (fun y hy ↦ h y hy _ (by simp)) (fun y hy ↦ h y hy _ (by simp))
 
+/-- A disk rotation of nonpositive radius fixes every point. -/
 theorem diskRotation_of_nonpos {n : ℕ} {c : ℂ} {r : ℝ} (hr : r ≤ 0) (z : ℂ) :
     diskRotation n c r z = z := by
   by_cases hz : z ∈ closedBall c r

@@ -92,6 +92,7 @@ theorem iterate_rotation (n : ℕ) (c z : ℂ) (k : ℕ) :
   | zero => simp
   | succ k ih => rw [Function.iterate_succ_apply', ih, rotation]; ring
 
+/-- For `n ≠ 0` the `n`-th iterate of the rotation by `-2π / n` about `c` is the identity. -/
 theorem iterate_rotation_self {n : ℕ} (hn : n ≠ 0) (c : ℂ) : (rotation n c)^[n] = id := by
   ext1 z
   simp [iterate_rotation, exp_rotationAngle_pow_self hn]
@@ -147,21 +148,27 @@ theorem bijective_diskRotation {n : ℕ} (hn : n ≠ 0) (c : ℂ) (r : ℝ) :
   · simpa [Function.iterate_succ_apply] using congrFun h z
   · simpa [Function.iterate_succ_apply'] using congrFun h z
 
+/-- The `n`-th iterate of the left generator is the identity. -/
 theorem iterate_genA_self {n : ℕ} (hn : n ≠ 0) (r : ℝ) : (genA n r)^[n] = id :=
   iterate_diskRotation_self hn leftCenter r
 
+/-- The `n`-th iterate of the right generator is the identity. -/
 theorem iterate_genB_self {n : ℕ} (hn : n ≠ 0) (r : ℝ) : (genB n r)^[n] = id :=
   iterate_diskRotation_self hn rightCenter r
 
+/-- The left generator maps the left disk into itself. -/
 theorem mapsTo_genA (n : ℕ) (r : ℝ) : Set.MapsTo (genA n r) (leftDisk r) (leftDisk r) :=
   mapsTo_diskRotation n leftCenter r
 
+/-- The right generator maps the right disk into itself. -/
 theorem mapsTo_genB (n : ℕ) (r : ℝ) : Set.MapsTo (genB n r) (rightDisk r) (rightDisk r) :=
   mapsTo_diskRotation n rightCenter r
 
+/-- For `n ≠ 0` the left generator is a bijection of `ℂ`. -/
 theorem bijective_genA {n : ℕ} (hn : n ≠ 0) (r : ℝ) : Function.Bijective (genA n r) :=
   bijective_diskRotation hn leftCenter r
 
+/-- For `n ≠ 0` the right generator is a bijection of `ℂ`. -/
 theorem bijective_genB {n : ℕ} (hn : n ≠ 0) (r : ℝ) : Function.Bijective (genB n r) :=
   bijective_diskRotation hn rightCenter r
 

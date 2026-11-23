@@ -52,6 +52,7 @@ def PtValid (n : ℕ) (r : ℝ) : List Letter → ℂ → Prop
   | [], _ => True
   | l :: w, z => z ∈ closedBall l.center r ∧ PtValid n r w (l.glob n z)
 
+/-- A word valid at both end points of a segment is valid on the segment. -/
 theorem wordValid_of_ptValid {n : ℕ} {r : ℝ} {w : List Letter} {P Q : ℂ} (hP : PtValid n r w P)
     (hQ : PtValid n r w Q) : WordValid n r w P Q := by
   induction w generalizing P Q with
@@ -141,8 +142,11 @@ def ofQuad (q : Quad m) : CycQ m := ⟨q.a, (v m + 1) * q.b, 0, -q.b⟩
 
 /-- The root `ζ = exp (2πi / n)` satisfies the relations of the model `CycQ m`. -/
 structure IsRoot (n m : ℕ) (ζ : ℂ) : Prop where
+  /-- `ζ` is the root of unity `exp (2πi / n)`. -/
   exp_eq : exp (2 * π * I / n) = ζ
+  /-- The quartic relation of the model. -/
   pow_four : ζ ^ 4 = -1 + (v m : ℂ) * ζ ^ 2
+  /-- The representation `√m = (v + 1) ζ - ζ³` of the square root in the model. -/
   sqrt_eq : ((v m : ℂ) + 1) * ζ - ζ ^ 3 = ((√(m : ℝ) : ℝ) : ℂ)
 
 /-- The complex number represented by an element of the model. -/
@@ -151,19 +155,23 @@ noncomputable def embed (ζ : ℂ) (x : CycQ m) : ℂ :=
 
 variable {n : ℕ} {ζ : ℂ}
 
+/-- The embedding is additive. -/
 @[simp] theorem embed_add (x y : CycQ m) : embed ζ (x + y) = embed ζ x + embed ζ y := by
   simp only [embed, show x + y = ⟨x.c0 + y.c0, x.c1 + y.c1, x.c2 + y.c2, x.c3 + y.c3⟩ from rfl]
   push_cast
   ring
 
+/-- The embedding commutes with subtraction. -/
 @[simp] theorem embed_sub (x y : CycQ m) : embed ζ (x - y) = embed ζ x - embed ζ y := by
   simp only [embed, show x - y = ⟨x.c0 - y.c0, x.c1 - y.c1, x.c2 - y.c2, x.c3 - y.c3⟩ from rfl]
   push_cast
   ring
 
+/-- The embedding sends the integer `k` of the model to `k`. -/
 @[simp] theorem embed_ofInt (k : ℤ) : embed ζ (ofInt k : CycQ m) = k := by
   simp [embed, ofInt]
 
+/-- The embedding commutes with multiplication by integers. -/
 @[simp] theorem embed_smul (k : ℤ) (x : CycQ m) : embed ζ (smul k x) = k * embed ζ x := by
   simp only [embed, smul]
   push_cast
@@ -172,16 +180,19 @@ variable {n : ℕ} {ζ : ℂ}
 /-- The inverse `v ζ - ζ³` of `ζ`. -/
 noncomputable def zetaInv (m : ℕ) (ζ : ℂ) : ℂ := (v m : ℂ) * ζ - ζ ^ 3
 
+/-- `zetaInv m ζ` is the inverse of `ζ`. -/
 theorem IsRoot.mul_zetaInv (hζ : IsRoot n m ζ) : ζ * zetaInv m ζ = 1 := by
   rw [zetaInv]
   linear_combination -hζ.pow_four
 
+/-- `TDCSG.CycQ.mulZeta` is multiplication by `ζ`. -/
 theorem embed_mulZeta (hζ : IsRoot n m ζ) (x : CycQ m) :
     embed ζ (mulZeta x) = ζ * embed ζ x := by
   simp only [embed, mulZeta]
   push_cast
   linear_combination (-(x.c3 : ℂ)) * hζ.pow_four
 
+/-- `TDCSG.CycQ.mulZetaInv` is multiplication by `ζ⁻¹`. -/
 theorem embed_mulZetaInv (hζ : IsRoot n m ζ) (x : CycQ m) :
     embed ζ (mulZetaInv x) = zetaInv m ζ * embed ζ x := by
   have h : mulZeta (mulZetaInv x) = x := by
@@ -191,6 +202,7 @@ theorem embed_mulZetaInv (hζ : IsRoot n m ζ) (x : CycQ m) :
   rw [embed_mulZeta hζ] at h'
   rw [← h', ← mul_assoc, mul_comm (zetaInv m ζ), hζ.mul_zetaInv, one_mul]
 
+/-- The embedding is multiplicative. -/
 theorem embed_mul (hζ : IsRoot n m ζ) (x y : CycQ m) :
     embed ζ (x * y) = embed ζ x * embed ζ y := by
   simp only [show x * y = smul x.c0 y + smul x.c1 (mulZeta y) + smul x.c2 (mulZeta (mulZeta y)) +
@@ -199,6 +211,7 @@ theorem embed_mul (hζ : IsRoot n m ζ) (x y : CycQ m) :
   simp only [embed]
   ring
 
+/-- The complex conjugate of `ζ` is `ζ⁻¹`. -/
 theorem IsRoot.conj_eq (hζ : IsRoot n m ζ) : (starRingEnd ℂ) ζ = zetaInv m ζ := by
   have h1 : (starRingEnd ℂ) ζ = exp (-(2 * π * I / n)) := by
     rw [← hζ.exp_eq, ← exp_conj]
@@ -212,12 +225,14 @@ theorem IsRoot.conj_eq (hζ : IsRoot n m ζ) : (starRingEnd ℂ) ζ = zetaInv m 
         rw [hζ.mul_zetaInv, mul_one]
     _ = zetaInv m ζ := by rw [← mul_assoc, h2, one_mul]
 
+/-- The embedding commutes with complex conjugation. -/
 theorem embed_conj (hζ : IsRoot n m ζ) (x : CycQ m) :
     embed ζ (conj x) = (starRingEnd ℂ) (embed ζ x) := by
   simp only [conj, embed_add, embed_ofInt, embed_mulZetaInv hζ]
   simp only [embed, map_add, map_mul, map_intCast, map_pow, hζ.conj_eq]
   ring
 
+/-- An element recognized by `TDCSG.CycQ.toQuad?` as `q ∈ ℤ[√m]` embeds as the real number `q`. -/
 theorem embed_of_toQuad? (hζ : IsRoot n m ζ) {x : CycQ m} {q : Quad m}
     (h : x.toQuad? = some q) : embed ζ x = (q.toReal : ℂ) := by
   simp only [toQuad?] at h
@@ -229,6 +244,7 @@ theorem embed_of_toQuad? (hζ : IsRoot n m ζ) {x : CycQ m} {q : Quad m}
   rw [← hζ.sqrt_eq]
   ring
 
+/-- `TDCSG.CycQ.ofQuad q` embeds as the real number `q`. -/
 theorem embed_ofQuad (hζ : IsRoot n m ζ) (q : Quad m) : embed ζ (ofQuad q) = (q.toReal : ℂ) := by
   simp only [embed, ofQuad, Quad.toReal]
   push_cast
@@ -250,9 +266,11 @@ def rot : Letter → CycQ m → CycQ m
 /-- The global rotation of a letter, on doubled points. -/
 def stepP (l : Letter) (P : CycQ m) : CycQ m := center l + rot l (P - center l)
 
+/-- The doubled centre of a letter embeds as twice its centre. -/
 theorem embed_center (l : Letter) : embed ζ (center l : CycQ m) = 2 * l.center := by
   cases l <;> simp [center, Letter.center, leftCenter, rightCenter]
 
+/-- `TDCSG.CycQ.rot l` is multiplication by the rotation factor of `l`. -/
 theorem embed_rot (hζ : IsRoot n m ζ) (l : Letter) (x : CycQ m) :
     embed ζ (rot l x) = l.factor n * embed ζ x := by
   have hf : exp (-(2 * π * I / n)) = zetaInv m ζ := by
@@ -265,6 +283,8 @@ theorem embed_rot (hζ : IsRoot n m ζ) (l : Letter) (x : CycQ m) :
 /-- The point `(P + Q s) / 2` of the plane. -/
 noncomputable def pt (ζ : ℂ) (s : ℝ) (P Q : CycQ m) : ℂ := (embed ζ P + embed ζ Q * s) / 2
 
+/-- `TDCSG.CycQ.stepP` and `TDCSG.CycQ.rot` compute the global rotation of a letter on the
+point `(P + Q s) / 2`. -/
 theorem pt_step (hζ : IsRoot n m ζ) (s : ℝ) (l : Letter) (P Q : CycQ m) :
     pt ζ s (stepP l P) (rot l Q) = l.glob n (pt ζ s P Q) := by
   simp only [pt, stepP, embed_add, embed_rot hζ, embed_sub, embed_center, Letter.glob]
@@ -277,6 +297,8 @@ def memOK (R h : Quad m) (C P Q : CycQ m) : Bool :=
   | some n₁, some n₂, some n₃ => Quad.nonneg₂ (⟨4, 0⟩ * R - n₁ - n₂ * h) (-n₃) h
   | _, _, _ => false
 
+/-- Soundness of `TDCSG.CycQ.memOK`: the point `(P + Q √h) / 2` lies in the closed disk of radius
+`r ≥ √R` about `C / 2`. -/
 theorem mem_of_memOK (hζ : IsRoot n m ζ) {R h : Quad m} {C P Q : CycQ m}
     (H : memOK R h C P Q = true) (hh : 0 ≤ h.toReal) {r : ℝ} (hr : √R.toReal ≤ r) :
     pt ζ √h.toReal P Q ∈ closedBall (embed ζ C / 2) r := by
@@ -332,12 +354,16 @@ def runQ : List Letter → CycQ m → CycQ m
   | [], Q => Q
   | l :: w, Q => runQ w (rot l Q)
 
+/-- `TDCSG.CycQ.runP` and `TDCSG.CycQ.runQ` compute the global rotation of a word on the point
+`(P + Q s) / 2`. -/
 theorem globalWord_pt (hζ : IsRoot n m ζ) (s : ℝ) (w : List Letter) (P Q : CycQ m) :
     globalWord n w (pt ζ s P Q) = pt ζ s (runP w P) (runQ w Q) := by
   induction w generalizing P Q with
   | nil => rfl
   | cons l w ih => rw [globalWord, ← pt_step hζ, ih, runP, runQ]
 
+/-- Soundness of `TDCSG.CycQ.validOK`: the word is valid at `(P + Q √h) / 2` at every radius
+`r ≥ √R`. -/
 theorem ptValid_of_validOK (hζ : IsRoot n m ζ) {R h : Quad m} (hh : 0 ≤ h.toReal) {r : ℝ}
     (hr : √R.toReal ≤ r) {w : List Letter} {P Q : CycQ m} (H : validOK R h w P Q = true) :
     PtValid n r w (pt ζ √h.toReal P Q) := by
@@ -374,6 +400,7 @@ noncomputable def val (h₁ h₂ : Quad m) (x : Lin m) : ℝ :=
 def le (h₁ h₂ : Quad m) (x y : Lin m) : Bool :=
   Quad.nonneg₃ (y.A - x.A) (y.B₁ - x.B₁) (y.B₂ - x.B₂) h₁ h₂
 
+/-- Soundness of `TDCSG.CycQ.Lin.le`. -/
 theorem val_le_of_le {h₁ h₂ : Quad m} (hh₁ : 0 ≤ h₁.toReal) (hh₂ : 0 ≤ h₂.toReal) {x y : Lin m}
     (H : le h₁ h₂ x y = true) : x.val h₁ h₂ ≤ y.val h₁ h₂ := by
   have := Quad.nonneg₃_sound hh₁ hh₂ H
@@ -385,6 +412,7 @@ theorem val_le_of_le {h₁ h₂ : Quad m} (hh₁ : 0 ≤ h₁.toReal) (hh₂ : 0
 def act (pos : Bool) (c : Quad m) (x : Lin m) : Lin m :=
   if pos then ⟨x.A + c, x.B₁, x.B₂⟩ else ⟨c - x.A, -x.B₁, -x.B₂⟩
 
+/-- `TDCSG.CycQ.Lin.act` computes the isometry `TDCSG.Renormalization.ract` on parameters. -/
 theorem val_act (h₁ h₂ : Quad m) (pos : Bool) (c : Quad m) (x : Lin m) :
     (act pos c x).val h₁ h₂ = ract pos (c.toReal / 2) (x.val h₁ h₂) := by
   cases pos <;> simp only [act, ract, val, Bool.false_eq_true, ite_false, ite_true,
@@ -393,6 +421,7 @@ theorem val_act (h₁ h₂ : Quad m) (pos : Bool) (c : Quad m) (x : Lin m) :
 /-- Multiplication by `e ∈ ℤ[√m]`. -/
 def scale (e : Quad m) (x : Lin m) : Lin m := ⟨e * x.A, e * x.B₁, e * x.B₂⟩
 
+/-- `TDCSG.CycQ.Lin.scale e` multiplies the parameter by `e`. -/
 theorem val_scale (h₁ h₂ : Quad m) (e : Quad m) (x : Lin m) :
     (scale e x).val h₁ h₂ = e.toReal * x.val h₁ h₂ := by
   simp only [scale, val, Quad.toReal_mul]
@@ -503,6 +532,8 @@ noncomputable abbrev famLo (h₁ h₂ : Quad m) (i : ℕ) : ℝ := (F.getD i def
 noncomputable abbrev famHi (h₁ h₂ : Quad m) (i : ℕ) : ℝ := (F.getD i default).hi.val h₁ h₂
 
 include hh₁ hh₂ in
+/-- Soundness of `TDCSG.CycQ.chainOK`: every parameter between `x / 2` and `y / 2` is carried
+along the chain `gs` by members applied inside their domains, to its image under the composite. -/
 theorem isComposite_of_chainOK {gs : List ℕ} {x y : Lin m} (H : chainOK h₁ h₂ F gs x y = true)
     {s : ℝ} (hs : s ∈ Set.uIcc (x.val h₁ h₂) (y.val h₁ h₂)) :
     IsComposite (famS F) (famPos F) (famC F) (famLo F h₁ h₂) (famHi F h₁ h₂) s gs
@@ -529,6 +560,8 @@ theorem isComposite_of_chainOK {gs : List ℕ} {x y : Lin m} (H : chainOK h₁ h
       split_ifs <;> simp [e] <;> ring
 
 include hh₁ hh₂ in
+/-- Soundness of `TDCSG.CycQ.piecesOK`: on the interval from `x₀ / 2` to `e / 2` the isometry
+`t ↦ ±t + c / 2` is, pointwise, a composite of family members applied inside their domains. -/
 theorem exists_isComposite_of_piecesOK {pos : Bool} {c : Quad m} {ps : List (Piece m)} :
     ∀ {x₀ e : Lin m}, piecesOK h₁ h₂ F pos c x₀ e ps = true →
     ∀ s ∈ Set.Icc (x₀.val h₁ h₂) (e.val h₁ h₂), ∃ gs,
@@ -562,6 +595,7 @@ end Soundness
 
 variable {R h₁ h₂ ε : Quad m} {p V : CycQ m} {F : List (Entry m)} {P : List (List (Piece m))}
 
+/-- The point `(2p + A V + (B V) s) / 2` is `p + ((A + B s) / 2) V`. -/
 theorem pt_ofQuad (hζ : IsRoot n m ζ) (s : ℝ) (A B : Quad m) :
     pt ζ s (p + p + V * ofQuad A) (V * ofQuad B) =
       embed ζ p + (((A.toReal + B.toReal * s) / 2 : ℝ) : ℂ) * embed ζ V := by
@@ -583,6 +617,8 @@ theorem of_wordOK (hζ : IsRoot n m ζ) {h : Quad m} (hh : 0 ≤ h.toReal) {r : 
   rw [← pt_ofQuad hζ, ← pt_ofQuad hζ]
   exact ⟨ptValid_of_validOK hζ hh hr hv, by rw [globalWord_pt hζ, hP, hQ]⟩
 
+/-- Soundness of `TDCSG.CycQ.endOK`: the word of `e` is valid at the point of parameter `x / 2`
+and maps it to the point of parameter given by the action of `e`. -/
 theorem of_endOK (hζ : IsRoot n m ζ) (hh₁ : 0 ≤ h₁.toReal) (hh₂ : 0 ≤ h₂.toReal) {r : ℝ}
     (hr : √R.toReal ≤ r) {e : Entry m} {x : Lin m} (H : endOK R h₁ h₂ p V e x = true) :
     PtValid n r e.word (embed ζ p + (x.val h₁ h₂ : ℂ) * embed ζ V) ∧

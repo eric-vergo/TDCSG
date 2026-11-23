@@ -74,6 +74,7 @@ noncomputable def diskPerm (n : ℕ) (c : ℂ) (r : ℝ) : Perm ℂ :=
       exact Function.bijective_id
     · exact bijective_diskRotation hn c r
 
+/-- The disk permutation acts as the disk rotation. -/
 @[simp]
 theorem diskPerm_apply (n : ℕ) (c : ℂ) (r : ℝ) (z : ℂ) :
     diskPerm n c r z = diskRotation n c r z :=
@@ -85,10 +86,12 @@ noncomputable def permA (n : ℕ) (r : ℝ) : Perm ℂ := diskPerm n leftCenter 
 /-- The right generator `TDCSG.genB n r` as a permutation of `ℂ`. -/
 noncomputable def permB (n : ℕ) (r : ℝ) : Perm ℂ := diskPerm n rightCenter r
 
+/-- `permA` acts as the left generator. -/
 @[simp]
 theorem permA_apply (n : ℕ) (r : ℝ) (z : ℂ) : permA n r z = genA n r z :=
   rfl
 
+/-- `permB` acts as the right generator. -/
 @[simp]
 theorem permB_apply (n : ℕ) (r : ℝ) (z : ℂ) : permB n r z = genB n r z :=
   rfl
@@ -112,6 +115,7 @@ noncomputable def rotationIsometry (n : ℕ) (c : ℂ) : ℂ ≃ᵢ ℂ where
     simp only [rotation, dist_eq_norm, add_sub_add_left_eq_sub, ← mul_sub, norm_mul,
       norm_exp_rotationAngle, one_mul, sub_sub_sub_cancel_right]
 
+/-- `rotationIsometry` acts as the rotation. -/
 @[simp]
 theorem rotationIsometry_apply (n : ℕ) (c z : ℂ) : rotationIsometry n c z = rotation n c z :=
   rfl
@@ -193,21 +197,26 @@ def preserving (S : Set ℂ) : Subgroup (Perm ℂ) where
     intro y hy
     simpa [and_comm] using hg y hy
 
+/-- Membership in `preserving S`. -/
 theorem mem_preserving {S : Set ℂ} {g : Perm ℂ} :
     g ∈ preserving S ↔ ∀ y ∈ S, g y ∈ S ∧ g⁻¹ y ∈ S :=
   Iff.rfl
 
+/-- `permA` belongs to the group. -/
 theorem permA_mem_GG (n₁ n₂ : ℕ) (r₁ r₂ : ℝ) : permA n₁ r₁ ∈ GG n₁ n₂ r₁ r₂ := by
   rw [GG_eq_closure]
   exact Subgroup.subset_closure (by simp)
 
+/-- `permB` belongs to the group. -/
 theorem permB_mem_GG (n₁ n₂ : ℕ) (r₁ r₂ : ℝ) : permB n₂ r₂ ∈ GG n₁ n₂ r₁ r₂ := by
   rw [GG_eq_closure]
   exact Subgroup.subset_closure (by simp)
 
+/-- Every point lies in its own orbit. -/
 theorem mem_orbit_self (n₁ n₂ : ℕ) (r₁ r₂ : ℝ) (p : ℂ) : p ∈ orbit n₁ n₂ r₁ r₂ p :=
   ⟨1, Subgroup.one_mem _, rfl⟩
 
+/-- If both generators preserve `S`, so does the whole group. -/
 theorem GG_le_preserving {n₁ n₂ : ℕ} {r₁ r₂ : ℝ} {S : Set ℂ} (hA : permA n₁ r₁ ∈ preserving S)
     (hB : permB n₂ r₂ ∈ preserving S) : GG n₁ n₂ r₁ r₂ ≤ preserving S := by
   rw [GG_eq_closure, Subgroup.closure_le]
@@ -222,6 +231,7 @@ theorem orbit_subset {n₁ n₂ : ℕ} {r₁ r₂ : ℝ} {S : Set ℂ} {p : ℂ}
   rintro y ⟨g, hg, rfl⟩
   exact (GG_le_preserving hA hB hg p hp).1
 
+/-- The group preserves each of its orbits. -/
 theorem GG_le_preserving_orbit (n₁ n₂ : ℕ) (r₁ r₂ : ℝ) (p : ℂ) :
     GG n₁ n₂ r₁ r₂ ≤ preserving (orbit n₁ n₂ r₁ r₂ p) := by
   intro g hg
@@ -229,6 +239,7 @@ theorem GG_le_preserving_orbit (n₁ n₂ : ℕ) (r₁ r₂ : ℝ) (p : ℂ) :
   refine ⟨⟨g * h, Subgroup.mul_mem _ hg hh, rfl⟩, ⟨g⁻¹ * h, ?_, rfl⟩⟩
   exact Subgroup.mul_mem _ (Subgroup.inv_mem _ hg) hh
 
+/-- Elements of the group map an orbit into itself. -/
 theorem apply_mem_orbit {n₁ n₂ : ℕ} {r₁ r₂ : ℝ} {p y : ℂ} {g : Perm ℂ}
     (hg : g ∈ GG n₁ n₂ r₁ r₂) (hy : y ∈ orbit n₁ n₂ r₁ r₂ p) : g y ∈ orbit n₁ n₂ r₁ r₂ p :=
   (GG_le_preserving_orbit n₁ n₂ r₁ r₂ p hg y hy).1

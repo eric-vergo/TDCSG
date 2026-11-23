@@ -94,24 +94,29 @@ instance : Mul (Quad m) := ⟨fun x y ↦ ⟨x.a * y.a + m * x.b * y.b, x.a * y.
 /-- The real number `a + b √m`. -/
 noncomputable def toReal (x : Quad m) : ℝ := x.a + x.b * √(m : ℝ)
 
+/-- `0` evaluates to `0`. -/
 @[simp] theorem toReal_zero : (0 : Quad m).toReal = 0 := by simp [toReal, show (0 : Quad m) =
   ⟨0, 0⟩ from rfl]
 
+/-- Evaluation is additive. -/
 @[simp] theorem toReal_add (x y : Quad m) : (x + y).toReal = x.toReal + y.toReal := by
   simp only [toReal, show x + y = ⟨x.a + y.a, x.b + y.b⟩ from rfl]
   push_cast
   ring
 
+/-- Evaluation commutes with negation. -/
 @[simp] theorem toReal_neg (x : Quad m) : (-x).toReal = -x.toReal := by
   simp only [toReal, show -x = ⟨-x.a, -x.b⟩ from rfl]
   push_cast
   ring
 
+/-- Evaluation commutes with subtraction. -/
 @[simp] theorem toReal_sub (x y : Quad m) : (x - y).toReal = x.toReal - y.toReal := by
   simp only [toReal, show x - y = ⟨x.a - y.a, x.b - y.b⟩ from rfl]
   push_cast
   ring
 
+/-- Evaluation is multiplicative. -/
 @[simp] theorem toReal_mul (x y : Quad m) : (x * y).toReal = x.toReal * y.toReal := by
   simp only [toReal, show x * y = ⟨x.a * y.a + m * x.b * y.b, x.a * y.b + x.b * y.a⟩ from rfl]
   have := Real.mul_self_sqrt (Nat.cast_nonneg (α := ℝ) m)
@@ -122,6 +127,7 @@ noncomputable def toReal (x : Quad m) : ℝ := x.a + x.b * √(m : ℝ)
 def nonneg (x : Quad m) : Bool :=
   sqrtNonneg (fun z : ℤ ↦ decide (0 ≤ z)) x.a x.b (m : ℤ)
 
+/-- Soundness of `TDCSG.Quad.nonneg`. -/
 theorem nonneg_toReal {x : Quad m} (h : x.nonneg = true) : 0 ≤ x.toReal := by
   have := sqrtNonneg_sound (nn := fun z : ℤ ↦ decide (0 ≤ z)) (e := fun z : ℤ ↦ (z : ℝ))
     (by simp) (by simp) (by simp) (by simp) (by simp) h
@@ -130,6 +136,7 @@ theorem nonneg_toReal {x : Quad m} (h : x.nonneg = true) : 0 ≤ x.toReal := by
 /-- The exact test for `0 ≤ x + y √h`. -/
 def nonneg₂ (x y h : Quad m) : Bool := sqrtNonneg nonneg x y h
 
+/-- Soundness of `TDCSG.Quad.nonneg₂`: `x + y √h ≥ 0`. -/
 theorem nonneg₂_sound {x y h : Quad m} (hh : 0 ≤ h.toReal) (H : nonneg₂ x y h = true) :
     0 ≤ x.toReal + y.toReal * √h.toReal :=
   sqrtNonneg_sound (nn := nonneg) (e := toReal) (fun _ ↦ nonneg_toReal) toReal_neg toReal_sub
@@ -144,6 +151,7 @@ def nonneg₃ (x y z h₁ h₂ : Quad m) : Bool :=
     nonneg₂ (-x) (-y) h₁ && z.nonneg &&
       nonneg₂ (z * z * h₂ - x * x - y * y * h₁) (-(x * y + x * y)) h₁
 
+/-- Soundness of `TDCSG.Quad.nonneg₃`: `x + y √h₁ + z √h₂ ≥ 0`. -/
 theorem nonneg₃_sound {x y z h₁ h₂ : Quad m} (hh₁ : 0 ≤ h₁.toReal) (hh₂ : 0 ≤ h₂.toReal)
     (H : nonneg₃ x y z h₁ h₂ = true) :
     0 ≤ x.toReal + y.toReal * √h₁.toReal + z.toReal * √h₂.toReal := by

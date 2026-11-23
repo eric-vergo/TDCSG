@@ -42,8 +42,10 @@ namespace TDCSG
 /-- The orbit of `z` under the full-plane rotation by `-2π / n` about `c`. -/
 def rotOrbit (n : ℕ) (c z : ℂ) : Set ℂ := Set.range fun j : ℕ ↦ (rotation n c)^[j] z
 
+/-- A point lies in its own rotation orbit. -/
 theorem mem_rotOrbit_self (n : ℕ) (c z : ℂ) : z ∈ rotOrbit n c z := ⟨0, rfl⟩
 
+/-- The rotation maps a rotation orbit into itself. -/
 theorem rotation_mem_rotOrbit {n : ℕ} {c z y : ℂ} (hy : y ∈ rotOrbit n c z) :
     rotation n c y ∈ rotOrbit n c z := by
   obtain ⟨j, rfl⟩ := hy
