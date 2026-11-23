@@ -74,8 +74,9 @@ need, are in [`notes/certificates.md`](notes/certificates.md) and
 ## Results
 
 Every claim below has one of these statuses: **proved in Lean**; **refereed written proof** (a
-note in `notes/proofs/` and an independent referee report); **proved modulo a certified
-computation**; **computed, not certified**; **conjecture**; **open**.
+note in `notes/proofs/` with an independent referee report in the repository; "refereed" here
+does not mean journal peer review); **proved modulo a certified computation**; **computed, not
+certified**; **conjecture**; **open**.
 
 In Lean there is no `sorry`, no `native_decide` and no extra axiom: every theorem of `TDCSG`
 depends only on `propext`, `Classical.choice` and `Quot.sound`.
@@ -103,8 +104,8 @@ the conclusion of §4 and §5 (what Lean proves) are refereed, correct after min
 Only the written proof gives the explicit bound N ≤ 16√5/δ, δ = r_c² − r², and the growth
 O(1/(3+φ−r²)) of the Galois conjugates of the translations as r approaches the threshold.
 
-Superseded notes from earlier approaches to the fivefold bound are kept in a private companion
-repository, TDCSG-archive.
+The private companion repository TDCSG-archive holds notes on other approaches to the fivefold
+bound, which the proof above does not use.
 
 ### Other results proved in Lean
 
