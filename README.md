@@ -172,7 +172,8 @@ Theorem names are in the namespaces `TDCSG.Statements` (file `TDCSG/Statements.l
   classes have a threshold of at least max(2, d_n); on (r_A, max(2, d_n)) a log-convex
   Denjoy–Carleman class has only constant invariants if and only if it is quasi-analytic
   ([`regularity-scale.md`](notes/proofs/regularity-scale.md); report
-  [`referee-report-regularity-scale.md`](notes/proofs/referee-report-regularity-scale.md)).
+  [`referee-report-regularity-scale.md`](notes/proofs/referee-report-regularity-scale.md)). The
+  parts not covered by the report are marked in the note as not yet refereed.
 - **Theorem A for n = 5, 8, 10, 12** (the infinite orbits formalized above), with all data in the
   notes ([`critical-radius-n5.md`](notes/proofs/critical-radius-n5.md),
   [`critical-radius-n8.md`](notes/proofs/critical-radius-n8.md),
