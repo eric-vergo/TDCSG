@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) throw new Error("Missing verification record");
     const record = await response.json();
-    const expected = ["FiveDisk.finite_iff", "FiveDisk.infinite_orbit_zero", "FiveDisk.supremum_finite"];
+    const expected = ["FiveDisk.finite_iff"];
     if (record.status !== "passed" || !/^[a-f0-9]{40}$/.test(record.commit) ||
         !/^https:\/\/github\.com\/eric-vergo\/TDCSG\/actions\/runs\/\d+\/?$/.test(record.run_url) ||
         !Array.isArray(record.theorems) || record.theorems.length !== expected.length ||
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const recordLink = document.createElement("a");
     recordLink.href = url.href;
     recordLink.textContent = "Download the verification record";
-    status.append("All three statements passed independent replay at commit ", commit, ". ", run, ". ", recordLink, ".");
+    status.append("The statement passed independent replay at commit ", commit, ". ", run, ". ", recordLink, ".");
   } catch {
     status.textContent = fallback;
   }

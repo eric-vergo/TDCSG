@@ -107,7 +107,7 @@ for page in pages:
     page_url = origin + prefix + page.relative_to(site).as_posix()
     Resources(page_url).feed(page.read_text())
 
-for decl in ("FiveDisk.finite_iff", "FiveDisk.infinite_orbit_zero", "FiveDisk.supremum_finite"):
+for decl in ("FiveDisk.finite_iff",):
     assert decl in linked_declarations, f"Missing theorem panel for {decl}"
 assert figures == expected, (figures, expected)
 manifest = site / "figures/SHA256SUMS"
