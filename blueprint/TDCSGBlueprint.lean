@@ -29,7 +29,7 @@ authors := ["Eric Vergo", "OpenAI GPT-6.2 Astra"]
 %%%
 
 ![Two closed disks of radius the square root of three plus phi, centered at minus one and one. The chord from minus E on the right circle to E on the left circle passes through zero.](/figures/critical-chord.svg)
-*Figure 1.* The two closed disks at the critical radius $`R=\sqrt{3+\varphi}\approx2.149`, centered at $`-1` (blue) and $`1` (orange). The chord from $`-E` to $`E`, where $`E=\zeta-\zeta^2` and $`\zeta=\exp(2\pi i/5)`, passes through $`0`. Notice that $`E` lies on the boundary of the left disk, since $`|E+1|^2=3+\varphi`, and $`-E` on the boundary of the right disk; the two circles cross at $`\pm(\zeta-\zeta^4)`.
+*Figure 1.* The two closed disks at the critical radius $`R=\sqrt{3+\varphi}\approx2.149`, centered at $`-1` (blue, labelled left disk) and $`1` (vermilion, labelled right disk). The chord from $`-E` to $`E`, where $`E=\zeta-\zeta^2` and $`\zeta=\exp(2\pi i/5)`, passes through $`0`. Notice that $`E` lies on the boundary of the left disk, since $`|E+1|^2=3+\varphi`, and $`-E` on the boundary of the right disk; the two circles cross at $`\pm(\zeta-\zeta^4)`.
 
 Place two closed disks of radius $`r` in the plane, centered at $`-1` and $`1`. One move turns
 the left disk clockwise through a fifth of a full turn, carrying the points inside it along and

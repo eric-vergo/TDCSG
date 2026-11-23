@@ -15,31 +15,45 @@ tag := "levels"
 %%%
 
 This chapter of Part II uses the lens estimate of Chapter 5 to build barriers for the walks of
-Chapter 4. A good level of a coordinate, defined below, is an integer value of that coordinate at
-which every edge of the center graph that raises the coordinate from that value by one has an
-endpoint with no other neighbor. Good levels recur within a bounded distance, uniformly in the
+Chapter 4. A good level of a coordinate, defined below, is an integer value of that coordinate
+whose phase, a real number computed from the level, the window center and the coordinate, lies
+far from a fixed lattice in the real line. Below the threshold, the lens estimate shows that every
+edge of the center graph that raises the coordinate from a good level by one has an endpoint with
+no other neighbor. Good levels recur within a bounded distance, uniformly in the
 window, and Chapter 7 uses one good level below and one above the starting labels, in every
 coordinate, to confine the walks.
 
 ![A label n in a gray window with its edge to n plus e zero. Beyond a dashed cut, the four other candidate neighbors of n plus e zero lie outside the window, so n plus e zero is a leaf.](/figures/terminal.svg)
-*Figure 6.* A crossing at a good level, computed for $`r=2.12`, $`x=0.472` and coordinate $`j=0`. The label $`n=(4,-3,1,1,-3)` has weight zero, projects to $`P(n)=7-4\varphi`, and its coordinate $`n_0=4` is a good level; the edge from $`n` to $`n+e_0` crosses it. The leaf $`n+e_0` lies beyond the cut $`\operatorname{Re}w=\operatorname{Re}x+\kappa-\eta` (enlarged at right), so by the lens estimate its four other candidates $`n+e_0-e_k` (gray) lie outside the window, while $`n` keeps its other neighbors $`n+e_k` (orange). Such crossings occur only for $`r>4-\sqrt{15-7\varphi}\approx2.083`; at $`r=1.8` no edge lies at a good level.
+*Figure 6.* A crossing at a good level, computed for $`r=2.12`, $`x=0.472` and coordinate $`j=0`. The label $`n=(4,-3,1,1,-3)` has weight zero, projects to $`P(n)=7-4\varphi`, and its coordinate $`n_0=4` is a good level; the edge from $`n` to $`n+e_0` crosses it. The leaf $`n+e_0` lies beyond the cut $`\operatorname{Re}w=\operatorname{Re}x+\kappa-\eta` (enlarged at right), so by the lens estimate its four other candidates $`n+e_0-e_k` (gray open rings, dashed) lie outside the window, while $`n` keeps its other neighbors $`n+e_k` (vermilion filled dots). Such crossings occur only for $`r>4-\sqrt{15-7\varphi}\approx2.083`; at $`r=1.8` no edge crosses a good level.
 
 A good level acts as a wall in the integer coordinates, not as a line in the projected disk.
-Crossing a wall in the $`j`th coordinate changes $`n_j` by one. The figure isolates the local effect: one endpoint has only
-the crossing edge left. In this illustration $`x=0.87` and $`r=1.8`. Gray spokes mark rejected
-candidates. In this window the drawn edge is not at a good level; the lemma below shows that at
-a good level a crossing must end this way. The theorem chooses walls for arbitrary windows and
-both sides of each coordinate.
+Crossing a wall in the $`j`th coordinate changes $`n_j` by one. The figure shows the local effect:
+one endpoint of the crossing edge has no neighbor other than the other endpoint, and the dashed
+gray spokes mark the rejected candidates. The lemma below shows that every crossing at a good
+level ends this way.
+
+Crossings at good levels are rare. If an edge from $`n` to $`n+e_j` has both ends in the window,
+the proof below writes the phase of the level $`n_j`, up to a multiple of $`L`, as
+$`\operatorname{Re}(q)+1/2` with $`|q|\le r/2` and $`|q+1|\le r/2`. Then
+$`-r/2\le\operatorname{Re}(q)\le r/2-1`, so the phase lies within $`r/2-1/2` of $`L\mathbb Z`,
+while a good level has its phase farther than $`L/2-\eta` from $`L\mathbb Z`, with $`L` and
+$`\eta` as in the definition below. Both can hold only
+if $`r/2-1/2>L/2-\eta`, that is, $`r^2-8r+7\varphi+1<0`, which for $`r<R` means
+$`r>4-\sqrt{15-7\varphi}\approx2.083`. So such an edge exists only for radii close to
+$`R\approx2.149`, which is why Figure 6 uses $`r=2.12`. For smaller radii, such as $`r=1.8` in
+Figure 7, no edge of the center graph crosses a good level at all.
+The theorem at the end of the chapter chooses walls for arbitrary windows and both sides of each
+coordinate.
 
 ![Phases of the levels minus 13 to 9 of one coordinate, plotted modulo the period. The good levels minus ten, minus two and three land in the shaded bands near half a period.](/figures/levels.svg)
-*Figure 7.* The phase $`(1+\varphi/2)m+1/2-\operatorname{Re}x` of each level $`m` of coordinate $`0`, reduced modulo $`L=\varphi-1/2`, for $`x=0.87` and $`r=1.8`. A level is good when its phase lies in a green band, farther than $`L/2-\eta` from $`L\mathbb Z`; in the range drawn the good levels are $`-10`, $`-2` and $`3`. The proof looks for $`lo` among the levels at most $`-3` and for $`hi` among those at least $`3`, which keeps the starting labels $`0`, $`e_0` and their neighbors, whose coordinates lie between $`-1` and $`1`, strictly inside the slab $`lo<n_0\le hi`. Here it can take $`lo=-10` and $`hi=3`; the good level $`-2` lies in the gap $`|m|\le2`, which is not searched.
+*Figure 7.* The phase $`(1+\varphi/2)m+1/2-\operatorname{Re}x` of each level $`m` of coordinate $`0`, reduced modulo $`L=\varphi-1/2`, for $`x=0.87` and $`r=1.8`. A level is good when its phase lies in one of the two green bands labelled good, farther than $`L/2-\eta` from $`L\mathbb Z`; in the range drawn the good levels are $`-10`, $`-2` and $`3` (large dots). The confinement proof of Chapter 7 looks for $`lo` among the levels from $`-2K-3` to $`-3` and for $`hi` among those from $`3` to $`2K+3`, where $`K` is the bound of the theorem at the end of this chapter. In the range drawn its only candidates are $`lo=-10` and $`hi=3` (filled dots on dashed lines). The good level $`-2` (open ring) lies in the gap $`|m|\le2` between the two search ranges. It is left out because of where the proof searches, not because of the starting labels: as $`lo` it would also keep the starting labels $`0`, $`e_0` and their neighbors, whose coordinates lie between $`-1` and $`1`, inside the slab $`lo<n_0\le hi`.
 
-For the same window in direction zero, each dot gives the phase of an integer level, reduced
-to the interval from minus to plus half a period. The two shaded bands are the allowed phases.
-The levels $`-10`, $`-2` and $`3` land there. The proof takes one good level at most $`-3` and
-one at least $`3`, here $`-10` and $`3`, so that the starting labels and their neighbors lie
-strictly between them. The following argument finds such a pair without searching separately
-for each window.
+Figure 7 uses another window, $`x=0.87` and $`r=1.8`, and coordinate $`0`. Each dot gives the
+phase of an integer level, reduced to the interval from minus to plus half a period. The two
+shaded bands are the good phases, and the levels $`-10`, $`-2` and $`3` land there. Chapter 7
+takes one good level at most $`-3` and one at least $`3`, here $`-10` and $`3`, so that the
+starting labels and their neighbors lie strictly between them. The theorem at the end of this
+chapter finds such levels within a bounded distance, uniformly in the window.
 
 :::definition "good_level" (lean := "TDCSG.Five.IsGoodLevel") (uses := "center_projection")
 Fix the radius $`r`, the window center $`x` and a coordinate $`j`. Put $`L=\varphi-1/2` and
@@ -50,7 +64,8 @@ than $`L/2-\eta` from every point of $`L\mathbb Z`.
 
 :::lemma_ "terminal_crossing" (lean := "TDCSG.Five.IsGoodLevel.leaf") (uses := "good_level, active_graph, unit_step, sharp_lens")
 Let $`0\le r<R`. Let $`n` be a weight-zero label whose coordinate $`n_j` is a good level, with
-$`n` and $`n+e_j` both in the window. Then no label $`n+e_k` with $`k\ne j` lies in the window,
+$`n` and $`n+e_j` both in the window, so that $`n` and $`n+e_j` are joined by an edge of the
+center graph. Then no label $`n+e_k` with $`k\ne j` lies in the window,
 or no label $`n+e_j-e_k` with $`k\ne j` does. So one endpoint of the edge has no other neighbor.
 :::
 

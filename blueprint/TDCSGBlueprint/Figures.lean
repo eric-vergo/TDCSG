@@ -16,7 +16,7 @@ instance is recomputed here and the build stops if it no longer has the property
 states.
 
 All plates share one palette: the left disk, its centre `−1` and the weight-zero labels (the
-left centres) are blue; the right disk, its centre `+1` and the weight-one labels are vermillion;
+left centres) are blue; the right disk, its centre `+1` and the weight-one labels are vermilion;
 the window disk is grey. The two hues are the Okabe–Ito pair, which stays distinguishable under
 the common colour-vision deficiencies.
 -/
@@ -35,7 +35,7 @@ private def muted := Rgba.rgb 96 108 116
 private def faint := Rgba.rgb 172 182 188
 /-- The left disk, its centre `−1` and the weight-zero labels (Okabe–Ito blue). -/
 private def leftC := Rgba.rgb 0 114 178
-/-- The right disk, its centre `+1` and the weight-one labels (Okabe–Ito vermillion). -/
+/-- The right disk, its centre `+1` and the weight-one labels (Okabe–Ito vermilion). -/
 private def rightC := Rgba.rgb 213 94 0
 /-- The good phases of a level (Okabe–Ito bluish green). -/
 private def goodC := Rgba.rgb 0 158 115
@@ -357,8 +357,9 @@ private def opening : Except String String := Id.run do
     labelAt f l 0 (-12) (math "−1") leftC, labelAt f r 0 24 (math "+1") rightC,
     labelAt f ⟨0, 0⟩ 6 24 (math "0"), labelAt f e 9 (-9) (math "E") leftC .start,
     labelAt f ((-1 : Float) * e) (-9) 22 (math "−E") rightC .finish,
-    labelAt f top 9 (-2) (math "ζ − ζ⁴") ink .start,
-    labelAt f ((-1 : Float) * top) 9 16 (math "ζ⁴ − ζ") ink .start,
+    -- Inside the lens, clear of both circles, which cross at the two marked points.
+    labelAt f top 0 40 (math "ζ − ζ⁴") ink,
+    labelAt f ((-1 : Float) * top) 0 (-30) (math "ζ⁴ − ζ") ink,
     label ⟨240, 333⟩ (math s!"R = √(3 + φ) ≈ {dec critical}")]
 
 /-! ### Figure 2: one generator step -/
