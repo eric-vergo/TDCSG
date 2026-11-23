@@ -31,7 +31,19 @@ inductive Entry where
 /-- The figures with their names. A new figure is added here to be previewed. -/
 def previews : Array (String × Entry) := #[
   ("criticalChord", .plane criticalChord),
-  ("orbitRadius", .frames sliderFrames)]
+  ("orbitRadius", .frames sliderFrames),
+  ("extensionJump", .plane extensionJump),
+  ("disjointDisks", .plane disjointDisks),
+  ("generatorStep", .plane generatorStep),
+  ("wordSteps", .frames stepFrames),
+  ("radiusLineInfinite", .plane radiusLineInfinite),
+  ("radiusLineFinite", .plane radiusLineFinite),
+  ("chordPieces", .plane chordPieces),
+  ("wordTrace", .frames traceFrames),
+  ("chordOrbit", .plane chordOrbit),
+  ("orderEight", .plane orderEight),
+  ("orderTen", .plane orderTen),
+  ("orderTwelve", .plane orderTwelve)]
 
 /-- The pictures of one figure: name suffix and figure, light, dark, narrow and narrow dark. -/
 def variants (fig : Plane.Figure) : Array (String × Plane.Figure) :=

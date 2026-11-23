@@ -5,6 +5,12 @@ Authors: Eric Vergo, Claude Fable 5.2
 import TDCSGFigures.Data
 import TDCSGFigures.Style
 import TDCSGFigures.Front
+import TDCSGFigures.Data.Early
+import TDCSGFigures.Compound
+import TDCSGFigures.TwoDisks
+import TDCSGFigures.Parts
+import TDCSGFigures.Chord
+import TDCSGFigures.OtherOrders
 
 /-!
 # The figures of the blueprint
