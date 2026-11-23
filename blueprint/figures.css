@@ -1,10 +1,17 @@
+/* A figure and its caption share one paragraph of the prose column: the image, centred and never
+   wider than the column, then the numbered caption text. */
 img[src*="figures/"] {
   display: block;
-  width: min(100%, 41rem);
+  width: min(100%, 34rem);
   max-width: 100%;
-  margin-inline: auto;
+  margin: 0 auto .6rem;
   height: auto;
-  border-radius: .35rem;
+  border-radius: .5rem;
+}
+
+p:has(> img[src*="figures/"]) {
+  font-size: .92em;
+  line-height: 1.45;
 }
 
 html[data-theme="dark"] img[src*="figures/"] {

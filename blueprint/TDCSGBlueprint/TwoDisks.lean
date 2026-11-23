@@ -41,7 +41,8 @@ say that it has finitely or infinitely many elements; each is the negation of th
 set `S`, such as an orbit, the corresponding statement is
 [`S.Infinite`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Basic/Finite/Defs.html#Set.Infinite).
 
-![Two overlapping closed disks centered at minus one and one. The segment from the left center to zero turns clockwise through 72 degrees.](/figures/disks.svg)
+![Two overlapping closed disks of radius 1.5 centered at minus one and one. The left generator turns the origin clockwise through 72 degrees about minus one, to a of zero.](/figures/disks.svg)
+*Figure 2.* The closed disks of radius $`1.5` about $`-1` (blue) and $`1` (orange), and one step of the left generator $`a`: it turns the origin clockwise through $`72^\circ` about $`-1`, to $`a(0)=-1+\zeta^4` with $`\zeta=\exp(2\pi i/5)`. The origin lies in both disks, so both generators move it.
 
 Choose a point in the plane. The left generator $`a` turns it clockwise through $`360/n`
 degrees about $`-1` if it belongs to the closed disk about $`-1`, including the boundary. Outside

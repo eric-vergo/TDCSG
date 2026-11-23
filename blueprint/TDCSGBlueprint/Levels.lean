@@ -21,7 +21,8 @@ endpoint with no other neighbor. Good levels recur within a bounded distance, un
 window, and Chapter 7 uses one good level below and one above the starting labels, in every
 coordinate, to confine the walks.
 
-![Four candidate unit edges from the rust leaf end outside the blue window. The horizontal edge leads to the only retained neighbor.](/figures/terminal.svg)
+![A label n in a gray window with its edge to n plus e zero. Beyond a dashed cut, the four other candidate neighbors of n plus e zero lie outside the window, so n plus e zero is a leaf.](/figures/terminal.svg)
+*Figure 6.* A crossing at a good level, computed for $`r=2.12`, $`x=0.472` and coordinate $`j=0`. The label $`n=(4,-3,1,1,-3)` has weight zero, projects to $`P(n)=7-4\varphi`, and its coordinate $`n_0=4` is a good level; the edge from $`n` to $`n+e_0` crosses it. The leaf $`n+e_0` lies beyond the cut $`\operatorname{Re}w=\operatorname{Re}x+\kappa-\eta` (enlarged at right), so by the lens estimate its four other candidates $`n+e_0-e_k` (gray) lie outside the window, while $`n` keeps its other neighbors $`n+e_k` (orange). Such crossings occur only for $`r>4-\sqrt{15-7\varphi}\approx2.083`; at $`r=1.8` no edge lies at a good level.
 
 A good level acts as a wall in the integer coordinates, not as a line in the projected disk.
 Crossing a wall in the $`j`th coordinate changes $`n_j` by one. The figure isolates the local effect: one endpoint has only
@@ -30,7 +31,8 @@ candidates. In this window the drawn edge is not at a good level; the lemma belo
 a good level a crossing must end this way. The theorem chooses walls for arbitrary windows and
 both sides of each coordinate.
 
-![Phases at integer levels plotted modulo the period. The selected levels minus ten and three land in the shaded bands near a half-period.](/figures/levels.svg)
+![Phases of the levels minus 13 to 9 of one coordinate, plotted modulo the period. The good levels minus ten, minus two and three land in the shaded bands near half a period.](/figures/levels.svg)
+*Figure 7.* The phase $`(1+\varphi/2)m+1/2-\operatorname{Re}x` of each level $`m` of coordinate $`0`, reduced modulo $`L=\varphi-1/2`, for $`x=0.87` and $`r=1.8`. A level is good when its phase lies in a green band, farther than $`L/2-\eta` from $`L\mathbb Z`; in the range drawn the good levels are $`-10`, $`-2` and $`3`. The proof looks for $`lo` among the levels at most $`-3` and for $`hi` among those at least $`3`, which keeps the starting labels $`0`, $`e_0` and their neighbors, whose coordinates lie between $`-1` and $`1`, strictly inside the slab $`lo<n_0\le hi`. Here it can take $`lo=-10` and $`hi=3`; the good level $`-2` lies in the gap $`|m|\le2`, which is not searched.
 
 For the same window in direction zero, each dot gives the phase of an integer level, reduced
 to the interval from minus to plus half a period. The two shaded bands are the allowed phases.

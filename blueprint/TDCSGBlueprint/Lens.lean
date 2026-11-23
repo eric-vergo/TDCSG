@@ -18,7 +18,8 @@ This chapter of Part II is where the threshold $`\sqrt{3+\varphi}` enters the fi
 lemma is an estimate on the overlap of two disks, sharp exactly at the
 threshold; Chapter 6 turns its margin into barriers for the walks of Chapter 4.
 
-![At the critical radius the rightmost intersection of two disks lies on the vertical cut. At radius 1.8 the rightmost intersection lies strictly to its left.](/figures/lens.svg)
+![Two disks of radius r over two about zero and u, with their overlap shaded. At the critical radius the tip of the overlap lies on the vertical cut. At radius 1.8 it lies strictly to the left of the moved cut.](/figures/lens.svg)
+*Figure 5.* The two window tests $`|v|\le r/2` (solid) and $`|v-u|\le r/2` (dashed) for $`u=\zeta`, and their overlap, the lens. At $`r=R` (left) the tip of the lens is the point $`v_*` on the cut $`\operatorname{Re}v=\kappa`, where $`\kappa=(2\varphi+1)/4`. At $`r=1.8` (right) the tip lies strictly left of the cut, even after the cut has moved left by $`\eta=(3+\varphi-r^2)/16`.
 
 Suppose two different center changes are possible. Rotate the coordinates so the crossing
 direction is horizontal. Their simultaneous tests put a vector $`v` in two disks of radius
