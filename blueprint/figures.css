@@ -42,3 +42,8 @@ html[data-theme="dark"] img[src*="figures/"] {
 .bp_build_metadata_commit {
   word-break: break-all;
 }
+
+/* Long Lean names in the front-page prose break rather than widen a narrow screen. */
+.titlepage p code {
+  overflow-wrap: anywhere;
+}
