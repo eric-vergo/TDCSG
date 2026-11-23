@@ -100,9 +100,9 @@ theorem exists_encard_orbit_le {n₁ n₂ : ℕ} (h : Nat.lcm n₁ n₂ ∈ ({1,
     (r₁ r₂ : ℝ) : ∃ N : ℕ, ∀ p : ℂ, (orbit n₁ n₂ r₁ r₂ p).encard ≤ N :=
   TDCSG.exists_encard_orbit_le h r₁ r₂
 
-/-- The converse direction of Theorem 1 of arXiv:2302.12950: if `lcm n₁ n₂ ∈ {1, 2, 3, 4, 6}`,
-then the two-disk compound symmetry group is finite for all radii. No bound on its order is
-stated. -/
+/-- The converse direction of Theorem 1 of the paper arXiv:2302.12950: if
+`lcm n₁ n₂ ∈ {1, 2, 3, 4, 6}`, then the two-disk compound symmetry group is finite for all radii.
+No bound on its order is stated. -/
 theorem finite_GG {n₁ n₂ : ℕ} (h : Nat.lcm n₁ n₂ ∈ ({1, 2, 3, 4, 6} : Finset ℕ)) (r₁ r₂ : ℝ) :
     Finite (GG n₁ n₂ r₁ r₂) :=
   TDCSG.finite_GG h r₁ r₂

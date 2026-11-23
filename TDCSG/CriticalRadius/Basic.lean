@@ -286,7 +286,8 @@ theorem WordValid.mono {n : ℕ} {r r' : ℝ} (h : r ≤ r') {w : List Letter} {
       ih hw.2.2⟩
 
 /-- A word valid on a segment acts on every point of it as its global rotation, which is
-affine. This is Lemma 1.2 of `notes/proofs/critical-radius-n5.md`. -/
+affine. This is the convexity lemma, Lemma 1.2 of the note
+`notes/proofs/critical-radius-n5.md`. -/
 theorem applyWord_segment {n : ℕ} {r : ℝ} {w : List Letter} {P Q : ℂ}
     (hw : WordValid n r w P Q) {s : ℝ} (hs : s ∈ Set.Icc (0 : ℝ) 1) :
     applyWord n r w (P + s * (Q - P)) =

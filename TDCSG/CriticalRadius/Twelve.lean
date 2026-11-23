@@ -532,7 +532,7 @@ theorem embed_dirModel : embed zeta dirModel = chordDir := by
   rw [zeta_cube, zeta_sq, zeta_eq]
   apply Complex.ext <;> simp [chordDir] <;> ring
 
-/-- **Theorem A** of `notes/proofs/critical-radius-n12.md`, orbit form: for every
+/-- Theorem A of the note `notes/proofs/critical-radius-n12.md`, orbit form: for every
 `r ≥ √(40 - 22√3)` and every `k`, the orbit of `p*` contains `p* + 2 (2 - √3)^(k+2) V`. -/
 theorem mem_orbit_pStar_pow {r : ℝ} (hr : √(40 - 22 * t) ≤ r) (k : ℕ) :
     pStar + ((2 * (2 - t) ^ (k + 2) : ℝ) : ℂ) * chordDir ∈ orbit 12 12 r r pStar := by

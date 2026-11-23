@@ -320,8 +320,8 @@ theorem exists_encard_orbit_le {n₁ n₂ : ℕ} (h : Nat.lcm n₁ n₂ ∈ ({1,
     exact exists_encard_orbit_le_of_lattice exp_neg_two_pi_I_div_six_sq
       conj_exp_neg_two_pi_I_div_six im_exp_neg_two_pi_I_div_six_ne_zero (hmem h₁) (hmem h₂) r₁ r₂
 
-/-- The converse direction of Theorem 1 of arXiv:2302.12950: if `lcm n₁ n₂ ∈ {1, 2, 3, 4, 6}`,
-then the two-disk compound symmetry group is finite for all radii. -/
+/-- The converse direction of Theorem 1 of the paper arXiv:2302.12950: if
+`lcm n₁ n₂ ∈ {1, 2, 3, 4, 6}`, then the two-disk compound symmetry group is finite for all radii. -/
 theorem finite_GG {n₁ n₂ : ℕ} (h : Nat.lcm n₁ n₂ ∈ ({1, 2, 3, 4, 6} : Finset ℕ)) (r₁ r₂ : ℝ) :
     Finite (GG n₁ n₂ r₁ r₂) :=
   let ⟨N, hN⟩ := exists_encard_orbit_le h r₁ r₂
