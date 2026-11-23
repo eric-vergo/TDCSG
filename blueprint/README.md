@@ -14,6 +14,15 @@ chapters and their linked Lean declarations. The generator writes a multipage
 site, sidebar, searchable Lean panels, dependency graph and Project Stats page.
 The Pages deployment serves the same directory under the repository prefix.
 
+`lake exe vbp build` also replays the site's Lean declarations, with everything they depend on,
+in the two kernel checkers of the Lean toolchain, `con-leche` and `con-ron` (in the toolchain's
+`bin`). Green marks and fills appear only where both accepted; the Project Stats page shows each
+checker's answer. An accepted export is recorded in the user's cache directory
+(`verso-blueprint/kernel-replay-checkers.json`), and a later build of an identical export does
+not run the checkers again. `lake exe vbp build --no-kernel-replay` skips the replay; the site
+then shows no green and no page says "proved". The release check
+(`scripts/check-pages.py --release`) requires an accepted replay that covers every node.
+
 The entry point is `BlueprintMain.lean`. The chapter sequence lives in
 `blueprint/TDCSGBlueprint.lean`, one module per chapter in
 `blueprint/TDCSGBlueprint/`:
@@ -123,7 +132,8 @@ the root `lean-toolchain`.
 
 The repository pins the fork, PILean (`pilean`, and its Verso and LeAnTeX adapters
 `pilean-verso` and `pilean-leantex`, all at one PILean commit), Mathlib and their dependencies in
-`lake-manifest.json`. The root pin of `pilean` overrides the older one the fork requires. Keep
+`lake-manifest.json`. The fork requires the same PILean commit; the root requires `pilean` as
+well because `TDCSGFigures` imports PILean directly. Keep
 Mathlib's shared package revisions when updating the documentation dependencies: update the
 PILean packages alone with `lake update pilean pilean-verso pilean-leantex`.
 
