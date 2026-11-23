@@ -69,4 +69,26 @@ def figureWidth : Float := 600
 /-- The width of a figure's narrow rendition, for screens up to 560 pixels wide. -/
 def narrowWidth : Float := 340
 
+/-! ### Roles of the figures of Part II -/
+
+/-- The role of the window, the closed disk of radius `r/2` about the window centre `x`, and of
+the window centre. -/
+def windowRole : String := "window"
+
+/-- The role of a good level: the good phases of a level plot and the walls the confinement proof
+uses. -/
+def goodRole : String := "good"
+
+/-- The roles of the figures of Part II with their light and dark colours. -/
+def partTwoRoles : Array PlaneRole := #[
+  -- A dark slate for the window, apart from the grey of inactive elements (the style's faint
+  -- colour); lightened on the dark page.
+  ⟨windowRole, ⟨52, 72, 84, 255⟩, ⟨168, 190, 204, 255⟩⟩,
+  -- Okabe–Ito bluish green, darkened for labels on white; lightened on the dark page.
+  ⟨goodRole, ⟨0, 116, 88, 255⟩, ⟨88, 212, 170, 255⟩⟩]
+
+/-- The house style with the roles of Part II added. -/
+def partTwoStyle : Style :=
+  { houseStyle with plane := { houseStyle.plane with roles := roles ++ partTwoRoles } }
+
 end TDCSGFigures
