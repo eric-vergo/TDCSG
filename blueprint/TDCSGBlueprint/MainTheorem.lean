@@ -47,7 +47,7 @@ Both endpoints of the threshold are therefore settled: below $`R` every orbit is
 number depending only on $`r`, and at $`R` a single orbit, that of zero, is already infinite. The
 Lean proof obtains the bound below $`R` from density and compactness, without an explicit value.
 The [written proof](https://github.com/eric-vergo/TDCSG/blob/main/notes/proofs/sharp-lower-bound-n5-pentagrid.md)
-makes the bound explicit: by its Lemma 4 every $`N` consecutive levels contain a good level, for an
-$`N\le16\sqrt5/\delta` where $`\delta=R^2-r^2`, and every orbit then has at most
-$`1+10(2N+7)^5` points. These explicit
-bounds are not part of the Lean development.
+makes the bound explicit. By its Lemma 4 and its proof, every $`M` consecutive levels contain a
+good level, for an $`M\le16\sqrt5/\delta` where $`\delta=R^2-r^2`; this $`M` plays the role of
+$`2K+1` for the recurrence bound $`K` of Chapter 6. Every orbit then has at most
+$`1+10(2M+7)^5` points. These explicit bounds are not part of the Lean development.

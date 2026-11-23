@@ -27,7 +27,7 @@ argument has four steps, one per chapter.
   finitely many choices of center and direction.
 * *The lens estimate* (Chapter 5). Two disks of radius $`r/2` whose centers are at distance one
   overlap in a lens. Below the threshold the lens ends strictly before a fixed vertical line, with
-  a margin of $`(3+\varphi-r^2)/16`.
+  a margin of at least $`(3+\varphi-r^2)/16`.
 * *Good levels* (Chapter 6). The margin gives integer levels of each coordinate at which every
   crossing edge of the label graph ends at a leaf. Good levels recur within a bounded distance,
   uniformly in the starting point, because $`\varphi` is irrational.

@@ -20,12 +20,15 @@ Its theorem writes every orbit point inside the two disks in terms of a reachabl
 on the reachable vertices, proved in Chapter 7, bounds the orbit.
 
 ![Five unit steps from zero and a circular window centered at one half. The steps to 1, zeta and zeta to the fourth end inside the window; the steps to zeta squared and zeta cubed end outside it.](/figures/moving.svg)
-*Figure 4.* The moving frame at $`x=1/2` and $`r=1.95`. From the current left center $`0` (blue), a change of active center is a unit step to one of $`1,\zeta,\ldots,\zeta^4`. The steps that end inside the window $`|w-x|\le r/2` (orange) can act; $`\zeta^2` and $`\zeta^3` lie outside it (gray, dashed). Notice that $`\zeta` and $`\zeta^4` lie only just inside, at distance about $`0.970` from $`x`.
+*Figure 4.* The moving frame at $`x=1/2` and $`r=1.95`. From the current left center $`0` (blue), a change of active center is a unit step to one of $`1,\zeta,\ldots,\zeta^4`. The steps that end inside the window $`|w-x|\le r/2` (vermilion, solid, ending in filled dots) can act; $`\zeta^2` and $`\zeta^3` lie outside it (gray, dashed, ending in open rings). Notice that $`\zeta` and $`\zeta^4` lie only just inside, at distance about $`0.970` from $`x`.
 
 The transformation $`x=(z+1)/2` sends the two original centers to 0 and 1 and halves all distances.
 Follow the rotations in a moving frame. Its orientation has just five possibilities. A change of
 active center moves one unit in a direction $`\zeta^j`, where $`\zeta=\exp(2\pi i/5)`. The point
 $`x` stays fixed. To decide whether a center can act, ask whether it lies within $`r/2` of $`x`.
+
+From here on the letter $`n` denotes a label, an integer vector, and the order of the rotations
+is fixed at $`5`.
 
 :::definition "center_projection" (lean := "TDCSG.Five.dir, TDCSG.Five.Label, TDCSG.Five.Label.basis, TDCSG.Five.Label.proj, TDCSG.Five.Label.weight")
 Record a center by an integer vector $`n=(n_0,\ldots,n_4)`, its label. Its position in the

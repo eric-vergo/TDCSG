@@ -21,27 +21,28 @@ orbit by one number, and the finiteness criterion of Chapter 1 makes $`GG_5(r)` 
 $`r<R`, where $`R=\sqrt{3+\varphi}`.
 
 ![The 18 labels of the example component drawn at their projections inside the circular window, with the edges of the center graph.](/figures/component.svg)
-*Figure 8.* The component of the label $`0` in the center graph for $`x=1/2` and $`r=1.95`: 18 labels, each drawn at its projection $`P(n)` inside the window $`|w-x|\le r/2`, blue for weight zero and orange for weight one. The labels $`0` and $`e_0` of the two initial centers project to $`0` and $`1`. Each edge joins a weight-zero label $`n` to some $`n+e_j`; segments that cross in the drawing do not meet in the graph.
+*Figure 8.* The component of the label $`0` in the center graph for $`x=1/2` and $`r=1.95`: 18 labels, each drawn at its projection $`P(n)` inside the window $`|w-x|\le r/2`, blue for weight zero (the left centers) and vermilion for weight one (the right centers), as in the legend. The labels $`0` and $`e_0` of the two initial centers project to $`0` and $`1`. Each edge joins a weight-zero label $`n` to some $`n+e_j`; segments that cross in the drawing do not meet in the graph.
 
 Here the window is $`x=1/2` and $`r=1.95`. Starting at zero, enumerate the integer labels
 of every retained neighbor until each has been visited. There are 18 labels in this component.
-Blue vertices have weight zero and rust vertices have weight one. A line crossing away from a
-marked vertex does not create an edge in the label graph. The window tests and the enumeration generate this picture. The theorem must also control every other starting point.
+The weight-zero labels (blue) are left centers and the weight-one labels (vermilion) are right
+centers; every edge joins one of each. A line crossing away from a marked vertex does not create
+an edge in the label graph. The window tests and the enumeration generate this picture. The theorem must also control every other starting point.
 
 :::lemma_ "one_step" (lean := "SimpleGraph.Reachable.mem_or_exists_adj_of_leaf")
 In a simple graph, let $`S` be a set of vertices that contains a vertex $`s` and all its
-neighbors. Suppose that every edge from $`p\in S` to $`q\notin S` has a leaf endpoint: $`q` is
-the only neighbor of $`p`, or $`p` is the only neighbor of $`q`. Then every vertex reachable
+neighbors. Suppose that every edge from $`u\in S` to $`v\notin S` has a leaf endpoint: $`v` is
+the only neighbor of $`u`, or $`u` is the only neighbor of $`v`. Then every vertex reachable
 from $`s` lies in $`S` or is adjacent to a vertex of $`S`.
 :::
 
 :::proof "one_step"
 Call a vertex of $`S` anchored if it is $`s` or has a neighbor in $`S`. Along a walk from $`s`,
 every vertex in $`S` is anchored, because the walk reached it from $`s` or from a neighbor in
-$`S`. Suppose the walk steps from an anchored $`p` to $`q\notin S`. Then $`p\ne s`, since all
-neighbors of $`s` lie in $`S`. So $`p` has a neighbor in $`S`, which differs from $`q`, and the
-hypothesis makes $`p` the only neighbor of $`q`. The next step returns to the anchored vertex
-$`p`. Hence every vertex of the walk lies in $`S` or is a leaf hanging off a vertex of $`S`.
+$`S`. Suppose the walk steps from an anchored $`u` to $`v\notin S`. Then $`u\ne s`, since all
+neighbors of $`s` lie in $`S`. So $`u` has a neighbor in $`S`, which differs from $`v`, and the
+hypothesis makes $`u` the only neighbor of $`v`. The next step returns to the anchored vertex
+$`u`. Hence every vertex of the walk lies in $`S` or is a leaf hanging off a vertex of $`S`.
 :::
 
 :::lemma_ "slab_crossing" (lean := "TDCSG.Five.leaf_of_crossing") (uses := "active_graph, good_level, terminal_crossing")
@@ -57,8 +58,8 @@ lemma then removes every other neighbor of one endpoint.
 :::
 
 :::theorem "label_box" (lean := "TDCSG.Five.exists_abs_le_of_centerReach") (uses := "all_walls, slab_crossing, one_step")
-Let $`0\le r<R`. There is a bound $`N` such that, for every window center $`x`, every label
-reachable in the center graph has all coordinates of absolute value at most $`N`.
+Let $`0\le r<R`. There is a bound $`D` such that, for every window center $`x`, every label
+reachable in the center graph has all coordinates of absolute value at most $`D`.
 :::
 
 :::proof "label_box" (lean := "TDCSG.Five.abs_sub_le_one_of_adj")
@@ -66,12 +67,13 @@ Take $`K` from the recurrence of good levels. In coordinate $`j`, choose a good 
 within $`K` of $`-K-3` and a good level $`hi` within $`K` of $`K+3`. Adjacent labels differ by
 at most one in each coordinate, so the starting label, $`0` or $`e_0`, and its neighbors lie in
 the slab $`lo<n_j\le hi`. By the two preceding lemmas, every reachable label lies in the slab or
-next to it. Hence $`|n_j|\le 2K+4`.
+next to it. Hence $`|n_j|\le 2K+4`, so $`D=2K+4` is a bound.
 :::
 
 :::lemma_ "box_finite" (lean := "TDCSG.finite_of_orbit_subset_insert_image") (uses := "group_orbit, two_disk_finite")
-Let $`T` be a finite set, and for each point $`p` let $`f_p` be a map from $`T` to the plane. If
-the orbit of every point $`p` lies in $`\{p\}\cup f_p(T)`, then $`GG_n(r)` is finite.
+Let $`T` be a finite set, and for each point $`z` let $`f_z` be a map from $`T` to the plane. If
+the orbit of every point $`z` lies in $`\{z\}\cup f_z(T)`, then $`GG_5(r)` is finite. The Lean
+lemma holds for the two-disk group of any orders and radii.
 :::
 
 :::proof "box_finite"
@@ -85,8 +87,8 @@ The group $`GG_5(r)` is finite for every $`r<R`.
 
 :::proof "subcritical"
 For $`r<0` the group is finite by the case of radii below one in Chapter 2. For $`0\le r<R` take the bound
-$`N` of the label box. Let $`T` consist of the triples $`(c,j,n)` with $`c=\pm1`, a direction
-$`j` and a label $`n` with $`|n_k|\le N`, and put $`f_z(c,j,n)=c+2((z+1)/2-P(n))/\zeta^j`. A
+$`D` of the label box. Let $`T` consist of the triples $`(c,j,n)` with $`c=\pm1`, a direction
+$`j` and a label $`n` with $`|n_k|\le D`, and put $`f_z(c,j,n)=c+2((z+1)/2-P(n))/\zeta^j`. A
 point outside both disks is fixed by the whole group. A point inside one disk keeps its whole
 orbit inside the two disks, and the passage from words to walks writes each orbit point as $`f_z` of a triple
 whose label is reachable and hence lies in the box.
