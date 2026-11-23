@@ -10,11 +10,11 @@ public import Mathlib.Analysis.Complex.Basic
 /-!
 # The lens estimate
 
-This is Lemma 2 of `notes/proofs/sharp-lower-bound-n5-pentagrid.md`. Write `R = r / 2`,
+This is Lemma 2 of `notes/proofs/sharp-lower-bound-n5-pentagrid.md`. Write `ρ = r / 2`,
 `c = cos (2π / 5) = (φ - 1) / 2`, `d = cos (4π / 5) = -φ / 2`, `L = c - d = φ - 1 / 2` and
 `a = (1 + L) / 2 = (2φ + 1) / 4`. Below the critical radius `√(3 + φ)`, a point `v` of the disk of
-radius `R` about `0` whose real part is close to `a` lies farther than `R` from each of the four
-other fifth roots of unity `u = ζ^{±1}, ζ^{±2}`: the lens of points within `R` of both `0` and `u`
+radius `ρ` about `0` whose real part is close to `a` lies farther than `ρ` from each of the four
+other fifth roots of unity `u = ζ^{±1}, ζ^{±2}`: the lens of points within `ρ` of both `0` and `u`
 does not reach real part `a - η`, where `η = (3 + φ - r²) / 16`.
 
 ## Main statements
