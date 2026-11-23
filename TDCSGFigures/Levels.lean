@@ -78,6 +78,10 @@ def bandEdge : Float := RealValue.toFloat (rat (1 / 2) - bandWidth)
 page and is none of the style's colours (a plot's dark twin restyles only those). -/
 def notGoodGrey : Rgba := ⟨128, 128, 136, 255⟩
 
+/-- The colour of the good levels: a bluish green beside the good role of the plane figures
+(`goodRole`), readable on the light and on the dark page, and none of the style's colours. -/
+def goodGreen : Rgba := ⟨0, 150, 110, 255⟩
+
 /-- The phase of each level m = −13, …, 9 of coordinate 0 at r = 1.8, x = 0.87, reduced modulo
 L, with the good bands, the good levels −10, −2, 3, the walls lo = −10 and hi = 3 and the gap
 |m| ≤ 2 between the ranges where the proof looks for them. -/
@@ -92,9 +96,8 @@ def levelPhases : Plot.Figure where
     y := { label := "phase of m modulo L, in units of L", domain := some (-0.5, 0.5) }
     series := #[
       .scatterOfSamples "not good" (notGood.map sample) (some notGoodGrey) (radius := some 3),
-      .scatterOfSamples "good, between the search ranges" (goodInGap.map sample)
-        (radius := some 5),
-      .scatterOfSamples "good: the walls lo = −10, hi = 3" (walls.map sample) (radius := some 6)]
+      .scatterOfSamples "good" ((levels.filter good).map sample) (some goodGreen)
+        (radius := some 6)]
     notes := #[
       .hband bandEdge 0.5 "good",
       .hband (-0.5) (-bandEdge) "good",

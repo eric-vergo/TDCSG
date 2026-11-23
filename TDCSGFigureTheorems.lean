@@ -1230,9 +1230,9 @@ namespace TDCSGFigures.Levels
 
 open PILean PILean.Plane PILean.Exact TDCSGFigures
 
-/-- What `levelPhases` plots, and why. Its one panel holds three series of markers, in this order:
-the levels of `-13, …, 9` that are not good, the good levels in the gap `|m| ≤ 2` (`-2`), and the
-walls `lo = -10`, `hi = 3`; each marker is at `(m, phaseAt m)`, the rational ball centre at
+/-- What `levelPhases` plots, and why. Its one panel holds two series of markers, in this order:
+the levels of `-13, …, 9` that are not good, in grey, and the good ones, in green; each marker is
+at `(m, phaseAt m)`, the rational ball centre at
 precision `64` of the exact reduced phase `t - ⌊t + 1/2⌋`, `t = phase/L` in `ℚ(√5)`, decided
 for every level drawn. The good levels among them are exactly `-10`, `-2`, `3`, by the exact test
 `isGoodLevel` (`TDCSG.Five.IsGoodLevel`); `-10` is the only good level from `-13` to `-3` and `3`
@@ -1242,9 +1242,7 @@ lines and texts (`notes`), the axes, the layout and the pixels. -/
 theorem levelPhases_spec :
     levelPhases.panels.map (·.series) = #[#[
       .scatterOfSamples "not good" (notGood.map sample) (some notGoodGrey) (radius := some 3),
-      .scatterOfSamples "good, between the search ranges" (goodInGap.map sample)
-        (radius := some 5),
-      .scatterOfSamples "good: the walls lo = −10, hi = 3" (walls.map sample)
+      .scatterOfSamples "good" ((levels.filter good).map sample) (some goodGreen)
         (radius := some 6)]] ∧
     levels = (List.range 23).map (fun (i : Nat) => (i : Int) - 13) ∧
     sample = (fun (m : Int) => ((m : Rat), phaseAt m)) ∧
