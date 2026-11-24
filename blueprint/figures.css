@@ -170,3 +170,14 @@ main .word-stills li { font: .85rem var(--td-ui); margin: 0; }
 main .word-plate .word-note { margin: 0; padding: .65rem 1rem; font: 1rem/1.45 var(--td-type); }
 main .pilean-inline-svg > g > path:first-of-type[fill="#ffffff"] { fill: var(--td-plate); }
 main:has(.pilean-figure) .bp_sbs_informal .bp_kind_theorem_content { border-bottom: 1px solid var(--td-rule); padding-bottom: .55rem; }
+
+@media (max-width: 35rem) {
+  /* The disk geometry scales to the column; keep its four mathematical labels readable. */
+  .word-scene text {
+    font-size: 26px;
+    paint-order: stroke;
+    stroke: var(--td-plate);
+    stroke-width: 2px;
+    stroke-linejoin: round;
+  }
+}

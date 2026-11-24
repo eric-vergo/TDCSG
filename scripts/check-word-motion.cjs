@@ -91,6 +91,12 @@ async function main() {
       await page.setViewportSize({width,height:850});
       for (const colorScheme of ["dark","light"]) {
         await page.emulateMedia({colorScheme,reducedMotion:"reduce"});
+        if (width === 360) {
+          const sizes = await page.locator(".word-scene text").evaluateAll(labels=>
+            labels.map(label=>parseFloat(getComputedStyle(label).fontSize)*label.getScreenCTM().a));
+          assert.equal(sizes.length,12);
+          assert.ok(sizes.every(size=>size>=12), "mobile center and endpoint labels are readable");
+        }
         assert.ok(await page.locator(".word-plate").evaluateAll(nodes=>
           nodes.every(node=>node.scrollWidth<=node.clientWidth+1)));
       }
