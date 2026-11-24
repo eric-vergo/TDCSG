@@ -32,9 +32,9 @@ def axisTick (x : AxisValue) : Item :=
   Plane.Exact.tickAt (axisAt x 0) (axisAt (.rat 0) 0) (axisAt (.rat 1) 0)
 
 /-- The items of the radius line; `infiniteFirst` draws the infinite half thick (Part I), otherwise
-the finite half (Part II). -/
-def radiusLineItems (infiniteFirst : Bool) : Array Item :=
-  let thick := fun (b : Bool) => if b then (6 : Float) else 2.5
+the finite half (Part II). With `both` the two halves have equal weight. -/
+def radiusLineItems (infiniteFirst : Bool) (both := false) : Array Item :=
+  let thick := fun (b : Bool) => if b || both then (6 : Float) else 2.5
   #[Plane.Exact.segment (axisAt (.rat (-1 / 2)) 0) (axisAt (.rat (33 / 10)) 0) |>.withArrow
       |>.named "the axis of the radius r",
     Plane.Exact.segment (axisAt axisR finiteRow) (axisAt (.rat (-1 / 2)) finiteRow) |>.withArrow

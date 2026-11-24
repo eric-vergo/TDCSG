@@ -90,8 +90,9 @@ The letters $`a,b,a,b` applied to $`z=0` at $`r=1.95`, one step at a time. On th
 disks are drawn halved, $`w\mapsto(w+1)/2`, so their centers are $`0` and $`1` and the point
 $`(y+1)/2` moves; on the right the same state in the moving frame of the proof: the window about
 $`x=1/2` (the cross) stays fixed, and the left and right centers $`P(n)` and $`P(n+e_j)` move by
-unit steps, with the edge between them when both lie in the window. Earlier points and centers
-stay in grey. Notice that the point lies in a halved disk exactly when that disk's center lies in
+unit steps, with the edge between them when both lie in the window. Start with the first $`a`. The left center stays at label zero while the direction turns from
+$`0` to $`1`. The candidate right center moves from $`P(e_0)=1` to $`P(e_1)=\zeta`.
+On the next $`b`, follow that right center as the left label changes. Grey marks show the earlier positions. Notice that the point lies in a halved disk exactly when that disk's center lies in
 the window, as the framing equation $`2(x-P(n))=\zeta^j(y+1)` requires.
 :::
 

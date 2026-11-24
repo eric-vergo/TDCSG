@@ -99,6 +99,13 @@ window (open rings at the ends of dashed spokes), so $`n` is a leaf and the walk
 to $`n+e_2`, as the one-step lemma requires.
 :::
 
+:::figure TDCSGFigures.coordinateBox (label := "coordinate-box") (inline := true) (proves := TDCSGFigures.coordinateBox_spec) (alt := "Five horizontal rows, one per coordinate, with open rings for good levels and dots for the coordinate values reached by the component of zero.")
+Unpack a label into its five coordinates. In each row the rings mark two good levels for the
+window of {figref "component-of-zero"}[]; every dot is at $`-1`, $`0` or $`1` in this example. Choosing
+one integer from each bounded range gives only finitely many possible labels. In the general
+proof a walk may step one place beyond a wall and return; the bound includes that extra place.
+:::
+
 :::lemma_ "box_finite" (lean := "TDCSG.finite_of_orbit_subset_insert_image") (uses := "group_orbit, two_disk_finite")
 Let $`T` be a finite set, and for each point $`z` let $`f_z` be a map from $`T` to the plane. If
 the orbit of every point $`z` lies in $`\{z\}\cup f_z(T)`, then $`GG_5(r)` is finite. The Lean

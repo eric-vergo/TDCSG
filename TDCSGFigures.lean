@@ -15,18 +15,20 @@ import TDCSGFigures.Lift
 import TDCSGFigures.Lens
 import TDCSGFigures.Levels
 import TDCSGFigures.Confinement
+import TDCSGFigures.ProofDiagrams
 
 /-!
 # The figures of the blueprint
 
 Every figure of the site is the value of a declaration with the attribute `@[figure]`, drawn by
 PILean from exact data (`TDCSGFigures.Data`, `TDCSGFigures.Data.Early`,
-`TDCSGFigures.Data.PartTwo`) in the house style (`TDCSGFigures.Style`), one module per page:
+`TDCSGFigures.Data.PartTwo`) in the house style (`TDCSGFigures.Style`), organized by chapter:
 `TDCSGFigures.Front` for the front page, `TDCSGFigures.Compound` and `TDCSGFigures.TwoDisks` for
 chapters 1 and 2, `TDCSGFigures.Parts` for the two part dividers, `TDCSGFigures.Chord` for
 chapter 3, `TDCSGFigures.Lift`, `TDCSGFigures.Lens`, `TDCSGFigures.Levels` and
-`TDCSGFigures.Confinement` for chapters 4 to 7, and `TDCSGFigures.OtherOrders` for chapter 9. The
-library needs neither Mathlib nor Verso. The specification theorem `<name>_spec` of each figure,
+`TDCSGFigures.Confinement` for chapters 4 to 7, and `TDCSGFigures.OtherOrders` for chapter 9.
+`TDCSGFigures.ProofDiagrams` draws the interval exchange, the coordinate bounds and the
+classification at the critical radius. The library needs neither Mathlib nor Verso. The specification theorem `<name>_spec` of each figure,
 which writes out what it draws, is stated and proved on the blueprint's page of the figures'
 theorems, `TDCSGFigureTheorems`, and attached to the figure there.
 -/

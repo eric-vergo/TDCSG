@@ -631,6 +631,36 @@ figure_proves wordTrace wordTrace_spec
 end TDCSGFigures
 ```
 
+{figref "exchanged-intervals"}[] shows the exact endpoint order before and after the return.
+
+```Verso.Genre.Manual.InlineLean.lean
+namespace TDCSGFigures
+
+open PILean PILean.Exact PILean.Plane
+
+/-- The two rows tile the same interval; the third image precedes the first and second. -/
+theorem exchangedIntervals_spec :
+    exchangedIntervals.items =
+      ((#[false, true].flatMap fun after => #[1, 2, 3].flatMap fun i => intervalBand i after) ++ #[
+        Plane.Exact.label "before" ((-5 / 4 : Rat), (1 / 2 : Rat)) .left,
+        Plane.Exact.label "after" ((-5 / 4 : Rat), (0 : Rat)) .left,
+        Plane.Exact.label "−1" ((-1 : Rat), (0 : Rat)) .below,
+        Plane.Exact.label "1" ((1 : Rat), (0 : Rat)) .below]) ∧
+    (returnInterval 1 false).1 = rat (-1) ∧ (returnInterval 3 false).2 = rat 1 ∧
+    (returnInterval 1 false).2 = (returnInterval 2 false).1 ∧
+    (returnInterval 2 false).2 = (returnInterval 3 false).1 ∧
+    (returnInterval 3 true).1 = rat (-1) ∧ (returnInterval 2 true).2 = rat 1 ∧
+    (returnInterval 3 true).2 = (returnInterval 1 true).1 ∧
+    (returnInterval 1 true).2 = (returnInterval 2 true).1 := by
+  refine ⟨rfl, ?_⟩
+  repeat' apply And.intro
+  all_goals decide +kernel
+
+figure_proves exchangedIntervals exchangedIntervals_spec
+
+end TDCSGFigures
+```
+
 {figref "chord-orbit"}[]: the figure `TDCSGFigures.chordOrbit`
 and its theorem `TDCSGFigures.chordOrbit_spec`.
 
@@ -1385,6 +1415,58 @@ theorem walkToLeaf_spec :
 figure_proves walkToLeaf walkToLeaf_spec
 
 end TDCSGFigures.Confinement
+```
+
+{figref "coordinate-box"}[] records the bounds of the component used in the worked example.
+
+```Verso.Genre.Manual.InlineLean.lean
+namespace TDCSGFigures
+
+open Confinement
+
+/-- Every displayed row has two good levels enclosing all the observed coordinates. -/
+theorem coordinateBox_spec :
+    coordinateBox.items = (Array.range 5).flatMap coordinateRow ∧
+    (List.range 5).all (fun j => match nearestWalls j with
+      | (some lo, some hi) => isGoodLevel compRadiusSq compX j lo == some true &&
+        isGoodLevel compRadiusSq compX j hi == some true &&
+        compLabels.all fun n => lo < n[j]! && n[j]! ≤ hi
+      | _ => false) = true := by
+  exact ⟨rfl, by decide +kernel⟩
+
+figure_proves coordinateBox coordinateBox_spec
+
+end TDCSGFigures
+```
+
+# The figure of chapter 8
+
+%%%
+tag := "theorems-main"
+file := "Theorems-main"
+%%%
+
+{figref "threshold-classification"}[] joins the two halves at the exact critical radius.
+
+```Verso.Genre.Manual.InlineLean.lean
+namespace TDCSGFigures
+
+open PILean PILean.Plane PILean.Exact TDCSGFigures.Early
+
+/-- Both rays meet at the same abscissa, excluded on the finite row and included on the
+infinite row. -/
+theorem radiusThreshold_spec :
+    axisR = .root ⟨⟨7 / 2, 1 / 2⟩⟩ ∧
+    radiusThreshold.items = radiusLineItems true true ∧
+    radiusThreshold.items[3]! = (Plane.Exact.point (axisAt axisR finiteRow) |>.marker .ring
+      |>.role finiteRole |>.named "R, not a radius of the finite half") ∧
+    radiusThreshold.items[4]! = (Plane.Exact.point (axisAt axisR infiniteRow)
+      |>.role infiniteRole |>.named "R, a radius of the infinite half") := by
+  exact ⟨rfl, rfl, rfl, rfl⟩
+
+figure_proves radiusThreshold radiusThreshold_spec
+
+end TDCSGFigures
 ```
 
 # The figures of chapter 9

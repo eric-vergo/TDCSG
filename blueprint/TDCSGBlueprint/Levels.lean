@@ -29,7 +29,8 @@ coordinate, to confine the walks.
 A crossing at a good level, at $`r=2.12`, $`x=0.472` and coordinate $`j=0`. The label
 $`n=(4,-3,1,1,-3)` (a dot) has weight zero, projects to $`P(n)=7-4\varphi`, and its coordinate
 $`n_0=4` is a good level; the thick edge from $`n` to $`n+e_0` raises $`n_0` from $`4` to $`5`.
-The leaf $`n+e_0` (a square: weight one) sits at the window's edge, in the shaded half-plane
+Follow the thick edge from level $`4` to level $`5`. The only way to take another step is back
+along the same edge to level $`4`. The leaf $`n+e_0` (a square: weight one) sits at the window's edge, in the shaded half-plane
 $`\operatorname{Re}w\ge\operatorname{Re}x+\kappa-\eta`, so by the lens estimate its four other
 candidates $`n+e_0-e_k` (open rings at the ends of dashed spokes) lie outside the window, while
 $`n` keeps its neighbors $`n+e_k` (squares inside the window). The small square around the

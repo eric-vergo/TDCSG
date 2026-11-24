@@ -10,16 +10,29 @@ import TDCSG.CriticalRadius.Five
 
 open Verso.Genre Verso.Genre.Manual Informal PILeanVerso
 
+/-- Interpret a letter of the PILean orbit engine in the proof library. -/
+private def proofLetter : TDCSGFigures.Early.Letter → TDCSG.Letter
+  | .a => .a
+  | .aInv => .aInv
+  | .b => .b
+  | .bInv => .bInv
+
+/-- The three displayed words are the three words of the interval-exchange proof. -/
+private theorem displayedWords_eq :
+    [TDCSGFigures.Early.word₁, TDCSGFigures.Early.word₂, TDCSGFigures.Early.word₃].map
+      (List.map proofLetter) = [TDCSG.Five.word₁, TDCSG.Five.word₂, TDCSG.Five.word₃] := rfl
+
 #doc (Manual) "The chord and its three words" =>
 
 %%%
 tag := "chord"
 %%%
 
-This chapter makes up Part I. It proves that $`GG_5(r)` is infinite for every $`r\ge R`, where
-$`R=\sqrt{3+\varphi}`. This is the half of the main theorem that holds at and above the
-threshold, and it shows that the finiteness of Part II cannot extend to $`R` itself. Write
-$`\zeta=\exp(2\pi i/5)`.
+At the critical radius $`R=\sqrt{3+\varphi}`, start at the center of the overlap and follow one
+point. Three sequences of disk turns bring it back to the same chord again and again. Each
+return moves it a fixed distance around an interval with its ends joined. That distance is
+irrational relative to the interval length, so the point never repeats. This gives the
+infinite orbit needed for Part I. Write $`\zeta=\exp(2\pi i/5)`.
 
 Set $`E=\zeta-\zeta^2` and write points on the chord as $`tE` with $`-1\le t\le1`. Each word
 below returns a point of its piece of the chord to the chord, and intermediate rotations within a
@@ -61,12 +74,21 @@ them. The kernel decides every check.
 :::
 
 :::figure_explorer TDCSGFigures.wordTrace (label := "word-trace") (proves := TDCSGFigures.wordTrace_spec) (alt := "Three frames, one per word. Each shows a piece of the chord, dashed, numbered 0, and its images after each letter, numbered by the letters applied, until the last image lies on the chord again.")
-The three words at the critical radius, one per frame. The piece of the chord that word $`i` acts
+Follow each word from left to right. The ring marks the active center. An inverse letter turns
+counterclockwise. The interval under each animation records the starting piece and its landing.
+The still traces show the same journey all at once. The piece of the chord that word $`i` acts
 on is numbered 0 and drawn dashed; its image after $`k` letters is numbered $`k`, and the last image
 lies on the chord again, moved by $`(2\varphi-2)E` for the first two words and by $`(2\varphi-4)E`
 for the third. Before every letter both ends of the current segment lie in that letter's closed
 disk, so the letter turns the whole segment; the marked ends lie on a boundary circle, where a disk
 test holds with equality.
+:::
+
+:::figure TDCSGFigures.exchangedIntervals (label := "exchanged-intervals") (inline := true) (proves := TDCSGFigures.exchangedIntervals_spec) (alt := "Before the return the pieces read 1, 2, 3. After the return they read 3, 1, 2 on the same interval.")
+Read each row from $`-1` to $`1`. Pieces 1 and 2 travel along different routes through the disks but
+land side by side, with the same displacement. Piece 3 wraps past the right end and reappears at
+the left. If you join the two ends of the interval to make a circle of circumference two, all
+three moves become the same rotation by $`2/\varphi`. Repeating a return adds that distance again.
 :::
 
 :::theorem "threshold_infinite" (lean := "TDCSG.Five.exists_mem_orbit, TDCSG.Five.infinite_orbit_zero, TDCSG.Five.infinite_GG") (uses := "word_action, infinite_of_orbit, generated_by_two")

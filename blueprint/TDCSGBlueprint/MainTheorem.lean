@@ -7,8 +7,9 @@ import VersoBlueprint
 import TDCSGBlueprint.RepoFile
 import TDCSG.CriticalRadius.Five
 import TDCSGBlueprint.TwoDisks
+import TDCSGFigureTheorems
 
-open Verso.Genre Verso.Genre.Manual Informal TDCSGBlueprint
+open Verso.Genre Verso.Genre.Manual Informal TDCSGBlueprint PILeanVerso
 
 #doc (Manual) "Proof of the main theorem" =>
 
@@ -28,6 +29,12 @@ Let $`r` be real. If $`r<R`, the group $`GG_5(r)` is finite by the
 {bpref "threshold_infinite"}[infinite half], so it is not finite. This is the equivalence. The
 radii with an infinite group are then exactly the closed half-line $`[R,\infty)`, whose infimum
 is $`R`, so the critical radius is $`R`.
+:::
+
+:::figure TDCSGFigures.radiusThreshold (label := "threshold-classification") (inline := true) (proves := TDCSGFigures.radiusThreshold_spec) (alt := "Two half-lines meet at R. The finite half ends at an open ring and the infinite half begins at a filled dot.")
+Read the two endpoints at $`R` together. Below the open ring, the coordinate box bounds every
+orbit uniformly. At the filled dot, the three words already give zero an infinite orbit. These
+two arguments account for every radius, including equality.
 :::
 
 The equivalence is the Lean theorem `TDCSG.CriticalRadius.finite_GG_five_iff`, and the value of

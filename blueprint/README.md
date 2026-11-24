@@ -99,6 +99,23 @@ name and gapless numbering, allows no other image in the pages, follows the Lean
 `lake exe pilean-verify`, the inline-picture check of PILean's Verso adapter and a fresh render of
 the figures compared with the site's folder.
 
+Chapter 3 progressively enhances the three PILean frames of `wordTrace` with a looping
+illustration for each word. The player turns each rendered segment about the active center and
+snaps to the next checked path at the end of the letter. The generator supplies the letters and
+interval coordinates from Lean. The original numbered traces remain available in the chapter.
+With reduced motion, each word has a labeled still for every turn.
+
+With the site served locally and Playwright Core available to Node, run the browser check against
+the site root (including its prefix if it has one):
+
+```sh
+node scripts/check-word-motion.cjs http://localhost:8000/
+```
+
+Set `CHROMIUM` to an installed Chromium executable when using a browser outside Playwright's cache.
+The check compares both ends of every animated turn with the checked PILean paths, follows the
+chapter links and exercises playback, offscreen suspension, mobile widths and reduced motion.
+
 ### Adding a figure
 
 1. Put the exact data it needs in `TDCSGFigures/Data.lean` or `TDCSGFigures/Data/` (points of
