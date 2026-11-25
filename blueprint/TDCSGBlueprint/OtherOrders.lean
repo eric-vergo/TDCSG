@@ -2,14 +2,14 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo, OpenAI GPT-6.2 Astra, Claude
 -/
+import VersoManual
 import VersoBlueprint
 import PILeanVerso
-import TDCSGBlueprint.RepoFile
 import TDCSGFigureTheorems
 import TDCSG.CriticalRadius.Statements
 import TDCSG.Finiteness
 
-open Verso.Genre Verso.Genre.Manual Informal PILeanVerso TDCSGBlueprint
+open Verso.Genre Verso.Genre.Manual Informal PILeanVerso
 
 #doc (Manual) "Other orders" =>
 

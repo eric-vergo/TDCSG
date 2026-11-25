@@ -15,10 +15,24 @@ weak.linter.style.longLine = true
 # Source files carry a licence line and an authors line, without a copyright line.
 weak.linter.style.header = false
 
+# The blueprint tool chain, from the eric-vergo forks of Verso Blueprint, Verso and SubVerso (all
+# for Lean v4.36.0), pinned to the revisions that Verso Blueprint itself pins. Verso and SubVerso
+# are required here, before Verso Blueprint, so that the workspace uses these revisions: a commit of
+# Verso's `release/v4.36.0` branch and one of SubVerso's `release/verso-v4.36.0` branch.
+[[require]]
+name = "subverso"
+git = "https://github.com/eric-vergo/subverso"
+rev = "4e04c61d96960d5a1461c6c870572ccb8b45a495"
+
+[[require]]
+name = "verso"
+git = "https://github.com/eric-vergo/verso"
+rev = "94cea086b880f61f5b3847d30151b8e5f80e1259"
+
 [[require]]
 name = "VersoBlueprint"
 git = "https://github.com/eric-vergo/verso-blueprint.git"
-rev = "d4984e261d0a4cb0a984c41b3b98625fae27e8aa"
+rev = "02159cd8cb5b69babf94817cdeabb93064d6f0e1"
 
 # PILean draws the figures; the Verso adapter puts them in the site, the LeAnTeX adapter typesets
 # their labels. The figures library imports PILean directly, so `pilean` is required here rather
@@ -26,24 +40,26 @@ rev = "d4984e261d0a4cb0a984c41b3b98625fae27e8aa"
 [[require]]
 name = "pilean"
 git = "https://github.com/eric-vergo/PILean"
-rev = "f55e4e6aa5f5206bbebf2185ec35c32000051aea"
+rev = "542cdfd77e179c7352d870ae6a2712d3622d5f86"
 
 [[require]]
 name = "pilean-verso"
 git = "https://github.com/eric-vergo/PILean"
-rev = "f55e4e6aa5f5206bbebf2185ec35c32000051aea"
+rev = "542cdfd77e179c7352d870ae6a2712d3622d5f86"
 subDir = "verso"
 
 [[require]]
 name = "pilean-leantex"
 git = "https://github.com/eric-vergo/PILean"
-rev = "f55e4e6aa5f5206bbebf2185ec35c32000051aea"
+rev = "542cdfd77e179c7352d870ae6a2712d3622d5f86"
 subDir = "leantex"
 
+# Mathlib is required last so that its pins of shared dependencies (ProofWidgets, Plausible)
+# take precedence over the blueprint tool chain's when Lake resolves the workspace.
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4"
-rev = "56a005855ea17e0b0958f73ec801ae140b0a1679"
+rev = "v4.36.0"
 
 [[lean_lib]]
 name = "TDCSG"
@@ -58,11 +74,11 @@ root = "TDCSGCompute.Main"
 
 [[lean_lib]]
 name = "ComparatorChallenge"
-roots = ["Comparator.Challenge"]
+roots = ["Comparator.FiveDisk.Challenge"]
 
 [[lean_lib]]
 name = "ComparatorSolution"
-roots = ["Comparator.Solution"]
+roots = ["Comparator.FiveDisk.Solution"]
 
 # The figures of the blueprint, drawn by PILean from exact data: no Mathlib, no Verso. The
 # workspace in `figures/` builds and previews them alone.

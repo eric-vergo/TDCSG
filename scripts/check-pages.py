@@ -5,7 +5,8 @@ files are listed in the PILean manifest `-verso-data/pilean-figures/manifest.jso
 check reads instead of a list of names. For each figure it requires a visible numbered caption and
 an accessible name, no active markup, Lean links that land on an element of an existing page, and
 the Blueprint's numbering: "Figure k" on the unnumbered pages, "Figure c.k" in chapter c, each
-counter running 1, 2, … without gaps or repeats; no page may show any other image. It runs PILean's
+counter running 1, 2, … without gaps or repeats; no page may show any other image than a figure's
+own page (`div.pilean-figure-page`) shows of its files. It runs PILean's
 checks: `pilean-verify` (the folder agrees with its manifest), the site check of PILean's Verso
 adapter (every inline picture is the body of a file the manifest lists, with the theme rules the
 manifest records) and a fresh render compared with the folder (`--check-figures`, through the
@@ -38,6 +39,10 @@ unpinned_repository_links = {
     f"https://github.com/{repository}/actions",
 }
 linked_declarations = set()
+# Declarations attached to a proof: the side-by-side layout lists them, with their status, in the
+# popover of the node's Lean chip ("Attached to the proof") rather than in a panel of their own.
+proof_declarations = set()
+attached_to_proof = set()
 source_links = set()
 repository_links = set()
 verification_urls = set()
@@ -56,6 +61,8 @@ pilean_repo_links = set()
 active_markup = []
 # Images outside PILean figures: (page, address).
 other_images = []
+# Inline pictures on the figures' own pages (the frames of an explorer).
+figure_page_inline = []
 
 
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source",
@@ -73,6 +80,9 @@ class Resources(HTMLParser):
         self.pilean_stack = []
         self.part = None
         self.hidden = 0
+        # The open `div` elements inside a figure's own page (`div.pilean-figure-page`), whose
+        # pictures are that figure's files.
+        self.figure_page_divs = 0
 
     def pilean_start(self, tag, attrs, classes):
         """Track a PILean figure block or the figures list, and what is inside it."""
@@ -143,8 +153,9 @@ class Resources(HTMLParser):
         self.resource_data(data)
 
     def handle_starttag(self, tag, attrs):
-        attrs = dict(attrs)
-        classes = attrs.get("class", "").split()
+        # An attribute written without a value (`<td class>`) reads as None.
+        attrs = {k: v or "" for k, v in attrs}
+        classes = attrs["class"].split() if "class" in attrs else []
         self.pilean_start(tag, attrs, classes)
         # Statement declarations render as `div.bp_decl_source` panels, declarations attached to a
         # proof as `li.bp_external_decl_item` entries; both carry the declaration and its range.
@@ -157,14 +168,22 @@ class Resources(HTMLParser):
             panel = self.source_panels[-1]
             assert panel, f"Source link outside a Lean declaration panel in {page}"
             source_links.add((*panel, attrs["href"]))
-        if tag == "img" and not self.pilean_stack:
+        if tag == "div" and (self.figure_page_divs or "pilean-figure-page" in classes):
+            self.figure_page_divs += 1
+        if tag == "svg" and self.figure_page_divs and "pilean-inline-svg" in classes:
+            figure_page_inline.append(page)
+        if tag == "img" and not self.pilean_stack and not self.figure_page_divs:
             other_images.append((page, attrs.get("src", "")))
         if tag == "a" and attrs.get("href"):
             self.anchor = urljoin(self.base, attrs["href"])
         if tag == "base" and attrs.get("href"):
             self.base = urljoin(self.base, attrs["href"])
             return
-        linked_declarations.update(attrs.get("data-lean-decls", "").split())
+        decls = attrs.get("data-lean-decls", "").split()
+        if attrs.get("data-bp-facet") == "proof":
+            proof_declarations.update(decls)
+        else:
+            linked_declarations.update(decls)
         for key in ("src", "href"):
             value = attrs.get(key)
             if not value or value.startswith("#"):
@@ -184,6 +203,8 @@ class Resources(HTMLParser):
 
     def handle_endtag(self, tag):
         self.pilean_end(tag)
+        if tag == "div" and self.figure_page_divs:
+            self.figure_page_divs -= 1
         if tag in ("div", "li"):
             self.source_panels.pop()
         if tag == "a":
@@ -211,7 +232,7 @@ def check_source_links(commit, theorems):
         lines = source_at(commit, path)
         assert 1 <= int(start) <= int(end) <= len(lines), f"{decl}: range outside {path}"
         if decl in theorems:
-            assert path == "Comparator/Solution.lean", f"{decl}: incorrect solution file {path}"
+            assert path == "Comparator/FiveDisk/Solution.lean", f"{decl}: incorrect solution file {path}"
             name = re.escape(decl.rsplit(".", 1)[-1])
             excerpt = "\n".join(lines[int(start) - 1:int(end)])
             assert re.search(rf"^theorem {name}\b", excerpt, re.MULTILINE), f"{decl}: wrong source range"
@@ -245,9 +266,18 @@ def check_repository_links(commit, run_id):
     assert not failures, "\n".join(failures)
 
 
+attached_list = re.compile(r'<span class="bp_code_hover_label">Attached to the proof</span>'
+                           r'<ul class="bp_code_hover_list">(.*?)</ul>', re.S)
 for page in pages:
     page_url = origin + prefix + page.relative_to(site).as_posix()
-    Resources(page_url).feed(page.read_text())
+    text = page.read_text()
+    Resources(page_url).feed(text)
+    for items in attached_list.findall(text):
+        attached_to_proof.update(re.findall(r'<span class="bp_code_decl_name"><code>([^<]+)</code>',
+                                            items))
+
+missing = proof_declarations - linked_declarations - attached_to_proof
+assert not missing, f"declarations of a proof listed nowhere: {sorted(missing)}"
 
 for decl in ("FiveDisk.finite_iff",):
     assert decl in linked_declarations, f"Missing theorem panel for {decl}"
@@ -299,7 +329,8 @@ run("pilean-verify", ["lake", "exe", "pilean-verify", str(pilean_dir)])
 out = run("the inline-picture check", ["python3", "-I", str(pilean_tests / "inline_check.py"),
                                          str(site)])
 match = re.search(r"(\d+) of (\d+) inline pictures match", out)
-assert match and int(match.group(1)) == int(match.group(2)) == inline_pictures > 0, out
+assert match and int(match.group(1)) == int(match.group(2)) == \
+    inline_pictures + len(figure_page_inline) and inline_pictures > 0, out
 out = run("the fresh render (--check-figures)",
           ["lake", "lean", "BlueprintMain.lean", "--", "--run", "BlueprintMain.lean",
            "--check-figures", str(pilean_dir)])
@@ -316,7 +347,7 @@ if "--release" in sys.argv[2:]:
     run_url = f"https://github.com/eric-vergo/TDCSG/actions/runs/{os.environ['GITHUB_RUN_ID']}"
     assert record["run_url"] == run_url and os.environ["GITHUB_RUN_ID"].isdigit()
     assert record["toolchain"] == Path("lean-toolchain").read_text().strip()
-    assert record["theorems"] == json.loads(Path("comparator.json").read_text())["theorem_names"]
+    assert record["theorems"] == json.loads(Path("Comparator/FiveDisk/comparator.json").read_text())["theorem_names"]
     assert record["kernels"] == ["Lean kernel"]
     check_source_links(record["commit"], record["theorems"])
     # The site's kernel replay: both checkers of the toolchain (`con-leche`, `con-ron`) accepted

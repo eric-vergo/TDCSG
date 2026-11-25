@@ -4,12 +4,11 @@ Authors: Eric Vergo, Claude
 -/
 import VersoManual
 import VersoBlueprint
-import TDCSGBlueprint.RepoFile
 import TDCSG.CriticalRadius.Five
 import TDCSGBlueprint.TwoDisks
 import TDCSGFigureTheorems
 
-open Verso.Genre Verso.Genre.Manual Informal TDCSGBlueprint PILeanVerso
+open Verso.Genre Verso.Genre.Manual Informal PILeanVerso
 
 #doc (Manual) "Proof of the main theorem" =>
 

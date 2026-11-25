@@ -42,8 +42,8 @@ def main (args : List String) : IO UInt32 := do
     (".lake/packages/leantex/fonts/LPPL-1.3c.txt", "LPPL-1.3c.txt")]
   PILeanVerso.withFigures (%doc TDCSGBlueprint) site_figures% args
     (options := { leanLinks := .site, repo := some "https://github.com/eric-vergo/TDCSG" })
-    fun args =>
-      Informal.PreviewManifest.blueprintMainWithPreviewData (%doc TDCSGBlueprint) args
+    fun doc args =>
+      Informal.PreviewManifest.blueprintMainWithPreviewData doc args
         (extensionImpls := by exact extension_impls%)
         (config := { extraFilesHtml := files, extraCss := {⟨css⟩}, extraJs := {⟨js⟩, ⟨motion⟩} })
         (sideBySide := true)

@@ -1,15 +1,8 @@
-/* Styles of the prose around the figures: the front page's text column and metadata, long names
-   and licence notes on narrow screens. The figures drawn by PILean carry their own styles and dark
+/* Styles of the prose around the figures: the front page's lists and metadata, long names and
+   licence notes on narrow screens. The figures drawn by PILean carry their own styles and dark
    theme. */
 
-/* The front-page prose, paragraphs and lists alike, keeps to one text column. */
-.authors ~ :is(p, ul, ol) {
-  max-width: 78ch;
-  margin-inline: auto;
-  box-sizing: border-box;
-}
-
-/* Lists take the text face of the paragraphs, as in the chapters, so that `ch` is the same unit. */
+/* Lists on the front page take the text face of its paragraphs, as in the chapters. */
 .authors ~ :is(ul, ol) {
   font-family: var(--verso-text-font-family);
 }
@@ -36,17 +29,11 @@
   overflow-wrap: anywhere;
 }
 
-/* A heading's permalink sits just after its last word, outside the heading's box. On a narrow
-   screen the heading keeps room for it at the end of the line, so that it does not reach past the
-   side gutter; the centred title of the front page keeps the same room on both sides. */
-@media (max-width: 40rem) {
-  :is(h1, h2, h3, h4, h5, h6):has(> .permalink-widget.inline) {
-    padding-inline-end: 2rem;
-  }
-
-  .titlepage h1:has(> .permalink-widget.inline) {
-    padding-inline-start: 2rem;
-  }
+/* The figures' own pages are titled with their declarations' names; in the list of those pages
+   and in the page navigation such a name breaks rather than widen a narrow screen. */
+main ol.section-toc li,
+main .prev-next-buttons .where {
+  overflow-wrap: anywhere;
 }
 
 /* The reading pages share the classic edition's paper, serif text and ruled figure plates. */

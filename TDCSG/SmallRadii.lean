@@ -40,7 +40,7 @@ open Complex Metric Equiv
 namespace TDCSG
 
 /-- The orbit of `z` under the full-plane rotation by `-2π / n` about `c`. -/
-def rotOrbit (n : ℕ) (c z : ℂ) : Set ℂ := Set.range fun j : ℕ ↦ (rotation n c)^[j] z
+noncomputable def rotOrbit (n : ℕ) (c z : ℂ) : Set ℂ := Set.range fun j : ℕ ↦ (rotation n c)^[j] z
 
 /-- A point lies in its own rotation orbit. -/
 theorem mem_rotOrbit_self (n : ℕ) (c z : ℂ) : z ∈ rotOrbit n c z := ⟨0, rfl⟩
@@ -112,7 +112,7 @@ theorem finite_orbit_of_le_one (n₁ n₂ : ℕ) {r₁ r₂ : ℝ} (h₁ : r₁ 
     {y | p ∈ rightDisk r₂ ∧ y ∈ R₂ p}
   have hS : S.Finite :=
     (((Set.finite_singleton p).union (finite_rotOrbit _ _ _)).union
-      (finite_rotOrbit _ _ _)).union ((finite_rotOrbit n₁ leftCenter p).subset fun _ h ↦ h.2)
+      (finite_rotOrbit _ _ _)).union ((finite_rotOrbit n₁ leftCenter p).subset fun _ ↦ And.right)
       |>.union ((finite_rotOrbit n₂ rightCenter p).subset fun _ h ↦ h.2)
   have hd₁ : dist (0 : ℂ) leftCenter = 1 := by simp [leftCenter]
   have hd₂ : dist (0 : ℂ) rightCenter = 1 := by simp [rightCenter]

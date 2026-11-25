@@ -2,11 +2,11 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo, OpenAI GPT-6.2 Astra, Claude
 -/
+import VersoManual
 import VersoBlueprint
-import TDCSGBlueprint.RepoFile
-import Comparator.Solution
+import Comparator.FiveDisk.Solution
 
-open Verso.Genre Verso.Genre.Manual Informal TDCSGBlueprint
+open Verso.Genre Verso.Genre.Manual Informal
 
 #doc (Manual) "Verification" =>
 
@@ -50,7 +50,7 @@ namespaces available, run
 ```
 bash scripts/get-mathlib-cache.sh
 lake build
-lake comparator
+lake comparator --config Comparator/FiveDisk/comparator.json
 bash scripts/check-comparator-negative.sh
 ```
 
@@ -70,9 +70,9 @@ links to the commit and to the run. Every run, with its full log, is listed in t
 another computer has no verification record, and the line below says so. The Project Stats page
 lists what the blueprint found in the compiled declarations.
 
-Read the {repoFile "Comparator/Challenge.lean"}[standalone challenge],
-{repoFile "Comparator/Solution.lean"}[solution], and
-{repoFile "comparator.json"}[allowed axioms] at the commit this site was built from. The challenge
+Read the {repoFile "Comparator/FiveDisk/Challenge.lean"}[standalone challenge],
+{repoFile "Comparator/FiveDisk/Solution.lean"}[solution], and
+{repoFile "Comparator/FiveDisk/comparator.json"}[allowed axioms] at the commit this site was built from. The challenge
 compares formal statements. Checking how those statements express the intended mathematical
 problem also requires reading their definitions.
 
@@ -84,7 +84,7 @@ number := false
 
 Verso and the cited Verso Blueprint modules credit Lean FRO LLC and their respective
 authors under the [Apache License 2.0](/Apache-2.0.txt). The
-[Blueprint source](https://github.com/eric-vergo/verso-blueprint/tree/d4984e261d0a4cb0a984c41b3b98625fae27e8aa)
+[Blueprint source](https://github.com/eric-vergo/verso-blueprint/tree/02159cd8cb5b69babf94817cdeabb93064d6f0e1)
 includes the individual file credits. PILean draws the figures. LeAnTeX
 typesets the formulas with glyph outlines from Antonis Tsolomitis’s New Computer Modern.
 The selected fonts carry the GUST Font License. See the
