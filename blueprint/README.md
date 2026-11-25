@@ -141,6 +141,21 @@ chapter links and exercises playback, offscreen suspension, mobile widths and re
    (links := TDCSGFigures.name_spec) (alt := "…")` or `:::figure_explorer`, the caption as the
    body; the chapter imports `TDCSGFigureTheorems`.
 
+### The frame pair for other words
+
+The two frames of chapter 4 (`changeOfFrame`) are computed by `TDCSGFigures.Lift.statesFor` in
+`TDCSGFigures/Data/Frames.lean` for any squared radius in `ℚ(√5)`, starting point of `ℤ[ζ₅]` and
+word in `a`, `b`, `a⁻¹`, `b⁻¹`. `stepsHold` checks the geometry of every step exactly; the
+general statements are `TDCSG.Five.proj_turn_genA`, `proj_turn_genB`, `halved_genA`,
+`halved_genB` and `frameMap_apply_halved`. `wordReport` lists, letter by letter, whether a letter
+acts and the exact margin of its disk's centre against the window, and how far the orbit reaches
+in both frames. `scripts/FrameWords.lean`, outside every build, searches the words in `a` and `b`
+at `r = 1.95` for words with letters that do not act and for words whose orbit closes:
+
+```sh
+lake env lean scripts/FrameWords.lean
+```
+
 ### Drawing figures in a worktree
 
 The folder `figures/` is a small Lake workspace that builds `TDCSGFigures` and the preview tool
