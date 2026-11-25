@@ -20,7 +20,7 @@ number := false
 Part II proves the other half of the main theorem: for every radius $`r<\sqrt{3+\varphi}` the
 group $`GG_5(r)` is finite. It consists of Chapters 4 to 7, and Chapter 8 joins the two halves.
 
-:::figure TDCSGFigures.radiusLineFinite (label := "radius-line-finite") (inline := true) (proves := TDCSGFigures.radiusLineFinite_spec) (alt := "A line of radii with the critical radius R marked between 2 and 3. Above, the finite half ends in an open ring at R and is drawn thick; below, the infinite half starts with a filled dot at R.")
+:::figure TDCSGFigures.radiusLineFinite (label := "radius-line-finite") (inline := true) (links := TDCSGFigures.radiusLineFinite_spec) (alt := "A line of radii with the critical radius R marked between 2 and 3. Above, the finite half ends in an open ring at R and is drawn thick; below, the infinite half starts with a filled dot at R.")
 The radii $`r` with the critical radius $`R=\sqrt{3+\varphi}\approx2.149` marked. The group
 $`GG_5(r)` is finite for $`r<R`, the upper half-line, which ends in an open ring because $`R` is not
 one of its radii, and infinite for $`r\ge R`, the lower half-line, which starts with a filled dot at

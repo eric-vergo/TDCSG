@@ -26,7 +26,7 @@ the figure's code builds them, so a change to the figure that the theorem does n
 build, and proves the facts the caption relies on, by `rfl` and `decide +kernel`. What a theorem
 does not state is said at the end of its doc string: how the builders draw, the layout, the
 lettering, the color values and the pixels. PILean attaches each theorem to its figure with
-`figure_proves`, which accepts only a theorem whose statement names the figure and which depends on
+`figure_links`, which accepts only a theorem whose statement names the figure and which depends on
 no axiom beyond `propext`, `Classical.choice` and `Quot.sound`.
 
 The theorems are not statements of the proof, and they are not nodes of the dependency graph.
@@ -120,7 +120,7 @@ theorem criticalChord_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves criticalChord criticalChord_spec
+figure_links criticalChord criticalChord_spec
 
 end TDCSGFigures
 ```
@@ -197,7 +197,7 @@ theorem extensionJump_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves extensionJump extensionJump_spec
+figure_links extensionJump extensionJump_spec
 
 end TDCSGFigures
 ```
@@ -277,7 +277,7 @@ theorem disjointDisks_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves disjointDisks disjointDisks_spec
+figure_links disjointDisks disjointDisks_spec
 
 end TDCSGFigures
 ```
@@ -356,7 +356,7 @@ theorem generatorStep_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves generatorStep generatorStep_spec
+figure_links generatorStep generatorStep_spec
 
 end TDCSGFigures
 ```
@@ -414,7 +414,7 @@ theorem wordSteps_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves wordSteps wordSteps_spec
+figure_links wordSteps wordSteps_spec
 
 end TDCSGFigures
 ```
@@ -477,7 +477,7 @@ theorem radiusLineInfinite_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves radiusLineInfinite radiusLineInfinite_spec
+figure_links radiusLineInfinite radiusLineInfinite_spec
 
 end TDCSGFigures
 ```
@@ -572,7 +572,7 @@ theorem chordPieces_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves chordPieces chordPieces_spec
+figure_links chordPieces chordPieces_spec
 
 end TDCSGFigures
 ```
@@ -626,7 +626,7 @@ theorem wordTrace_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves wordTrace wordTrace_spec
+figure_links wordTrace wordTrace_spec
 
 end TDCSGFigures
 ```
@@ -656,7 +656,7 @@ theorem exchangedIntervals_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves exchangedIntervals exchangedIntervals_spec
+figure_links exchangedIntervals exchangedIntervals_spec
 
 end TDCSGFigures
 ```
@@ -767,7 +767,7 @@ theorem chordOrbit_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves chordOrbit chordOrbit_spec
+figure_links chordOrbit chordOrbit_spec
 
 end TDCSGFigures
 ```
@@ -830,7 +830,7 @@ theorem radiusLineFinite_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves radiusLineFinite radiusLineFinite_spec
+figure_links radiusLineFinite radiusLineFinite_spec
 
 end TDCSGFigures
 ```
@@ -912,7 +912,7 @@ theorem unitSteps_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves unitSteps unitSteps_spec
+figure_links unitSteps unitSteps_spec
 
 end TDCSGFigures.Lift
 ```
@@ -950,7 +950,7 @@ theorem changeOfFrame_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves changeOfFrame changeOfFrame_spec
+figure_links changeOfFrame changeOfFrame_spec
 
 end TDCSGFigures.Lift
 ```
@@ -1063,7 +1063,7 @@ theorem lensEstimate_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves lensEstimate lensEstimate_spec
+figure_links lensEstimate lensEstimate_spec
 
 end TDCSGFigures.Lens
 ```
@@ -1099,7 +1099,7 @@ theorem lensRadius_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves lensRadius lensRadius_spec
+figure_links lensRadius lensRadius_spec
 
 end TDCSGFigures.Lens
 ```
@@ -1197,7 +1197,7 @@ theorem terminalCrossing_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves terminalCrossing terminalCrossing_spec
+figure_links terminalCrossing terminalCrossing_spec
 
 end TDCSGFigures.Levels
 ```
@@ -1247,7 +1247,7 @@ theorem terminalZoom_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves terminalZoom terminalZoom_spec
+figure_links terminalZoom terminalZoom_spec
 
 end TDCSGFigures.Levels
 ```
@@ -1286,7 +1286,7 @@ theorem levelPhases_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves levelPhases levelPhases_spec
+figure_links levelPhases levelPhases_spec
 
 end TDCSGFigures.Levels
 ```
@@ -1376,7 +1376,7 @@ theorem componentOfZero_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves componentOfZero componentOfZero_spec
+figure_links componentOfZero componentOfZero_spec
 
 end TDCSGFigures.Confinement
 ```
@@ -1412,7 +1412,7 @@ theorem walkToLeaf_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves walkToLeaf walkToLeaf_spec
+figure_links walkToLeaf walkToLeaf_spec
 
 end TDCSGFigures.Confinement
 ```
@@ -1434,7 +1434,7 @@ theorem coordinateBox_spec :
       | _ => false) = true := by
   exact ⟨rfl, by decide +kernel⟩
 
-figure_proves coordinateBox coordinateBox_spec
+figure_links coordinateBox coordinateBox_spec
 
 end TDCSGFigures
 ```
@@ -1464,7 +1464,7 @@ theorem radiusThreshold_spec :
       |>.role infiniteRole |>.named "R, a radius of the infinite half") := by
   exact ⟨rfl, rfl, rfl, rfl⟩
 
-figure_proves radiusThreshold radiusThreshold_spec
+figure_links radiusThreshold radiusThreshold_spec
 
 end TDCSGFigures
 ```
@@ -1551,7 +1551,7 @@ theorem orderEight_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves orderEight orderEight_spec
+figure_links orderEight orderEight_spec
 
 end TDCSGFigures
 ```
@@ -1650,7 +1650,7 @@ theorem orderTen_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves orderTen orderTen_spec
+figure_links orderTen orderTen_spec
 
 end TDCSGFigures
 ```
@@ -1730,7 +1730,7 @@ theorem orderTwelve_spec :
   repeat' apply And.intro
   all_goals decide +kernel
 
-figure_proves orderTwelve orderTwelve_spec
+figure_links orderTwelve orderTwelve_spec
 
 end TDCSGFigures
 ```

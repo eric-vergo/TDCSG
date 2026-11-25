@@ -20,7 +20,7 @@ This chapter of Part II is where the threshold $`\sqrt{3+\varphi}` enters the fi
 lemma is an estimate on the overlap of two disks, sharp exactly at the
 threshold; Chapter 6 turns its margin into barriers for the walks of Chapter 4.
 
-:::figure TDCSGFigures.Lens.lensEstimate (label := "lens-estimate") (inline := true) (proves := TDCSGFigures.Lens.lensEstimate_spec) (alt := "Two overlapping circles of radius 0.9 about 0 and u = zeta, their shaded lens, and two shaded vertical half-planes on the right, the lighter one with a dashed edge. The tip of the lens lies left of both half-planes; the point v-star lies on the edge of the darker one.")
+:::figure TDCSGFigures.Lens.lensEstimate (label := "lens-estimate") (inline := true) (links := TDCSGFigures.Lens.lensEstimate_spec) (alt := "Two overlapping circles of radius 0.9 about 0 and u = zeta, their shaded lens, and two shaded vertical half-planes on the right, the lighter one with a dashed edge. The tip of the lens lies left of both half-planes; the point v-star lies on the edge of the darker one.")
 The two window tests $`|v|\le r/2` (solid circle) and $`|v-u|\le r/2` (dashed circle) for
 $`u=\zeta` at $`r=1.8`, their lens, and the half-planes $`\operatorname{Re}v\ge\kappa-\eta`
 (lightly shaded strip with a dashed edge, together with everything to its right) and
@@ -72,7 +72,7 @@ by no $`v` at all. The estimate has content only for $`4-\sqrt{15-7\varphi}\le r
 range just below $`R\approx2.149`. This is the same threshold as the one beyond which, by
 Chapter 6, an edge of the center graph can cross a good level at all.
 
-:::figure_explorer TDCSGFigures.Lens.lensRadius (label := "lens-radius") (proves := TDCSGFigures.Lens.lensRadius_spec) (alt := "The lens picture at r = 1.8, 2, 2.08, 2.12 and R: as r grows the tip of the lens moves right towards the shaded half-planes and reaches the line Re v = kappa exactly at R.")
+:::figure_explorer TDCSGFigures.Lens.lensRadius (label := "lens-radius") (links := TDCSGFigures.Lens.lensRadius_spec) (alt := "The lens picture at r = 1.8, 2, 2.08, 2.12 and R: as r grows the tip of the lens moves right towards the shaded half-planes and reaches the line Re v = kappa exactly at R.")
 The lens of the disks $`|v|\le r/2` and $`|v-\zeta|\le r/2` with the half-planes
 $`\operatorname{Re}v\ge\kappa-\eta` (dashed edge) and $`\operatorname{Re}v\ge\kappa` for
 $`r=1.8, 2, 2.08, 2.12` and $`R=\sqrt{3+\varphi}`. As $`r` grows the strip between the two edges

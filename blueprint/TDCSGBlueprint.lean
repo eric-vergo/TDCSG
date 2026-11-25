@@ -30,7 +30,7 @@ open Verso.Genre Verso.Genre.Manual Informal PILeanVerso
 authors := ["Eric Vergo", "OpenAI GPT-6.2 Astra", "Claude"]
 %%%
 
-:::figure TDCSGFigures.criticalChord (label := "critical-chord") (inline := true) (proves := TDCSGFigures.criticalChord_spec) (alt := "Two closed disks of radius the square root of three plus phi, centered at minus one and one, drawn as circles, with their overlap shaded. The chord from minus E on the right circle to E on the left circle passes through zero in three colored pieces numbered 1, 2 and 3. The circles cross at zeta minus zeta to the fourth and its negative.")
+:::figure TDCSGFigures.criticalChord (label := "critical-chord") (inline := true) (links := TDCSGFigures.criticalChord_spec) (alt := "Two closed disks of radius the square root of three plus phi, centered at minus one and one, drawn as circles, with their overlap shaded. The chord from minus E on the right circle to E on the left circle passes through zero in three colored pieces numbered 1, 2 and 3. The circles cross at zeta minus zeta to the fourth and its negative.")
 The two closed disks at the critical radius $`R=\sqrt{3+\varphi}\approx2.149`, centered at $`-1`
 (labelled left disk) and $`1` (labelled right disk), and the lens they share. The chord from
 $`-E` to $`E`, where $`E=\zeta-\zeta^2` and $`\zeta=\exp(2\pi i/5)`, passes through $`0`; its

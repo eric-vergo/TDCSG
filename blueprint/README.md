@@ -88,7 +88,7 @@ The page Figures lists every figure.
 
 The theorems of the figures, `<name>_spec`, are stated and proved in Lean blocks of the page
 "Figures and their theorems", `TDCSGFigureTheorems.lean`, one section per page of the site, and
-attached to their figures there with `figure_proves`. Each writes out the figure's items and proves
+attached to their figures there with `figure_links`. Each writes out the figure's items and proves
 the facts its caption uses. The page lives at the repository root, in a library of its own,
 because PILean derives a theorem's source link from its module name. The theorems are not
 Blueprint statements, so they add no node to the dependency graph and are not part of the kernel
@@ -136,9 +136,9 @@ chapter links and exercises playback, offscreen suspension, mobile widths and re
    previews (below).
 4. Write its specification theorem `<name>_spec` in a Lean block of its page's section of
    `TDCSGFigureTheorems.lean`, with the item list written out and the exact facts proved by `rfl`
-   and `decide +kernel` (see `TDCSGFigures.criticalChord_spec`), followed by `figure_proves`.
+   and `decide +kernel` (see `TDCSGFigures.criticalChord_spec`), followed by `figure_links`.
 5. Put it in its chapter with `:::figure TDCSGFigures.name (label := "…") (inline := true)
-   (proves := TDCSGFigures.name_spec) (alt := "…")` or `:::figure_explorer`, the caption as the
+   (links := TDCSGFigures.name_spec) (alt := "…")` or `:::figure_explorer`, the caption as the
    body; the chapter imports `TDCSGFigureTheorems`.
 
 ### Drawing figures in a worktree
