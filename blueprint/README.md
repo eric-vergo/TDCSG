@@ -177,4 +177,4 @@ PILean packages alone with `lake update pilean pilean-verso pilean-leantex`.
 
 GitHub Actions supplies `verification.json` after its Linux comparator run succeeds. A local
 render remains usable without that file. See the
-[standalone challenge](../Comparator/Challenge.lean) and [solution](../Comparator/Solution.lean).
+[standalone challenge](../Comparator/FiveDisk/Challenge.lean) and [solution](../Comparator/FiveDisk/Solution.lean).

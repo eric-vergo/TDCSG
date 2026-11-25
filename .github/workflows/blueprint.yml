@@ -73,7 +73,8 @@ jobs:
 
       - name: Verify the independent challenge in the Linux sandbox
         run: |
-          lake comparator
+          lake exe vbp comparator-check
+          lake comparator --config Comparator/FiveDisk/comparator.json
           bash scripts/check-comparator-negative.sh
 
       - name: Build the figures and check their layout at both widths in both themes
@@ -97,7 +98,7 @@ jobs:
              --arg run_url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
              --arg toolchain "$(cat lean-toolchain)" \
              '{status:"passed", $commit, $run_url, $toolchain, theorems:.theorem_names, kernels:["Lean kernel"]}' \
-             comparator.json > _out/site/html-multi/verification.json
+             Comparator/FiveDisk/comparator.json > _out/site/html-multi/verification.json
           # Also requires the kernel replay to have accepted the whole site, and runs PILean's
           # checks of the figures: pilean-verify, the inline-picture check and a fresh render
           # compared with the site's figures folder.

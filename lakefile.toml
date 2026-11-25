@@ -74,11 +74,11 @@ root = "TDCSGCompute.Main"
 
 [[lean_lib]]
 name = "ComparatorChallenge"
-roots = ["Comparator.Challenge"]
+roots = ["Comparator.FiveDisk.Challenge"]
 
 [[lean_lib]]
 name = "ComparatorSolution"
-roots = ["Comparator.Solution"]
+roots = ["Comparator.FiveDisk.Solution"]
 
 # The figures of the blueprint, drawn by PILean from exact data: no Mathlib, no Verso. The
 # workspace in `figures/` builds and previews them alone.

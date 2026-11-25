@@ -211,7 +211,7 @@ def check_source_links(commit, theorems):
         lines = source_at(commit, path)
         assert 1 <= int(start) <= int(end) <= len(lines), f"{decl}: range outside {path}"
         if decl in theorems:
-            assert path == "Comparator/Solution.lean", f"{decl}: incorrect solution file {path}"
+            assert path == "Comparator/FiveDisk/Solution.lean", f"{decl}: incorrect solution file {path}"
             name = re.escape(decl.rsplit(".", 1)[-1])
             excerpt = "\n".join(lines[int(start) - 1:int(end)])
             assert re.search(rf"^theorem {name}\b", excerpt, re.MULTILINE), f"{decl}: wrong source range"
@@ -316,7 +316,7 @@ if "--release" in sys.argv[2:]:
     run_url = f"https://github.com/eric-vergo/TDCSG/actions/runs/{os.environ['GITHUB_RUN_ID']}"
     assert record["run_url"] == run_url and os.environ["GITHUB_RUN_ID"].isdigit()
     assert record["toolchain"] == Path("lean-toolchain").read_text().strip()
-    assert record["theorems"] == json.loads(Path("comparator.json").read_text())["theorem_names"]
+    assert record["theorems"] == json.loads(Path("Comparator/FiveDisk/comparator.json").read_text())["theorem_names"]
     assert record["kernels"] == ["Lean kernel"]
     check_source_links(record["commit"], record["theorems"])
     # The site's kernel replay: both checkers of the toolchain (`con-leche`, `con-ron`) accepted

@@ -4,7 +4,7 @@ Authors: Eric Vergo, OpenAI GPT-6.2 Astra, Claude
 -/
 import VersoManual
 import VersoBlueprint
-import Comparator.Solution
+import Comparator.FiveDisk.Solution
 
 open Verso.Genre Verso.Genre.Manual Informal
 
@@ -50,7 +50,7 @@ namespaces available, run
 ```
 bash scripts/get-mathlib-cache.sh
 lake build
-lake comparator
+lake comparator --config Comparator/FiveDisk/comparator.json
 bash scripts/check-comparator-negative.sh
 ```
 
@@ -70,9 +70,9 @@ links to the commit and to the run. Every run, with its full log, is listed in t
 another computer has no verification record, and the line below says so. The Project Stats page
 lists what the blueprint found in the compiled declarations.
 
-Read the {repoFile "Comparator/Challenge.lean"}[standalone challenge],
-{repoFile "Comparator/Solution.lean"}[solution], and
-{repoFile "comparator.json"}[allowed axioms] at the commit this site was built from. The challenge
+Read the {repoFile "Comparator/FiveDisk/Challenge.lean"}[standalone challenge],
+{repoFile "Comparator/FiveDisk/Solution.lean"}[solution], and
+{repoFile "Comparator/FiveDisk/comparator.json"}[allowed axioms] at the commit this site was built from. The challenge
 compares formal statements. Checking how those statements express the intended mathematical
 problem also requires reading their definitions.
 

@@ -7,7 +7,7 @@ Place two closed disks of radius r at −1 and 1. Each move turns one disk clock
 theorem TDCSG.CriticalRadius.criticalRadius_five : criticalRadius 5 = √(3 + φ)
 ```
 
-[Read the illustrated proof](https://eric-vergo.github.io/TDCSG/) · [Read the challenge statement](Comparator/Challenge.lean) · [Inspect the Lean proof](TDCSG/CriticalRadius/Five.lean) · [Check the published revision](https://eric-vergo.github.io/TDCSG/verification.json)
+[Read the illustrated proof](https://eric-vergo.github.io/TDCSG/) · [Read the challenge statement](Comparator/FiveDisk/Challenge.lean) · [Inspect the Lean proof](TDCSG/CriticalRadius/Five.lean) · [Check the published revision](https://eric-vergo.github.io/TDCSG/verification.json)
 
 Below the threshold, track which disk centers become active as a point moves. Each switch changes one integer coordinate. The disk geometry puts barriers on these coordinates, giving a uniform bound on the resulting orbits and hence a finite group. At the threshold a diagonal chord supports a sequence of distinct orbit points. The formal proof establishes this qualitative classification. The written proof also bounds the growth of the conjugate translations as the threshold approaches. [Written proof and quantitative bound](notes/proofs/sharp-lower-bound-n5-pentagrid.md)
 
@@ -21,14 +21,14 @@ The challenge states one theorem using Mathlib alone: it defines the two generat
 theorem FiveDisk.finite_iff (r : ℝ) : Finite (group r) ↔ r < radius
 ```
 
-with an intentional proof hole: the group is finite exactly for radii below the threshold, so it is infinite at the threshold and above. It corresponds to `finite_GG_five_iff` in the library. The solution proves the same statement from the project library. Lake Comparator checks that the two statements match and replays the solution with Lean’s kernel, allowing only `propext`, `Quot.sound` and `Classical.choice`. [Challenge](Comparator/Challenge.lean) · [Solution](Comparator/Solution.lean) · [Configuration](comparator.json)
+with an intentional proof hole: the group is finite exactly for radii below the threshold, so it is infinite at the threshold and above. It corresponds to `finite_GG_five_iff` in the library. The solution proves the same statement from the project library. Lake Comparator checks that the two statements match and replays the solution with Lean’s kernel, allowing only `propext`, `Quot.sound` and `Classical.choice`. [Challenge](Comparator/FiveDisk/Challenge.lean) · [Solution](Comparator/FiveDisk/Solution.lean) · [Configuration](Comparator/FiveDisk/comparator.json)
 
 From a checkout with [elan](https://github.com/leanprover/elan) and Linux bubblewrap with user namespaces available, run
 
 ```sh
 bash scripts/get-mathlib-cache.sh
 lake build
-lake comparator
+lake comparator --config Comparator/FiveDisk/comparator.json
 bash scripts/check-comparator-negative.sh
 ```
 
@@ -44,7 +44,7 @@ The final command makes two changes to the challenge, each in its own disposable
 | `TDCSG/CriticalRadius/Five/` | Its proof: `Cyclotomic` (an exact model of ℤ[ζ₅]), `Chord` (the infinite orbit at the threshold), `Labels`, `Lens`, `Levels`, `Confinement` (finiteness below it) |
 | `TDCSG/ForMathlib/` | General lemmas the proof uses: bounded return times of dense cyclic subgroups, walks crossing a cut through leaves |
 | `TDCSG/CriticalRadius/` | Also the critical radius `TDCSG.criticalRadius n` and the infinite orbits for n = 8, 10, 12, stated in `Statements.lean` |
-| `Comparator/` | The challenge statement and its solution |
+| `Comparator/FiveDisk/` | The challenge statement, its solution and the Comparator configuration |
 | `blueprint/` | The blueprint site: one chapter module per chapter in `blueprint/TDCSGBlueprint/`, build instructions in [`blueprint/README.md`](blueprint/README.md) |
 | `TDCSGFigures/` | The site's figures, drawn by [PILean](https://github.com/eric-vergo/PILean) from exact data (no Mathlib, no Verso); `figures/` is a small workspace that builds and previews them alone |
 | `TDCSGFigureTheorems.lean` | The site's page "Figures and their theorems": for every figure, the theorem that writes out what it draws |

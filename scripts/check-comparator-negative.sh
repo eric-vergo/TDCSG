@@ -3,6 +3,8 @@
 # Each run must be rejected with the expected judgment.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+challenge=Comparator/FiveDisk/Challenge.lean
+config=Comparator/FiveDisk/comparator.json
 scratch=$(mktemp -d)
 trap 'rm -rf "$scratch"' EXIT
 
@@ -13,8 +15,8 @@ expect_rejection() {
   shift 3
   local dir="$scratch/$name"
   mkdir "$dir"
-  sed "$script" Comparator/Challenge.lean > "$dir/Changed.lean"
-  if cmp -s Comparator/Challenge.lean "$dir/Changed.lean"; then
+  sed "$script" "$challenge" > "$dir/Changed.lean"
+  if cmp -s "$challenge" "$dir/Changed.lean"; then
     echo "The $name mutation did not change the challenge." >&2
     exit 1
   fi
@@ -23,8 +25,8 @@ expect_rejection() {
     FiveDisk.finite_iff \
     propext Quot.sound Classical.choice' _ "$dir" > "$dir/challenge.ndjson"
   local status=0
-  lake comparator "$@" --challenge-from-export "$dir/challenge.ndjson" > "$dir/judge.log" 2>&1 \
-    || status=$?
+  lake comparator --config "$config" "$@" --challenge-from-export "$dir/challenge.ndjson" \
+    > "$dir/judge.log" 2>&1 || status=$?
   if [[ $status != 1 ]] || ! grep -Fq "$expected" "$dir/judge.log"; then
     cat "$dir/judge.log" >&2
     exit 1
