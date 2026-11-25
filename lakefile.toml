@@ -32,7 +32,7 @@ rev = "94cea086b880f61f5b3847d30151b8e5f80e1259"
 [[require]]
 name = "VersoBlueprint"
 git = "https://github.com/eric-vergo/verso-blueprint.git"
-rev = "92e4c9de3725add8d3a46d85902c65134ee309c8"
+rev = "cc82fb88974659b6890997a1975d21f7cd4d280c"
 
 # PILean draws the figures; the Verso adapter puts them in the site, the LeAnTeX adapter typesets
 # their labels. The figures library imports PILean directly, so `pilean` is required here rather
@@ -40,18 +40,18 @@ rev = "92e4c9de3725add8d3a46d85902c65134ee309c8"
 [[require]]
 name = "pilean"
 git = "https://github.com/eric-vergo/PILean"
-rev = "542cdfd77e179c7352d870ae6a2712d3622d5f86"
+rev = "f4d9923c3f9672d3a7227ea91901d80b5b8a487a"
 
 [[require]]
 name = "pilean-verso"
 git = "https://github.com/eric-vergo/PILean"
-rev = "542cdfd77e179c7352d870ae6a2712d3622d5f86"
+rev = "f4d9923c3f9672d3a7227ea91901d80b5b8a487a"
 subDir = "verso"
 
 [[require]]
 name = "pilean-leantex"
 git = "https://github.com/eric-vergo/PILean"
-rev = "542cdfd77e179c7352d870ae6a2712d3622d5f86"
+rev = "f4d9923c3f9672d3a7227ea91901d80b5b8a487a"
 subDir = "leantex"
 
 # Mathlib is required last so that its pins of shared dependencies (ProofWidgets, Plausible)

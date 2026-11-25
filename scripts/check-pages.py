@@ -285,7 +285,7 @@ assert not other_images, f"images outside PILean figures: {other_images}"
 
 # The figures drawn by PILean, against the manifest of the files the site build rendered.
 pilean_manifest = json.loads((pilean_dir / "manifest.json").read_text())
-assert pilean_manifest["format"] == "pilean-manifest-1", pilean_manifest["format"]
+assert pilean_manifest["format"] == "pilean-manifest-3", pilean_manifest["format"]
 manifest_decls = {entry["decl"] for entry in pilean_manifest["files"]}
 assert manifest_decls, "the PILean manifest lists no figure"
 shown = [fig["decl"] for _, fig in pilean_figures]
