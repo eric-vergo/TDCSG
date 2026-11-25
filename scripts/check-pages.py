@@ -5,7 +5,8 @@ files are listed in the PILean manifest `-verso-data/pilean-figures/manifest.jso
 check reads instead of a list of names. For each figure it requires a visible numbered caption and
 an accessible name, no active markup, Lean links that land on an element of an existing page, and
 the Blueprint's numbering: "Figure k" on the unnumbered pages, "Figure c.k" in chapter c, each
-counter running 1, 2, … without gaps or repeats; no page may show any other image. It runs PILean's
+counter running 1, 2, … without gaps or repeats; no page may show any other image than a figure's
+own page (`div.pilean-figure-page`) shows of its files. It runs PILean's
 checks: `pilean-verify` (the folder agrees with its manifest), the site check of PILean's Verso
 adapter (every inline picture is the body of a file the manifest lists, with the theme rules the
 manifest records) and a fresh render compared with the folder (`--check-figures`, through the
@@ -56,6 +57,8 @@ pilean_repo_links = set()
 active_markup = []
 # Images outside PILean figures: (page, address).
 other_images = []
+# Inline pictures on the figures' own pages (the frames of an explorer).
+figure_page_inline = []
 
 
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source",
@@ -73,6 +76,9 @@ class Resources(HTMLParser):
         self.pilean_stack = []
         self.part = None
         self.hidden = 0
+        # The open `div` elements inside a figure's own page (`div.pilean-figure-page`), whose
+        # pictures are that figure's files.
+        self.figure_page_divs = 0
 
     def pilean_start(self, tag, attrs, classes):
         """Track a PILean figure block or the figures list, and what is inside it."""
@@ -143,8 +149,9 @@ class Resources(HTMLParser):
         self.resource_data(data)
 
     def handle_starttag(self, tag, attrs):
-        attrs = dict(attrs)
-        classes = attrs.get("class", "").split()
+        # An attribute written without a value (`<td class>`) reads as None.
+        attrs = {k: v or "" for k, v in attrs}
+        classes = attrs["class"].split() if "class" in attrs else []
         self.pilean_start(tag, attrs, classes)
         # Statement declarations render as `div.bp_decl_source` panels, declarations attached to a
         # proof as `li.bp_external_decl_item` entries; both carry the declaration and its range.
@@ -157,7 +164,11 @@ class Resources(HTMLParser):
             panel = self.source_panels[-1]
             assert panel, f"Source link outside a Lean declaration panel in {page}"
             source_links.add((*panel, attrs["href"]))
-        if tag == "img" and not self.pilean_stack:
+        if tag == "div" and (self.figure_page_divs or "pilean-figure-page" in classes):
+            self.figure_page_divs += 1
+        if tag == "svg" and self.figure_page_divs and "pilean-inline-svg" in classes:
+            figure_page_inline.append(page)
+        if tag == "img" and not self.pilean_stack and not self.figure_page_divs:
             other_images.append((page, attrs.get("src", "")))
         if tag == "a" and attrs.get("href"):
             self.anchor = urljoin(self.base, attrs["href"])
@@ -184,6 +195,8 @@ class Resources(HTMLParser):
 
     def handle_endtag(self, tag):
         self.pilean_end(tag)
+        if tag == "div" and self.figure_page_divs:
+            self.figure_page_divs -= 1
         if tag in ("div", "li"):
             self.source_panels.pop()
         if tag == "a":
@@ -299,7 +312,8 @@ run("pilean-verify", ["lake", "exe", "pilean-verify", str(pilean_dir)])
 out = run("the inline-picture check", ["python3", "-I", str(pilean_tests / "inline_check.py"),
                                          str(site)])
 match = re.search(r"(\d+) of (\d+) inline pictures match", out)
-assert match and int(match.group(1)) == int(match.group(2)) == inline_pictures > 0, out
+assert match and int(match.group(1)) == int(match.group(2)) == \
+    inline_pictures + len(figure_page_inline) and inline_pictures > 0, out
 out = run("the fresh render (--check-figures)",
           ["lake", "lean", "BlueprintMain.lean", "--", "--run", "BlueprintMain.lean",
            "--check-figures", str(pilean_dir)])
