@@ -25,7 +25,7 @@ no other neighbor. Good levels recur within a bounded distance, uniformly in the
 window, and Chapter 7 uses one good level below and one above the starting labels, in every
 coordinate, to confine the walks.
 
-:::figure TDCSGFigures.Levels.terminalCrossing (label := "terminal-crossing") (inline := true) (proves := TDCSGFigures.Levels.terminalCrossing_spec) (alt := "A label n inside a circular window, its edge to n plus e zero on the window's right edge, four other neighbors of n inside the window, and four open rings outside it joined to n plus e zero by dashed lines. A shaded half-plane on the right holds n plus e zero.")
+:::figure TDCSGFigures.Levels.terminalCrossing (label := "terminal-crossing") (inline := true) (links := TDCSGFigures.Levels.terminalCrossing_spec) (alt := "A label n inside a circular window, its edge to n plus e zero on the window's right edge, four other neighbors of n inside the window, and four open rings outside it joined to n plus e zero by dashed lines. A shaded half-plane on the right holds n plus e zero.")
 A crossing at a good level, at $`r=2.12`, $`x=0.472` and coordinate $`j=0`. The label
 $`n=(4,-3,1,1,-3)` (a dot) has weight zero, projects to $`P(n)=7-4\varphi`, and its coordinate
 $`n_0=4` is a good level; the thick edge from $`n` to $`n+e_0` raises $`n_0` from $`4` to $`5`.
@@ -37,7 +37,7 @@ $`n` keeps its neighbors $`n+e_k` (squares inside the window). The small square 
 leaf is enlarged in {figref "terminal-zoom"}[].
 :::
 
-:::figure TDCSGFigures.Levels.terminalZoom (label := "terminal-zoom") (inline := true) (proves := TDCSGFigures.Levels.terminalZoom_spec) (alt := "An enlargement near the leaf: the edge from n ends at the leaf, which lies right of the cut and left of the window's edge, with a scale bar of length 0.005.")
+:::figure TDCSGFigures.Levels.terminalZoom (label := "terminal-zoom") (inline := true) (links := TDCSGFigures.Levels.terminalZoom_spec) (alt := "An enlargement near the leaf: the edge from n ends at the leaf, which lies right of the cut and left of the window's edge, with a scale bar of length 0.005.")
 The neighborhood of the leaf $`n+e_0` of {figref "terminal-crossing"}[], enlarged, with a scale bar
 of length $`0.005`. The leaf $`P(n+e_0)=8-4\varphi` lies between $`0.0045` and $`0.0046` beyond the
 cut $`\operatorname{Re}w=\operatorname{Re}x+\kappa-\eta` (the left edge of the shaded half-plane)
@@ -67,7 +67,7 @@ level at all.
 The theorem at the end of the chapter chooses walls for arbitrary windows and both sides of each
 coordinate.
 
-:::figure TDCSGFigures.Levels.levelPhases (label := "level-phases") (inline := true) (proves := TDCSGFigures.Levels.levelPhases_spec) (alt := "A plot of the phase of each level m from minus 13 to 9, in units of L, between minus one half and one half. The levels minus 10, minus 2 and 3 land in the shaded good bands next to plus and minus L over 2; dashed vertical lines mark lo = minus 10 and hi = 3, and a shaded column marks the gap |m| ≤ 2.")
+:::figure TDCSGFigures.Levels.levelPhases (label := "level-phases") (inline := true) (links := TDCSGFigures.Levels.levelPhases_spec) (alt := "A plot of the phase of each level m from minus 13 to 9, in units of L, between minus one half and one half. The levels minus 10, minus 2 and 3 land in the shaded good bands next to plus and minus L over 2; dashed vertical lines mark lo = minus 10 and hi = 3, and a shaded column marks the gap |m| ≤ 2.")
 The phase $`(1+\varphi/2)m+1/2-\operatorname{Re}x` of each level $`m` of coordinate $`0` at
 $`x=0.87` and $`r=1.8`, reduced modulo $`L=\varphi-1/2` and drawn in units of $`L`. A level is good
 when its phase lies in one of the shaded bands labelled good, farther than $`L/2-\eta` from

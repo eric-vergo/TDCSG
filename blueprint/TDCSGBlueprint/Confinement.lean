@@ -22,7 +22,7 @@ depend on the starting point. With the description of orbit points by labels, th
 orbit by one number, and the orbit-bound lemma, in its two-disk form {bpref "two_disk_finite"}[],
 makes $`GG_5(r)` finite for every $`r<R`, where $`R=\sqrt{3+\varphi}`.
 
-:::figure TDCSGFigures.Confinement.componentOfZero (label := "component-of-zero") (inline := true) (proves := TDCSGFigures.Confinement.componentOfZero_spec) (alt := "Eighteen labels inside a circular window joined by edges into a star-shaped cycle: dots for weight zero, squares for weight one; the labels 0 and e0 lie on the horizontal axis through the window center.")
+:::figure TDCSGFigures.Confinement.componentOfZero (label := "component-of-zero") (inline := true) (links := TDCSGFigures.Confinement.componentOfZero_spec) (alt := "Eighteen labels inside a circular window joined by edges into a star-shaped cycle: dots for weight zero, squares for weight one; the labels 0 and e0 lie on the horizontal axis through the window center.")
 The component of the label $`0` in the center graph for $`x=1/2` and $`r=1.95`: 18 labels, each
 drawn at its projection $`P(n)` inside the window $`|w-x|\le r/2`, dots for weight zero (the left
 centers) and squares for weight one (the right centers); hovering over a label shows its integer
@@ -90,7 +90,7 @@ meet a wall at all. To watch a walk from $`0` meet a wall, {figref "walk-to-leaf
 window, $`r=2.13` and $`x=1/5`, where the component of $`0` has 131 labels and two of its edges cross
 a good level; it follows one of them.
 
-:::figure_explorer TDCSGFigures.Confinement.walkToLeaf (label := "walk-to-leaf") (proves := TDCSGFigures.Confinement.walkToLeaf_spec) (alt := "A numbered path of labels inside a circular window. Its last step reaches the label n on the window's edge; the other candidates of n lie outside the window and the walk can only step back.")
+:::figure_explorer TDCSGFigures.Confinement.walkToLeaf (label := "walk-to-leaf") (links := TDCSGFigures.Confinement.walkToLeaf_spec) (alt := "A numbered path of labels inside a circular window. Its last step reaches the label n on the window's edge; the other candidates of n lie outside the window and the walk can only step back.")
 A path of the center graph at $`r=2.13`, $`x=1/5`, found by a breadth-first search from $`0`,
 drawn step by step (labels numbered along the path, dots for weight zero, squares for weight one).
 It lowers the coordinate $`n_2` from $`0` to $`-4`, then crosses the good level $`-5` into the label
@@ -99,7 +99,7 @@ window (open rings at the ends of dashed spokes), so $`n` is a leaf and the walk
 to $`n+e_2`, as the one-step lemma requires.
 :::
 
-:::figure TDCSGFigures.coordinateBox (label := "coordinate-box") (inline := true) (proves := TDCSGFigures.coordinateBox_spec) (alt := "Five horizontal rows, one per coordinate, with open rings for good levels and dots for the coordinate values reached by the component of zero.")
+:::figure TDCSGFigures.coordinateBox (label := "coordinate-box") (inline := true) (links := TDCSGFigures.coordinateBox_spec) (alt := "Five horizontal rows, one per coordinate, with open rings for good levels and dots for the coordinate values reached by the component of zero.")
 Unpack a label into its five coordinates. In each row the rings mark two good levels for the
 window of {figref "component-of-zero"}[]; every dot is at $`-1`, $`0` or $`1` in this example. Choosing
 one integer from each bounded range gives only finitely many possible labels. In the general

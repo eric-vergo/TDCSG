@@ -48,7 +48,7 @@ $`a^{-1}a^{-1}b^{-1}a^{-1}b^{-1}`, $`ababb`, and $`abab^{-1}a^{-1}b^{-1}`.
 Apply their letters from left to right.
 :::
 
-:::figure TDCSGFigures.chordPieces (label := "chord-pieces") (inline := true) (proves := TDCSGFigures.chordPieces_spec) (alt := "Two closed disks of the critical radius about minus one and one, their lens, and the chord from minus E to E through the lens, cut into three pieces numbered 1, 2, 3; the three words are written below.")
+:::figure TDCSGFigures.chordPieces (label := "chord-pieces") (inline := true) (links := TDCSGFigures.chordPieces_spec) (alt := "Two closed disks of the critical radius about minus one and one, their lens, and the chord from minus E to E through the lens, cut into three pieces numbered 1, 2, 3; the three words are written below.")
 The closed disks of radius $`R=\sqrt{3+\varphi}` about $`-1` and $`1`, their lens, and the chord
 from $`-E` to $`E`, where $`E=\zeta-\zeta^2` lies on the left circle and $`-E` on the right one. The
 cuts $`(1-\varphi)E` and $`(3-2\varphi)E` divide the chord into the pieces numbered 1, 2 and 3;
@@ -73,7 +73,7 @@ endpoints are the claimed translates, and the composite of rotations is the tran
 them. The kernel decides every check.
 :::
 
-:::figure_explorer TDCSGFigures.wordTrace (label := "word-trace") (proves := TDCSGFigures.wordTrace_spec) (alt := "Three frames, one per word. Each shows a piece of the chord, dashed, numbered 0, and its images after each letter, numbered by the letters applied, until the last image lies on the chord again.")
+:::figure_explorer TDCSGFigures.wordTrace (label := "word-trace") (links := TDCSGFigures.wordTrace_spec) (alt := "Three frames, one per word. Each shows a piece of the chord, dashed, numbered 0, and its images after each letter, numbered by the letters applied, until the last image lies on the chord again.")
 Follow each word from left to right. The ring marks the active center. An inverse letter turns
 counterclockwise. The interval under each animation records the starting piece and its landing.
 The still traces show the same journey all at once. The piece of the chord that word $`i` acts
@@ -84,7 +84,7 @@ disk, so the letter turns the whole segment; the marked ends lie on a boundary c
 test holds with equality.
 :::
 
-:::figure TDCSGFigures.exchangedIntervals (label := "exchanged-intervals") (inline := true) (proves := TDCSGFigures.exchangedIntervals_spec) (alt := "Before the return the pieces read 1, 2, 3. After the return they read 3, 1, 2 on the same interval.")
+:::figure TDCSGFigures.exchangedIntervals (label := "exchanged-intervals") (inline := true) (links := TDCSGFigures.exchangedIntervals_spec) (alt := "Before the return the pieces read 1, 2, 3. After the return they read 3, 1, 2 on the same interval.")
 Read each row from $`-1` to $`1`. Pieces 1 and 2 travel along different routes through the disks but
 land side by side, with the same displacement. Piece 3 wraps past the right end and reappears at
 the left. If you join the two ends of the interval to make a circle of circumference two, all
@@ -106,7 +106,7 @@ forces $`k=l` because $`\varphi` is irrational. The points $`t_kE` are distinct 
 An infinite orbit forces an infinite group.
 :::
 
-:::figure TDCSGFigures.chordOrbit (label := "chord-orbit") (inline := true) (proves := TDCSGFigures.chordOrbit_spec) (alt := "The orbit of zero along the chord: 25 rows, one per step k from 0 to 24, each with one point on the parameter line from minus one to one, and three vertical bands for the pieces of the three words.")
+:::figure TDCSGFigures.chordOrbit (label := "chord-orbit") (inline := true) (links := TDCSGFigures.chordOrbit_spec) (alt := "The orbit of zero along the chord: 25 rows, one per step k from 0 to 24, each with one point on the parameter line from minus one to one, and three vertical bands for the pieces of the three words.")
 The returns $`t_0E,t_1E,\ldots,t_{24}E` of the orbit of zero to the chord, one row per step $`k`
 from the top (the axis on the left), on the parameter line $`t\mapsto tE`, $`-1\le t<1`. The bands
 mark the pieces of the three words, cut at $`t=1-\varphi` and $`t=3-2\varphi`; each point lies in

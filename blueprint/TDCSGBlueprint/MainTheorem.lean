@@ -30,7 +30,7 @@ radii with an infinite group are then exactly the closed half-line $`[R,\infty)`
 is $`R`, so the critical radius is $`R`.
 :::
 
-:::figure TDCSGFigures.radiusThreshold (label := "threshold-classification") (inline := true) (proves := TDCSGFigures.radiusThreshold_spec) (alt := "Two half-lines meet at R. The finite half ends at an open ring and the infinite half begins at a filled dot.")
+:::figure TDCSGFigures.radiusThreshold (label := "threshold-classification") (inline := true) (links := TDCSGFigures.radiusThreshold_spec) (alt := "Two half-lines meet at R. The finite half ends at an open ring and the infinite half begins at a filled dot.")
 Read the two endpoints at $`R` together. Below the open ring, the coordinate box bounds every
 orbit uniformly. At the filled dot, the three words already give zero an infinite orbit. These
 two arguments account for every radius, including equality.
