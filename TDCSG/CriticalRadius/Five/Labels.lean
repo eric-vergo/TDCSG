@@ -267,6 +267,122 @@ theorem exists_centerReach_of_mem_orbit {z y : ℂ} (hy : y ∈ orbit 5 5 r r z)
     rw [he', mul_div_cancel_left₀ _ (dir_ne_zero j), rightCenter]
     ring
 
+/-! ### A step in the two frames
+
+The halved starting frame shows the two disks as the disks of radius `r / 2` about `0` and `1`
+and the current point as `(y + 1) / 2`. The moving frame of `Framed` shows the window of radius
+`r / 2` about `x`, fixed, and the current left and right centres `P(n)` and `P(n + e_j)`. The
+rigid motion `frameMap n j` carries the first picture onto the second, and each acting letter
+turns one centre of the moving frame about the other by `ζ`. -/
+
+/-- `ζʲ⁺¹ = ζ ζʲ`. -/
+theorem dir_add_one (j : Fin 5) : dir (j + 1) = ζ * dir j := by
+  rw [dir_add, show dir 1 = ζ from pow_one ζ, mul_comm]
+
+/-- The right centre seen from the left centre is the direction `ζʲ`. -/
+theorem proj_add_basis_sub (n : Label) (j : Fin 5) : proj (n + basis j) - proj n = dir j := by
+  rw [map_add, proj_basis, add_sub_cancel_left]
+
+/-- **The turn of `a` in the moving frame.** When `a` acts, the left centre `P(n)` stays and the
+new right centre `P(n + e_{j+1})` is the old one `P(n + e_j)` turned about `P(n)` by `ζ`, a fifth
+of a turn counter-clockwise. -/
+theorem proj_turn_genA (n : Label) (j : Fin 5) :
+    proj (n + basis (j + 1)) - proj n = ζ * (proj (n + basis j) - proj n) := by
+  rw [proj_add_basis_sub, proj_add_basis_sub, dir_add_one]
+
+/-- **The turn of `b` in the moving frame.** When `b` acts, the right centre `P(n + e_j)` stays
+and the new left centre `P(n + e_j - e_{j+1})` is the old one `P(n)` turned about `P(n + e_j)`
+by `ζ`. -/
+theorem proj_turn_genB (n : Label) (j : Fin 5) :
+    proj (n + basis j - basis (j + 1)) - proj (n + basis j) =
+      ζ * (proj n - proj (n + basis j)) := by
+  simp only [map_add, map_sub, proj_basis, dir_add_one]
+  ring
+
+/-- The turn of `a⁻¹ = a⁴` in the moving frame: the left centre stays and the right centre turns
+about it by `ζ⁴ = ζ⁻¹`, so the direction index goes down by one. -/
+theorem proj_turn_genA_inv (n : Label) (j : Fin 5) :
+    proj (n + basis (j - 1)) - proj n = ζ ^ 4 * (proj (n + basis j) - proj n) := by
+  have h := dir_add_one_mul_zeta_pow_four (j - 1)
+  rw [sub_add_cancel] at h
+  rw [proj_add_basis_sub, proj_add_basis_sub, ← h, mul_comm]
+
+/-- The turn of `b⁻¹ = b⁴` in the moving frame: the right centre stays and the left centre turns
+about it by `ζ⁴`, to `P(n + e_j - e_{j-1})`. -/
+theorem proj_turn_genB_inv (n : Label) (j : Fin 5) :
+    proj (n + basis j - basis (j - 1)) - proj (n + basis j) =
+      ζ ^ 4 * (proj n - proj (n + basis j)) := by
+  have h := dir_add_one_mul_zeta_pow_four (j - 1)
+  rw [sub_add_cancel] at h
+  simp only [map_add, map_sub, proj_basis]
+  linear_combination h
+
+/-- **The turn of `a` in the halved frame.** When `a` acts, the halved point `(y + 1) / 2` turns
+about the halved left centre `0` by `ζ⁴`, a fifth of a turn clockwise. -/
+theorem halved_genA {y : ℂ} (hy : y ∈ closedBall leftCenter r) :
+    (TDCSG.genA 5 r y + 1) / 2 = ζ ^ 4 * ((y + 1) / 2) := by
+  rw [TDCSG.genA, diskRotation_of_mem hy, rotation, leftCenter, Nat.cast_ofNat,
+    exp_rotationAngle_five]
+  ring
+
+/-- **The turn of `b` in the halved frame.** When `b` acts, the halved point `(y + 1) / 2` turns
+about the halved right centre `1` by `ζ⁴`. -/
+theorem halved_genB {y : ℂ} (hy : y ∈ closedBall rightCenter r) :
+    (TDCSG.genB 5 r y + 1) / 2 - 1 = ζ ^ 4 * ((y + 1) / 2 - 1) := by
+  rw [TDCSG.genB, diskRotation_of_mem hy, rotation, rightCenter, Nat.cast_ofNat,
+    exp_rotationAngle_five]
+  ring
+
+/-- The point lies in a disk exactly when the centre that its frame equation pairs with that disk
+lies in the window: `2 (x - P(n)) = ζʲ (y - p)` makes `|y - p| = 2 |P(n) - x|`. -/
+theorem mem_closedBall_iff_inWindow {y p : ℂ} {n : Label} {j : Fin 5}
+    (h : 2 * (x - proj n) = dir j * (y - p)) : y ∈ closedBall p r ↔ InWindow r x n := by
+  have e := congrArg norm h
+  rw [norm_mul, norm_mul, norm_dir, one_mul, norm_sub_rev x, Complex.norm_ofNat] at e
+  rw [mem_closedBall, dist_eq_norm, InWindow]
+  constructor <;> intro <;> linarith
+
+/-- The rigid motion `T(w) = P(n) + ζʲ w` from the halved starting frame to the moving frame of
+the state with label `n` and direction index `j`. -/
+noncomputable def frameMap (n : Label) (j : Fin 5) (w : ℂ) : ℂ :=
+  proj n + dir j * w
+
+/-- `T` sends the halved left centre `0` to the left centre `P(n)`. -/
+@[simp] theorem frameMap_zero (n : Label) (j : Fin 5) : frameMap n j 0 = proj n := by
+  simp [frameMap]
+
+/-- `T` sends the halved right centre `1` to the right centre `P(n + e_j)`. -/
+@[simp] theorem frameMap_one (n : Label) (j : Fin 5) : frameMap n j 1 = proj (n + basis j) := by
+  simp [frameMap]
+
+/-- `T` sends the halved point `(y + 1) / 2` to the window centre `x`, for a framed state. -/
+theorem frameMap_apply_halved {y : ℂ} {n : Label} {j : Fin 5}
+    (h : 2 * (x - proj n) = dir j * (y + 1)) : frameMap n j ((y + 1) / 2) = x := by
+  rw [frameMap]
+  linear_combination -h / 2
+
+/-- `T` preserves distances: it is a rotation followed by a translation, with no reflection. -/
+@[simp] theorem dist_frameMap (n : Label) (j : Fin 5) (w w' : ℂ) :
+    dist (frameMap n j w) (frameMap n j w') = dist w w' := by
+  simp [frameMap, dist_eq_norm, ← mul_sub]
+
+/-- After `a` acts, the motion of the new state undoes the turn of the halved frame:
+`T'(ζ⁴ w) = T(w)` for `T' = frameMap n (j + 1)`. So the window centre `x` and the left centre stay
+where they are while the halved picture turns. -/
+theorem frameMap_genA (n : Label) (j : Fin 5) (w : ℂ) :
+    frameMap n (j + 1) (ζ ^ 4 * w) = frameMap n j w := by
+  rw [frameMap, frameMap, ← dir_add_one_mul_zeta_pow_four j]
+  ring
+
+/-- After `b` acts, the motion of the new state undoes the turn of the halved frame about `1`:
+`T'(1 + ζ⁴ (w - 1)) = T(w)` for `T' = frameMap (n + e_j - e_{j+1}) (j + 1)`. So the window centre
+`x` and the right centre stay where they are. -/
+theorem frameMap_genB (n : Label) (j : Fin 5) (w : ℂ) :
+    frameMap (n + basis j - basis (j + 1)) (j + 1) (1 + ζ ^ 4 * (w - 1)) = frameMap n j w := by
+  have h := dir_add_one_mul_zeta_pow_four j
+  simp only [frameMap, map_add, map_sub, proj_basis]
+  linear_combination (w - 1) * h
+
 end TDCSG.Five
 
 end
