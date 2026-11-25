@@ -145,14 +145,14 @@ chapter links and exercises playback, offscreen suspension, mobile widths and re
 
 The two frames of chapter 4 (`changeOfFrame`) are computed by `TDCSGFigures.Lift.statesFor` in
 `TDCSGFigures/Data/Frames.lean` for any squared radius in `ℚ(√5)`, starting point of `ℤ[ζ₅]` and
-word in `a`, `b`, `a⁻¹`, `b⁻¹`. `stepsHold` checks the geometry of every step exactly; the
-general statements are `TDCSG.Five.framePicture_genA_genB`, `framePicture_symm`,
-`two_mul_sub_proj_genA`, `two_mul_sub_proj_genB`, `halved_genA` and `halved_genB`. `wordReport` lists, letter by letter, whether a letter
-acts and the exact margin of its disk's centre against the window, and how far the orbit reaches
-in both frames; `wordSummary` collects what a pin states. The figure's word is pinned in
-`TDCSGFigures/Lift.lean`, other candidate words in `TDCSGTests/FrameWords.lean`, which `lake test`
-builds. `scripts/FrameWords.lean`, outside every build, searches the words in `a` and `b`
-at `r = 1.95` for words with letters that do not act and for words whose orbit closes:
+word in `a`, `b`, `a⁻¹`, `b⁻¹`. `stepsHold` checks the geometry of every step exactly; the general
+statements are `TDCSG.Five.framePicture_genA_genB`, `framePicture_symm`, `two_mul_sub_proj_genA`,
+`two_mul_sub_proj_genB`, `halved_genA` and `halved_genB`. `wordReport` lists, letter by letter,
+whether a letter acts and the exact margin of its disk's centre against the window, and how far the
+orbit reaches in both frames; `wordSummary` collects what a pin states. The figure's word is pinned
+in `TDCSGFigures/Lift.lean`, other candidate words in `TDCSGTests/FrameWords.lean`, which
+`lake test` builds. `scripts/FrameWords.lean`, outside every build, searches the words in `a` and
+`b` at `r = 1.95` for words with letters that do not act and for words whose orbit closes:
 
 ```sh
 lake env lean scripts/FrameWords.lean

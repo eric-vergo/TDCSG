@@ -41,6 +41,8 @@ labels of coordinate sum `0` and `1`, starting at `0` or `e₀`.
   reachable in the centre graph (Lemma 1 of the written proof).
 * `TDCSG.Five.two_mul_sub_proj_genA`, `TDCSG.Five.two_mul_sub_proj_genB` and their forms for a
   letter that does not act and for the inverse letters: how a letter updates the frame.
+* `TDCSG.Five.framePicture_iff`: the picture of a frame is the halved picture moved rigidly
+  exactly when the frame equation holds.
 * `TDCSG.Five.framePicture_genA_genB`, `TDCSG.Five.framePicture_symm`: before and after any
   letter, the moving-frame picture is the halved picture moved rigidly by `frameMap`.
 -/
@@ -511,7 +513,8 @@ theorem frameMap_genB_halved {y : ℂ} {n : Label} {j : Fin 5}
 /-- The moving-frame picture of the frame `(n, j)` is the halved picture of the point `y` moved
 by `frameMap n j`: the halved left centre `0`, the halved right centre `1` and the halved point
 `(y + 1) / 2` go to the left centre `P(n)`, the right centre `P(n + e_j)` and the window centre
-`x`. -/
+`x`. The first two conjuncts hold for every frame (`frameMap_zero`, `frameMap_one`); the third is
+the framing equation `2 (x - P(n)) = ζʲ (y + 1)` (`framePicture_iff`). -/
 def FramePicture (x y : ℂ) (n : Label) (j : Fin 5) : Prop :=
   frameMap n j 0 = proj n ∧ frameMap n j 1 = proj (n + basis j) ∧ frameMap n j ((y + 1) / 2) = x
 
@@ -519,6 +522,14 @@ def FramePicture (x y : ℂ) (n : Label) (j : Fin 5) : Prop :=
 theorem framePicture_of_two_mul_sub_proj {y : ℂ} {n : Label} {j : Fin 5}
     (h : 2 * (x - proj n) = dir j * (y + 1)) : FramePicture x y n j :=
   ⟨frameMap_zero n j, frameMap_one n j, frameMap_apply_halved h⟩
+
+/-- The picture of a frame is the halved picture moved rigidly exactly when the frame equation
+holds. -/
+theorem framePicture_iff {y : ℂ} {n : Label} {j : Fin 5} :
+    FramePicture x y n j ↔ 2 * (x - proj n) = dir j * (y + 1) := by
+  refine ⟨fun ⟨_, _, h⟩ => ?_, framePicture_of_two_mul_sub_proj⟩
+  rw [frameMap] at h
+  linear_combination -2 * h
 
 /-- **The two frames, before and after a generator.** For a point `y` framed by `(n, j)`, the
 moving-frame picture is the halved picture moved by `frameMap n j`, and after `a` or `b` it is the

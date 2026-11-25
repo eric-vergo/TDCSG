@@ -32,8 +32,9 @@ starting point of `ℤ[ζ₅]` and any word in `a`, `b`, `a⁻¹`, `b⁻¹`.
   `(r/2)² - |P - x|²` of the centre of its disk against the window, with decimals for reading;
   `wordExtent`: how far the orbit reaches in either frame, and whether it closes.
 
-`wordSummary` collects, from one computation of the states, what the pins of a word state: the
-figure's word is pinned in `TDCSGFigures.Lift`, other words in `TDCSGTests.FrameWords`.
+`wordSummary` collects in one record what the pins of a word state, so that each pin decides one
+equality: the figure's word is pinned in `TDCSGFigures.Lift`, other words in
+`TDCSGTests.FrameWords`.
 -/
 
 namespace TDCSGFigures.Lift
@@ -307,8 +308,8 @@ structure WordSummary where
   centreSq : QSqrt5
   deriving DecidableEq
 
-/-- The summary of `w` applied to `z` at squared radius `r2`, from one computation of the states:
-it equals `⟨idlePositions r2 w z, stepsHold r2 w z, closes r2 w z, (wordExtent r2 w z).halvedSq,
+/-- The summary of `w` applied to `z` at squared radius `r2`, as one record; by its definition it
+equals `⟨idlePositions r2 w z, stepsHold r2 w z, closes r2 w z, (wordExtent r2 w z).halvedSq,
 (wordExtent r2 w z).centreSq⟩`. -/
 def wordSummary (r2 : QSqrt5) (w : List Letter) (z : Zeta5 := origin) : WordSummary :=
   let ss := statesFor r2 w z
