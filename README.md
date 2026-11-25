@@ -56,8 +56,7 @@ The final command makes two changes to the challenge, each in its own disposable
 
 ## Building
 
-The project uses Lean `v4.35.0` (see `lean-toolchain`) and Mathlib at revision
-`56a005855ea17e0b0958f73ec801ae140b0a1679` (see `lakefile.toml`). With
+The project uses Lean `v4.36.0` (see `lean-toolchain`) and Mathlib `v4.36.0` (see `lakefile.toml`). With
 [elan](https://github.com/leanprover/elan) installed:
 
 ```sh

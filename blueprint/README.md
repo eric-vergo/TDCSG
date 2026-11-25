@@ -153,7 +153,7 @@ worktree's copy, so several worktrees can build at the same time without sharing
 git worktree add -b figure-NAME ../TDCSG-wt-NAME figures
 cd ../TDCSG-wt-NAME
 mkdir -p .lake/packages
-cp -cR /Users/eric/Github/TDCSG/.lake/packages/pilean .lake/packages/pilean
+cp -cR ../TDCSG/.lake/packages/pilean .lake/packages/pilean   # from the main checkout
 cd figures
 lake build                                       # TDCSGCompute and TDCSGFigures
 lake exe tdcsg-figure-preview --out out NAME     # every figure when no NAME is given
@@ -168,12 +168,14 @@ the page `TDCSGFigureTheorems`, which needs Verso, and `lake build TDCSGBlueprin
 
 ## Dependencies
 
-The repository pins the fork, PILean (`pilean`, and its Verso and LeAnTeX adapters
-`pilean-verso` and `pilean-leantex`, all at one PILean commit), Mathlib and their dependencies in
-`lake-manifest.json`. The fork requires the same PILean commit; the root requires `pilean` as
-well because `TDCSGFigures` imports PILean directly. Keep
-Mathlib's shared package revisions when updating the documentation dependencies: update the
-PILean packages alone with `lake update pilean pilean-verso pilean-leantex`.
+The repository pins the fork of Verso Blueprint, the forks of Verso and SubVerso it builds on,
+PILean (`pilean`, and its Verso and LeAnTeX adapters `pilean-verso` and `pilean-leantex`, all at
+one PILean commit), Mathlib and their dependencies in `lakefile.toml` and `lake-manifest.json`.
+Verso, SubVerso and PILean are pinned at the commits the fork itself pins; the root requires
+Verso and SubVerso before the fork so that the workspace uses these revisions, `pilean` because
+`TDCSGFigures` imports PILean directly, and Mathlib last so that its revisions of the packages it
+shares with the fork (ProofWidgets, Plausible) win. When moving the fork, move these pins with it,
+one package at a time, and keep Mathlib's shared package revisions.
 
 GitHub Actions supplies `verification.json` after its Linux comparator run succeeds. A local
 render remains usable without that file. See the
