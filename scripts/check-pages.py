@@ -39,6 +39,10 @@ unpinned_repository_links = {
     f"https://github.com/{repository}/actions",
 }
 linked_declarations = set()
+# Declarations attached to a proof: the side-by-side layout lists them, with their status, in the
+# popover of the node's Lean chip ("Attached to the proof") rather than in a panel of their own.
+proof_declarations = set()
+attached_to_proof = set()
 source_links = set()
 repository_links = set()
 verification_urls = set()
@@ -175,7 +179,11 @@ class Resources(HTMLParser):
         if tag == "base" and attrs.get("href"):
             self.base = urljoin(self.base, attrs["href"])
             return
-        linked_declarations.update(attrs.get("data-lean-decls", "").split())
+        decls = attrs.get("data-lean-decls", "").split()
+        if attrs.get("data-bp-facet") == "proof":
+            proof_declarations.update(decls)
+        else:
+            linked_declarations.update(decls)
         for key in ("src", "href"):
             value = attrs.get(key)
             if not value or value.startswith("#"):
@@ -258,9 +266,18 @@ def check_repository_links(commit, run_id):
     assert not failures, "\n".join(failures)
 
 
+attached_list = re.compile(r'<span class="bp_code_hover_label">Attached to the proof</span>'
+                           r'<ul class="bp_code_hover_list">(.*?)</ul>', re.S)
 for page in pages:
     page_url = origin + prefix + page.relative_to(site).as_posix()
-    Resources(page_url).feed(page.read_text())
+    text = page.read_text()
+    Resources(page_url).feed(text)
+    for items in attached_list.findall(text):
+        attached_to_proof.update(re.findall(r'<span class="bp_code_decl_name"><code>([^<]+)</code>',
+                                            items))
+
+missing = proof_declarations - linked_declarations - attached_to_proof
+assert not missing, f"declarations of a proof listed nowhere: {sorted(missing)}"
 
 for decl in ("FiveDisk.finite_iff",):
     assert decl in linked_declarations, f"Missing theorem panel for {decl}"
