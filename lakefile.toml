@@ -32,7 +32,7 @@ rev = "94cea086b880f61f5b3847d30151b8e5f80e1259"
 [[require]]
 name = "VersoBlueprint"
 git = "https://github.com/eric-vergo/verso-blueprint.git"
-rev = "bc798def4e11d32e6921af79f17468608142e271"
+rev = "02159cd8cb5b69babf94817cdeabb93064d6f0e1"
 
 # PILean draws the figures; the Verso adapter puts them in the site, the LeAnTeX adapter typesets
 # their labels. The figures library imports PILean directly, so `pilean` is required here rather

@@ -84,7 +84,7 @@ number := false
 
 Verso and the cited Verso Blueprint modules credit Lean FRO LLC and their respective
 authors under the [Apache License 2.0](/Apache-2.0.txt). The
-[Blueprint source](https://github.com/eric-vergo/verso-blueprint/tree/d4984e261d0a4cb0a984c41b3b98625fae27e8aa)
+[Blueprint source](https://github.com/eric-vergo/verso-blueprint/tree/02159cd8cb5b69babf94817cdeabb93064d6f0e1)
 includes the individual file credits. PILean draws the figures. LeAnTeX
 typesets the formulas with glyph outlines from Antonis Tsolomitis’s New Computer Modern.
 The selected fonts carry the GUST Font License. See the
