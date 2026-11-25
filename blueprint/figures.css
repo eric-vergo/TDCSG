@@ -29,6 +29,13 @@
   overflow-wrap: anywhere;
 }
 
+/* The figures' own pages are titled with their declarations' names; in the list of those pages
+   and in the page navigation such a name breaks rather than widen a narrow screen. */
+main ol.section-toc li,
+main .prev-next-buttons .where {
+  overflow-wrap: anywhere;
+}
+
 /* The reading pages share the classic edition's paper, serif text and ruled figure plates. */
 html {
   --td-paper: #faf8f3;
