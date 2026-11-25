@@ -930,7 +930,7 @@ after `0, 1, 2, 3, 4` of the letters `a, b, a, b` applied to `z = 0` at `r = 1.9
 `frame k` with the caption `stepCaption k`. The states are computed exactly: the points
 `y₀ = 0, y₁, …, y₄` of `ℤ[ζ₅]`, the labels `n` of the current left centre
 `0, 0, e₁ - e₂, e₁ - e₂, e₁ - e₂ + e₃ - e₄` and the direction indices `j = 0, 1, 2, 3, 4`; every
-letter acts (the exact disk test of `inLeft` or `inRight` holds), and every state satisfies the
+letter acts (the exact disk test `Early.Letter.covers` holds), and every state satisfies the
 framing equation `2 (x - P(n)) = ζʲ (y + 1)` of `TDCSG.Five.Framed` exactly. The current left and
 right centres `P(n)` and `P(n + eⱼ)` drawn in the moving frame lie in the window in every state,
 as the chapter's invariant requires of an acting letter's centre. Not stated: the items of each
@@ -939,7 +939,7 @@ theorem changeOfFrame_spec :
     changeOfFrame = Plane.stepper frames ∧
     frames = (List.range 5).toArray.map (fun k =>
       (stepCaption k (states.getD k ⟨origin, zeroLabel, 0, true⟩), frame k)) ∧
-    word = ['a', 'b', 'a', 'b'] ∧
+    word = [.a, .b, .a, .b] ∧
     (states.map (·.n) == [#[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 1, -1, 0, 0],
       #[0, 1, -1, 0, 0], #[0, 1, -1, 1, -1]]) = true ∧
     states.map (·.j) = [0, 1, 2, 3, 4] ∧

@@ -22,7 +22,8 @@ import TDCSGFigures.ProofDiagrams
 
 Every figure of the site is the value of a declaration with the attribute `@[figure]`, drawn by
 PILean from exact data (`TDCSGFigures.Data`, `TDCSGFigures.Data.Early`,
-`TDCSGFigures.Data.PartTwo`) in the house style (`TDCSGFigures.Style`), organized by chapter:
+`TDCSGFigures.Data.PartTwo`, `TDCSGFigures.Data.Frames`) in the house style
+(`TDCSGFigures.Style`), organized by chapter:
 `TDCSGFigures.Front` for the front page, `TDCSGFigures.Compound` and `TDCSGFigures.TwoDisks` for
 chapters 1 and 2, `TDCSGFigures.Parts` for the two part dividers, `TDCSGFigures.Chord` for
 chapter 3, `TDCSGFigures.Lift`, `TDCSGFigures.Lens`, `TDCSGFigures.Levels` and

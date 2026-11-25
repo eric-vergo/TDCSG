@@ -3,7 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo, Claude Fable 5.2
 -/
 import PILean.Trust.Attr
-import TDCSGFigures.Data.PartTwo
+import TDCSGFigures.Data.Frames
 import TDCSGFigures.Style
 
 /-!
@@ -16,8 +16,8 @@ import TDCSGFigures.Style
   `r = 1.95`. Each step shows, side by side, the two disks in the halved starting frame
   `w ↦ (w + 1)/2` (centres `0` and `1`, radius `r/2`, the point `(y + 1)/2` moving) and the moving
   frame of the chapter's proof (the window about `x = 1/2` fixed, the left and right centres
-  `P(n)` and `P(n + eⱼ)` moving by unit steps). The framing equation `2 (x - P(n)) = ζʲ (y + 1)`
-  of `TDCSG.Five.Framed` holds exactly at every step (`changeOfFrame_spec`).
+  `P(n)` and `P(n + eⱼ)` moving by unit steps), the states being `statesFor radiusSq word`. The
+  framing equation `2 (x - P(n)) = ζʲ (y + 1)` of `TDCSG.Five.Framed` holds (`changeOfFrame_spec`).
 -/
 
 namespace TDCSGFigures.Lift
@@ -125,51 +125,21 @@ def unitSteps : Plane.Figure where
 /-! ### The change of frame -/
 
 /-- The letters applied to `z = 0`, in order. -/
-def word : List Char := ['a', 'b', 'a', 'b']
+def word : List Early.Letter := [.a, .b, .a, .b]
 
-/-- The left disk `|w + 1| ≤ r` holds `y`: `|y + 1|² ≤ r²`, exactly. -/
-def inLeft (y : Zeta5) : Bool := QSqrt.le (y + Zeta5.ofInt 1).normSq radiusSq
-
-/-- The right disk `|w - 1| ≤ r` holds `y`. -/
-def inRight (y : Zeta5) : Bool := QSqrt.le (y - Zeta5.ofInt 1).normSq radiusSq
-
-/-- One state of the orbit: the point `y`, its framing label `n` and direction `j`, and whether the
-letter that led to it acted. -/
-structure State where
-  /-- The point. -/
-  y : Zeta5
-  /-- The framing label, of weight zero: the current left centre. -/
-  n : Label
-  /-- The direction index: the current right centre is `n + eⱼ`. -/
-  j : Nat
-  /-- Whether the letter that led here acted (`true` at the start). -/
-  acted : Bool := true
-
-/-- The letter `c` applied to a state, as `TDCSG.Five.Framed.genA` and `genB` update the frame:
-`a` turns `y` clockwise by `2π/5` about `-1` when `y` is in the left disk and raises `j`; `b` turns
-it about `1` when it is in the right disk, raises `j` and moves the left centre to
-`n + eⱼ - eⱼ₊₁`. -/
-def State.apply (s : State) (c : Char) : State :=
-  if c == 'a' then
-    if inLeft s.y then
-      { y := (s.y + Zeta5.ofInt 1) * zeta 4 - Zeta5.ofInt 1, n := s.n, j := (s.j + 1) % 5 }
-    else { s with acted := false }
-  else
-    if inRight s.y then
-      { y := (s.y - Zeta5.ofInt 1) * zeta 4 + Zeta5.ofInt 1,
-        n := shift (shift s.n s.j 1) ((s.j + 1) % 5) (-1), j := (s.j + 1) % 5 }
-    else { s with acted := false }
+/-- The letter `l` applied to a state at `r = 1.95` (`State.applyAt`). -/
+def State.apply (s : State) (l : Early.Letter) : State := s.applyAt radiusSq l
 
 /-- The states after `0, 1, …, 4` letters, starting from `y = 0`, `n = 0`, `j = 0`
 (`TDCSG.Five.framed_self`). -/
-def states : List State :=
-  word.foldl (fun acc c => acc ++ [(acc.getLast?.getD ⟨origin, zeroLabel, 0, true⟩).apply c])
-    [⟨origin, zeroLabel, 0, true⟩]
+def states : List State := statesFor radiusSq word
 
 /-- The framing equation `2 (x - P(n)) = ζʲ (y + 1)` at `x = 1/2`, that is
-`1 - 2 P(n) = ζʲ (y + 1)`, checked exactly in `ℤ[ζ₅]`. -/
-def State.framed (s : State) : Bool :=
-  Zeta5.ofInt 1 - Zeta5.ofInt 2 * proj s.n == zeta s.j * (s.y + Zeta5.ofInt 1)
+`1 - 2 P(n) = ζʲ (y + 1)`, checked exactly in `ℤ[ζ₅]` (`State.framedFrom`). -/
+def State.framed (s : State) : Bool := s.framedFrom origin
+
+-- The squared radius of the words of `TDCSGFigures.Data.Frames` is this figure's.
+#guard radiusSq == wordRadiusSq
 
 /-- The rational shift of the moving frame's picture to the right of the halved frame's. -/
 def shiftX : Rat := 3
@@ -202,10 +172,10 @@ def labelText (n : Label) : String :=
 def stepCaption (k : Nat) (s : State) : String :=
   if k == 0 then "the start: y = z = 0, n = 0, j = 0"
   else
-    let c := (word.getD (k - 1) 'a')
-    let centre := if c == 'a' then "−1" else "+1"
-    if s.acted then s!"{c} turns y about {centre}: n = {labelText s.n}, j = {s.j}"
-    else s!"{c} does not act"
+    let c := word.getD (k - 1) .a
+    let centre := if c.centre == leftCentre then "−1" else "+1"
+    if s.acted then s!"{c.text} turns y about {centre}: n = {labelText s.n}, j = {s.j}"
+    else s!"{c.text} does not act"
 
 /-- The halved disks: the closed disk of radius `r/2` about `0` (the left disk, halved) and about
 `1` (the right disk, halved), outlined. -/
