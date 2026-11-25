@@ -49,10 +49,10 @@ def leftCenter : ℂ := -1
 def rightCenter : ℂ := 1
 
 /-- The closed left disk of radius `r`, centred at `-1`. -/
-def leftDisk (r : ℝ) : Set ℂ := closedBall leftCenter r
+noncomputable def leftDisk (r : ℝ) : Set ℂ := closedBall leftCenter r
 
 /-- The closed right disk of radius `r`, centred at `1`. -/
-def rightDisk (r : ℝ) : Set ℂ := closedBall rightCenter r
+noncomputable def rightDisk (r : ℝ) : Set ℂ := closedBall rightCenter r
 
 /-- The rotation of `ℂ` by the angle `-2π / n` about the point `c`. -/
 noncomputable def rotation (n : ℕ) (c z : ℂ) : ℂ :=

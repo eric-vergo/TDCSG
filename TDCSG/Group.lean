@@ -162,7 +162,7 @@ def orbit (n₁ n₂ : ℕ) (r₁ r₂ : ℝ) (p : ℂ) : Set ℂ :=
   {y | ∃ g ∈ GG n₁ n₂ r₁ r₂, g p = y}
 
 /-- The union of the closed left disk of radius `r₁` and the closed right disk of radius `r₂`. -/
-def diskUnion (r₁ r₂ : ℝ) : Set ℂ := leftDisk r₁ ∪ rightDisk r₂
+noncomputable def diskUnion (r₁ r₂ : ℝ) : Set ℂ := leftDisk r₁ ∪ rightDisk r₂
 
 /-- Some point of `S` lies on one of the two boundary circles of radius `r`. -/
 def TouchesBoundary (S : Set ℂ) (r : ℝ) : Prop :=

@@ -39,7 +39,7 @@ namespace TDCSG
 /-- The group is finitely generated, by `permA` and `permB`. -/
 instance (n₁ n₂ : ℕ) (r₁ r₂ : ℝ) : Group.FG (GG n₁ n₂ r₁ r₂) := by
   rw [GG_eq_closure]
-  exact Group.closure_finite_fg _
+  infer_instance
 
 /-- `TDCSG.orbit` is the orbit of the action of the subgroup `TDCSG.GG` on `ℂ`. -/
 theorem mulAction_orbit_eq (n₁ n₂ : ℕ) (r₁ r₂ : ℝ) (p : ℂ) :
