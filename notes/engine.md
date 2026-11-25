@@ -100,7 +100,7 @@ with exact decisions, signs of (√2 − 1)^k up to k = 80, which need about 100
 
 ```sh
 lake build tdcsg-orbit          # also built by `lake build`
-lake test                       # runs `tdcsg-orbit --selftest`
+lake test                       # the self-tests of `tdcsg-orbit --selftest`, through `tdcsg-test`
 .lake/build/bin/tdcsg-orbit orbit -n 5 --r2 closed-1/100 --cap 10000000
 .lake/build/bin/tdcsg-orbit orbit -n 33 --r2 touch+1/10000 --format lines
 .lake/build/bin/tdcsg-orbit thresholds -n 12 --cap 1000000 --upto closed --rc closed --unit fund

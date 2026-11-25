@@ -2,8 +2,7 @@ name = "TDCSG"
 version = "0.1.0"
 keywords = ["math"]
 defaultTargets = ["TDCSG", "tdcsg-orbit", "ComparatorSolution"]
-testDriver = "«tdcsg-orbit»"
-testDriverArgs = ["--selftest"]
+testDriver = "«tdcsg-test»"
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -88,6 +87,16 @@ name = "TDCSGFigures"
 [[lean_exe]]
 name = "tdcsg-figure-preview"
 root = "TDCSGFigures.Preview"
+
+# The test driver of `lake test`: the self-tests of the orbit engine, and kernel-checked pins of
+# words for the figures that neither the figures library nor the blueprint builds.
+[[lean_lib]]
+name = "TDCSGTests"
+roots = ["TDCSGTests.FrameWords"]
+
+[[lean_exe]]
+name = "tdcsg-test"
+root = "TDCSGTests.Main"
 
 # The blueprint's page of the figures' theorems. It sits at the repository root so that the
 # source links of the theorems, which PILean derives from module names, name the right file.

@@ -62,14 +62,15 @@ The project uses Lean `v4.36.0` (see `lean-toolchain`) and Mathlib `v4.36.0` (se
 ```sh
 bash scripts/get-mathlib-cache.sh   # fetch the imported Mathlib modules and their dependencies
 lake build
-lake test            # self-test of the orbit engine
+lake test            # self-test of the orbit engine, pins of the figures' words
 .lake/build/bin/tdcsg-orbit orbit -n 5 --r2 closed-1/100   # an exact orbit computation
 ```
 
-`lake build` builds the proof library and the engine; `lake test` runs the engine's self-test
-(known finite cases, rows of the certificate tables, tangency and cap cases, tampered
-certificates). The commands that generate and check certificates, and the caps the large runs
-need, are in [`notes/certificates.md`](notes/certificates.md) and
+`lake build` builds the proof library and the engine; `lake test` runs the engine's self-test (known
+finite cases, rows of the certificate tables, tangency and cap cases, tampered certificates) and
+kernel-checks the pins of `TDCSGTests` (words for the figures of chapter 4). The commands that
+generate and check certificates, and the caps the large runs need, are in
+[`notes/certificates.md`](notes/certificates.md) and
 [`notes/relative-certificates.md`](notes/relative-certificates.md).
 
 ## Results
