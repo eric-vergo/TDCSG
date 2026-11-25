@@ -25,14 +25,15 @@ starting point of `ℤ[ζ₅]` and any word in `a`, `b`, `a⁻¹`, `b⁻¹`.
 * `State.framedFrom`: the framing equation `2 (x - P(n)) = ζʲ (y + 1)`, as
   `(z + 1) - 2 P(n) = ζʲ (y + 1)` in `ℤ[ζ₅]`.
 * `State.stepHolds`: the geometry of one step, checked exactly in `ℤ[ζ₅]` (the general
-  statements are `TDCSG.Five.proj_turn_genA`, `TDCSG.Five.proj_turn_genB`,
-  `TDCSG.Five.halved_genA`, `TDCSG.Five.halved_genB` and `TDCSG.Five.frameMap_apply_halved`).
+  statements are `TDCSG.Five.framePicture_genA_genB`, `TDCSG.Five.framePicture_symm`,
+  `TDCSG.Five.two_mul_sub_proj_genA`, `TDCSG.Five.two_mul_sub_proj_genB` and their forms for
+  the inverses and for a letter that does not act, `TDCSG.Five.halved_genA`, `halved_genB`).
 * `stepReports`, `wordReport`: for each letter of a word, whether it acts and the exact margin
   `(r/2)² - |P - x|²` of the centre of its disk against the window, with decimals for reading;
   `wordExtent`: how far the orbit reaches in either frame, and whether it closes.
 
-The theorems at the end pin the act and idle patterns of the words the figures of chapter 4 use or
-may use, by `decide +kernel`.
+`wordSummary` collects, from one computation of the states, what the pins of a word state: the
+figure's word is pinned in `TDCSGFigures.Lift`, other words in `TDCSGTests.FrameWords`.
 -/
 
 namespace TDCSGFigures.Lift
@@ -146,26 +147,39 @@ def State.stepHolds (r2 : QSqrt5) (z : Zeta5) (l : Letter) (s : State) : Bool :=
   acts == inWindowFrom r2 z m && (s.y - l.centre).normSq == windowDistSq4 z m && geometry &&
     s.framedFrom z && t.framedFrom z
 
+/-- Whether every step of `w` has the geometry of `State.stepHolds`, for the states `ss` of `w`
+from `z` at squared radius `r2`. -/
+def stepsHoldOf (r2 : QSqrt5) (z : Zeta5) (w : List Letter) (ss : List State) : Bool :=
+  (w.zip ss).all fun (l, s) => s.stepHolds r2 z l
+
 /-- Whether every step of `w` from `z` at squared radius `r2` has the geometry of
 `State.stepHolds`. -/
 def stepsHold (r2 : QSqrt5) (w : List Letter) (z : Zeta5 := origin) : Bool :=
-  (w.zip (statesFor r2 w z)).all fun (l, s) => s.stepHolds r2 z l
+  stepsHoldOf r2 z w (statesFor r2 w z)
 
 /-- The letters of `w` that act from `z` at squared radius `r2`, in order. -/
 def actPattern (r2 : QSqrt5) (w : List Letter) (z : Zeta5 := origin) : List Bool :=
   (statesFor r2 w z).tail.map (·.acted)
 
+/-- The positions (from `1`) of the letters that do not act, read from the states of a word. -/
+def idleOf (ss : List State) : List Nat :=
+  ((ss.tail.map (·.acted)).zipIdx 1).filterMap fun (b, k) => if b then none else some k
+
 /-- The positions (from `1`) of the letters of `w` that do not act. -/
 def idlePositions (r2 : QSqrt5) (w : List Letter) (z : Zeta5 := origin) : List Nat :=
-  ((actPattern r2 w z).zipIdx 1).filterMap fun (b, k) => if b then none else some k
+  idleOf (statesFor r2 w z)
 
-/-- Whether the orbit returns to its start: the last state has the label, the direction index
-(modulo `5`) and the point of the first, so both frames show the starting picture again. -/
-def closes (r2 : QSqrt5) (w : List Letter) (z : Zeta5 := origin) : Bool :=
-  let ss := statesFor r2 w z
+/-- Whether the last of the states `ss` has the label, the direction index (modulo `5`) and the
+point of the first, so both frames show the starting picture again. -/
+def closesOf (ss : List State) : Bool :=
   match ss.head?, ss.getLast? with
   | some s, some t => t.y == s.y && t.n == s.n && t.j % 5 == s.j % 5
   | _, _ => false
+
+/-- Whether the orbit of `z` under `w` at squared radius `r2` returns to its start
+(`closesOf`). -/
+def closes (r2 : QSqrt5) (w : List Letter) (z : Zeta5 := origin) : Bool :=
+  closesOf (statesFor r2 w z)
 
 /-! ### Reports for choosing words -/
 
@@ -237,13 +251,16 @@ structure Extent where
 /-- The larger of two numbers of `ℚ(√5)`, exact. -/
 def qMax (p q : QSqrt5) : QSqrt5 := if QSqrt.lt p q then q else p
 
-/-- The extent of the orbit of `z` under `w` at squared radius `r2`. -/
-def wordExtent (r2 : QSqrt5) (w : List Letter) (z : Zeta5 := origin) : Extent :=
-  let ss := statesFor r2 w z
+/-- The extent of the states `ss` of an orbit of `z`. -/
+def extentOf (z : Zeta5) (ss : List State) : Extent :=
   { halvedSq := ss.foldl (fun m s => qMax m ((s.y + Zeta5.ofInt 1).normSq * rat (1 / 4))) (rat 0)
     centreSq := ss.foldl (fun m s => qMax (qMax m (windowDistSq4 z s.n * rat (1 / 4)))
       (windowDistSq4 z s.rightLabel * rat (1 / 4))) (rat 0)
-    closed := closes r2 w z }
+    closed := closesOf ss }
+
+/-- The extent of the orbit of `z` under `w` at squared radius `r2`. -/
+def wordExtent (r2 : QSqrt5) (w : List Letter) (z : Zeta5 := origin) : Extent :=
+  extentOf z (statesFor r2 w z)
 
 /-- The word as text, `a b a⁻¹ …`. -/
 def wordText (w : List Letter) : String := " ".intercalate (w.map Letter.text)
@@ -272,79 +289,31 @@ def inverseWord (w : List Letter) : List Letter :=
   w.reverse.map fun
     | .a => .aInv | .aInv => .a | .b => .bInv | .bInv => .b
 
-/-! ### The words of chapter 4
+/-! ### One summary per word -/
 
-At `r = 1.95` from `z = 0` (`x = 1/2`), checked by `decide +kernel`: which letters act, the
-geometry of every step (`stepsHold`), whether the orbit closes, and how far it reaches in both
-frames (`wordExtent`, squared). -/
+/-- What the pins of a word state: the idle positions, whether every step has the geometry of
+`State.stepHolds`, whether the orbit closes, and its squared extents in both frames
+(`wordExtent`). -/
+structure WordSummary where
+  /-- The positions (from `1`) of the letters that do not act. -/
+  idle : List Nat
+  /-- Whether every step has the geometry of `State.stepHolds`. -/
+  stepsHold : Bool
+  /-- Whether the orbit returns to its start. -/
+  closes : Bool
+  /-- The largest `|(y + 1)/2|²`. -/
+  halvedSq : QSqrt5
+  /-- The largest `|P - x|²` of a left or right centre. -/
+  centreSq : QSqrt5
+  deriving DecidableEq
 
-/-- `r² = 1.95²`, the squared radius of the figures of chapter 4 (`TDCSGFigures.Lift.radiusSq`). -/
-def wordRadiusSq : QSqrt5 := rat (39 / 20 * (39 / 20))
-
-/-- `a b a b`: every letter acts; the orbit does not close; it reaches `|(y + 1)/2|² = 21/4 - 2√5`
-(about `0.88²`) and `|P - x|² = 3/2 - √5/4` (about `0.97²`). -/
-theorem frames_abab :
-    actPattern wordRadiusSq [.a, .b, .a, .b] = [true, true, true, true] ∧
-    stepsHold wordRadiusSq [.a, .b, .a, .b] = true ∧
-    closes wordRadiusSq [.a, .b, .a, .b] = false ∧
-    (wordExtent wordRadiusSq [.a, .b, .a, .b]).halvedSq = ⟨21 / 4, -2⟩ ∧
-    (wordExtent wordRadiusSq [.a, .b, .a, .b]).centreSq = ⟨3 / 2, -1 / 4⟩ := by
-  decide +kernel
-
-/-- `a a b a b a a b b a b b`: the letters `3`, `5` and `10` do not act, the others do; the orbit
-does not close; it reaches `|(y + 1)/2|² = |P - x|² = 3/2 + √5/4` (about `1.43²`), the squared
-distance of each idle letter's centre from `x`. -/
-theorem frames_aababaabbabb :
-    idlePositions wordRadiusSq [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b] = [3, 5, 10] ∧
-    stepsHold wordRadiusSq [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b] = true ∧
-    closes wordRadiusSq [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b] = false ∧
-    (wordExtent wordRadiusSq [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b]).halvedSq =
-      ⟨3 / 2, 1 / 4⟩ ∧
-    (wordExtent wordRadiusSq [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b]).centreSq =
-      ⟨3 / 2, 1 / 4⟩ := by
-  decide +kernel
-
-/-- `a b a b b a b`, `a b a b` continued: only the letter `6` does not act; the orbit does not
-close; it reaches `|(y + 1)/2|² = |P - x|² = 11/4 - √5/2` (about `1.28²`). -/
-theorem frames_ababbab :
-    idlePositions wordRadiusSq [.a, .b, .a, .b, .b, .a, .b] = [6] ∧
-    stepsHold wordRadiusSq [.a, .b, .a, .b, .b, .a, .b] = true ∧
-    closes wordRadiusSq [.a, .b, .a, .b, .b, .a, .b] = false ∧
-    (wordExtent wordRadiusSq [.a, .b, .a, .b, .b, .a, .b]).halvedSq = ⟨11 / 4, -1 / 2⟩ ∧
-    (wordExtent wordRadiusSq [.a, .b, .a, .b, .b, .a, .b]).centreSq = ⟨11 / 4, -1 / 2⟩ := by
-  decide +kernel
-
-/-- `a a b a a a`: only the letter `3` does not act, and the orbit closes: the five acting `a`
-turn the right centre once around the left centre `0`. It reaches `|(y + 1)/2|² = 1/4` and
-`|P - x|² = 3/2 + √5/4`. -/
-theorem frames_aabaaa :
-    idlePositions wordRadiusSq [.a, .a, .b, .a, .a, .a] = [3] ∧
-    stepsHold wordRadiusSq [.a, .a, .b, .a, .a, .a] = true ∧
-    closes wordRadiusSq [.a, .a, .b, .a, .a, .a] = true ∧
-    (wordExtent wordRadiusSq [.a, .a, .b, .a, .a, .a]).halvedSq = ⟨1 / 4, 0⟩ ∧
-    (wordExtent wordRadiusSq [.a, .a, .b, .a, .a, .a]).centreSq = ⟨3 / 2, 1 / 4⟩ := by
-  decide +kernel
-
-/-- `a a b a a a b b b b b`: only the letter `3` does not act, both `a` and `b` act, and the orbit
-closes; it reaches `|(y + 1)/2|² = |P - x|² = 3/2 + √5/4`. -/
-theorem frames_aabaaabbbbb :
-    idlePositions wordRadiusSq [.a, .a, .b, .a, .a, .a, .b, .b, .b, .b, .b] = [3] ∧
-    stepsHold wordRadiusSq [.a, .a, .b, .a, .a, .a, .b, .b, .b, .b, .b] = true ∧
-    closes wordRadiusSq [.a, .a, .b, .a, .a, .a, .b, .b, .b, .b, .b] = true ∧
-    (wordExtent wordRadiusSq [.a, .a, .b, .a, .a, .a, .b, .b, .b, .b, .b]).halvedSq =
-      ⟨3 / 2, 1 / 4⟩ ∧
-    (wordExtent wordRadiusSq [.a, .a, .b, .a, .a, .a, .b, .b, .b, .b, .b]).centreSq =
-      ⟨3 / 2, 1 / 4⟩ := by
-  decide +kernel
-
-/-- The inverse letters follow their frame rule: every step of a word followed by its inverse has
-the geometry of `stepsHold`, and the orbit returns to its start, for the twelve-letter word with
-three idle letters. -/
-theorem frames_inverse :
-    stepsHold wordRadiusSq ([.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b] ++
-      inverseWord [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b]) = true ∧
-    closes wordRadiusSq ([.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b] ++
-      inverseWord [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b]) = true := by
-  decide +kernel
+/-- The summary of `w` applied to `z` at squared radius `r2`, from one computation of the states:
+it equals `⟨idlePositions r2 w z, stepsHold r2 w z, closes r2 w z, (wordExtent r2 w z).halvedSq,
+(wordExtent r2 w z).centreSq⟩`. -/
+def wordSummary (r2 : QSqrt5) (w : List Letter) (z : Zeta5 := origin) : WordSummary :=
+  let ss := statesFor r2 w z
+  let e := extentOf z ss
+  { idle := idleOf ss, stepsHold := stepsHoldOf r2 z w ss, closes := e.closed,
+    halvedSq := e.halvedSq, centreSq := e.centreSq }
 
 end TDCSGFigures.Lift

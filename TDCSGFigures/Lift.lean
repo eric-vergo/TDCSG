@@ -138,8 +138,12 @@ def states : List State := statesFor radiusSq word
 `1 - 2 P(n) = ζʲ (y + 1)`, checked exactly in `ℤ[ζ₅]` (`State.framedFrom`). -/
 def State.framed (s : State) : Bool := s.framedFrom origin
 
--- The squared radius of the words of `TDCSGFigures.Data.Frames` is this figure's.
-#guard radiusSq == wordRadiusSq
+/-- The word of `changeOfFrame` at `r = 1.95` from `z = 0`: every letter acts, every step has the
+geometry of `State.stepHolds`, the orbit does not close, and it reaches
+`|(y + 1)/2|² = 21/4 - 2√5` (about `0.88²`) and `|P - x|² = 3/2 - √5/4` (about `0.97²`). -/
+theorem wordSummary_word :
+    wordSummary radiusSq word = ⟨[], true, false, ⟨21 / 4, -2⟩, ⟨3 / 2, -1 / 4⟩⟩ := by
+  decide +kernel
 
 /-- The rational shift of the moving frame's picture to the right of the halved frame's. -/
 def shiftX : Rat := 3
