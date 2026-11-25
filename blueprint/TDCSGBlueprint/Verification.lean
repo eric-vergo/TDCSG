@@ -2,11 +2,11 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo, OpenAI GPT-6.2 Astra, Claude
 -/
+import VersoManual
 import VersoBlueprint
-import TDCSGBlueprint.RepoFile
 import Comparator.Solution
 
-open Verso.Genre Verso.Genre.Manual Informal TDCSGBlueprint
+open Verso.Genre Verso.Genre.Manual Informal
 
 #doc (Manual) "Verification" =>
 

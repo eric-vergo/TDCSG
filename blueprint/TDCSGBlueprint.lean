@@ -4,7 +4,6 @@ Authors: Eric Vergo, OpenAI GPT-6.2 Astra, Claude
 -/
 import VersoManual
 import VersoBlueprint
-import TDCSGBlueprint.RepoFile
 import VersoBlueprint.Commands.Graph
 import VersoBlueprint.Commands.Summary
 import PILeanVerso
@@ -23,7 +22,7 @@ import TDCSGBlueprint.OtherOrders
 import TDCSGBlueprint.Verification
 import TDCSGFigureTheorems
 
-open Verso.Genre Verso.Genre.Manual Informal PILeanVerso TDCSGBlueprint
+open Verso.Genre Verso.Genre.Manual Informal PILeanVerso
 
 #doc (Manual) "The critical radius of fivefold disk rotations" =>
 
