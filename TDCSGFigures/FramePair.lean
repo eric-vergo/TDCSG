@@ -46,6 +46,13 @@ and vanishes before the next letter moves.
 disk (left panel) and of its riding disk (right panel). It is an actor of its own, shown only in
 the key with the mark, so nothing turns while it is shown.
 
+**Options.** With `pivotMark`, the centre of each turn is marked by a solid ring in both panels
+(the centre of the letter's halved disk on the left, the centre that stays on the right): it
+appears in a key of its own before the turn, stays through the turn and gives way to the next
+mark, and `FramePairConfig.pivotsPlaced` checks exactly that it lies where the declared turn
+turns. With `faintDisks`, the riding disks of the right panel are drawn faint. Both are off on
+the site.
+
 **Views.** One view for all keys of a panel, both panels at one unit length, side by side in twice
 the width of one panel, each cropped to its own extent and a legend above it. Each panel's height
 is its own, so a narrow, stacked rendition has no empty band.
@@ -79,14 +86,25 @@ structure FramePairConfig where
   /-- Whether the word is written under the left panel with the current letter marked (an option,
   off on the site; `TDCSGFigures.WordStrip`). -/
   strip : Bool := false
+  /-- Whether the centre of each turn is marked in both panels (an option, off on the site): a
+  solid ring about the centre of the letter's disk, which appears in a key of its own before the
+  turn, stays through it and gives way to the next mark (`KeyRef.pivot`). -/
+  pivotMark : Bool := false
+  /-- Whether the riding disks of the right panel are drawn faint (an option, off on the site), so
+  that the pair of centres and its edge stand out. -/
+  faintDisks : Bool := false
 
 /-- A key of the animation: the state after `state` letters, with the mark of the idle letter
-before it shown (`mark`) or not. -/
+before it shown (`mark`) or not, and with the centre of the turn of letter `i` marked
+(`pivot = some i`, with `FramePairConfig.pivotMark`). -/
 structure KeyRef where
   /-- The number of letters applied. -/
   state : Nat
   /-- Whether the mark of the letter before it, which does not act, is shown. -/
   mark : Bool := false
+  /-- The letter (from `0`) whose turn centre is marked: before its turn (`state = i`) and after
+  it (`state = i + 1`). -/
+  pivot : Option Nat := none
   deriving BEq, Inhabited, Repr
 
 /-- The two panels. -/
@@ -120,16 +138,20 @@ def letterOf (k : Nat) : Letter := cfg.word.getD k .a
 def idleAt (k : Nat) : Bool := k ≥ 1 && !(cfg.stateAt k).acted
 
 /-- The keys (see the module docstring): state `0`, then for each letter the state it reaches,
-preceded by the same state with the letter's mark shown when the letter does not act. -/
+preceded by the same state with the letter's mark shown when the letter does not act; with
+`pivotMark`, a letter that acts gets two keys, the state before it with the centre of its turn
+marked, then the state it reaches with the mark still shown. -/
 def keyRefs : List KeyRef :=
-  ⟨0, false⟩ :: (List.range cfg.word.length).flatMap fun i =>
-    if cfg.idleAt (i + 1) then [⟨i + 1, true⟩, ⟨i + 1, false⟩] else [⟨i + 1, false⟩]
+  { state := 0 } :: (List.range cfg.word.length).flatMap fun i =>
+    if cfg.idleAt (i + 1) then [{ state := i + 1, mark := true }, { state := i + 1 }]
+    else if cfg.pivotMark then [{ state := i, pivot := some i }, { state := i + 1, pivot := some i }]
+    else [{ state := i + 1 }]
 
 /-- The number of keys: one per state, and one more for each letter that does not act. -/
 def keyCount : Nat := cfg.keyRefs.length
 
 /-- Key `j`. -/
-def keyRef (j : Nat) : KeyRef := cfg.keyRefs.getD j ⟨0, false⟩
+def keyRef (j : Nat) : KeyRef := cfg.keyRefs.getD j { state := 0 }
 
 /-- The fixed disks of the left panel, `(title, centre, radius)`, left then right: the disks of
 radius `r/2` about `0` and `1`. -/
@@ -194,6 +216,8 @@ structure Actor where
   records : List (Plane.Incidence × String) := []
   /-- The Lean declaration it shows. -/
   decl : Option Lean.Name := none
+  /-- Whether it is drawn faint. -/
+  faint : Bool := false
 
 /-- The actor as an item: its geometry from its anchors only, its base title, its recorded
 incidences and its id. -/
@@ -209,7 +233,7 @@ def Actor.item (a : Actor) : Item :=
       let it := withRole r (Plane.Exact.circle p0 ρ |>.width w)
       if dashed then it.dashed else it
     | .stroke r w => withRole r (Plane.Exact.segment p0 p1 |>.width w)
-  let named := geom.named a.base
+  let named := (if a.faint then geom.faint else geom).named a.base
   let linked := match a.decl with
     | some d => named.declRef d
     | none => named
@@ -266,9 +290,48 @@ def idleActor (k : Nat) (c : ZetaFrac) (role : String) (name : String) : Actor :
   { id := s!"idle-{k}", kind := .outline ringRadius (some role) 2 true,
     base := s!"a ring about the center of {name}: its letter does not act", anchors := [c] }
 
+/-- The radius of the ring that marks the centre of a turn. -/
+def pivotRadius : Rat := 1 / 6
+
+/-- The ring that marks the centre `c` of the turn of letter `i` (from `0`), about the centre of
+the disk titled `name`. -/
+def pivotActor (i : Nat) (c : ZetaFrac) (role : String) (name : String) : Actor :=
+  { id := s!"pivot-{i}", kind := .outline pivotRadius (some role) 3 false,
+    base := s!"a solid ring about the center of {name}: the center of the turn", anchors := [c] }
+
 namespace FramePairConfig
 
 variable (cfg : FramePairConfig)
+
+/-- The letter whose turn centre key `r` marks, when it acts: its index and the letter. -/
+def pivotOf (r : KeyRef) : Option (Nat × Letter) :=
+  match r.pivot with
+  | some i =>
+    let l := cfg.letterOf i
+    if l.covers cfg.r2 (cfg.stateAt i).y then some (i, l) else none
+  | none => none
+
+/-- The pivot ring of key `r` in the left panel, about the halved centre of the letter's disk. -/
+def leftPivot (r : KeyRef) : List Actor :=
+  match cfg.pivotOf r with
+  | some (i, l) =>
+    let side := sideIndex l
+    let (name, c, _) := cfg.leftDisks.getD side ("", ZetaFrac.ofZeta origin, 0)
+    [pivotActor i c (if side == 0 then leftRole else rightRole) name]
+  | none => []
+
+/-- The pivot ring of key `r` in the right panel, about the centre of the letter's disk before
+its turn (`bodyTurnOf`), which the turn leaves in place. -/
+def rightPivot (r : KeyRef) : List Actor :=
+  match cfg.pivotOf r with
+  | some (i, l) =>
+    match cfg.bodyTurnOf i with
+    | some (c, _) =>
+      let (role, name) := if sideIndex l == 0 then (leftRole, "the left disk, riding")
+        else (rightRole, "the right disk, riding")
+      [pivotActor i c role name]
+    | none => []
+  | none => []
 
 /-- The circle of the idle mark of key `r` in the left panel, for the records of the points. -/
 def leftIdleCircle (r : KeyRef) : List (String × ZetaFrac × Rat) :=
@@ -283,7 +346,9 @@ the point. -/
 def leftActors (r : KeyRef) : List Actor :=
   let k := r.state
   let disks := cfg.leftDisks
-  let circles := disks ++ cfg.leftIdleCircle r
+  let pivot := cfg.leftPivot r
+  let circles := disks ++ cfg.leftIdleCircle r ++
+    pivot.map fun a => (a.base, a.anchors.getD 0 (ZetaFrac.ofZeta origin), pivotRadius)
   let centres := (disks.zipIdx.map fun ((_, c, _), i) =>
     let (role, name) := if i == 0 then (leftRole, "the left center 0")
       else (rightRole, "the right center 1")
@@ -296,7 +361,7 @@ def leftActors (r : KeyRef) : List Actor :=
       [idleActor k c (if i == 0 then leftRole else rightRole) name]
     else []
   let p := cfg.pointAt k
-  centres ++ idleA ++
+  centres ++ idleA ++ pivot ++
     [{ id := "point", kind := .dot 5 none, base := "the point (y + 1)/2",
        anchors := [p], records := recordsOf p circles [] }]
 
@@ -322,13 +387,16 @@ def rightActors (r : KeyRef) : List Actor :=
     else []
   let idleCircles : List (String × ZetaFrac × Rat) :=
     idle.map fun a => (a.base, a.anchors.getD 0 x, ringRadius)
-  let circles := window ++ riding ++ idleCircles
+  let pivot := cfg.rightPivot r
+  let pivotCircles : List (String × ZetaFrac × Rat) :=
+    pivot.map fun a => (a.base, a.anchors.getD 0 x, pivotRadius)
+  let circles := window ++ riding ++ idleCircles ++ pivotCircles
   let segments : List (String × ZetaFrac × ZetaFrac) := [(edgeName, pl, pr)]
   let disks : List Actor := [
     { id := "left-disk", kind := .outline ρ (some leftRole) 1.5 false,
-      base := "the left disk, riding", anchors := [pl] },
+      base := "the left disk, riding", anchors := [pl], faint := cfg.faintDisks },
     { id := "right-disk", kind := .outline ρ (some rightRole) 1.5 false,
-      base := "the right disk, riding", anchors := [pr] }]
+      base := "the right disk, riding", anchors := [pr], faint := cfg.faintDisks }]
   let edge : Actor :=
     { id := "edge", kind := .stroke none 1.5, base := edgeName, anchors := [pl, pr] }
   let xActor : Actor :=
@@ -341,7 +409,7 @@ def rightActors (r : KeyRef) : List Actor :=
       decl := some `TDCSG.Five.Label.proj },
     { id := "right", kind := .dot 5 (some rightRole), base := "the right center P(n + eⱼ)",
       anchors := [pr], records := recordsOf pr (others pr) [] }]
-  disks ++ idle ++ [edge, xActor] ++ centres
+  disks ++ idle ++ pivot ++ [edge, xActor] ++ centres
 
 /-- The actors of a panel at key `j` (`leftActors`, `rightActors` of `keyRef j`): the one list
 that the key figures draw and the arrival check reads. -/
@@ -362,6 +430,9 @@ inductive StepPhase where
   | markAppears
   /-- The mark of a letter that does not act vanishes. -/
   | markVanishes
+  /-- The centre of the next turn is marked (with `FramePairConfig.pivotMark`); the mark of the
+  turn before vanishes. -/
+  | pivotShown
   deriving DecidableEq, Inhabited, Repr
 
 /-- What happens between key `j` and key `j + 1`, in each panel's own coordinates: the letter, what
@@ -410,7 +481,8 @@ def frameStepWith (actors : Panel → Nat → List Actor) (j : Nat) : FrameStep 
   let s := cfg.stateAt i
   let l := cfg.letterOf i
   let phase : StepPhase :=
-    if r.state == r'.state then .markVanishes else if r'.mark then .markAppears else .turn
+    if r.state == r'.state then (if r'.pivot.isSome then .pivotShown else .markVanishes)
+    else if r'.mark then .markAppears else .turn
   let acts := phase == .turn && l.covers cfg.r2 s.y
   let ids := fun (p : Panel) (j : Nat) => (actors p j).map (·.id)
   let diff := fun (xs ys : List String) => ys.filter fun id => !xs.contains id
@@ -494,14 +566,41 @@ def ringsPlacedWith (actors : Panel → Nat → List Actor) : Bool :=
 /-- `ringsPlacedWith` for the actors the key figures draw (`actorsAt`). -/
 def ringsPlaced : Bool := cfg.ringsPlacedWith cfg.actorsAt
 
+/-- Whether the turn centres are marked where the turns turn, decided exactly, with the actors
+given by `actors`: no key shows more than one pivot ring in a panel; with `pivotMark`, every turn
+step `j` shows the ring of its letter in both keys `j` and `j + 1` and in both panels, about the
+declared centre of that panel's turn (`leftTurn`, `rightTurn`); without it, no key shows one. -/
+def pivotsPlacedWith (actors : Panel → Nat → List Actor) : Bool :=
+  let rings := fun (p : Panel) (k : Nat) => (actors p k).filter (·.id.startsWith "pivot-")
+  (List.range cfg.keyCount).all (fun k =>
+    [Panel.left, .right].all fun p =>
+      (rings p k).length ≤ (if cfg.pivotMark then 1 else 0)) &&
+  (!cfg.pivotMark ||
+    (List.range (cfg.keyCount - 1)).all fun j =>
+      let st := cfg.frameStepWith actors j
+      if st.phase != .turn then true
+      else
+        let id := s!"pivot-{(cfg.keyRef (j + 1)).state - 1}"
+        let ringAt := fun (p : Panel) (k : Nat) (c : ZetaFrac) =>
+          (rings p k).any fun a => a.id == id && a.anchors.length == 1 &&
+            a.anchors.all (ZetaFrac.same · c)
+        match st.leftTurn, st.rightTurn with
+        | some lt, some rt =>
+          [j, j + 1].all fun k => ringAt .left k lt.centre && ringAt .right k rt.centre
+        | _, _ => false)
+
+/-- `pivotsPlacedWith` for the actors the key figures draw (`actorsAt`). -/
+def pivotsPlaced : Bool := cfg.pivotsPlacedWith cfg.actorsAt
+
 /-- Whether every declared move of the frame pair carries key `k` onto key `k + 1` exactly, for
 the actors the key figures draw (`actorsAt`), and every ring sits about its letter's centre
-(`ringsPlaced`). The general statements behind it:
+(`ringsPlaced`), and every turn centre is marked where its turn turns (`pivotsPlaced`). The
+general statements behind it:
 `TDCSG.Five.halved_genA`, `halved_genB`, `halved_permA_symm`, `halved_permB_symm` (left panel),
 `TDCSG.Five.two_mul_sub_proj_genA`, `two_mul_sub_proj_genB`, `two_mul_sub_proj_permA_symm`,
 `two_mul_sub_proj_permB_symm`, `frameMap_genA_halved` and `framePicture_genA_genB` (right
 panel). -/
-def allArrive : Bool := cfg.allArriveWith cfg.actorsAt && cfg.ringsPlaced
+def allArrive : Bool := cfg.allArriveWith cfg.actorsAt && cfg.ringsPlaced && cfg.pivotsPlaced
 
 /-- Whether every actor of every key, drawn (`Actor.item`), gives back its base title
 (`baseTitle`). -/
@@ -530,7 +629,14 @@ def keyCaption (j : Nat) : String :=
   let r := cfg.keyRef j
   let k := r.state
   let s := cfg.stateAt k
-  if k == 0 then
+  if let some (i, l) := (cfg.pivotOf r).filter (·.1 == k) then
+    let (own, ownName) := match l with
+      | .a | .aInv => ("left", "0")
+      | .b | .bInv => ("right", "1")
+    s!"Letter {i + 1}, {l.text}, is next: the point lies in the {own} disk, so it acts; a solid " ++
+      s!"ring marks the {own} center {ownName} and, in the moving frame, the {own} center, " ++
+      s!"about which both panels turn. {whereText s}"
+  else if k == 0 then
     "Start: z = 0, so x = 1/2. Left: the disks halved, with centers 0 and 1, and the point " ++
       "(y + 1)/2. Right: the window about x, the point fixed at x, and the left and right " ++
       "centers P(n) and P(n + eⱼ) with the halved disks riding on them; n is the integer label " ++

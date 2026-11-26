@@ -86,6 +86,44 @@ theorem ringElsewhere_fails :
     ({} : FramePairConfig).ringsPlacedWith ringElsewhere = false := by
   decide +kernel
 
+/-- A word whose turns alternate between the two centres except around its idle letters, at
+`r = 2.12`: `a b⁻¹ a b a⁻¹ b⁻¹ a b a⁻¹ b`, with the turn centres marked (`pivotMark`). -/
+def pivotWord : FramePairConfig :=
+  { word := [.a, .bInv, .a, .b, .aInv, .bInv, .a, .b, .aInv, .b], radius := 53 / 25,
+    pivotMark := true }
+
+/-- With the turn centres marked, every step arrives and every turn centre is marked where its
+turn turns (`pivotsPlaced`): the letters `3` and `8` do not act, and each of the eight turns gets
+a key of its own in which its centre is marked first. -/
+theorem frameSteps_pivot :
+    pivotWord.allArrive = true ∧ pivotWord.pivotsPlaced = true ∧ pivotWord.keyCount = 21 ∧
+      idlePositions pivotWord.r2 pivotWord.word = [3, 8] ∧
+      (pivotWord.frameSteps.map (·.phase)).count .pivotShown = 8 := by
+  decide +kernel
+
+/-- The actors of `pivotWord` with the ring of each turn centre drawn, in the moving frame, about
+the other centre of the pair. -/
+def pivotElsewhere (p : Panel) (k : Nat) : List Actor :=
+  (pivotWord.actorsAt p k).map fun a =>
+    if p == .right && a.id.startsWith "pivot-" then
+      let (l, r) := pivotWord.centresAt (pivotWord.keyRef k).state
+      { a with anchors := a.anchors.map fun c => if ZetaFrac.same c l then r else l }
+    else a
+
+/-- A turn centre marked about the wrong centre fails the check of the marks. -/
+theorem pivotElsewhere_fails : pivotWord.pivotsPlacedWith pivotElsewhere = false := by
+  decide +kernel
+
+/-- Without the option, no key shows a turn-centre mark, for the figure's word. -/
+theorem no_pivots : ({} : FramePairConfig).pivotsPlaced = true := by
+  decide +kernel
+
+-- The animations with the turn centres marked, and with the riding disks faint as well, pass every
+-- check of PILean's engine; checked by evaluation (the drawing is in floating point).
+#guard pivotWord.motion.problems.isEmpty
+#guard ({ pivotWord with faintDisks := true }).motion.problems.isEmpty
+#guard ({ pivotMark := true } : FramePairConfig).motion.problems.isEmpty
+
 /-- The word strip, an option off on the site, marks the letter of every key, for the frame pair
 and for the three words. -/
 theorem strip_marks :
