@@ -17,12 +17,14 @@ checks level, and exits with status 1 if there is one. The site build renders th
 with the files, fingerprints and manifest of `PILeanVerso.withFigures`; these previews are only
 for looking.
 
-`tdcsg-figure-preview --frame-pair-keys DIR [--word W] [--variant R1|R2|R3] [--trails] [--full]`
-draws the key figures of the frame pair (`TDCSGFigures.Lift.FramePairConfig.keys`) for the word
-`W` (letters `a`, `b`, `A = a⁻¹`, `B = b⁻¹`; `abab` by default) as pictures of each panel in a
-folder of `DIR` named after the variant, with contact sheets (`sheet*.html`: one row per key, the
-two panels and the caption), prints their layout problems and whether every declared move
-arrives exactly (`FramePairConfig.allArrive`), and exits with status 1 if one fails.
+`tdcsg-figure-preview --frame-pair-keys DIR [OPTION …]` draws the key figures of the frame pair
+(`TDCSGFigures.Lift.FramePairConfig.keys`) as pictures of each panel in a folder of `DIR` named
+after the variant, with contact sheets (`sheet*.html`: one row per key, the two panels and the
+caption), prints their layout problems, whether every declared move arrives exactly
+(`FramePairConfig.allArrive`) and the disks' diameters in pixels, and exits with status 1 if one
+fails. The options: `--word W` (letters `a`, `b`, `A = a⁻¹`, `B = b⁻¹`; `abab` by default),
+`--variant R1|R2|R3`, `--trails`, `--trail-arcs`, `--full`, `--idle outline|ring` and
+`--view shared|cropped|wide-right`.
 -/
 
 namespace TDCSGFigures.Preview
@@ -122,6 +124,12 @@ def parseFramePair : List String → Lift.FramePairConfig → Except String Lift
   | "--variant" :: "R3" :: rest, c => parseFramePair rest { c with right := .bodiesGraph }
   | "--trails" :: rest, c => parseFramePair rest { c with trails := true }
   | "--full" :: rest, c => parseFramePair rest { c with left := .full }
+  | "--trail-arcs" :: rest, c => parseFramePair rest { c with trailStyle := .arcs }
+  | "--idle" :: "outline" :: rest, c => parseFramePair rest { c with idleMark := .outline }
+  | "--idle" :: "ring" :: rest, c => parseFramePair rest { c with idleMark := .ring }
+  | "--view" :: "shared" :: rest, c => parseFramePair rest { c with view := .shared }
+  | "--view" :: "cropped" :: rest, c => parseFramePair rest { c with view := .cropped }
+  | "--view" :: "wide-right" :: rest, c => parseFramePair rest { c with view := .wideRight }
   | a :: _, _ => .error s!"--frame-pair-keys: unknown option {a}"
 
 /-- The name of a variant's folder: word, right style, trails, left scale. -/
@@ -130,7 +138,10 @@ def variantName (c : Lift.FramePairConfig) : String :=
     | .a => "a" | .b => "b" | .aInv => "A" | .bInv => "B")
   let r := match c.right with | .bodies => "R1" | .centres => "R2" | .bodiesGraph => "R3"
   s!"{w}-{r}-{if c.trails then "trails" else "notrails"}-" ++
-    (match c.left with | .halved => "halved" | .full => "full")
+    (match c.left with | .halved => "halved" | .full => "full") ++
+    (if c.trails && c.trailStyle == .arcs then "-arcs" else "") ++
+    (match c.idleMark with | .outline => "" | .ring => "-ring") ++
+    (match c.view with | .shared => "" | .cropped => "-cropped" | .wideRight => "-wideright")
 
 /-- A contact sheet: one row per key with the pictures `left` and `right` (file names relative to
 the sheet) and the caption. -/
@@ -172,6 +183,21 @@ def renderFramePair (dir : System.FilePath) (c : Lift.FramePairConfig) :
     (contactSheet title (sheet "-narrow-dark") true true)
   return (problems, c.allArrive)
 
+/-- The diameter in pixels of the disks of each panel, at its width and at its narrow width. -/
+def diskSizes (c : Lift.FramePairConfig) : String :=
+  match c.keys[0]? with
+  | none => ""
+  | some (l, r) =>
+    let rl : Float := match c.left with
+      | .halved => Exact.toFloat c.radius | .full => 2 * Exact.toFloat c.radius
+    let d := fun (f : Plane.Figure) (ρ : Float) => (f.frame.scale * ρ).round.toUInt64.toNat
+    let nl := l.narrow.getD l
+    let nr := r.narrow.getD r
+    s!"disk diameter: left {d l rl} px, right {d r (Exact.toFloat c.radius)} px " ++
+      s!"(panels {l.width.round.toUInt64.toNat} and {r.width.round.toUInt64.toNat} px wide); " ++
+      s!"narrow: left {d nl rl} px, " ++
+      s!"right {d nr (Exact.toFloat c.radius)} px"
+
 end TDCSGFigures.Preview
 
 open PILean TDCSGFigures.Preview in
@@ -182,7 +208,7 @@ def main (args : List String) : IO UInt32 := do
     let (ps, ok) ← renderFramePair dir c
     for p in ps do IO.println s!"  {p}"
     IO.println (s!"{variantName c}: {c.keyCount} keys, {ps.size} layout problems, " ++
-      s!"exact arrival {ok}")
+      s!"exact arrival {ok}; {diskSizes c}")
     return if ps.isEmpty && ok then 0 else 1
   let (dir, names) ← IO.ofExcept (parse args ("out", #[]))
   let unknown := names.filter fun n => !previews.any (·.1 == n)
