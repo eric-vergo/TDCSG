@@ -1,0 +1,547 @@
+<!doctype html>
+<!--
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Eric Vergo, Claude Opus 5.5
+
+The page that `tdcsg-figure-preview --motion-variants DIR` writes as `DIR/index.html`: the
+variants of the animated frame pair, with controls to re-time them and a block of chosen values to
+copy back into Lean. A local tool, not part of the site. The generator replaces the marker comment
+in the first script with the variants and the SVG texts.
+
+How the clock works: every SVG is written at the canonical pacing (every move and every rest one
+second, moves not eased, the loop closed by a cut). The page pauses the SVG's own clock and sets
+its time on every animation frame: a rest of tuned length d at progress u shows the canonical time
+start + u; a move shows start + ease(u), so that the tuned easing is exactly what the SVG's
+keySplines would draw; a crossfade seam fades the panels out at the end of the loop and in at its
+start while they show the last and the first key.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frame pair variants</title>
+<style>
+:root { --bg: #ffffff; --fg: #1b1d21; --muted: #5b6270; --line: #d5d8de; --panel: #f4f5f7;
+  --accent: #2f6fdf; color-scheme: light; }
+:root[data-theme="dark"] { --bg: #1b1d21; --fg: #e6e6e6; --muted: #a2a8b3; --line: #3a3e46;
+  --panel: #24272c; --accent: #7aa7ff; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg);
+  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; padding: 16px; }
+@media (max-width: 900px) { main { grid-template-columns: minmax(0, 1fr); } }
+h1 { font-size: 18px; margin: 0 0 8px; }
+h2 { font-size: 14px; margin: 14px 0 6px; color: var(--muted); text-transform: uppercase;
+  letter-spacing: .04em; }
+#stage { min-width: 0; }
+#picture { width: 100%; overflow: hidden; }
+#picture svg, .still svg { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+#caption { min-height: 4.2em; margin: 8px auto 0; max-width: 60em; }
+#transport { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+#scrubwrap { position: relative; flex: 1; height: 28px; }
+#scrub { width: 100%; margin: 0; position: absolute; top: 6px; left: 0; }
+#ticks { position: absolute; left: 8px; right: 8px; top: 0; height: 6px; pointer-events: none; }
+#ticks span { position: absolute; top: 0; width: 1px; height: 6px; background: var(--muted); }
+#ticks span.idle { background: #c47a00; }
+#clock { font-variant-numeric: tabular-nums; min-width: 9em; text-align: right;
+  color: var(--muted); }
+aside { background: var(--panel); border: 1px solid var(--line); border-radius: 8px;
+  padding: 12px; min-width: 0; }
+label { display: block; }
+.row { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) 4.6em; gap: 6px;
+  align-items: center; margin: 4px 0; }
+.row input[type=range] { width: 100%; }
+.row input[type=number] { width: 100%; }
+.grid2 { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); gap: 4px 6px;
+  align-items: center; }
+select, input, button, textarea { font: inherit; color: var(--fg); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 4px; padding: 2px 4px; }
+select { width: 100%; }
+button { cursor: pointer; padding: 3px 10px; }
+.spline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px;
+  margin: 4px 0; }
+.presets { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0; }
+.presets button { padding: 1px 6px; font-size: 12px; }
+.toggles { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 4px 0; }
+.toggles label { display: inline-flex; gap: 4px; align-items: center; }
+textarea { width: 100%; height: 10.5em; font: 12px/1.35 ui-monospace, Menlo, monospace;
+  white-space: pre; }
+#stills { display: none; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 14px; margin-top: 12px; }
+#stills.on { display: grid; }
+.still { border: 1px solid var(--line); border-radius: 6px; padding: 6px; }
+.still p { margin: 4px 0 0; font-size: 12px; }
+.note { color: var(--muted); font-size: 12px; }
+#info { color: var(--muted); font-size: 12px; margin-top: 4px; }
+</style>
+</head>
+<body>
+<main>
+<section id="stage">
+  <h1 id="title">Frame pair</h1>
+  <div id="picture" aria-live="off"></div>
+  <div id="transport">
+    <button id="play" type="button">Pause</button>
+    <div id="scrubwrap"><div id="ticks"></div>
+      <input id="scrub" type="range" min="0" max="1000" step="1" value="0"
+        aria-label="Position in the loop"></div>
+    <span id="clock">0.00 / 0.00 s</span>
+  </div>
+  <p id="caption"></p>
+  <div id="info"></div>
+  <div id="stills" aria-label="The key frames with their captions"></div>
+</section>
+<aside>
+  <h2>Variant</h2>
+  <div class="grid2">
+    <label for="d-word">Word</label><select id="d-word"></select>
+    <label for="d-right">Right panel</label><select id="d-right"></select>
+    <label for="d-trails">Trails</label><select id="d-trails"></select>
+    <label for="d-view">View</label><select id="d-view"></select>
+    <label for="d-idle">Idle mark</label><select id="d-idle"></select>
+    <label for="d-left">Left panel</label><select id="d-left"></select>
+    <label for="variant">All</label><select id="variant"></select>
+  </div>
+  <div class="toggles">
+    <label><input type="radio" name="layout" value="wide" checked> wide</label>
+    <label><input type="radio" name="layout" value="narrow"> narrow</label>
+    <label><input type="radio" name="theme" value="light" checked> light</label>
+    <label><input type="radio" name="theme" value="dark"> dark</label>
+    <label><input type="checkbox" id="showStills"> show stills</label>
+  </div>
+  <h2>Pacing (seconds)</h2>
+  <div id="sliders"></div>
+  <h2>Easing of the turns</h2>
+  <select id="easing">
+    <option value="linear">linear</option>
+    <option value="standard">standard ease (0.42 0 0.58 1)</option>
+    <option value="spline">cubic Bézier</option>
+  </select>
+  <div class="spline" id="splineBox">
+    <input type="number" id="x1" min="0" max="1" step="0.01" aria-label="x1">
+    <input type="number" id="y1" min="0" max="1" step="0.01" aria-label="y1">
+    <input type="number" id="x2" min="0" max="1" step="0.01" aria-label="x2">
+    <input type="number" id="y2" min="0" max="1" step="0.01" aria-label="y2">
+  </div>
+  <div class="presets" id="presets"></div>
+  <p class="note">Control values are kept in [0, 1], as SVG's keySplines require.</p>
+  <h2>Chosen values</h2>
+  <textarea id="chosen" readonly aria-label="Chosen values"></textarea>
+  <button id="copy" type="button">Copy</button> <span id="copied" class="note"></span>
+  <button id="reset" type="button">Reset pacing</button>
+</aside>
+</main>
+<script>
+"use strict";
+/*@DATA@*/
+</script>
+<script>
+"use strict";
+// ---- the data (from the generator) ----
+const DATA = window.FRAME_PAIR_DATA || { variants: [], svgs: {} };
+const VARIANTS = DATA.variants;
+
+// ---- parameters ----
+const SLIDERS = [
+  ["turn", "turn", 0.1, 4, 0.05, 1.1],
+  ["hold", "hold", 0, 4, 0.05, 0.5],
+  ["idle", "idle step", 0.1, 4, 0.05, 0.9],
+  ["firstHold", "first hold", 0, 6, 0.05, 1.5],
+  ["lastHold", "last hold", 0, 6, 0.05, 2],
+  ["seam", "seam fade (0 = cut)", 0, 3, 0.05, 0.4],
+  ["speed", "speed (×)", 0.1, 3, 0.05, 1],
+];
+const PRESETS = [
+  ["standard", [0.42, 0, 0.58, 1]], ["soft", [0.45, 0, 0.55, 1]], ["ease", [0.25, 0.1, 0.25, 1]],
+  ["ease-out", [0, 0, 0.58, 1]], ["ease-in", [0.42, 0, 1, 1]], ["strong", [0.65, 0, 0.35, 1]],
+];
+const DEFAULTS = { turn: 1.1, hold: 0.5, idle: 0.9, firstHold: 1.5, lastHold: 2, seam: 0.4,
+  speed: 1, easing: "spline", spline: [0.45, 0, 0.55, 1] };
+const STORE = "frame-pair-preview-settings";
+
+const state = Object.assign({}, DEFAULTS, { variant: VARIANTS.length ? VARIANTS[0].id : "",
+  layout: "wide", theme: "light", stills: false, seamTouched: {} });
+
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem(STORE) || "null");
+    if (s && typeof s === "object") {
+      for (const k of Object.keys(DEFAULTS).concat(["variant", "layout", "theme", "stills",
+          "seamTouched"])) if (k in s) state[k] = s[k];
+    }
+  } catch (e) { /* storage unavailable: defaults */ }
+}
+function saveSettings() {
+  try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) { /* ignore */ }
+}
+
+// ---- easing: the cubic Bézier of SMIL keySplines and CSS cubic-bezier ----
+const clamp01 = x => (!(x > 0) ? 0 : x >= 1 ? 1 : x);
+function controls() {
+  if (state.easing === "linear") return [0, 0, 1, 1];
+  if (state.easing === "standard") return [0.42, 0, 0.58, 1];
+  return state.spline.map(clamp01);
+}
+function bez(a, b, s) { const r = 1 - s; return 3 * r * r * s * a + 3 * r * s * s * b + s * s * s; }
+function ease(x) {
+  if (!(x > 0)) return 0;
+  if (x >= 1) return 1;
+  const [x1, y1, x2, y2] = controls();
+  if (state.easing === "linear") return x;
+  let lo = 0, hi = 1;
+  for (let i = 0; i < 64; i++) { const m = (lo + hi) / 2; if (bez(x1, x2, m) < x) lo = m; else hi = m; }
+  return bez(y1, y2, (lo + hi) / 2);
+}
+
+// ---- the tuned timeline over the canonical one ----
+let variant = null;
+let timeline = { segs: [], cycle: 1 };
+
+function buildTimeline() {
+  const v = variant, segs = [];
+  const keys = v.steps.length + 1;
+  const half = state.seam > 0 ? state.seam / 2 : 0;
+  let t = 0;
+  const push = (kind, dur, canon, map, info) => {
+    segs.push(Object.assign({ kind, start: t, dur: Math.max(dur, 0), canon, map }, info || {}));
+    t += Math.max(dur, 0);
+  };
+  const first = v.segments[0];
+  if (half > 0) push("seamIn", half, first.start, "fadeIn", { key: 0 });
+  for (const s of v.segments) {
+    if (s.kind === "rest") {
+      const d = s.key === 0 ? state.firstHold : s.key === keys - 1 ? state.lastHold : state.hold;
+      push("rest", d, s.start, "linear", { key: s.key });
+    } else if (s.kind === "turn") {
+      push("turn", state.turn, s.start, "ease", { step: s.step });
+    } else {
+      push("idle", state.idle, s.start, "linear", { step: s.step });
+    }
+  }
+  const last = v.segments[v.segments.length - 1];
+  if (half > 0) push("seamOut", half, last.start + last.duration * 0.999, "fadeOut",
+    { key: keys - 1 });
+  timeline = { segs, cycle: Math.max(t, 1e-6) };
+}
+
+// the canonical time and the opacity of the panels at the tuned time t (seconds into the loop)
+function canonAt(t) {
+  const { segs, cycle } = timeline;
+  let u = ((t % cycle) + cycle) % cycle;
+  let s = segs[segs.length - 1];
+  for (const x of segs) { if (u < x.start + x.dur) { s = x; break; } }
+  const p = s.dur > 0 ? Math.min(Math.max((u - s.start) / s.dur, 0), 1) : 0;
+  let canon = s.canon, opacity = 1;
+  if (s.map === "linear") canon = s.canon + Math.min(p, 0.999999);
+  else if (s.map === "ease") canon = s.canon + Math.min(ease(p), 0.999999);
+  else if (s.map === "fadeIn") opacity = p;
+  else if (s.map === "fadeOut") opacity = 1 - p;
+  return { canon, opacity, seg: s, progress: p };
+}
+
+// ---- the picture ----
+const picture = document.getElementById("picture");
+let svg = null, panels = [];
+let playing = true, origin = performance.now(), pausedAt = 0;
+
+function fileOf(v, layout, theme) {
+  return v.files[(layout === "narrow" ? "narrow" : "wide") + (theme === "dark" ? "Dark" : "")];
+}
+function insertSvg(text, into, prefix) {
+  const t = prefix ? text.replace(/\bid="/g, `id="${prefix}`)
+    .replace(/url\(#/g, `url(#${prefix}`).replace(/href="#/g, `href="#${prefix}`) : text;
+  into.innerHTML = t;
+  const el = into.querySelector("svg");
+  if (el) { el.pauseAnimations(); el.removeAttribute("width"); el.removeAttribute("height"); }
+  return el;
+}
+function showVariant() {
+  variant = VARIANTS.find(v => v.id === state.variant) || VARIANTS[0];
+  state.variant = variant.id;
+  const size = variant.size[state.layout];
+  svg = insertSvg(DATA.svgs[fileOf(variant, state.layout, state.theme)], picture, "");
+  picture.style.maxWidth = (state.layout === "narrow" ? size[0] * 1.25 : size[0] * 1.6) + "px";
+  picture.style.margin = "0 auto";
+  panels = svg ? Array.from(svg.querySelectorAll("[data-pilean-panel]")) : [];
+  document.getElementById("title").textContent = variant.title;
+  document.getElementById("info").textContent =
+    `${variant.id} · ${size[0]} × ${size[1]} px · SVG ${variant.bytes[state.layout + (state.theme === "dark" ? "Dark" : "")]} bytes` +
+    (variant.closed ? " · closed word: the last key equals the first" : "");
+  buildTimeline();
+  drawTicks();
+  renderStills();
+  syncControls();
+}
+
+function render(t) {
+  if (!svg) return;
+  const { canon, opacity, seg } = canonAt(t);
+  svg.setCurrentTime(canon);
+  for (const p of panels) p.style.opacity = opacity === 1 ? "" : String(opacity);
+  const k = seg.kind === "rest" || seg.kind === "seamIn" || seg.kind === "seamOut" ? seg.key
+    : seg.step + 1;
+  const cap = document.getElementById("caption");
+  if (cap.dataset.key !== String(k)) { cap.textContent = variant.captions[k]; cap.dataset.key = k; }
+  const u = ((t % timeline.cycle) + timeline.cycle) % timeline.cycle;
+  document.getElementById("clock").textContent =
+    `${u.toFixed(2)} / ${timeline.cycle.toFixed(2)} s`;
+  if (!scrubbing) document.getElementById("scrub").value = String(Math.round(1000 * u / timeline.cycle));
+  window.previewNow = { t: u, canon, opacity, kind: seg.kind, key: k };
+}
+function loopTime(now) { return playing ? (now - origin) / 1000 * state.speed : pausedAt; }
+function frame(now) { render(loopTime(now)); requestAnimationFrame(frame); }
+
+// ---- transport ----
+let scrubbing = false;
+function setPlaying(p) {
+  const now = performance.now();
+  if (p && !playing) origin = now - pausedAt * 1000 / state.speed;
+  if (!p && playing) pausedAt = loopTime(now) % timeline.cycle;
+  playing = p;
+  document.getElementById("play").textContent = p ? "Pause" : "Play";
+}
+function seek(u) {
+  pausedAt = u;
+  origin = performance.now() - u * 1000 / state.speed;
+}
+document.getElementById("play").addEventListener("click", () => setPlaying(!playing));
+const scrub = document.getElementById("scrub");
+scrub.addEventListener("input", () => {
+  scrubbing = true;
+  seek(Number(scrub.value) / 1000 * timeline.cycle);
+  render(Number(scrub.value) / 1000 * timeline.cycle);
+});
+scrub.addEventListener("change", () => { scrubbing = false; });
+function drawTicks() {
+  const box = document.getElementById("ticks");
+  box.innerHTML = "";
+  for (const s of timeline.segs) {
+    if (s.kind !== "turn" && s.kind !== "idle") continue;
+    const el = document.createElement("span");
+    el.className = s.kind;
+    el.style.left = (100 * s.start / timeline.cycle) + "%";
+    el.title = `step ${s.step + 1}${s.kind === "idle" ? " (does not act)" : ""}`;
+    box.appendChild(el);
+  }
+}
+
+// ---- stills: each key at the middle of its rest (the engine's rest check holds these to the
+// key stills within 0.05 px) ----
+function renderStills() {
+  const box = document.getElementById("stills");
+  box.classList.toggle("on", !!state.stills);
+  box.innerHTML = "";
+  if (!state.stills) return;
+  const text = DATA.svgs[fileOf(variant, state.layout, state.theme)];
+  for (const s of variant.segments) {
+    if (s.kind !== "rest") continue;
+    const cell = document.createElement("figure");
+    cell.className = "still";
+    cell.style.margin = "0";
+    const pic = document.createElement("div");
+    cell.appendChild(pic);
+    const el = insertSvg(text, pic, `k${s.key}-`);
+    if (el) el.setCurrentTime(s.start + s.duration / 2);
+    const cap = document.createElement("p");
+    cap.textContent = variant.captions[s.key];
+    cell.appendChild(cap);
+    box.appendChild(cell);
+  }
+}
+
+// ---- controls ----
+const DIMS = [
+  ["word", v => v.word, w => w],
+  ["right", v => v.options.right, r => ({ R1: "R1: centres with riding disks",
+    R2: "R2: centres and edge", R3: "R3: R1 with the centre-graph edge" }[r] || r)],
+  ["trails", v => v.options.trails ? "dots" : "none", x => x],
+  ["view", v => v.options.view, x => x],
+  ["idle", v => v.options.idle, x => x],
+  ["left", v => v.options.left, x => x],
+];
+function fillVariantPickers() {
+  for (const [dim, get, label] of DIMS) {
+    const sel = document.getElementById("d-" + dim);
+    sel.innerHTML = "";
+    const vals = [...new Set(VARIANTS.map(get))];
+    for (const x of vals) {
+      const o = document.createElement("option");
+      o.value = x; o.textContent = label(x);
+      sel.appendChild(o);
+    }
+    sel.addEventListener("change", () => pickNearest(dim, sel.value));
+  }
+  const all = document.getElementById("variant");
+  all.innerHTML = "";
+  for (const w of [...new Set(VARIANTS.map(v => v.word))]) {
+    const g = document.createElement("optgroup");
+    g.label = w;
+    for (const v of VARIANTS.filter(v => v.word === w)) {
+      const o = document.createElement("option");
+      o.value = v.id;
+      o.textContent = `${v.options.right}, trails ${v.options.trails ? "dots" : "none"}, ` +
+        `${v.options.view}, ${v.options.idle}, left ${v.options.left}`;
+      g.appendChild(o);
+    }
+    all.appendChild(g);
+  }
+  all.addEventListener("change", () => { state.variant = all.value; applySeamDefault(); changed(true); });
+}
+// the variant with `dim` = `value` that agrees with the current one in the most other dimensions
+function pickNearest(dim, value) {
+  const cur = variant;
+  let best = null, score = -1;
+  for (const v of VARIANTS) {
+    const get = DIMS.find(d => d[0] === dim)[1];
+    if (get(v) !== value) continue;
+    let s = 0;
+    for (const [d, g] of DIMS) if (d !== dim && g(v) === g(cur)) s += 10 - DIMS.findIndex(x => x[0] === d);
+    if (s > score) { score = s; best = v; }
+  }
+  if (best) { state.variant = best.id; applySeamDefault(); changed(true); }
+}
+// a closed word loops without a jump: its seam is a cut unless the reader has set one for it
+function applySeamDefault() {
+  const v = VARIANTS.find(x => x.id === state.variant);
+  if (!v) return;
+  const key = v.word;
+  if (state.seamTouched && key in state.seamTouched) state.seam = state.seamTouched[key];
+  else state.seam = v.closed ? 0 : DEFAULTS.seam;
+}
+function fillSliders() {
+  const box = document.getElementById("sliders");
+  for (const [key, name, min, max, step] of SLIDERS) {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `<label for="r-${key}">${name}</label>` +
+      `<input type="range" id="r-${key}" min="${min}" max="${max}" step="${step}">` +
+      `<input type="number" id="n-${key}" min="${min}" max="${max}" step="${step}" aria-label="${name}">`;
+    box.appendChild(row);
+    const r = row.querySelector("input[type=range]"), n = row.querySelector("input[type=number]");
+    const set = x => {
+      const v = Math.min(Math.max(Number(x), min), max);
+      if (!Number.isFinite(v)) return;
+      if (key === "speed") {
+        const now = performance.now(), u = loopTime(now);
+        state.speed = v;
+        if (playing) origin = now - u * 1000 / v;
+      } else state[key] = v;
+      if (key === "seam" && variant) { state.seamTouched = state.seamTouched || {}; state.seamTouched[variant.word] = v; }
+      changed(false);
+    };
+    r.addEventListener("input", () => set(r.value));
+    n.addEventListener("change", () => set(n.value));
+  }
+  const presets = document.getElementById("presets");
+  for (const [name, vals] of PRESETS) {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = name;
+    b.addEventListener("click", () => {
+      if (name === "standard") state.easing = "standard";
+      else { state.easing = "spline"; state.spline = vals.slice(); }
+      changed(false);
+    });
+    presets.appendChild(b);
+  }
+  document.getElementById("easing").addEventListener("change", e => {
+    state.easing = e.target.value;
+    if (state.easing === "spline" && !Array.isArray(state.spline)) state.spline = DEFAULTS.spline.slice();
+    changed(false);
+  });
+  ["x1", "y1", "x2", "y2"].forEach((id, i) => {
+    document.getElementById(id).addEventListener("change", e => {
+      const x = Number(e.target.value);
+      if (!Number.isFinite(x)) return;
+      state.easing = "spline";
+      state.spline = state.spline.slice();
+      state.spline[i] = clamp01(x);
+      changed(false);
+    });
+  });
+  for (const el of document.querySelectorAll("input[name=layout], input[name=theme]"))
+    el.addEventListener("change", e => { state[e.target.name] = e.target.value; changed(true); });
+  document.getElementById("showStills").addEventListener("change", e => {
+    state.stills = e.target.checked; changed(false); renderStills(); });
+  document.getElementById("copy").addEventListener("click", async () => {
+    const text = document.getElementById("chosen").value;
+    let ok = false;
+    try { await navigator.clipboard.writeText(text); ok = true; } catch (e) { ok = false; }
+    if (!ok) { const ta = document.getElementById("chosen"); ta.focus(); ta.select();
+      try { ok = document.execCommand("copy"); } catch (e) { ok = false; } }
+    document.getElementById("copied").textContent = ok ? "copied" : "select the text and copy";
+  });
+  document.getElementById("reset").addEventListener("click", () => {
+    for (const k of Object.keys(DEFAULTS)) state[k] = Array.isArray(DEFAULTS[k]) ? DEFAULTS[k].slice() : DEFAULTS[k];
+    state.seamTouched = {};
+    applySeamDefault();
+    changed(false);
+  });
+}
+function changed(newPicture) {
+  // keep the place in the loop as a fraction of the cycle when the timing changes
+  const frac = timeline.cycle > 0 ? (loopTime(performance.now()) % timeline.cycle) / timeline.cycle : 0;
+  if (newPicture) showVariant(); else { buildTimeline(); drawTicks(); syncControls(); }
+  seek(frac * timeline.cycle);
+  document.documentElement.dataset.theme = state.theme;
+  saveSettings();
+}
+function syncControls() {
+  for (const [key] of SLIDERS) {
+    const r = document.getElementById("r-" + key), n = document.getElementById("n-" + key);
+    if (document.activeElement !== r) r.value = state[key];
+    if (document.activeElement !== n) n.value = state[key];
+  }
+  document.getElementById("easing").value = state.easing;
+  const c = state.easing === "spline" ? state.spline : controls();
+  ["x1", "y1", "x2", "y2"].forEach((id, i) => { document.getElementById(id).value = c[i]; });
+  for (const [dim, get] of DIMS) document.getElementById("d-" + dim).value = get(variant);
+  document.getElementById("variant").value = variant.id;
+  for (const el of document.querySelectorAll("input[name=layout]")) el.checked = el.value === state.layout;
+  for (const el of document.querySelectorAll("input[name=theme]")) el.checked = el.value === state.theme;
+  document.getElementById("showStills").checked = !!state.stills;
+  document.getElementById("chosen").value = chosenText();
+}
+
+// ---- the chosen values as Lean ----
+function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) [a, b] = [b, a % b]; return a || 1; }
+function rat(x) {
+  const n = Math.round(x * 100), g = gcd(n, 100);
+  const p = n / g, q = 100 / g;
+  return q === 1 ? String(p) : `${p}/${q}`;
+}
+function num(x) { return String(Math.round(x * 1000) / 1000); }
+function chosenText() {
+  const v = variant;
+  const e = state.easing === "linear" ? ".linear" : state.easing === "standard" ? ".standard"
+    : ".spline " + state.spline.map(clamp01).map(num).join(" ");
+  const seam = state.seam > 0 ? `.crossfade (${rat(state.seam)})` : ".cut";
+  const right = { R1: ".bodies", R2: ".centres", R3: ".bodiesGraph" }[v.options.right];
+  const idle = v.options.idle === "ring" ? ".ring" : ".outline";
+  return [
+    "-- TDCSGFigures/FramePair.lean",
+    "def framePairPacing : PILean.Anim.Pacing :=",
+    `  { turn := ${rat(state.turn)}, hold := ${rat(state.hold)}, idle := ${rat(state.idle)},`,
+    `    firstHold := ${rat(state.firstHold)}, lastHold := ${rat(state.lastHold)},`,
+    `    easing := ${e}, seam := ${seam} }`,
+    `-- variant ${v.id}:`,
+    `-- { word := parseWord "${v.word}", right := ${right}, trails := ${v.options.trails},`,
+    `--   view := .${v.options.view}, idleMark := ${idle}, left := .${v.options.left} }`,
+    `-- seen at speed ×${num(state.speed)} (the speed is not part of the pacing)`,
+  ].join("\n");
+}
+
+// ---- start ----
+loadSettings();
+if (!VARIANTS.some(v => v.id === state.variant) && VARIANTS.length) state.variant = VARIANTS[0].id;
+document.documentElement.dataset.theme = state.theme;
+fillVariantPickers();
+fillSliders();
+if (VARIANTS.length) {
+  showVariant();
+  requestAnimationFrame(frame);
+}
+window.preview = { state, canonAt, ease, chosenText, timeline: () => timeline, seek, setPlaying,
+  variants: VARIANTS };
+</script>
+</body>
+</html>

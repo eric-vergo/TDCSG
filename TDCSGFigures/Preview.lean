@@ -25,6 +25,18 @@ caption), prints their layout problems, whether every declared move arrives exac
 fails. The options: `--word W` (letters `a`, `b`, `A = a⁻¹`, `B = b⁻¹`; `abab` by default),
 `--variant R1|R2|R3`, `--trails`, `--trail-arcs`, `--full`, `--idle outline|ring` and
 `--view shared|cropped|wide-right`.
+
+`tdcsg-figure-preview --motion-variants DIR` animates the variants of the frame pair in
+`motionVariants` (`TDCSGFigures.Lift.FramePairConfig.motion`, two panels on one clock) and writes,
+for each, four standalone animated SVGs at the canonical pacing (`Lift.canonicalPacing`: every
+move and rest one second, no easing, a cut) to `DIR/svg` (`ID.svg`, `ID-dark.svg`,
+`ID-narrow.svg`, `ID-narrow-dark.svg`), the files PILean's `tools/motion-browser-check.py` reads
+for the light renditions to `DIR/check`, the list of variants with their options, segments,
+captions and sizes to `DIR/variants.json`, and `DIR/index.html`: a self-contained page (the
+template `FramePairPreview.html` with the variants and SVG texts filled in) that plays a variant
+re-timed by sliders for the durations, easing, seam and speed, scrubs through the loop, shows the
+stills, and writes the chosen values as Lean to copy. A variant the engine refuses (an error of
+`MotionPanels.report` under `checks := .fail`) is printed and makes the tool exit with status 1.
 -/
 
 namespace TDCSGFigures.Preview
@@ -198,11 +210,251 @@ def diskSizes (c : Lift.FramePairConfig) : String :=
       s!"narrow: left {d nl rl} px, " ++
       s!"right {d nr (Exact.toFloat c.radius)} px"
 
+/-! ### The animated frame pair: variants and a page to tune them -/
+
+/-- The variants of `--motion-variants`: the words `abab` (every letter acts), `ababbab` (one
+letter does not), `aababaabbabb` (three do not) and `aabaaabbbbb` (closed: its last key is its
+first), each with the right panel `R1` and `R3` (`R2` for the twelve-letter word), trails off and
+on, the views shared and cropped (wide-right for the two long words), the idle mark as an outline
+(as a ring for the twelve-letter word), and the left panel halved (full size for `abab` and the
+twelve-letter word). -/
+def motionVariants : Array Lift.FramePairConfig :=
+  let w := Lift.parseWord
+  let twelve := w "aababaabbabb"
+  let closed := w "aabaaabbbbb"
+  #[{ word := w "abab" }, { word := w "abab", trails := true },
+    { word := w "abab", right := .bodiesGraph }, { word := w "abab", left := .full },
+    { word := w "abab", view := .cropped },
+    { word := w "ababbab" }, { word := w "ababbab", trails := true },
+    { word := w "ababbab", right := .bodiesGraph }, { word := w "ababbab", view := .cropped },
+    { word := twelve }, { word := twelve, trails := true }, { word := twelve, right := .bodiesGraph },
+    { word := twelve, right := .bodiesGraph, trails := true }, { word := twelve, right := .centres },
+    { word := twelve, view := .cropped }, { word := twelve, view := .wideRight },
+    { word := twelve, right := .bodiesGraph, view := .wideRight },
+    { word := twelve, right := .centres, view := .wideRight },
+    { word := twelve, idleMark := .ring }, { word := twelve, left := .full },
+    { word := twelve, left := .full, view := .wideRight },
+    { word := closed }, { word := closed, trails := true }, { word := closed, right := .bodiesGraph },
+    { word := closed, view := .cropped }, { word := closed, view := .wideRight },
+    { word := closed, right := .bodiesGraph, view := .wideRight }]
+
+/-- A JSON string: escaped, and with `</` written `<\/` so that it can stand inside an HTML
+`script` element. -/
+def jsonString (s : String) : String :=
+  "\"" ++ (Trust.Json.escape s).replace "</" "<\\/" ++ "\""
+
+/-- A number as JSON (`0` for one that is not finite). -/
+def jsonNum (x : Float) : String := if x.isFinite then toString x else "0"
+
+/-- A page point as JSON. -/
+def jsonPoint (p : Point) : String := s!"[{jsonNum p.x}, {jsonNum p.y}]"
+
+/-- Whether some actor that turns has a label or a point's marker: then the picture must have
+upright groups. -/
+def turningMarks (m : Plane.Motion) : Bool :=
+  (m.steps.mapIdx fun j s => (j, s)).any fun (j, s) => s.moves.any fun (id, mv) =>
+    match mv, (m.keys.getD j default).actor? id with
+    | .turn .., some it => it.leaves.any (·.geom.upright)
+    | _, _ => false
+
+/-- What PILean's `tools/motion-browser-check.py` expects of a picture of panels, as JSON, in the
+shape PILean's own tests write for it: the cycle; at the middle of each key's rest every actor's
+anchor in the composed still and every upright group's anchor where the plan draws it; every turn
+with its centre, start, angle and the eased fraction done at a quarter, a half and three quarters
+of it; each panel's box on the page; and the marked points of every actor at every rest and at
+three points of every move (`phase`). -/
+def browserExpectations (name : String) (r : Plane.MotionPanelsReport) : String := Id.run do
+  let st := r.style
+  let anchorOf := fun (pr : Plane.PanelReport) (fig : Plane.Figure) (id : String) =>
+    (fig.actor? id).bind fun it => (it.leaves[0]?).bind fun lf =>
+      (Plane.anchors pr.env.frame st lf.geom)[0]?
+  let rests := (List.range r.figure.keyCount).map fun k =>
+    let actors := r.panels.toList.flatMap fun pr =>
+      let fig := pr.keys.figure k
+      let still := pr.plan.layers.filter (·.geoms.isNone)
+      let ids := (still.filterMap (·.version.actor)).toList.eraseDups.filter fig.hasActor
+      ids.filterMap fun id => (anchorOf pr fig id).map fun a =>
+        s!"\{\"id\": \"{pr.idPrefix}{Canvas.safeToken id}\", \"at\": {jsonPoint a}}"
+    let t := Exact.toFloat (r.timeline.restTime k)
+    let ups := ((r.markersAt t).filter (·.1 == "upright")).toList.map fun (_, q, _) =>
+      jsonPoint q
+    s!"\{\"key\": {k}, \"t\": {jsonNum t}, \"actors\": [{", ".intercalate actors}], " ++
+      s!"\"uprights\": [{", ".intercalate ups}]}"
+  let segs := r.timeline.segments
+  let turns := r.panels.toList.flatMap fun pr =>
+    let still := pr.plan.layers.filter (·.geoms.isNone)
+    still.toList.flatMap fun L => match L.version.actor with
+      | none => []
+      | some id => L.links.toList.filterMap fun
+        | .turn j c deg => do
+          let i ← (List.range segs.size).find? fun i => (segs[i]?.map (·.kind)) == some (.move j)
+          let s ← segs[i]?
+          let start ← anchorOf pr (pr.keys.figure j) id
+          let samples := [0.25, 0.5, 0.75].map fun (x : Float) =>
+            let t := Exact.toFloat s.start + x * Exact.toFloat s.dur
+            s!"\{\"t\": {jsonNum t}, " ++
+              s!"\"f\": {jsonNum ((pr.plan.clock.splines.getD i .linear).eval x)}}"
+          return s!"\{\"id\": \"{pr.idPrefix}{Canvas.safeToken id}\", \"step\": {j}, " ++
+            s!"\"centre\": {jsonPoint c}, \"start\": {jsonPoint start}, " ++
+            s!"\"sweep\": {jsonNum deg}, \"samples\": [{", ".intercalate samples}]}"
+        | .slide .. => none
+  let ups := r.panels.foldl (fun a pr => a + pr.plan.markerCounts.2) 0
+  let panels := (r.panels.zip r.layout.places).toList.map fun (pr, place) =>
+    s!"\{\"id\": \"{(pr.idPrefix.dropEnd 1).toString}\", \"box\": [{jsonNum place.x}, " ++
+      s!"{jsonNum place.y}, {jsonNum place.frame.width}, {jsonNum place.frame.height}]}"
+  let restTimes := (List.range r.figure.keyCount).map fun k =>
+    Exact.toFloat (r.timeline.restTime k)
+  let times := restTimes ++
+    (segs.toList.filter fun s => match s.kind with | .move _ => true | _ => false).flatMap
+      fun s => [0.25, 0.5, 0.75].map fun (x : Float) =>
+        Exact.toFloat s.start + x * Exact.toFloat s.dur
+  let phase := times.map fun t =>
+    let actors := ((r.markersAt t).filter (·.1.startsWith "actor ")).toList.map
+      fun (n, q, _) => s!"[\"{(n.drop 6).toString}\", {jsonPoint q}]"
+    s!"\{\"t\": {jsonNum t}, \"actors\": [{", ".intercalate actors}]}"
+  let marks := r.figure.panels.any fun p => turningMarks p.motion
+  return s!"\{\"name\": \"{name}\", \"svg\": \"{name}.svg\", " ++
+    s!"\"poster_png\": \"{name}-poster.png\", " ++
+    s!"\"cycle\": {jsonNum (Exact.toFloat r.timeline.cycle)}, \"uprights\": {ups}, " ++
+    s!"\"turning_marks\": {marks}, \"band\": {jsonNum r.layout.band}, " ++
+    s!"\"rests\": [{", ".intercalate rests}], \"turns\": [{", ".intercalate turns}], " ++
+    s!"\"panels\": [{", ".intercalate panels}], \"phase\": [{", ".intercalate phase}]}\n"
+
+/-- The segments of a picture's timeline as JSON: each rest with its key, each move with its
+step and whether its letter acts (`turn`) or not (`idle`), with its start and duration in
+seconds. -/
+def segmentsJson (c : Lift.FramePairConfig) (r : Plane.MotionPanelsReport) : String :=
+  let acts := c.frameSteps.toArray.map (·.acts)
+  let one := fun (s : Anim.Segment) =>
+    let time := s!"\"start\": {jsonNum (Exact.toFloat s.start)}, " ++
+      s!"\"duration\": {jsonNum (Exact.toFloat s.dur)}"
+    match s.kind with
+    | .rest k => s!"\{\"kind\": \"rest\", \"key\": {k}, {time}}"
+    | .move j =>
+      s!"\{\"kind\": \"{if acts.getD j true then "turn" else "idle"}\", \"step\": {j}, {time}}"
+    | .seamIn => s!"\{\"kind\": \"seamIn\", {time}}"
+    | .seamOut => s!"\{\"kind\": \"seamOut\", {time}}"
+  "[" ++ ", ".intercalate (r.timeline.segments.toList.map one) ++ "]"
+
+/-- The page of `--motion-variants`, with a marker where the data goes. -/
+def motionPage : String := include_str "FramePairPreview.html"
+
+/-- Whether the word is closed: its last key draws what its first does (the panels' actors, with
+their anchors, are the same), so that the loop needs no reset. -/
+def closedWord (c : Lift.FramePairConfig) : Bool :=
+  let last := c.word.length
+  [Lift.Panel.left, .right].all fun p =>
+    let a := c.actorsAt p 0
+    let b := c.actorsAt p last
+    a.length == b.length && (a.zip b).all fun (x, y) =>
+      x.id == y.id && x.anchors.length == y.anchors.length &&
+        (x.anchors.zip y.anchors).all fun (p, q) => Lift.ZetaFrac.same p q
+
+/-- One variant of `--motion-variants` written: its four SVGs (wide and narrow, light and dark)
+in `dir/svg`, the files of the browser check for its light renditions in `dir/check`, and its
+entry of `variants.json` with the SVG texts by file name; or the errors of the renditions that
+the engine refused. -/
+def renderMotionVariant (dir : System.FilePath) (c : Lift.FramePairConfig) :
+    IO (Except (Array String) (String × Array (String × String))) := do
+  let id := variantName c
+  let renditions : Array (String × String × Plane.MotionPanels) :=
+    let wide := c.motion
+    let dark := c.motionWith Lift.canonicalPacing (dark := true)
+    #[("wide", "", wide), ("wideDark", "-dark", dark)] ++
+      (wide.narrow.map fun n => #[("narrow", "-narrow", n)]).getD #[] ++
+      (dark.narrow.map fun n => #[("narrowDark", "-narrow-dark", n)]).getD #[]
+  let mut errors : Array String := #[]
+  let mut files : Array (String × String) := #[]
+  let mut sizes : Array (String × Nat × Nat) := #[]
+  let mut bytes : Array (String × Nat) := #[]
+  let mut segments := "[]"
+  for (key, suffix, P) in renditions do
+    let r := P.report
+    for n in r.problems do
+      if n.severity == .note then IO.println s!"  note, {id}{suffix}: {n.message}"
+    match r.svg? with
+    | .error es => errors := errors ++ es.map (s!"{id}{suffix}: " ++ ·)
+    | .ok svg =>
+      let file := s!"svg/{id}{suffix}.svg"
+      IO.FS.writeFile (dir / file) svg
+      files := files.push (file, svg)
+      sizes := sizes.push (key, r.pixelSize)
+      bytes := bytes.push (key, svg.utf8ByteSize)
+      if key == "wide" then segments := segmentsJson c r
+      if suffix == "" || suffix == "-narrow" then
+        let name := id ++ suffix
+        IO.FS.writeFile (dir / "check" / s!"{name}.svg") svg
+        for k in [0:P.keyCount] do
+          IO.FS.writeFile (dir / "check" / s!"{name}-key{k}.svg") (r.keyStillSvg k)
+        IO.FS.writeBinFile (dir / "check" / s!"{name}-poster.png")
+          ((r.keyStillPng P.poster).getD .empty)
+        IO.FS.writeFile (dir / "check" / s!"{name}.json") (browserExpectations name r)
+  if !errors.isEmpty then return .error errors
+  let right := match c.right with | .bodies => "R1" | .centres => "R2" | .bodiesGraph => "R3"
+  let view := match c.view with
+    | .shared => "shared" | .cropped => "cropped" | .wideRight => "wideRight"
+  let idle := match c.idleMark with | .outline => "dashed" | .ring => "ring"
+  let left := match c.left with | .halved => "halved" | .full => "full"
+  let obj := fun (xs : List String) => "{" ++ ", ".intercalate xs ++ "}"
+  let entry := obj [s!"\"id\": {jsonString id}", s!"\"word\": {jsonString c.wordText}",
+    s!"\"title\": {jsonString c.motion.info.title}",
+    s!"\"closed\": {closedWord c}",
+    "\"options\": " ++ obj [s!"\"right\": \"{right}\"", s!"\"trails\": {c.trails}",
+      s!"\"view\": \"{view}\"", s!"\"idle\": \"{idle}\"", s!"\"left\": \"{left}\""],
+    "\"steps\": [" ++ ", ".intercalate (c.frameSteps.map fun s =>
+      s!"\{\"letter\": {jsonString s.letter.text}, \"acts\": {s.acts}}") ++ "]",
+    s!"\"segments\": {segments}",
+    "\"captions\": [" ++ ", ".intercalate ((List.range c.keyCount).map fun k =>
+      jsonString (c.keyCaption k)) ++ "]",
+    "\"size\": " ++ obj (sizes.toList.map fun (k, w, h) => s!"\"{k}\": [{w}, {h}]"),
+    "\"bytes\": " ++ obj (bytes.toList.map fun (k, n) => s!"\"{k}\": {n}"),
+    "\"files\": " ++ obj (files.toList.map fun (f, _) =>
+      let key := if f.endsWith "-narrow-dark.svg" then "narrowDark"
+        else if f.endsWith "-narrow.svg" then "narrow"
+        else if f.endsWith "-dark.svg" then "wideDark" else "wide"
+      s!"\"{key}\": {jsonString f}")]
+  return .ok (entry, files)
+
+/-- Writes the variants of the animated frame pair (`motionVariants`) into `dir`: one standalone
+animated SVG per variant and rendition at the canonical pacing (`Lift.canonicalPacing`) in
+`dir/svg`, the files of PILean's browser check in `dir/check`, `variants.json`, and `index.html`,
+a page that plays the variants re-timed and writes the chosen values as Lean. Returns the
+messages of the variants the engine refused (an error under `checks := .fail`). -/
+def writeMotionVariants (dir : System.FilePath) : IO (Array String) := do
+  IO.FS.createDirAll (dir / "svg")
+  IO.FS.createDirAll (dir / "check")
+  let mut entries : Array String := #[]
+  let mut svgs : Array (String × String) := #[]
+  let mut errors : Array String := #[]
+  for c in motionVariants do
+    let t0 ← IO.monoMsNow
+    match ← renderMotionVariant dir c with
+    | .error es =>
+      errors := errors ++ es
+      IO.println s!"{variantName c}: {es.size} errors"
+    | .ok (entry, files) =>
+      entries := entries.push entry
+      svgs := svgs ++ files
+      let sizes := ", ".intercalate (files.toList.map fun (f, s) => s!"{f} {s.utf8ByteSize} B")
+      IO.println s!"{variantName c}: no errors ({(← IO.monoMsNow) - t0} ms); {sizes}"
+  let variants := "[\n" ++ ",\n".intercalate entries.toList ++ "\n]\n"
+  IO.FS.writeFile (dir / "variants.json") variants
+  let svgObj := "{" ++ ",\n".intercalate (svgs.toList.map fun (f, s) =>
+    s!"{jsonString f}: {jsonString s}") ++ "}"
+  let data := s!"window.FRAME_PAIR_DATA = \{\"variants\": {variants}, \"svgs\": {svgObj}};"
+  IO.FS.writeFile (dir / "index.html") (motionPage.replace "/*@DATA@*/" data)
+  return errors
+
 end TDCSGFigures.Preview
 
 open PILean TDCSGFigures.Preview in
 /-- Renders the previews (see the module docstring). -/
 def main (args : List String) : IO UInt32 := do
+  if let ["--motion-variants", dir] := args then
+    let errors ← writeMotionVariants dir
+    for e in errors do IO.println s!"  {e}"
+    IO.println s!"wrote {dir}/index.html; {errors.size} errors"
+    return if errors.isEmpty then 0 else 1
   if let "--frame-pair-keys" :: dir :: rest := args then
     let c ← IO.ofExcept (parseFramePair rest {})
     let (ps, ok) ← renderFramePair dir c

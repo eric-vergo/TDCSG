@@ -54,7 +54,8 @@ carries the actors' anchors in key `k` onto those in key `k + 1`; the general st
 `TDCSG.Five.two_mul_sub_proj_genA`, `TDCSG.Five.two_mul_sub_proj_genB`, `TDCSG.Five.halved_genA`,
 `TDCSG.Five.halved_genB` and `TDCSG.Five.frameMap_genA_halved`.
 
-Nothing here is a figure of the site; `tdcsg-figure-preview --frame-pair-keys` draws the keys.
+Nothing here is a figure of the site; `tdcsg-figure-preview --frame-pair-keys` draws the keys, and
+`TDCSGFigures.FramePairMotion` animates them.
 -/
 
 namespace TDCSGFigures.Lift

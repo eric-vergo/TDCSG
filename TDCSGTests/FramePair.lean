@@ -2,7 +2,7 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo, Claude Opus 5.5
 -/
-import TDCSGFigures.FramePair
+import TDCSGFigures.FramePairMotion
 
 /-!
 # The declared moves of the frame pair arrive exactly
@@ -17,7 +17,9 @@ check fail. Every drawn actor gives back its base title (`FramePairConfig.baseTi
 checked by evaluation, since the drawing goes through floating point).
 The letters that act are the ones pinned in `TDCSGTests.FrameWords`. This is the exact counterpart
 of the floating-point arrival check of an animation; the general statements behind it are
-`TDCSG.Five.framePicture_genA_genB` and `TDCSG.Five.halved_genA` with their companions.
+`TDCSG.Five.framePicture_genA_genB` and `TDCSG.Five.halved_genA` with their companions. The
+animation made from these moves (`FramePairConfig.motion`) passes the checks of PILean's motion
+engine for two of the words, checked by evaluation.
 -/
 
 namespace TDCSGTests.FramePair
@@ -95,5 +97,13 @@ def twelveLetters : FramePairConfig :=
 -- gives back its base title. The drawing goes through floating point, which the kernel does not
 -- reduce, so this is checked by evaluation when the module is built.
 #guard twelveLetters.baseTitlesRecoverable
+
+-- The animation of the frame pair (`FramePairConfig.motion`, two panels on one clock) passes
+-- every check of PILean's engine, with no error and no note, for `a b a b` and for the
+-- twelve-letter word with its idle letters marked by rings. The engine's checks are in floating
+-- point, so these are checked by evaluation when the module is built.
+#guard ({ word := [.a, .b, .a, .b] } : FramePairConfig).motion.problems.isEmpty
+#guard ({ word := [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b], idleMark := .ring } :
+  FramePairConfig).motion.problems.isEmpty
 
 end TDCSGTests.FramePair

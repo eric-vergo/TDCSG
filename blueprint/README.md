@@ -179,6 +179,26 @@ lake exe tdcsg-figure-preview --frame-pair-keys DIR --word aababaabbabb --varian
 writes the keys of both panels (light, dark, narrow) and contact sheets `DIR/<variant>/sheet*.html`,
 and prints the disks' diameters in pixels.
 
+`TDCSGFigures/FramePairMotion.lean` animates the keys: `FramePairConfig.motion` is a PILean
+`MotionPanels`, the two panels side by side in one SVG on one clock, one step per letter, the
+moves those of `frameSteps` (the point turns in the left panel, the body of centres in the
+right, idle marks and trails fade in and out), checked by PILean's engine (arrival within 0.01 px,
+the rests against the key stills, the written SVG against the baked frames, nothing leaving its
+panel while it turns). The exact pins above say that the declared moves carry each key onto the
+next; the engine's checks say that the picture draws those moves. To compare the variants in
+motion and choose a pacing (outside the repository; nothing goes into the site):
+
+```sh
+lake exe tdcsg-figure-preview --motion-variants DIR
+```
+
+writes one animated SVG per variant and rendition (wide, narrow, light, dark) at a canonical
+pacing to `DIR/svg`, `DIR/variants.json`, and `DIR/index.html`, a page that plays the chosen
+variant re-timed (turn, hold, idle step, first and last hold, seam, easing, speed), scrubs
+through the loop, shows the stills, and prints the chosen values as Lean to copy. `DIR/check`
+holds the files of PILean's browser check, `python3 tools/motion-browser-check.py DIR/check`
+from a PILean checkout.
+
 ### Drawing figures in a worktree
 
 The folder `figures/` is a small Lake workspace that builds `TDCSGFigures` and the preview tool
