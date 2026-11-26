@@ -39,18 +39,18 @@ rev = "11afe5e30105914a412551f4e0c042710345c459"
 [[require]]
 name = "pilean"
 git = "https://github.com/eric-vergo/PILean"
-rev = "437c79497b741a5b7733189cb86b500052846467"
+rev = "67270543a94dd5cab90ff4808fe1e11f164f86de"
 
 [[require]]
 name = "pilean-verso"
 git = "https://github.com/eric-vergo/PILean"
-rev = "437c79497b741a5b7733189cb86b500052846467"
+rev = "67270543a94dd5cab90ff4808fe1e11f164f86de"
 subDir = "verso"
 
 [[require]]
 name = "pilean-leantex"
 git = "https://github.com/eric-vergo/PILean"
-rev = "437c79497b741a5b7733189cb86b500052846467"
+rev = "67270543a94dd5cab90ff4808fe1e11f164f86de"
 subDir = "leantex"
 
 # Mathlib is required last so that its pins of shared dependencies (ProofWidgets, Plausible)

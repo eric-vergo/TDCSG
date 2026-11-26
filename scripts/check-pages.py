@@ -14,8 +14,8 @@ figure, nothing at all in an animation), the figures' pages against the manifest
 animation's words, its table of steps, its stills and exactly the files of a motion), and a fresh
 render compared with the folder (`--check-figures`, through the site's generator). Every animation
 must be recorded as checked strictly (`checks` `fail`, `errorsLeft` 0), as an illustration and
-with a narrow rendition. A link to a place in its own page (`#…`) must name an element the page
-has, except `#bp-motion`, the animations switch that Verso Blueprint's script puts in the menu.
+with a narrow rendition. A link written as a fragment alone (`#…`) must name an element of the page it leads
+to under the page's `base`, except `#bp-motion`, the animations switch that Verso Blueprint's script puts in the menu.
 With `--release` it also checks the hosted verification record, the source links at the verified
 commit, and that the site's kernel replay accepted every node and calls each judged theorem proved.
 """
@@ -68,8 +68,9 @@ active_markup = []
 other_images = []
 # Inline pictures on the figures' own pages (the frames of an explorer).
 figure_page_inline = []
-# Links to a place in the same page: (page, fragment). `#bp-motion` names the animations switch,
-# which Verso Blueprint's script adds to the page menu, and `#` the top of the page.
+# Links written as a fragment alone (`#…`): (page, the page they lead to under the page's `base`,
+# fragment). `#bp-motion` names the animations switch, which Verso Blueprint's script adds to the
+# page menu, and `#` the top of the page.
 same_page_links = []
 SAME_PAGE_FREE = {"#", "#bp-motion"}
 
@@ -204,7 +205,12 @@ class Resources(HTMLParser):
         for key in ("src", "href"):
             value = attrs.get(key)
             if key == "href" and value and value.startswith("#") and value not in SAME_PAGE_FREE:
-                same_page_links.append((page, unquote(value[1:])))
+                # Resolved against the page's `base`, as the browser does.
+                url = urlsplit(urljoin(self.base, value))
+                target = site / unquote(url.path[len(prefix):])
+                if target.is_dir() or not target.suffix:
+                    target = target / "index.html"
+                same_page_links.append((page, target, unquote(url.fragment)))
             if not value or value.startswith("#"):
                 continue
             url = urlsplit(urljoin(self.base, value))
@@ -297,11 +303,11 @@ for page in pages:
 
 dead = []
 texts = {}
-for link_page, fragment in same_page_links:
-    text = texts.setdefault(link_page, link_page.read_text())
+for link_page, target, fragment in same_page_links:
+    text = texts.setdefault(target, target.read_text() if target.is_file() else "")
     if f'id="{fragment}"' not in text and f'name="{fragment}"' not in text:
-        dead.append(f"{link_page.relative_to(site)}: #{fragment}")
-assert not dead, f"links to places the page does not have: {sorted(set(dead))[:10]}"
+        dead.append(f"{link_page.relative_to(site)}: #{fragment} in {target.relative_to(site)}")
+assert not dead, f"links to places that do not exist: {sorted(set(dead))[:10]}"
 
 missing = proof_declarations - linked_declarations - attached_to_proof
 assert not missing, f"declarations of a proof listed nowhere: {sorted(missing)}"
