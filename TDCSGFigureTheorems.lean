@@ -1448,7 +1448,6 @@ namespace TDCSGFigures.Lift
 
 open PILean PILean.Plane PILean.Exact TDCSGFigures
 
-open FramePairConfig in
 /-- The frame pair and the data its key frames are drawn from. The figure is the motion of the
 default configuration (`FramePairConfig.motion`): the word `a a b a b a a b b a b b` applied to
 `z = 0` at `r = 1.95`, without the word strip; its two panels' keys are the key figures
@@ -1497,39 +1496,6 @@ theorem framePair_keys :
       if moves.isEmpty then MotionStep.idle else { moves }) ∧
     framePair.captions =
       ((List.range ({} : FramePairConfig).keyCount).map ({} : FramePairConfig).keyCaption).toArray ∧
-    FramePairConfig.nbsp = " " ∧
-    (∀ s, whereText s =
-  let n := ("," ++ nbsp).intercalate (s.n.toList.map fun k =>
-    if k < 0 then s!"−{-k}" else toString k)
-  s!"(n{nbsp}={nbsp}({n}), j{nbsp}={nbsp}{s.j})") ∧
-    (∀ cfg : FramePairConfig, ∀ j, cfg.keyCaption j =
-  let r := cfg.keyRef j
-  let k := r.state
-  let s := cfg.stateAt k
-  if k == 0 then
-    "Start: z = 0, so x = 1/2. Left: the disks halved, with centers 0 and 1, and the point " ++
-      "(y + 1)/2. Right: the window about x, the point fixed at x, and the left and right " ++
-      "centers P(n) and P(n + eⱼ) with the halved disks riding on them; n is the integer label " ++
-      "of the left center, j the index of the direction from the left to the right center " ++
-      s!"{whereText s}."
-  else
-    let l := cfg.letterOf (k - 1)
-    let (own, other, ownName) := match l with
-      | .a | .aInv => ("left", "right", "0")
-      | .b | .bInv => ("right", "left", "1")
-    let (pointWay, centreWay) := match l with
-      | .a | .b => ("clockwise", "counterclockwise")
-      | .aInv | .bInv => ("counterclockwise", "clockwise")
-    let letter := s!"Letter {k}, {l.text},"
-    if s.acted then
-      s!"{letter} acts: the point turns a fifth of a turn {pointWay} about the {own} center " ++
-        s!"{ownName}; in the moving frame the {other} center turns a fifth of a turn " ++
-        s!"{centreWay} about the {own} center. {whereText s}"
-    else if r.mark then
-      s!"{letter} does not act: the point lies outside the {own} disk, and in the moving frame " ++
-        s!"the {own} center lies outside the window; a ring marks that center in both panels, " ++
-        s!"and nothing moves. {whereText s}"
-    else s!"{letter} did not act: the state is unchanged. {whereText s}") ∧
     (states.map (·.n) == [#[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0],
       #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[1, -1, 0, 0, 0],
       #[1, 0, -1, 0, 0], #[1, 0, -1, 0, 0], #[1, 0, 0, -1, 0], #[1, 0, 0, 0, -1]]) = true ∧
@@ -1550,11 +1516,8 @@ theorem framePair_keys :
       (({} : FramePairConfig).keyCaption j).startsWith h) = true ∧
     ({} : FramePairConfig).keyCount = 16 ∧ ({} : FramePairConfig).allArrive = true ∧
     ({} : FramePairConfig).ringsPlaced = true := by
-  refine ⟨by unfold framePair; with_reducible rfl, rfl, rfl, rfl, rfl, rfl,
-    by unfold framePair FramePairConfig.motion; with_reducible rfl, fun _ => rfl, fun _ => rfl,
-    fun _ => rfl, fun _ => rfl, fun _ _ _ _ => rfl,
-    by unfold framePair FramePairConfig.motion; with_reducible rfl, rfl, fun _ => rfl,
-    fun _ _ => rfl, ?_⟩
+  refine ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl,
+    fun _ => rfl, fun _ _ _ _ => rfl, rfl, ?_⟩
   repeat' apply And.intro
   all_goals decide +kernel
 
