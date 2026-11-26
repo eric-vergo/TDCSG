@@ -287,8 +287,11 @@ theorem extensionJump_keys :
     QSqrt.lt (rat 100) barOuter.normSq = true ∧
     ((jumpTurn.apply (ZetaFrac.ofZeta nearInside)).any
       (ZetaFrac.same · (ZetaFrac.ofZeta nearInsideImage))) = true := by
-  refine ⟨by unfold extensionJump; with_reducible rfl, rfl, fun _ => rfl, fun _ => rfl,
-    fun _ => rfl, rfl, rfl, rfl, rfl, rfl, rfl, ?_⟩
+  refine ⟨by unfold extensionJump; with_reducible rfl, rfl,
+    fun _ => by unfold jumpKey; with_reducible rfl,
+    fun _ => by unfold jumpKeyItems; with_reducible rfl,
+    fun _ => by unfold jumpInner; with_reducible rfl, by unfold jumpOuter; with_reducible rfl, rfl,
+    rfl, rfl, rfl, rfl, ?_⟩
   repeat' apply And.intro
   all_goals decide +kernel
 
@@ -378,7 +381,8 @@ theorem disjointDisks_spec :
     QSqrt.lt ((rightCentre + phiInv * Zeta5.pow 1) - rightCentre).normSq
       (rat (disjointRight * disjointRight)) = true := by
   refine ⟨by unfold disjointDisks; with_reducible rfl,
-    fun _ => by unfold disjointPanel; with_reducible rfl, fun _ => rfl,
+    fun _ => by unfold disjointPanel; with_reducible rfl,
+    fun _ => by unfold disjointKey; rw [if_pos (by decide)],
     by unfold disjointDisks; with_reducible rfl, rfl, rfl, rfl, rfl, rfl, rfl, ?_⟩
   repeat' apply And.intro
   all_goals decide +kernel
@@ -542,8 +546,9 @@ theorem generatorStep_spec :
     ((aZero - rightCentre).normSq == rat 7 - phi * rat 2) = true ∧
     QSqrt.lt r2ThreeHalves (aZero - rightCentre).normSq = true ∧
     decide ((19 / 10 - 1 : Rat) * (19 / 10 - 1) + (-6 / 5) * (-6 / 5) = 9 / 4) = true := by
-  refine ⟨by unfold generatorStep; with_reducible rfl, rfl,
-    by unfold generatorStep; with_reducible rfl, rfl, rfl, rfl, rfl, ?_⟩
+  refine ⟨by unfold generatorStep; with_reducible rfl,
+    by unfold generatorKeys; with_reducible rfl, by unfold generatorStep; with_reducible rfl, rfl,
+    rfl, rfl, rfl, ?_⟩
   repeat' apply And.intro
   all_goals decide +kernel
 
@@ -1046,7 +1051,8 @@ theorem exchangedIntervals_spec :
     (returnInterval 3 true).1 = rat (-1) ∧ (returnInterval 2 true).2 = rat 1 ∧
     (returnInterval 3 true).2 = (returnInterval 1 true).1 ∧
     (returnInterval 1 true).2 = (returnInterval 2 true).1 := by
-  refine ⟨by unfold exchangedIntervals; with_reducible rfl, rfl,
+  refine ⟨by unfold exchangedIntervals; with_reducible rfl,
+    by unfold intervalKey; rw [if_pos (by decide)],
     by unfold exchangedIntervals; with_reducible rfl, rfl, rfl, fun _ _ => rfl, fun _ => rfl,
     fun _ _ => rfl, rfl, ?_⟩
   repeat' apply And.intro
@@ -1222,8 +1228,9 @@ theorem chordOrbit_spec :
       (chordRows 24)[k + 1]!.2 ==
         t + phi * rat 2 - (if w == 3 then rat 4 else rat 2)) = true ∧
     ((chordRows 24).map (phiForm ·.2)).toList.eraseDups.length = 25 := by
-  refine ⟨by unfold chordOrbit; with_reducible rfl, rfl, rfl,
-    by unfold chordOrbit; with_reducible rfl, rfl, rfl, rfl, fun _ => rfl, rfl, rfl, fun _ => rfl,
+  refine ⟨by unfold chordOrbit; with_reducible rfl, rfl,
+    by unfold orbitKey; rw [if_pos (by decide)], by unfold chordOrbit; with_reducible rfl, rfl, rfl,
+    rfl, fun _ => rfl, rfl, rfl, fun _ => rfl,
     fun _ _ _ => rfl, rfl, rfl, rfl, rfl, rfl, ?_⟩
   repeat' apply And.intro
   all_goals decide +kernel
@@ -2135,7 +2142,14 @@ theorem walkToLeaf_keys :
   refine ⟨by unfold walkToLeaf; with_reducible rfl, rfl, ?_⟩
   repeat' apply And.intro
   all_goals first
-    | (intro _; rfl)
+    | (intro _; unfold walkAt; with_reducible rfl)
+    | (intro _; unfold walkShown; with_reducible rfl)
+    | (intro _; unfold walker; with_reducible rfl)
+    | (intro _; unfold walkKey; with_reducible rfl)
+    | (intro _; unfold walkNameIds; with_reducible rfl)
+    | (intro _; unfold walkMoves; with_reducible rfl)
+    | (intro _; unfold stepText; with_reducible rfl)
+    | (intro _; unfold walkCaption; with_reducible rfl)
     | (unfold walkToLeaf; with_reducible rfl)
     | decide +kernel
 
