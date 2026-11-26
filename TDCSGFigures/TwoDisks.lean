@@ -127,11 +127,11 @@ def fixedSamples : List Zeta5 :=
 def turnedImages : List Zeta5 := turnedSamples.map Letter.a.rotate
 
 /-- The content of the left disk that turns (actor `"disk"`), with the samples at `zs`: the
-segment from `-1` to the first, the first as a point and the others as small dots, each recording
+segment from the first to `-1`, the first as a point and the others as small dots, each recording
 that it lies inside the left disk. -/
 def turningContent (zs : List Zeta5) : Item :=
   let z := zs.headD origin
-  (group (#[Plane.Exact.segment leftCentre z |>.role leftRole |>.width 1.5,
+  (group (#[Plane.Exact.segment z leftCentre |>.role leftRole |>.width 1.5,
       Plane.Exact.point z |>.role leftRole] ++
     (zs.drop 1).toArray.map fun w =>
       Plane.Exact.point w |>.role leftRole |>.size 3 |>.incident .inside "the left circle"))
@@ -184,15 +184,15 @@ def generatorMoves : Nat → List (String × ExactMove ZetaFrac)
       ("image-label", .appear)]
 
 /-- The exact anchors of the actors of key `k` of `generatorStep`: at keys `0` and `1`, the
-content of the disk (the centre, then the samples, `turnedSamples` before the turn and
-`turnedImages` after, the first twice, as the end of the segment and as a point) and the points
+content of the disk (the first sample and the centre, the ends of the segment, then the samples,
+`turnedSamples` before the turn and `turnedImages` after) and the points
 outside; at key `2`, the marks of the turn (the ends of the segment and of the arc, the centre of
 the angle and of its label), the origin, `a(0)` and its label. -/
 def generatorActors (k : Nat) : List (ExactActor ZetaFrac) :=
   let z := ZetaFrac.ofZeta
   let samples := if k == 0 then turnedSamples else turnedImages
   if k ≤ 1 then
-    [⟨"disk", [z leftCentre, z (samples.headD origin)] ++ samples.map z⟩,
+    [⟨"disk", [z (samples.headD origin), z leftCentre] ++ samples.map z⟩,
       ⟨"outside", fixedSamples.map z⟩]
   else
     [⟨"image-spoke", [z leftCentre, z aZero]⟩, ⟨"angle", [z leftCentre]⟩,

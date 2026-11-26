@@ -24,7 +24,9 @@ against the same expectations.
 
 open PILean PILean.Plane TDCSGFigures
 
-/-- The animations of the site, with their declarations' names. -/
+/-- The animations of the site, with the names of their files in the site: the declaration's name,
+without the name of its module where the module's name begins it (`walkToLeaf`, declared in
+`TDCSGFigures.Confinement`). -/
 def motions : Array (String × MotionPanels) := #[
   ("TDCSGFigures.wordLoop1", wordLoop1),
   ("TDCSGFigures.wordLoop2", wordLoop2),
@@ -36,7 +38,7 @@ def motions : Array (String × MotionPanels) := #[
   ("TDCSGFigures.wordSteps", wordSteps),
   ("TDCSGFigures.exchangedIntervals", exchangedIntervals),
   ("TDCSGFigures.chordOrbit", chordOrbit),
-  ("TDCSGFigures.Confinement.walkToLeaf", Confinement.walkToLeaf)]
+  ("walkToLeaf", Confinement.walkToLeaf)]
 
 /-- Writes the files of `P` and of its narrow rendition into `dir`. -/
 def writePanels (dir : System.FilePath) (name : String) (P : MotionPanels) : IO Unit := do

@@ -37,7 +37,7 @@ theorem generator_wrongDirection :
 /-- A sample of the left disk drawn somewhere else after the turn is caught. -/
 theorem generator_displaced :
     allArrive 2 generatorMoves (fun k => if k == 1 then
-      [⟨"disk", [ZetaFrac.ofZeta leftCentre, ZetaFrac.ofZeta aZero, ZetaFrac.ofZeta aZero,
+      [⟨"disk", [ZetaFrac.ofZeta aZero, ZetaFrac.ofZeta leftCentre, ZetaFrac.ofZeta aZero,
         ZetaFrac.ofZeta origin]⟩, ⟨"outside", fixedSamples.map ZetaFrac.ofZeta⟩]
       else generatorActors k) = false := by
   decide +kernel

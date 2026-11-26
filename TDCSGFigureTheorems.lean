@@ -556,8 +556,8 @@ figure_links generatorStep generatorStep_spec
 
 /-- The key frames of `generatorStep` before the last and its moves. Key `k ≤ 1` draws, in the
 frame of the figure of the step, its disks, lens, radius, centres and names and, in place of its
-marks of the turn: the content of the left disk (`turningContent`), the segment from `-1` to the
-first sample and the samples `turnedSamples`, `0` among them, before the turn (key `0`) and their
+marks of the turn: the content of the left disk (`turningContent`), the segment from the first
+sample to `-1` and the samples `turnedSamples`, `0` among them, before the turn (key `0`) and their
 images `turnedImages` after it (key `1`), each recording that it lies inside the left disk; and the
 points `fixedSamples` outside it (`fixedContent`). Step `0` turns the content of the disk by
 `generatorTurn`, a fifth of a turn clockwise about `-1`; step `1` fades it and the points outside
@@ -585,7 +585,7 @@ theorem generatorStep_keys :
       #[turningContent (if k == 0 then turnedSamples else turnedImages), fixedContent] ++
       generatorCentres ++ generatorLabels ++ generatorNames) ∧
     (∀ zs, turningContent zs =
-      ((group (#[Plane.Exact.segment leftCentre (zs.headD origin) |>.role leftRole |>.width 1.5,
+      ((group (#[Plane.Exact.segment (zs.headD origin) leftCentre |>.role leftRole |>.width 1.5,
           Plane.Exact.point (zs.headD origin) |>.role leftRole] ++
         (zs.drop 1).toArray.map fun w =>
           Plane.Exact.point w |>.role leftRole |>.size 3 |>.incident .inside "the left circle"))
