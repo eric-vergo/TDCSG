@@ -39,18 +39,18 @@ rev = "11afe5e30105914a412551f4e0c042710345c459"
 [[require]]
 name = "pilean"
 git = "https://github.com/eric-vergo/PILean"
-rev = "67270543a94dd5cab90ff4808fe1e11f164f86de"
+rev = "18fc971d641faf7a5e8c7095f350b2f56f366493"
 
 [[require]]
 name = "pilean-verso"
 git = "https://github.com/eric-vergo/PILean"
-rev = "67270543a94dd5cab90ff4808fe1e11f164f86de"
+rev = "18fc971d641faf7a5e8c7095f350b2f56f366493"
 subDir = "verso"
 
 [[require]]
 name = "pilean-leantex"
 git = "https://github.com/eric-vergo/PILean"
-rev = "67270543a94dd5cab90ff4808fe1e11f164f86de"
+rev = "18fc971d641faf7a5e8c7095f350b2f56f366493"
 subDir = "leantex"
 
 # Mathlib is required last so that its pins of shared dependencies (ProofWidgets, Plausible)
@@ -92,7 +92,7 @@ root = "TDCSGFigures.Preview"
 # words for the figures that neither the figures library nor the blueprint builds.
 [[lean_lib]]
 name = "TDCSGTests"
-roots = ["TDCSGTests.FrameWords", "TDCSGTests.FramePair"]
+roots = ["TDCSGTests.FrameWords", "TDCSGTests.FramePair", "TDCSGTests.Motions"]
 
 [[lean_exe]]
 name = "tdcsg-test"
