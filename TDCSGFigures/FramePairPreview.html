@@ -73,12 +73,23 @@ textarea { width: 100%; height: 10.5em; font: 12px/1.35 ui-monospace, Menlo, mon
 .still p { margin: 4px 0 0; font-size: 12px; }
 .note { color: var(--muted); font-size: 12px; }
 #info { color: var(--muted); font-size: 12px; margin-top: 4px; }
+#reduced { display: none; margin: 0 0 8px; padding: 6px 8px; border: 1px solid var(--line);
+  border-radius: 6px; background: var(--panel); font-size: 13px; }
+#reduced.on { display: block; }
+/* This page is a tuner: it shows the moving picture even when the system asks for reduced
+   motion, overriding the rule inside the SVG that shows the poster still instead. */
+#picture .pilean-motion-live, #stills .pilean-motion-live { visibility: visible !important;
+  opacity: 1 !important; }
+#picture .pilean-motion-poster, #stills .pilean-motion-poster { display: none !important; }
 </style>
 </head>
 <body>
 <main>
 <section id="stage">
   <h1 id="title">Frame pair</h1>
+  <p id="reduced" role="note">Your system asks for reduced motion. On the site these pictures
+    would show their stills; this tuner still plays the motion (pause it with the button below).
+  </p>
   <div id="picture" aria-live="off"></div>
   <div id="transport">
     <button id="play" type="button">Pause</button>
@@ -143,11 +154,11 @@ const VARIANTS = DATA.variants;
 
 // ---- parameters ----
 const SLIDERS = [
-  ["turn", "turn", 0.1, 4, 0.05, 1.1],
-  ["hold", "hold", 0, 4, 0.05, 0.5],
-  ["idle", "idle step", 0.1, 4, 0.05, 0.9],
-  ["firstHold", "first hold", 0, 6, 0.05, 1.5],
-  ["lastHold", "last hold", 0, 6, 0.05, 2],
+  ["turn", "turn", 0.1, 4, 0.05, 1.6],
+  ["hold", "hold", 0, 4, 0.05, 0.9],
+  ["fade", "idle mark fade", 0.1, 3, 0.05, 0.4],
+  ["firstHold", "first hold", 0, 6, 0.05, 2],
+  ["lastHold", "last hold", 0, 6, 0.05, 2.5],
   ["seam", "seam fade (0 = cut)", 0, 3, 0.05, 0.4],
   ["speed", "speed (×)", 0.1, 3, 0.05, 1],
 ];
@@ -155,13 +166,16 @@ const PRESETS = [
   ["standard", [0.42, 0, 0.58, 1]], ["soft", [0.45, 0, 0.55, 1]], ["ease", [0.25, 0.1, 0.25, 1]],
   ["ease-out", [0, 0, 0.58, 1]], ["ease-in", [0.42, 0, 1, 1]], ["strong", [0.65, 0, 0.35, 1]],
 ];
-const DEFAULTS = { turn: 1.1, hold: 0.5, idle: 0.9, firstHold: 1.5, lastHold: 2, seam: 0.4,
+// the starting pacing, chosen from frame sequences recorded at speed 1: a fifth of a turn in
+// 1.6 s with a soft ease, and a rest of 0.9 s, leave time to follow two panels at once and to
+// read the caption before the next letter moves
+const DEFAULTS = { turn: 1.6, hold: 0.9, fade: 0.4, firstHold: 2, lastHold: 2.5, seam: 0.4,
   speed: 1, easing: "spline", spline: [0.45, 0, 0.55, 1] };
 const STORE = "frame-pair-preview-settings";
 
 // the variant shown first: the twelve-letter word with ringed idle letters and a wider right
 // panel, when it is in the list
-const FIRST = "aababaabbabb-R1-notrails-halved-ring-wideright";
+const FIRST = "aababaabbabb-R1-notrails-halved-wideright";
 const state = Object.assign({}, DEFAULTS, {
   variant: VARIANTS.some(v => v.id === FIRST) ? FIRST : VARIANTS.length ? VARIANTS[0].id : "",
   layout: "wide", theme: "light", stills: false, seamTouched: {} });
@@ -222,7 +236,8 @@ function buildTimeline() {
     } else if (s.kind === "turn") {
       push("turn", state.turn, s.start, "ease", { step: s.step });
     } else {
-      push("idle", state.idle, s.start, "linear", { step: s.step });
+      // the mark of a letter that does not act appears or vanishes, not eased
+      push(s.kind, state.fade, s.start, "linear", { step: s.step });
     }
   }
   const last = v.segments[v.segments.length - 1];
@@ -326,11 +341,11 @@ function drawTicks() {
   const box = document.getElementById("ticks");
   box.innerHTML = "";
   for (const s of timeline.segs) {
-    if (s.kind !== "turn" && s.kind !== "idle") continue;
+    if (s.kind !== "turn" && s.kind !== "appear") continue;
     const el = document.createElement("span");
-    el.className = s.kind;
+    el.className = s.kind === "appear" ? "idle" : "turn";
     el.style.left = (100 * s.start / timeline.cycle) + "%";
-    el.title = `step ${s.step + 1}${s.kind === "idle" ? " (does not act)" : ""}`;
+    el.title = s.kind === "appear" ? "a letter that does not act" : "a turn";
     box.appendChild(el);
   }
 }
@@ -364,9 +379,10 @@ const DIMS = [
   ["word", v => v.word, w => w],
   ["right", v => v.options.right, r => ({ R1: "R1: centres with riding disks",
     R2: "R2: centres and edge", R3: "R3: R1 with the centre-graph edge" }[r] || r)],
-  ["trails", v => v.options.trails ? "dots" : "none", x => x],
+  ["trails", v => v.options.trails, x => x === "full" ? "every earlier position" : x],
   ["view", v => v.options.view, x => x],
-  ["idle", v => v.options.idle, x => x],
+  ["idle", v => v.options.idle, x => ({ ring: "ring about the centre",
+    outline: "dashed circle outside the disk" }[x] || x)],
   ["left", v => v.options.left, x => x],
 ];
 function fillVariantPickers() {
@@ -389,7 +405,7 @@ function fillVariantPickers() {
     for (const v of VARIANTS.filter(v => v.word === w)) {
       const o = document.createElement("option");
       o.value = v.id;
-      o.textContent = `${v.options.right}, trails ${v.options.trails ? "dots" : "none"}, ` +
+      o.textContent = `${v.options.right}, trails ${v.options.trails}, ` +
         `${v.options.view}, ${v.options.idle}, left ${v.options.left}`;
       g.appendChild(o);
     }
@@ -545,20 +561,33 @@ function chosenText() {
   const seam = state.seam > 0 ? `.crossfade (${rat(state.seam)})` : ".cut";
   const right = { R1: ".bodies", R2: ".centres", R3: ".bodiesGraph" }[v.options.right];
   const idle = v.options.idle === "ring" ? ".ring" : ".outline";
+  const trails = v.options.trails !== "none";
+  const length = v.trailLength === null ? "none" : `some ${v.trailLength}`;
   return [
     "-- TDCSGFigures/FramePair.lean",
     "def framePairPacing : PILean.Anim.Pacing :=",
-    `  { turn := ${rat(state.turn)}, hold := ${rat(state.hold)}, idle := ${rat(state.idle)},`,
+    `  { turn := ${rat(state.turn)}, hold := ${rat(state.hold)}, fade := ${rat(state.fade)},`,
     `    firstHold := ${rat(state.firstHold)}, lastHold := ${rat(state.lastHold)},`,
     `    easing := ${e}, seam := ${seam} }`,
     `-- variant ${v.id}:`,
-    `-- { word := parseWord "${v.word}", right := ${right}, trails := ${v.options.trails},`,
+    `-- { word := parseWord "${v.word}", right := ${right}, trails := ${trails},`,
+    ...(trails ? [`--   trailLength := ${length},`] : []),
     `--   view := .${v.options.view}, idleMark := ${idle}, left := .${v.options.left} }`,
     `-- seen at speed ×${num(state.speed)} (the speed is not part of the pacing)`,
   ].join("\n");
 }
 
 // ---- start ----
+const reducedQuery = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)")
+  : null;
+function showReduced() {
+  const on = !!(reducedQuery && reducedQuery.matches);
+  document.getElementById("reduced").classList.toggle("on", on);
+}
+showReduced();
+if (reducedQuery && reducedQuery.addEventListener) {
+  reducedQuery.addEventListener("change", showReduced);
+}
 loadSettings();
 if (!VARIANTS.some(v => v.id === state.variant) && VARIANTS.length) state.variant = VARIANTS[0].id;
 document.documentElement.dataset.theme = state.theme;
