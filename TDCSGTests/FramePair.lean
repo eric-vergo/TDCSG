@@ -61,7 +61,8 @@ theorem frameSteps_aababaabbabb :
     (({ word := [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b] } : FramePairConfig).frameSteps.map
       (·.phase)).take 4 = [.turn, .turn, .markAppears, .markVanishes] ∧
     ({ word := [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b], right := .bodiesGraph } :
-      FramePairConfig).frameSteps.any (·.rightTurning.contains "graph-edge") = true := by
+      FramePairConfig).frameSteps.any
+        (·.rightTurning.any (·.startsWith "graph-edge-")) = true := by
   decide +kernel
 
 /-- `a b a b b a b`: every step arrives; the letter `6` does not act (two steps). -/

@@ -49,9 +49,9 @@ strokes, shown from the state where the position is left, except while it is occ
 `trailLength` letters (a short tail), or for good when `trailLength` is `none`; or, in the right
 panel, as faint arcs of the paths the centres swept (`TrailStyle.arcs`), for as long.
 
-**The centre-graph edge** (`RightStyle.bodiesGraph`) is one actor, `"graph-edge"`, shown while both
-centres lie in the window: it turns with the body while it stays shown, and appears or vanishes
-only when that condition changes.
+**The centre-graph edge** (`RightStyle.bodiesGraph`) is shown while both centres lie in the window,
+as one actor for each such run of states (`"graph-edge-<first state>"`, `graphRunStart`): it turns
+with the body while it stays shown, and appears or vanishes only when that condition changes.
 
 **Views** (`ViewStyle`): one view for all keys of a panel, both panels at one unit length (the
 full-size left panel at half): the same width for both (`shared`), each cropped to its own extent
@@ -221,6 +221,13 @@ def bothInWindow (k : Nat) : Bool :=
 /-- Whether key `k` shows the centre-graph edge (style `bodiesGraph`, both centres in the
 window). -/
 def showsGraphEdge (k : Nat) : Bool := cfg.right == .bodiesGraph && cfg.bothInWindow k
+
+/-- The first state of the run of states that show the centre-graph edge and end at state `k`
+(`k` itself when state `k - 1` does not show it): it names the edge's actor, so that the edge
+keeps one id while it stays shown and a new run gets a new one. -/
+def graphRunStart : Nat → Nat
+  | 0 => 0
+  | k + 1 => if cfg.showsGraphEdge k then graphRunStart k else k + 1
 
 /-- The fixed disks of the left panel, `(title, centre, radius)`, left then right. -/
 def leftDisks : List (String × ZetaFrac × Rat) :=
@@ -564,7 +571,7 @@ def rightActors (r : KeyRef) : List Actor :=
   let edges : List Actor :=
     [{ id := "edge", kind := .stroke none 1.5 false, base := edgeName, anchors := [pl, pr] }] ++
     (if cfg.showsGraphEdge k then
-      [{ id := "graph-edge", kind := .stroke (some windowRole) 4 false,
+      [{ id := s!"graph-edge-{cfg.graphRunStart k}", kind := .stroke (some windowRole) 4 false,
          base := graphEdgeName, anchors := [pl, pr], decl := some `TDCSG.Five.centerGraph }]
      else [])
   let xActor : Actor :=
@@ -670,7 +677,7 @@ def frameStepWith (actors : Panel → Nat → List Actor) (j : Nat) : FrameStep 
     leftTurning := if acts then ["point"] else []
     rightTurn := if acts then (cfg.bodyTurnOf i).map fun (c, q) => ⟨c, q⟩ else none
     rightTurning := if acts then
-      ("edge" :: "graph-edge" :: other).filter fun id =>
+      (("edge" :: other) ++ (ids .right j).filter (·.startsWith "graph-edge-")).filter fun id =>
         (ids .right j).contains id && (ids .right (j + 1)).contains id
       else []
     appearLeft := diff (ids .left j) (ids .left (j + 1))
