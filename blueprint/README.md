@@ -105,7 +105,9 @@ replay; `lake build TDCSGBlueprint` checks them.
 `scripts/check-pages.py` reads the manifest, requires a visible numbered caption, an accessible
 name and gapless numbering, allows no other image in the pages, follows the Lean links and every
 link to a place in the same page, requires every animation to be recorded as checked strictly
-(`checks` `fail`, no error left), as an illustration and with its narrow rendition, and calls
+(`checks` `fail`, no error left), with its narrow rendition (except the walk of chapter 7, scaled
+down as a whole on a small screen), and as an illustration or, for an animation that replaced a
+figure with a linked theorem, with that theorem (`LINKED_MOTIONS` in the script), and calls
 PILean's site checks (`tools/site/` of the `pilean` package): `pilean-verify`, every inline
 picture, moving ones included, against its file (`inline_check.py`), nothing active in a figure
 or an animation (`markup_check.py`), each figure's page against the manifest, with an animation's
@@ -128,22 +130,42 @@ The release workflow runs both after the build.
 
 ### Animations
 
-The three words of chapter 3 (`TDCSGFigures.wordLoop1`, `wordLoop2`, `wordLoop3` in
-`TDCSGFigures/Chord.lean`) and the frame pair of chapter 4 (`TDCSGFigures.Lift.framePair` in
-`TDCSGFigures/FramePairMotion.lean`) are animations drawn by PILean from exact key frames: each key
-is a `Plane.Figure` of exact data, and each step between two keys declares its moves, a turn of
-named items by a fifth of a full turn about an exact centre, or an item that appears or vanishes.
-PILean checks, at the strict level, that each declared turn carries one key onto the next, that
-every rest shows its key's still and that the written SVG draws what its plan says; the site
-build refuses an animation not checked strictly. The animations share one timing,
-`TDCSGFigures.motionPacing` in `TDCSGFigures/Style.lean`. They are illustrations: no theorem is
-linked to them, and the data of their key frames are stated on the page of the figures' theorems
-(`wordLoop_keys`, `framePair_keys`). The site ships no script of its own for them: the moving
-pictures are SMIL in the page, and what hides them is the stylesheet of PILean's adapter and the
-motion switch of Verso Blueprint. The figures keep the anchors of the steppers they replaced
-(`#word-trace` for Figure 3.2, `#change-of-frame` for Figure 4.2), and the site build writes a
-page at each old figure page's address that sends the reader on (`movedFigures` in
-`BlueprintMain.lean`).
+Thirteen figures are animations drawn by PILean from exact key frames: the turn of one disk and
+two disjoint disks of chapter 1 (`TDCSGFigures.extensionJump`, `disjointDisks` in
+`TDCSGFigures/Compound.lean`), one step of the left generator and a word letter by letter of
+chapter 2 (`generatorStep`, `wordSteps` in `TDCSGFigures/TwoDisks.lean`), the three words, the
+interval exchange and the orbit on the chord of chapter 3 (`wordLoop1`, `wordLoop2`, `wordLoop3`,
+`chordOrbit` in `TDCSGFigures/Chord.lean`, `exchangedIntervals` in
+`TDCSGFigures/ProofDiagrams.lean`), the frame pair of chapter 4 (`TDCSGFigures.Lift.framePair` in
+`TDCSGFigures/FramePairMotion.lean`) and the walk of chapter 7
+(`TDCSGFigures.Confinement.walkToLeaf`). Each key is a `Plane.Figure` of exact data, and each step
+between two keys declares its moves: a turn of named items by a fifth of a full turn about an
+exact centre, a slide along an exact vector, or an item that appears or vanishes. The moves are
+declared once, exactly (`TDCSGFigures.ExactMove` in `TDCSGFigures/Data/Moves.lean`, or the frame
+pair's own steps), and read twice: by PILean's engine, which draws them, and by the exact arrival
+check (`TDCSGFigures.allArrive`), which applies each to the exact anchors of the actors of one key
+in `ℚ(ζ₅)` or `ℚ(√5)²` and requires those of the next. PILean checks, at the strict level, that each
+declared move carries one key onto the next on the page, that every rest shows its key's still and
+that the written SVG draws what its plan says; the site build refuses an animation not checked
+strictly. The animations share one timing, `TDCSGFigures.motionPacing` in
+`TDCSGFigures/Style.lean` (the pieces of the interval exchange slide as long as a turn takes).
+
+Where an animation replaced a figure with a linked theorem (`generatorStep`, `extensionJump`,
+`disjointDisks`, `exchangedIntervals`, `chordOrbit`), it keeps the figure's name, label and
+number, its last key frame is that figure (`<name>Final`) and its poster, the still the figure page,
+the reduced-motion view and print show first, and the theorem `<name>_spec` stays linked: it states
+that the last key frame is the figure and what the figure draws. The other key frames, the moves
+and the captions are stated in a plain theorem `<name>_keys`. The other animations are
+illustrations (`@[figure illustration]`): no theorem is linked to them, and the data of their key
+frames are stated in `wordLoop_keys`, `wordSteps_keys`, `framePair_keys` and `walkToLeaf_keys`.
+`TDCSGTests.Motions` proves that the exact arrival checks refuse a wrong centre, fraction, vector
+or position.
+
+The site ships no script of its own for the animations: the moving pictures are SMIL in the page,
+and what hides them is the stylesheet of PILean's adapter and the motion switch of Verso Blueprint.
+The figures keep the anchors of the figures and steppers they replaced, and the site build writes
+a page at the address of each figure page whose declaration was renamed that sends the reader on
+(`movedFigures` in `BlueprintMain.lean`).
 
 Both kinds of animation have a word strip, off on the site: the word written under the picture
 with the letter of the current key marked (`FramePairConfig.strip`, `wordLoopWith i true`,
@@ -176,12 +198,17 @@ with the letter of the current key marked (`FramePairConfig.strip`, `wordLoopWit
    body; the chapter imports `TDCSGFigureTheorems`.
 
 An animation is a `Plane.MotionPanels` (one panel, or several on one clock) whose keys are drawn
-as in step 2 and whose steps declare their moves, with `pacing := motionPacing`,
-`checks := .fail`, `width := figureWidth` and `narrowWidth := some narrowWidth`, marked
-`@[figure illustration]`; its captions, one per key, carry no counter ("Step k of N" is added by
-the page). State the data of its key frames in a plain theorem on the page of the figures'
-theorems, add it to `previews` and to `motions` in `TDCSGTests/MotionOut.lean`, and show it with
-`:::figure TDCSGFigures.name (label := "…") (alt := "…")`.
+as in step 2 and whose steps declare their moves, exactly (`exactStep`, with `moveTiming` for its
+timing), with `pacing := motionPacing`, `checks := .fail`, `width := figureWidth` and
+`narrowWidth := some narrowWidth`, marked `@[figure illustration]`; its captions, one per key,
+carry no counter ("Step k of N" is added by the page). State in a plain theorem on the page of the
+figures' theorems that the figure is made of its keys and steps (`by unfold name; with_reducible
+rfl`, which fails at once when they differ), what each key draws, the declared moves, that they
+arrive exactly (`allArrive … = true`) and each caption as a function of its key's data; add it to
+`previews` and to `motions` in `TDCSGTests/MotionOut.lean`, and show it with
+`:::figure TDCSGFigures.name (label := "…") (alt := "…")`. An animation that replaces a figure with
+a linked theorem keeps its name and label, ends on that figure (and shows it as its poster), and
+keeps its theorem linked, as above.
 
 ### The frame pair for other words
 

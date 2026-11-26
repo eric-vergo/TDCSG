@@ -48,20 +48,20 @@ inductive Entry where
 def previews : Array (String × Entry) := #[
   ("criticalChord", .plane criticalChord),
   ("orbitRadius", .frames sliderFrames),
-  ("extensionJump", .plane extensionJump),
-  ("disjointDisks", .plane disjointDisks),
-  ("generatorStep", .plane generatorStep),
-  ("wordSteps", .frames stepFrames),
+  ("extensionJump", .motion extensionJump),
+  ("disjointDisks", .motion disjointDisks),
+  ("generatorStep", .motion generatorStep),
+  ("wordSteps", .motion wordSteps),
   ("radiusLineInfinite", .plane radiusLineInfinite),
   ("radiusLineFinite", .plane radiusLineFinite),
   ("chordPieces", .plane chordPieces),
   ("wordLoop1", .motion wordLoop1),
   ("wordLoop2", .motion wordLoop2),
   ("wordLoop3", .motion wordLoop3),
-  ("exchangedIntervals", .plane exchangedIntervals),
+  ("exchangedIntervals", .motion exchangedIntervals),
   ("coordinateBox", .plane coordinateBox),
   ("radiusThreshold", .plane radiusThreshold),
-  ("chordOrbit", .plane chordOrbit),
+  ("chordOrbit", .motion chordOrbit),
   ("orderEight", .plane orderEight),
   ("orderTen", .plane orderTen),
   ("orderTwelve", .plane orderTwelve),
@@ -73,7 +73,7 @@ def previews : Array (String × Entry) := #[
   ("terminalCrossing", .plane Levels.terminalCrossing),
   ("terminalZoom", .plane Levels.terminalZoom),
   ("componentOfZero", .plane Confinement.componentOfZero),
-  ("walkToLeaf", .frames Confinement.walkFrames)]
+  ("walkToLeaf", .motion Confinement.walkToLeaf)]
 
 /-- The pictures of one figure: name suffix and figure, light, dark, narrow and narrow dark. -/
 def variants (fig : Plane.Figure) : Array (String × Plane.Figure) :=

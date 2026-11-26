@@ -10,7 +10,7 @@ import PILeanTest.MotionPanels
 
 `tdcsg-motion-out DIR` writes, for each animation of the site and for its narrow rendition, the
 files that PILean's browser checks read, named by the declaration (`TDCSGFigures.wordLoop1`, with
-`-narrow` for the narrow rendition): the animated SVG, the still of each key (`-key<k>.svg`), the
+`-narrow` for the narrow rendition, when the animation has one): the animated SVG, the still of each key (`-key<k>.svg`), the
 poster key's PNG (`-poster.png`), and the expectations (`.json`), written by PILean's own writer
 `PILeanTest.MotionPanelsChecks.expectations` from the motion's report: at every rest each actor's
 anchor in the key's still, every turn with its centre, start, angle and the eased fraction done at
@@ -29,7 +29,14 @@ def motions : Array (String × MotionPanels) := #[
   ("TDCSGFigures.wordLoop1", wordLoop1),
   ("TDCSGFigures.wordLoop2", wordLoop2),
   ("TDCSGFigures.wordLoop3", wordLoop3),
-  ("TDCSGFigures.Lift.framePair", Lift.framePair)]
+  ("TDCSGFigures.Lift.framePair", Lift.framePair),
+  ("TDCSGFigures.extensionJump", extensionJump),
+  ("TDCSGFigures.disjointDisks", disjointDisks),
+  ("TDCSGFigures.generatorStep", generatorStep),
+  ("TDCSGFigures.wordSteps", wordSteps),
+  ("TDCSGFigures.exchangedIntervals", exchangedIntervals),
+  ("TDCSGFigures.chordOrbit", chordOrbit),
+  ("TDCSGFigures.Confinement.walkToLeaf", Confinement.walkToLeaf)]
 
 /-- Writes the files of `P` and of its narrow rendition into `dir`. -/
 def writePanels (dir : System.FilePath) (name : String) (P : MotionPanels) : IO Unit := do

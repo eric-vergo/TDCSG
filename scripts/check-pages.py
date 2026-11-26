@@ -6,16 +6,18 @@ check reads instead of a list of names. For each figure it requires a visible nu
 an accessible name, no active markup, Lean links that land on an element of an existing page, and
 the Blueprint's numbering: "Figure k" on the unnumbered pages, "Figure c.k" in chapter c, each
 counter running 1, 2, … without gaps or repeats; no page may show any other image than a figure's
-own page (`div.pilean-figure-page`) shows of its files. It runs PILean's
-checks (`tools/site/` of the `pilean` package): `pilean-verify` (the folder agrees with its
-manifest), the inline check (every inline picture is the body of a file the manifest lists, with
-the theme rules the manifest records, a moving picture element for element), the markup check (nothing active in a
-figure, nothing at all in an animation), the figures' pages against the manifest (with an
-animation's words, its table of steps, its stills and exactly the files of a motion), and a fresh
-render compared with the folder (`--check-figures`, through the site's generator). Every animation
-must be recorded as checked strictly (`checks` `fail`, `errorsLeft` 0), as an illustration and
-with a narrow rendition. A link written as a fragment alone (`#…`) must name an element of the page it leads
-to under the page's `base`, except `#bp-motion`, the animations switch that Verso Blueprint's script puts in the menu.
+own page (`div.pilean-figure-page`) shows of its files. It runs PILean's checks (`tools/site/` of
+the `pilean` package): `pilean-verify` (the folder agrees with its manifest), the inline check
+(every inline picture is the body of a file the manifest lists, with the theme rules the manifest
+records, a moving picture element for element), the markup check (nothing active in a figure,
+nothing at all in an animation), the figures' pages against the manifest (with an animation's
+words, its table of steps, its stills and exactly the files of a motion), and a fresh render
+compared with the folder (`--check-figures`, through the site's generator). Every animation must
+be recorded as checked strictly (`checks` `fail`, `errorsLeft` 0) and with a narrow rendition
+(except those of `NO_NARROW`); an animation that replaced a figure with a linked theorem keeps it
+(`LINKED_MOTIONS`), every other one is an illustration. A link written as a fragment alone (`#…`)
+must name an element of the page it leads to under the page's `base`, except `#bp-motion`, the
+animations switch that Verso Blueprint's script puts in the menu.
 With `--release` it also checks the hosted verification record, the source links at the verified
 commit, and that the site's kernel replay accepted every node and calls each judged theorem proved.
 """
@@ -257,10 +259,12 @@ def check_source_links(commit, theorems):
         lines = source_at(commit, path)
         assert 1 <= int(start) <= int(end) <= len(lines), f"{decl}: range outside {path}"
         if decl in theorems:
-            assert path == "Comparator/FiveDisk/Solution.lean", f"{decl}: incorrect solution file {path}"
+            assert path == "Comparator/FiveDisk/Solution.lean", \
+                f"{decl}: incorrect solution file {path}"
             name = re.escape(decl.rsplit(".", 1)[-1])
             excerpt = "\n".join(lines[int(start) - 1:int(end)])
-            assert re.search(rf"^theorem {name}\b", excerpt, re.MULTILINE), f"{decl}: wrong source range"
+            assert re.search(rf"^theorem {name}\b", excerpt, re.MULTILINE), \
+                f"{decl}: wrong source range"
         seen.add(decl)
     assert seen == linked_declarations, f"Missing Lean source panels: {linked_declarations - seen}"
     assert set(theorems) <= seen, "Missing independent theorem source links"
@@ -323,19 +327,37 @@ manifest_decls = {entry["decl"] for entry in pilean_manifest["files"]}
 assert manifest_decls, "the PILean manifest lists no figure"
 
 
-# Every animation is checked strictly, is an illustration and has its narrow rendition (that its
-# files are exactly those of a motion is PILean's page check, below).
+# Every animation is checked strictly and has one caption per key (that its files are exactly
+# those of a motion is PILean's page check, below). An animation that replaced a figure with a
+# linked theorem keeps that theorem (`LINKED_MOTIONS`); every other animation is an illustration.
+# Every animation has its narrow rendition except those of `NO_NARROW`, whose picture is scaled
+# down as a whole on a small screen.
+LINKED_MOTIONS = {
+    "TDCSGFigures.generatorStep": "TDCSGFigures.generatorStep_spec",
+    "TDCSGFigures.extensionJump": "TDCSGFigures.extensionJump_spec",
+    "TDCSGFigures.disjointDisks": "TDCSGFigures.disjointDisks_spec",
+    "TDCSGFigures.exchangedIntervals": "TDCSGFigures.exchangedIntervals_spec",
+    "TDCSGFigures.chordOrbit": "TDCSGFigures.chordOrbit_spec",
+}
+NO_NARROW = {"TDCSGFigures.Confinement.walkToLeaf"}
 motions = {}
 for entry in pilean_manifest["files"]:
     if entry.get("kind") == "motion":
         motions.setdefault(entry["decl"], []).append(entry)
+assert set(LINKED_MOTIONS) | NO_NARROW <= set(motions), \
+    f"animations named here but not in the site: {sorted(set(LINKED_MOTIONS) | NO_NARROW)}"
 for decl, entries in sorted(motions.items()):
     first = entries[0]
-    assert all(e.get("checks") == "fail" and e.get("errorsLeft") == 0 and e.get("narrow") is True
-               for e in entries), f"{decl}: an animation not checked strictly or without its " \
-        f"narrow rendition: {first}"
-    assert all(e.get("standing") == "illustration" for e in entries), \
-        f"{decl}: an animation must be an illustration"
+    assert all(e.get("checks") == "fail" and e.get("errorsLeft") == 0 for e in entries), \
+        f"{decl}: an animation not checked strictly: {first}"
+    assert all(e.get("narrow") is (decl not in NO_NARROW) for e in entries), \
+        f"{decl}: a narrow rendition where none is expected, or none where one is: {first}"
+    if decl in LINKED_MOTIONS:
+        assert all(e.get("standing") == "linked" and e.get("theorems") == [LINKED_MOTIONS[decl]]
+                   for e in entries), f"{decl}: must keep its linked theorem: {first}"
+    else:
+        assert all(e.get("standing") == "illustration" for e in entries), \
+            f"{decl}: an animation must be an illustration"
     assert first["captions"] == first["keys"], f"{decl}: one caption per key"
 shown = [fig["decl"] for _, fig in pilean_figures]
 assert set(shown) == manifest_decls, \
@@ -397,11 +419,13 @@ if "--release" in sys.argv[2:]:
     assert verification_urls == {origin + prefix + "verification.json"}, verification_urls
     record = json.loads((site / "verification.json").read_text())
     assert record["status"] == "passed"
-    assert record["commit"] == os.environ["GITHUB_SHA"] and re.fullmatch("[a-f0-9]{40}", record["commit"])
+    assert record["commit"] == os.environ["GITHUB_SHA"] and \
+        re.fullmatch("[a-f0-9]{40}", record["commit"])
     run_url = f"https://github.com/eric-vergo/TDCSG/actions/runs/{os.environ['GITHUB_RUN_ID']}"
     assert record["run_url"] == run_url and os.environ["GITHUB_RUN_ID"].isdigit()
     assert record["toolchain"] == Path("lean-toolchain").read_text().strip()
-    assert record["theorems"] == json.loads(Path("Comparator/FiveDisk/comparator.json").read_text())["theorem_names"]
+    assert record["theorems"] == \
+        json.loads(Path("Comparator/FiveDisk/comparator.json").read_text())["theorem_names"]
     assert record["kernels"] == ["Lean kernel"]
     check_source_links(record["commit"], record["theorems"])
     # The site's kernel replay: both checkers of the toolchain (`con-leche`, `con-ron`) accepted

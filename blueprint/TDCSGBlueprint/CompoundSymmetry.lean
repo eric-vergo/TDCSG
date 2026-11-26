@@ -205,13 +205,17 @@ circle move, while points just outside it stay fixed. So the extensions do not l
 isometry group of $`X`, and the only common home for all of them is the group of all bijections
 of $`X`. The metric is used only to say what the balls are and which maps of a ball are allowed.
 
-:::figure TDCSGFigures.extensionJump (label := "extension-jump") (inline := true) (links := TDCSGFigures.extensionJump_spec) (alt := "A closed disk B of radius 10 about c. A point p just inside the boundary is turned 72 degrees clockwise to a far point; a point q just outside the boundary stays where it is.")
+:::figure TDCSGFigures.extensionJump (label := "extension-jump") (links := TDCSGFigures.extensionJump_spec) (alt := "A closed disk B of radius 10 about c and a bar from 8 to 12 across its boundary circle, with p = 9 inside and q = 11 outside. The disk turns 72 degrees clockwise: the part of the bar inside B, with p, swings away; the part outside, with q, stays. Then the turn is drawn as an arc from p to its image, about 11.9 from q.")
 A closed disk $`B` of radius 10 about $`c=0`, turned clockwise through $`72^\circ` and extended by
-the identity: the extension $`\hat h` turns the point $`p=9`, just inside $`B`, to
-$`\hat h(p)=9\zeta^4` (labelled image of p), and fixes the point $`q=11`, just outside. Before the
-turn $`p` and $`q` are 2 apart; afterwards they are $`\sqrt{301-99\varphi}\approx11.9` apart. However
-close to the boundary $`p` and $`q` are taken, the jump stays, so $`\hat h` is not continuous and is
-no isometry of the plane.
+the identity. A bar from 8 to 12 crosses the boundary circle at 10: the extension $`\hat h` turns the
+part in $`B`, its point on the circle included, with $`p=9`, and fixes the part outside, with
+$`q=11`, so the bar is torn at the circle. The last frame shows $`\hat h(p)=9\zeta^4` (labelled
+image of p). Before the turn $`p` and $`q` are 2 apart; afterwards they are
+$`\sqrt{301-99\varphi}\approx11.9` apart. However close to the boundary $`p` and $`q` are taken, the
+jump stays, so $`\hat h` is not continuous and is no isometry of the plane. The key frames are exact
+and the last one is the figure its theorem states (`TDCSGFigures.extensionJump_spec`, the other
+frames in `TDCSGFigures.extensionJump_keys`); between them the browser turns the drawn bar about
+$`c`.
 :::
 
 *Empty balls and empty families.* Radii are arbitrary real numbers. A ball of negative radius is
@@ -292,12 +296,16 @@ the identity has every $`\hat h_i` trivial, and then every $`h_i` trivial by inj
 extension.
 :::
 
-:::figure TDCSGFigures.disjointDisks (label := "disjoint-disks") (inline := true) (links := TDCSGFigures.disjointDisks_spec) (alt := "Two disjoint closed disks, of radius 4/5 about minus one and 7/10 about one, with a gap between them. In each disk one point is turned 72 degrees clockwise about its center.")
+:::figure TDCSGFigures.disjointDisks (label := "disjoint-disks") (links := TDCSGFigures.disjointDisks_spec) (alt := "Two panels on one clock, each with two disjoint closed disks, of radius 4/5 about minus one and 7/10 about one, and a point in each. Left: the left point turns 72 degrees clockwise about minus one, then the right point about one. Right: the same two turns in the other order. Both panels end in the same picture, with the arcs of the two turns.")
 Two disjoint closed disks, $`B_1` of radius $`4/5` about $`-1` and $`B_2` of radius $`7/10` about
-$`1`, each turned clockwise through $`72^\circ` by its own generator. The turn $`a` of $`B_1` moves
-$`x` to $`a(x)` and fixes every point outside $`B_1`, such as $`y`; the turn $`b` of $`B_2` moves
-$`y` to $`b(y)` and fixes $`x`. Since $`4/5+7/10<2` the dashed gap separates the disks, the turns
-move disjoint sets of points and commute, and the group they generate is $`C_5\times C_5`.
+$`1`, each turned clockwise through $`72^\circ` by its own generator, in both orders on one clock:
+$`a` then $`b` on the left, $`b` then $`a` on the right. The turn $`a` of $`B_1` moves $`x` to
+$`a(x)` and fixes every point outside $`B_1`, such as $`y`; the turn $`b` of $`B_2` moves $`y` to
+$`b(y)` and fixes $`x`. Both orders end in the same picture. Since $`4/5+7/10<2` the dashed gap
+separates the disks, the turns move disjoint sets of points and commute, and the group they
+generate is $`C_5\times C_5`. The key frames are exact, both panels end in the figure its theorem
+states (`TDCSGFigures.disjointDisks_spec`, the other frames in `TDCSGFigures.disjointDisks_keys`),
+and between them the browser turns the drawn points about the centers.
 :::
 
 :::lemma_ "uniform_orbits" (lean := "MulAction.finite_of_encard_orbit_le")

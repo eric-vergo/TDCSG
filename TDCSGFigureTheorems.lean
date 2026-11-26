@@ -29,14 +29,20 @@ lettering, the color values and the pixels. PILean attaches each theorem to its 
 `figure_links`, which accepts only a theorem whose statement names the figure and which depends on
 no axiom beyond `propext`, `Classical.choice` and `Quot.sound`.
 
-The animations (the three words of chapter 3 and the frame pair of chapter 4) are illustrations:
-no theorem is linked to them. Each is drawn from exact key frames, which its stills show; between
-two key frames the browser turns the drawn items about the stated centres, and that motion is not
-part of any statement. What the key frames show, and that each declared turn carries one key frame
-onto the next exactly, is stated here as a plain theorem, which also states that the figure
-shown is made of exactly those key frames, moves and captions (`TDCSGFigures.wordLoop_figures`,
-`TDCSGFigures.wordLoop_keys`, `TDCSGFigures.wordLoop_captions`,
-`TDCSGFigures.Lift.framePair_keys`).
+Many figures are animations. Each is drawn from exact key frames, which its stills show; between
+two key frames the browser turns or slides the drawn items about the stated centres or along the
+stated vectors, and that motion is not part of any statement. What the key frames show, that the
+figure shown is made of exactly those key frames, declared moves and captions, and that each
+declared turn or slide carries one key frame onto the next exactly, is stated here as a plain
+theorem (`TDCSGFigures.wordLoop_keys`, `TDCSGFigures.Lift.framePair_keys`,
+`TDCSGFigures.generatorStep_keys` and the other `_keys` theorems). Where an animation replaced a
+figure with a linked theorem, its last key frame is that figure, and the theorem stays linked to
+the animation: it states that the last key frame is the figure and what the figure draws
+(`TDCSGFigures.generatorStep_spec`, `TDCSGFigures.extensionJump_spec`,
+`TDCSGFigures.disjointDisks_spec`, `TDCSGFigures.exchangedIntervals_spec`,
+`TDCSGFigures.chordOrbit_spec`). The other animations (the word followed letter by letter and the
+three words of chapters 2 and 3, the frame pair of chapter 4 and the walk of chapter 7) are
+illustrations: no theorem is linked to them.
 
 The theorems are not statements of the proof, and they are not nodes of the dependency graph.
 
@@ -145,56 +151,68 @@ tag := "theorems-compound"
 file := "Theorems-compound"
 %%%
 
-{figref "extension-jump"}[]: the figure `TDCSGFigures.extensionJump`
-and its theorem `TDCSGFigures.extensionJump_spec`.
+{figref "extension-jump"}[]: the animation `TDCSGFigures.extensionJump`, whose last key frame is the
+figure of the jump, with its theorem `TDCSGFigures.extensionJump_spec`; the other key frames and
+the moves are stated in `TDCSGFigures.extensionJump_keys`.
 
 ```Verso.Genre.Manual.InlineLean.lean
 namespace TDCSGFigures
 
 open PILean PILean.Plane PILean.Exact TDCSGFigures.Early
 
-/-- What `extensionJump` draws, item for item, and why its records are right. The data are the
-disk `B` of radius `10` about `c = 0`, the points `p = 9` and `q = 11`, the image
-`ĥ(p) = 9ζ⁴` of `p` under the turn through `72°` clockwise (multiplication by
-`ζ⁴ = e^{-2πi/5}`), and the end `10ζ²` of the drawn radius. The items are written out in drawing
-order, each with its colour, title, width, dashes, link and recorded incidences. The facts hold
-exactly in `ℚ(√5)`: `|p|² = 81 < 100 < 121 = |q|²` (`p` inside `B`, `q` outside, so the extension
-turns `p` and fixes `q`), `|ĥ(p)|² = 81`, `|p - q|² = 4`, `|ĥ(p) - ĥ(q)|² = |9ζ⁴ - 11|² =
-301 - 99φ > 100`, and `|10ζ²|² = 100`. Not stated: how the builders and modifiers draw, the layout,
-the lettering, the style's colour values and the pixels. -/
+/-- The animation `extensionJump` and the figure of the jump, its last key frame. The animation has
+one panel whose keys are `jumpKey 0`, `jumpKey 1` and `extensionJumpFinal`, and whose steps are
+made from the declared moves `jumpMoves`; its poster, the still shown under reduced motion and in
+print, is the last key. The figure of the jump, `extensionJumpFinal`, draws the disk `B` of radius
+`10` about `c = 0`, the points `p = 9` and `q = 11`, the image `ĥ(p) = 9ζ⁴` of `p` under the turn
+through `72°` clockwise (multiplication by `ζ⁴ = e^{-2πi/5}`), and the end `10ζ²` of the drawn
+radius. Its items are written out in drawing order, each with its colour, title, width, dashes,
+link, recorded incidences and, for those the animation fades in, its id. The facts hold exactly in
+`ℚ(√5)`: `|p|² = 81 < 100 < 121 = |q|²` (`p` inside `B`, `q` outside, so the extension turns `p`
+and fixes `q`), `|ĥ(p)|² = 81`, `|p - q|² = 4`, `|ĥ(p) - ĥ(q)|² = |9ζ⁴ - 11|² = 301 - 99φ > 100`,
+and `|10ζ²|² = 100`. Not stated: how the builders and modifiers draw, the layout, the lettering,
+the style's colour values and the pixels. -/
 theorem extensionJump_spec :
+    extensionJump.panels = #[{ motion :=
+      { keys := #[jumpKey 0, jumpKey 1, extensionJumpFinal],
+        steps := ((List.range 2).map (exactStep ∘ jumpMoves)).toArray } }] ∧
+    extensionJump.poster = 2 ∧
     ballRadius = 10 ∧ nearInside = Zeta5.ofInt 9 ∧ nearOutside = Zeta5.ofInt 11 ∧
     nearInsideImage = nearInside * Zeta5.pow 4 ∧ ballSpoke = Zeta5.ofInt 10 * Zeta5.pow 2 ∧
     origin = Zeta5.zero ∧
-    extensionJump.items = #[
+    extensionJumpFinal.items = #[
       Plane.Exact.disk origin ballRadius |>.noFill |>.role leftRole |>.named "the disk B"
         |>.describedBy "the closed disk of radius 10 about c = 0" |>.declRef `TDCSG.ballPerm,
       Plane.Exact.arc origin (9 : Rat) 0 (-deg 72) |>.withArrow |>.role leftRole |>.width 1.5
         |>.named "the turn of p through 72° clockwise about c"
-        |>.declRef `TDCSG.ballPerm_apply_of_mem,
+        |>.declRef `TDCSG.ballPerm_apply_of_mem |>.withId "arc",
       Plane.Exact.segment origin ballSpoke |>.role leftRole |>.width 1.5 |>.dashed
         |>.named "a radius of B, length 10",
       Plane.Exact.labelBeside "radius 10" origin ballSpoke |>.role leftRole,
       Plane.Exact.angleMark origin 0 (-deg 72) (some 30) |>.role leftRole
-        |>.named "the angle of the turn, 72° clockwise",
-      Plane.Exact.segment nearInside nearOutside |>.faint |>.dashed |>.named "p to q, length 2",
+        |>.named "the angle of the turn, 72° clockwise" |>.withId "angle",
+      Plane.Exact.segment nearInside nearOutside |>.faint |>.dashed |>.named "p to q, length 2"
+        |>.withId "gap",
       Plane.Exact.segment nearInsideImage nearOutside |>.faint |>.dashed
-        |>.named "ĥ(p) to ĥ(q), length about 11.9",
-      Plane.label "2" ⟨21 / 2, 0⟩ .above,
+        |>.named "ĥ(p) to ĥ(q), length about 11.9" |>.withId "image-gap",
+      Plane.label "2" ⟨21 / 2, 0⟩ .above |>.withId "gap-label",
       Plane.label "≈ 11.9" ((PlanePoint.toPoint nearInsideImage).lerp
-        (PlanePoint.toPoint nearOutside) 0.62) (.toward (deg 136)) (some 4),
+        (PlanePoint.toPoint nearOutside) 0.62) (.toward (deg 136)) (some 4)
+        |>.withId "image-gap-label",
       Plane.Exact.point origin |>.role leftRole |>.named "the center c",
       Plane.Exact.point nearInside |>.role leftRole |>.named "p" |>.incident .inside "the disk B"
-        |>.declRef `TDCSG.ballPerm_apply_of_mem,
+        |>.declRef `TDCSG.ballPerm_apply_of_mem |>.withId "p",
       Plane.Exact.point nearOutside |>.named "q = ĥ(q)" |>.incident .outside "the disk B"
-        |>.declRef `TDCSG.ballPerm_apply_of_notMem,
+        |>.declRef `TDCSG.ballPerm_apply_of_notMem |>.withId "q",
       Plane.Exact.point nearInsideImage |>.role leftRole |>.named "ĥ(p)"
-        |>.incident .inside "the disk B",
+        |>.incident .inside "the disk B" |>.withId "image",
       Plane.Exact.label "c" origin .auto |>.role leftRole,
-      Plane.Exact.label "p" nearInside .above |>.role leftRole,
-      Plane.Exact.label "q, fixed" nearOutside .belowRight,
-      Plane.Exact.label "image of p" nearInsideImage .auto |>.role leftRole,
-      Plane.Exact.label "72°" origin (.toward (-deg 36)) (some 42) |>.role leftRole,
+      Plane.Exact.label "p" nearInside .above |>.role leftRole |>.withId "p-label",
+      Plane.Exact.label "q, fixed" nearOutside .belowRight |>.withId "q-label",
+      Plane.Exact.label "image of p" nearInsideImage .auto |>.role leftRole
+        |>.withId "image-label",
+      Plane.Exact.label "72°" origin (.toward (-deg 36)) (some 42) |>.role leftRole
+        |>.withId "angle-label",
       Plane.Exact.label "disk B" ((-6 : Rat), (-5 : Rat)) |>.role leftRole] ∧
     QSqrt.lt nearInside.normSq (rat 100) = true ∧ QSqrt.lt (rat 100) nearOutside.normSq = true ∧
     (nearInsideImage.normSq == rat 81) = true ∧
@@ -202,37 +220,110 @@ theorem extensionJump_spec :
     ((nearInsideImage - nearOutside).normSq == rat 301 - phi * rat 99) = true ∧
     QSqrt.lt (rat 100) (nearInsideImage - nearOutside).normSq = true ∧
     (ballSpoke.normSq == rat 100) = true := by
-  refine ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, ?_⟩
+  refine ⟨by unfold extensionJump; with_reducible rfl, by unfold extensionJump; with_reducible rfl,
+    rfl, rfl, rfl, rfl, rfl, rfl, rfl, ?_⟩
   repeat' apply And.intro
   all_goals decide +kernel
 
 figure_links extensionJump extensionJump_spec
 
+/-- The key frames of `extensionJump` before the last and its moves. Key `k ≤ 1` draws, in the
+frame of the figure of the jump, the disk, its radius, the bar from `8` to `12` across the
+boundary circle in two parts and the centre: the part in `B`, from `8` to `10` with `p = 9`
+(`jumpInner`), turned by `ζ⁴` about `0` at key `1`, and the part outside, from `10` to `12` with
+`q = 11` (`jumpOuter`); at key `0` also the segment from `p` to `q`, its length and the label of
+`p`. Step `0` turns the part in `B` by `jumpTurn`, a fifth of a turn clockwise about `0`, while the
+segment from `p` to `q` and the labels fade; step `1` fades the bar out and the marks of the figure
+of the jump in. Each declared move, applied exactly in `ℚ(ζ₅)` to the anchors of the actors of
+one key, gives those of the next (`jumpArrives`). The ends of the parts lie as stated: `|8|² < 100`,
+`|10|² = 100` (on the boundary circle, so in the closed disk, and turned), `|12|² > 100`, and the
+turn by `ζ⁴` is the extension's turn: it carries `p` to `ĥ(p)`. The captions are written out. Not
+stated: how the builders draw, the timing and the frames the browser draws between the key
+frames. -/
+theorem extensionJump_keys :
+    extensionJump.captions = jumpCaptions ∧
+    jumpCaptions = #[
+      "A closed disk B of radius 10 about c = 0, to be turned through 72° clockwise and extended \
+        by the identity. A bar from 8 to 12 crosses the boundary circle at 10: p = 9 lies inside \
+        B, q = 11 outside, 2 apart.",
+      "The extension ĥ turns the part of the bar in B, its point 10 on the circle included, about \
+        c and fixes the part outside: the bar is torn at the circle. p went to ĥ(p) = 9ζ⁴, q \
+        stayed.",
+      "p and q were 2 apart; ĥ(p) and ĥ(q) = q are about 11.9 apart. However close to the circle \
+        p and q are taken, the jump stays, so ĥ is not continuous and is no isometry of the \
+        plane."] ∧
+    (∀ k, jumpKey k =
+      { extensionJumpFinal with
+        items := jumpKeyItems k
+        info := { title := jumpCaptions.getD k "" } }) ∧
+    (∀ k, jumpKeyItems k =
+      #[jumpDisk] ++ jumpRadius ++ (if k == 0 then #[jumpGap, jumpGapLabel] else #[]) ++
+        #[jumpCentre, jumpInner (if k == 0 then Zeta5.ofInt 1 else zeta 4), jumpOuter,
+          jumpCentreLabel] ++ (if k == 0 then #[jumpPLabel] else #[]) ++ #[jumpName]) ∧
+    (∀ τ, jumpInner τ =
+      ((group #[Plane.Exact.segment (barInner * τ) (barCut * τ) |>.role leftRole |>.width 4
+            |>.named "the part of the bar in B, from 8 to 10",
+          Plane.Exact.point (nearInside * τ) |>.role leftRole |>.incident .inside "the disk B"
+            |>.incident .on "the part of the bar in B, from 8 to 10"])
+        |>.named "the part of the bar in B and the point p, turned by ĥ" |>.withId "inner")) ∧
+    jumpOuter =
+      ((group #[Plane.Exact.segment barCut barOuter |>.width 4
+            |>.named "the part of the bar outside B, from 10 to 12",
+          Plane.Exact.point nearOutside |>.incident .outside "the disk B"
+            |>.incident .on "the part of the bar outside B, from 10 to 12",
+          Plane.Exact.label "q, fixed" nearOutside .belowRight])
+        |>.named "the part of the bar outside B and the point q, fixed by ĥ" |>.withId "outer") ∧
+    barInner = Zeta5.ofInt 8 ∧ barCut = Zeta5.ofInt 10 ∧ barOuter = Zeta5.ofInt 12 ∧
+    jumpTurn = ⟨ZetaFrac.ofZeta origin, -1 / 5⟩ ∧
+    jumpMoves 0 = [("inner", .turn jumpTurn), ("gap", .vanish), ("gap-label", .vanish),
+      ("p-label", .vanish)] ∧
+    moveKinds (jumpMoves 1) = [("inner", "vanish"), ("outer", "vanish"), ("arc", "appear"),
+      ("angle", "appear"), ("gap", "appear"), ("image-gap", "appear"), ("gap-label", "appear"),
+      ("image-gap-label", "appear"), ("p", "appear"), ("q", "appear"), ("image", "appear"),
+      ("p-label", "appear"), ("q-label", "appear"), ("image-label", "appear"),
+      ("angle-label", "appear")] ∧
+    jumpArrives = true ∧
+    QSqrt.lt barInner.normSq (rat 100) = true ∧ (barCut.normSq == rat 100) = true ∧
+    QSqrt.lt (rat 100) barOuter.normSq = true ∧
+    ((jumpTurn.apply (ZetaFrac.ofZeta nearInside)).any
+      (ZetaFrac.same · (ZetaFrac.ofZeta nearInsideImage))) = true := by
+  refine ⟨by unfold extensionJump; with_reducible rfl, rfl, fun _ => rfl, fun _ => rfl,
+    fun _ => rfl, rfl, rfl, rfl, rfl, rfl, rfl, ?_⟩
+  repeat' apply And.intro
+  all_goals decide +kernel
+
 end TDCSGFigures
 ```
 
-{figref "disjoint-disks"}[]: the figure `TDCSGFigures.disjointDisks`
-and its theorem `TDCSGFigures.disjointDisks_spec`.
+{figref "disjoint-disks"}[]: the animation `TDCSGFigures.disjointDisks`, whose last key frame in
+both panels is the figure of the two turns, with its theorem `TDCSGFigures.disjointDisks_spec`;
+the other key frames and the moves are stated in `TDCSGFigures.disjointDisks_keys`.
 
 ```Verso.Genre.Manual.InlineLean.lean
 namespace TDCSGFigures
 
 open PILean PILean.Plane PILean.Exact TDCSGFigures.Early
 
-/-- What `disjointDisks` draws, item for item, and why its records are right. The data are the
+/-- The animation `disjointDisks` and the figure of the two turns, the last key frame of both of
+its panels. The animation has two panels on one clock, `disjointPanel true` (`a`, then `b`) and
+`disjointPanel false` (`b`, then `a`), whose keys are `disjointKey b k` for `k = 0, …, 3`, the
+last one `disjointDisksFinal`; its poster is the last key. The figure of the two turns draws the
 radii `r₁ = 4/5` and `r₂ = 7/10` of the disks `B₁` about `-1` and `B₂` about `1`, the points
 `x = -1 + φ⁻¹ ζ²` and `y = 1 + φ⁻¹ ζ²` (`φ⁻¹ = ζ + ζ⁴`), and their images `a(x) = -1 + φ⁻¹ ζ` and
-`b(y) = 1 + φ⁻¹ ζ`. The items are written out in drawing order. The facts hold exactly:
+`b(y) = 1 + φ⁻¹ ζ`; its items are written out in drawing order. The facts hold exactly:
 `r₁ + r₂ < 2`, so the disks are disjoint and the gap runs from `-1 + r₁ = -1/5` to
 `1 - r₂ = 3/10`; `|x + 1|² = |y - 1|² = φ⁻²` with `φ⁻² < r₂² < r₁²`; `x` lies outside `B₂` and `y`
 outside `B₁`; `a` turns `x` to `a(x)` and fixes `y`, `b` turns `y` to `b(y)` and fixes `x`; `a(x)`
 lies in `B₁` and `b(y)` in `B₂`. Not stated: how the builders and modifiers draw, the layout, the
 lettering, the style's colour values and the pixels. -/
 theorem disjointDisks_spec :
+    disjointDisks.panels = #[disjointPanel true, disjointPanel false] ∧
+    (∀ b, (disjointPanel b).motion.keys = ((List.range 4).map (disjointKey b)).toArray) ∧
+    (∀ b, disjointKey b 3 = disjointDisksFinal) ∧ disjointDisks.poster = 3 ∧
     disjointLeft = 4 / 5 ∧ disjointRight = 7 / 10 ∧
     leftSample = leftCentre + phiInv * Zeta5.pow 2 ∧
     rightSample = rightCentre + phiInv * Zeta5.pow 2 ∧ phiInvReal = ⟨-1 / 2, 1 / 2⟩ ∧
-    disjointDisks.items = #[
+    disjointDisksFinal.items = #[
       Plane.Exact.disk leftCentre disjointLeft |>.noFill |>.role leftRole |>.named "the disk B₁"
         |>.describedBy "the closed disk of radius 4/5 about −1",
       Plane.Exact.disk rightCentre disjointRight |>.noFill |>.role rightRole |>.named "the disk B₂"
@@ -242,25 +333,29 @@ theorem disjointDisks_spec :
         |>.declRef `TDCSG.leftDisk_disjoint_rightDisk,
       Plane.label "gap" ⟨1 / 20, 0⟩ .below,
       Plane.Exact.arc leftCentre phiInvReal (deg 144) (deg 72) |>.withArrow |>.role leftRole
-        |>.width 1.5 |>.named "the turn a of B₁, 72° clockwise about −1" |>.declRef `TDCSG.genA,
+        |>.width 1.5 |>.named "the turn a of B₁, 72° clockwise about −1" |>.declRef `TDCSG.genA
+        |>.withId "arc-a",
       Plane.Exact.arc rightCentre phiInvReal (deg 144) (deg 72) |>.withArrow |>.role rightRole
-        |>.width 1.5 |>.named "the turn b of B₂, 72° clockwise about 1" |>.declRef `TDCSG.genB,
+        |>.width 1.5 |>.named "the turn b of B₂, 72° clockwise about 1" |>.declRef `TDCSG.genB
+        |>.withId "arc-b",
       Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1",
       Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1",
       Plane.Exact.point leftSample |>.role leftRole |>.named "x" |>.incident .inside "the disk B₁"
-        |>.incident .outside "the disk B₂",
+        |>.incident .outside "the disk B₂" |>.withId "x",
       Plane.Exact.point (leftCentre + phiInv * zeta 1) |>.role leftRole |>.named "a(x)"
-        |>.incident .inside "the disk B₁",
+        |>.incident .inside "the disk B₁" |>.withId "ax",
       Plane.Exact.point rightSample |>.role rightRole |>.named "y" |>.incident .inside "the disk B₂"
-        |>.incident .outside "the disk B₁",
+        |>.incident .outside "the disk B₁" |>.withId "y",
       Plane.Exact.point (rightCentre + phiInv * zeta 1) |>.role rightRole |>.named "b(y)"
-        |>.incident .inside "the disk B₂",
+        |>.incident .inside "the disk B₂" |>.withId "by",
       Plane.Exact.label "−1" leftCentre .below |>.role leftRole,
       Plane.Exact.label "+1" rightCentre .below |>.role rightRole,
-      Plane.Exact.label "x" leftSample .auto |>.role leftRole,
-      Plane.Exact.label "a(x)" (leftCentre + phiInv * zeta 1) .auto |>.role leftRole,
-      Plane.Exact.label "y" rightSample .auto |>.role rightRole,
-      Plane.Exact.label "b(y)" (rightCentre + phiInv * zeta 1) .auto |>.role rightRole,
+      Plane.Exact.label "x" leftSample .auto |>.role leftRole |>.withId "x-label",
+      Plane.Exact.label "a(x)" (leftCentre + phiInv * zeta 1) .auto |>.role leftRole
+        |>.withId "ax-label",
+      Plane.Exact.label "y" rightSample .auto |>.role rightRole |>.withId "y-label",
+      Plane.Exact.label "b(y)" (rightCentre + phiInv * zeta 1) .auto |>.role rightRole
+        |>.withId "by-label",
       Plane.Exact.label "B₁, radius 4/5" ((-1 : Rat), (-1 : Rat)) |>.role leftRole
         |>.declRef `TDCSG.nonempty_mulEquiv_of_add_lt_two,
       Plane.Exact.label "B₂, radius 7/10" ((1 : Rat), (-1 : Rat)) |>.role rightRole
@@ -282,11 +377,86 @@ theorem disjointDisks_spec :
       (rat (disjointLeft * disjointLeft)) = true ∧
     QSqrt.lt ((rightCentre + phiInv * Zeta5.pow 1) - rightCentre).normSq
       (rat (disjointRight * disjointRight)) = true := by
-  refine ⟨rfl, rfl, rfl, rfl, rfl, rfl, ?_⟩
+  refine ⟨by unfold disjointDisks; with_reducible rfl,
+    fun _ => by unfold disjointPanel; with_reducible rfl, fun _ => rfl,
+    by unfold disjointDisks; with_reducible rfl, rfl, rfl, rfl, rfl, rfl, rfl, ?_⟩
   repeat' apply And.intro
   all_goals decide +kernel
 
 figure_links disjointDisks disjointDisks_spec
+
+/-- The key frames of `disjointDisks` before the last and its moves. The panels are titled by
+their order. Key `k ≤ 2` of a panel draws, in the frame of the figure of the two turns, the disks,
+the gap, the centres and the names, and the two points that move with their labels: `x` turned
+by `a` from key `1` on in the panel `a`, then `b` and from key `2` on in the other, `y` turned by
+`b` from key `2` on in the first panel and from key `1` on in the other (`disjointX`,
+`disjointY`). Step `0` turns `x` by `a` (a fifth of a turn clockwise about `-1`) in the first
+panel and `y` by `b` (about `1`) in the other; step `1` the other one; step `2` fades the moving
+points out and the marks of the figure of the two turns in. Each declared move, applied exactly in
+`ℚ(ζ₅)` to the anchors of the actors of one key, gives those of the next, in both panels
+(`disjointArrives`); at key `2` both panels show `x` at `a(x)` and `y` at `b(y)`, the points of the
+figure of the two turns, so both orders end in the same picture. The captions are written out.
+Not stated: how the builders draw, the timing and the frames the browser draws between the key
+frames. -/
+theorem disjointDisks_keys :
+    disjointDisks.captions = disjointCaptions ∧
+    disjointCaptions = #[
+      "Two disjoint closed disks, B₁ of radius 4/5 about −1 and B₂ of radius 7/10 about 1, a \
+        point x in B₁ and a point y in B₂. Left: a, then b. Right: b, then a.",
+      "Left: a turns B₁ a fifth of a turn clockwise about −1, carrying x, and fixes y. Right: b \
+        turns B₂ a fifth of a turn clockwise about +1, carrying y, and fixes x.",
+      "Left: b turns y; right: a turns x. Both orders end in the same picture: the two turns move \
+        disjoint sets of points, so they commute.",
+      "The turn a of B₁ and the turn b of B₂, each through 72° clockwise: a moves x to a(x) and \
+        fixes y, b moves y to b(y) and fixes x."] ∧
+    (∀ b, disjointPanel b =
+      { title := if b then "a, then b" else "b, then a"
+        motion :=
+          { keys := ((List.range 4).map (disjointKey b)).toArray,
+            steps := ((List.range 3).map fun k => exactStep (disjointMoves b k)).toArray } }) ∧
+    (∀ b k, k ≠ 3 → disjointKey b k =
+      { disjointDisksFinal with
+        items := disjointKeyItems b k,
+        info := { title := disjointCaptions.getD k "" } }) ∧
+    (∀ b k, disjointKeyItems b k = disjointBase ++ disjointCentres ++
+      #[disjointMoverX (disjointX b k), disjointMoverY (disjointY b k)] ++
+      disjointCentreLabels ++ disjointNames) ∧
+    (∀ w, disjointMoverX w =
+      ((group #[Plane.Exact.point w |>.role leftRole |>.incident .inside "the disk B₁"
+            |>.incident .outside "the disk B₂",
+          Plane.Exact.label "x" w (.toward (-deg 72)) |>.role leftRole])
+        |>.named "the point x of B₁, turned by a" |>.withId "x-moving")) ∧
+    (∀ w, disjointMoverY w =
+      ((group #[Plane.Exact.point w |>.role rightRole |>.incident .inside "the disk B₂"
+            |>.incident .outside "the disk B₁",
+          Plane.Exact.label "y" w (.toward (-deg 72)) |>.role rightRole])
+        |>.named "the point y of B₂, turned by b" |>.withId "y-moving")) ∧
+    (∀ b k, disjointX b k =
+      if disjointXTurned b k then Letter.a.rotate leftSample else leftSample) ∧
+    (∀ b k, disjointY b k =
+      if disjointYTurned b k then Letter.b.rotate rightSample else rightSample) ∧
+    (∀ k, disjointXTurned true k = decide (1 ≤ k) ∧ disjointXTurned false k = decide (2 ≤ k)) ∧
+    (∀ k, disjointYTurned true k = decide (2 ≤ k) ∧ disjointYTurned false k = decide (1 ≤ k)) ∧
+    disjointTurnA = ⟨ZetaFrac.ofZeta leftCentre, -1 / 5⟩ ∧
+    disjointTurnB = ⟨ZetaFrac.ofZeta rightCentre, -1 / 5⟩ ∧
+    disjointMoves true 0 = [("x-moving", .turn disjointTurnA)] ∧
+    disjointMoves true 1 = [("y-moving", .turn disjointTurnB)] ∧
+    disjointMoves false 0 = [("y-moving", .turn disjointTurnB)] ∧
+    disjointMoves false 1 = [("x-moving", .turn disjointTurnA)] ∧
+    (∀ b, moveKinds (disjointMoves b 2) = [("x-moving", "vanish"), ("y-moving", "vanish"),
+      ("arc-a", "appear"), ("arc-b", "appear"), ("x", "appear"), ("ax", "appear"), ("y", "appear"),
+      ("by", "appear"), ("x-label", "appear"), ("ax-label", "appear"), ("y-label", "appear"),
+      ("by-label", "appear")]) ∧
+    disjointArrives = true ∧
+    (Letter.a.rotate leftSample == leftCentre + phiInv * zeta 1) = true ∧
+    (Letter.b.rotate rightSample == rightCentre + phiInv * zeta 1) = true := by
+  refine ⟨by unfold disjointDisks; with_reducible rfl, rfl, fun _ => rfl, fun _ _ h => ?_,
+    fun _ _ => rfl, fun _ => rfl, fun _ => rfl, fun _ _ => rfl, fun _ _ => rfl, fun _ => ⟨rfl, rfl⟩,
+    fun _ => ⟨rfl, rfl⟩, rfl, rfl, rfl, rfl, rfl, rfl, fun b => ?_, ?_⟩
+  · simp only [disjointKey, beq_iff_eq, h, if_false]
+  · cases b <;> rfl
+  repeat' apply And.intro
+  all_goals decide +kernel
 
 end TDCSGFigures
 ```
@@ -298,26 +468,36 @@ tag := "theorems-disks"
 file := "Theorems-disks"
 %%%
 
-{figref "generator-step"}[]: the figure `TDCSGFigures.generatorStep`
-and its theorem `TDCSGFigures.generatorStep_spec`.
+{figref "generator-step"}[]: the animation `TDCSGFigures.generatorStep`, whose last key frame is
+the figure of one step of the left generator, with its theorem `TDCSGFigures.generatorStep_spec`;
+the other key frames and the moves are stated in `TDCSGFigures.generatorStep_keys`.
 
 ```Verso.Genre.Manual.InlineLean.lean
 namespace TDCSGFigures
 
 open PILean PILean.Plane PILean.Exact TDCSGFigures.Early
 
-/-- What `generatorStep` draws, item for item, and why its records are right. The data are the
-radius `3/2` of both disks, `a(0) = -1 + ζ⁴` and the end `(19/10, -6/5)` of the drawn radius of
-the right disk. The items are written out in drawing order, each with its colour, title, width,
-dashes, link and recorded incidences. The facts hold exactly in `ℚ(√5)`: `a` turns `0` to `a(0)`
-(`0` lies in the left disk); `|0 ∓ 1|² = 1 < 9/4`, so `0` is inside both disks and the lens;
-`|a(0) + 1|² = 1 < 9/4` and `|a(0) - 1|² = 7 - 2φ > 9/4`, so `a(0)` is inside the left disk and
-outside the right one and the lens; `|(19/10, -6/5) - 1|² = 9/4`. Not stated: how the builders and
-modifiers draw, the layout, the lettering, the style's colour values and the pixels. -/
+/-- The animation `generatorStep` and the figure of one step of the left generator, its last key
+frame. The animation has one panel whose keys are `generatorKeys`, two keys and then
+`generatorStepFinal`, and whose steps are made from the declared moves `generatorMoves`; its
+poster, the still shown under reduced motion and in print, is the last key. The figure of the
+step draws the radius `3/2` of both disks, `a(0) = -1 + ζ⁴` and the end `(19/10, -6/5)` of the
+drawn radius of the right disk; its items are written out in drawing order, each with its colour,
+title, width, dashes, link, recorded incidences and, for those the animation fades in, its id.
+The facts hold exactly in `ℚ(√5)`: `a` turns `0` to `a(0)` (`0` lies in the left disk);
+`|0 ∓ 1|² = 1 < 9/4`, so `0` is inside both disks and the lens; `|a(0) + 1|² = 1 < 9/4` and
+`|a(0) - 1|² = 7 - 2φ > 9/4`, so `a(0)` is inside the left disk and outside the right one and the
+lens; `|(19/10, -6/5) - 1|² = 9/4`. Not stated: how the builders and modifiers draw, the layout,
+the lettering, the style's colour values and the pixels. -/
 theorem generatorStep_spec :
+    generatorStep.panels = #[{ motion :=
+      { keys := generatorKeys,
+        steps := ((List.range 2).map (exactStep ∘ generatorMoves)).toArray } }] ∧
+    generatorKeys = #[generatorKey 0, generatorKey 1, generatorStepFinal] ∧
+    generatorStep.poster = 2 ∧
     aZero = leftCentre + Zeta5.pow 4 ∧ rightSpokeEnd = (19 / 10, -6 / 5) ∧
     r2ThreeHalves = rat (9 / 4) ∧
-    generatorStep.items = #[
+    generatorStepFinal.items = #[
       Plane.Exact.disk leftCentre (3 / 2 : Rat) |>.noFill |>.role leftRole
         |>.named "the left circle"
         |>.describedBy "the closed disk of radius 3/2 about −1, turned by a" |>.declRef `TDCSG.genA,
@@ -333,24 +513,25 @@ theorem generatorStep_spec :
       Plane.Exact.segment leftCentre origin |>.role leftRole |>.width 1.5
         |>.named "from −1 to 0",
       Plane.Exact.segment leftCentre aZero |>.role leftRole |>.width 1.5
-        |>.named "from −1 to a(0)",
+        |>.named "from −1 to a(0)" |>.withId "image-spoke",
       Plane.Exact.angleMark leftCentre 0 (-deg 72) (some 22) |>.role leftRole
-        |>.named "72° clockwise",
-      Plane.Exact.label "72°" leftCentre (.toward (-deg 112)) (some 26) |>.role leftRole |>.size 12,
+        |>.named "72° clockwise" |>.withId "angle",
+      Plane.Exact.label "72°" leftCentre (.toward (-deg 112)) (some 26) |>.role leftRole |>.size 12
+        |>.withId "angle-label",
       Plane.Exact.arc leftCentre (1 : Rat) (deg 0) (-deg 72) |>.withArrow |>.role leftRole
         |>.width 2 |>.dashed |>.named "a turns 0 through 72° clockwise about −1"
-        |>.declRef `TDCSG.diskRotation,
+        |>.declRef `TDCSG.diskRotation |>.withId "arc",
       Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1",
       Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1",
       Plane.Exact.point origin |>.named "0" |>.incident .inside "the left circle"
-        |>.incident .inside "the right circle" |>.incident .inside "the lens",
+        |>.incident .inside "the right circle" |>.incident .inside "the lens" |>.withId "origin",
       Plane.Exact.point aZero |>.role leftRole |>.named "a(0) = −1 + ζ⁴"
         |>.incident .inside "the left circle" |>.incident .outside "the right circle"
-        |>.incident .outside "the lens" |>.declRef `TDCSG.genA,
+        |>.incident .outside "the lens" |>.declRef `TDCSG.genA |>.withId "image",
       Plane.Exact.label "−1" leftCentre .above |>.role leftRole,
       Plane.Exact.label "+1" rightCentre .above |>.role rightRole,
       Plane.Exact.label "0" origin .aboveRight,
-      Plane.Exact.label "a(0)" aZero .below |>.role leftRole,
+      Plane.Exact.label "a(0)" aZero .below |>.role leftRole |>.withId "image-label",
       Plane.Exact.label "left disk" ((-8 / 5 : Rat), (3 / 4 : Rat)) |>.role leftRole,
       Plane.Exact.label "right disk" ((8 / 5 : Rat), (3 / 4 : Rat)) |>.role rightRole,
       Plane.Exact.label "lens" ((0 : Rat), (5 / 8 : Rat)) |>.role lensRole |>.size 13] ∧
@@ -361,41 +542,116 @@ theorem generatorStep_spec :
     ((aZero - rightCentre).normSq == rat 7 - phi * rat 2) = true ∧
     QSqrt.lt r2ThreeHalves (aZero - rightCentre).normSq = true ∧
     decide ((19 / 10 - 1 : Rat) * (19 / 10 - 1) + (-6 / 5) * (-6 / 5) = 9 / 4) = true := by
-  refine ⟨rfl, rfl, rfl, rfl, ?_⟩
+  refine ⟨by unfold generatorStep; with_reducible rfl, rfl,
+    by unfold generatorStep; with_reducible rfl, rfl, rfl, rfl, rfl, ?_⟩
   repeat' apply And.intro
   all_goals decide +kernel
 
 figure_links generatorStep generatorStep_spec
 
+/-- The key frames of `generatorStep` before the last and its moves. Key `k ≤ 1` draws, in the
+frame of the figure of the step, its disks, lens, radius, centres and names and, in place of its
+marks of the turn: the content of the left disk (`turningContent`), the segment from `-1` to the
+first sample and the samples `turnedSamples`, `0` among them, before the turn (key `0`) and their
+images `turnedImages` after it (key `1`), each recording that it lies inside the left disk; and the
+points `fixedSamples` outside it (`fixedContent`). Step `0` turns the content of the disk by
+`generatorTurn`, a fifth of a turn clockwise about `-1`; step `1` fades it and the points outside
+out and the marks of the figure of the step in. The declared turn, applied exactly in `ℚ(ζ₅)` to
+the anchors of the actors of key `0`, gives those of key `1` (`generatorArrives`). The samples
+are what the generator does with them: each of `turnedSamples` lies in the closed left disk of
+radius `3/2` and `a` carries it to its image, the first to `a(0)`; each of `fixedSamples` lies
+outside it and `a` fixes it. The captions are written out. Not stated: how the builders draw, the
+timing and the frames the browser draws between the key frames. -/
+theorem generatorStep_keys :
+    generatorStep.captions = generatorCaptions ∧
+    generatorCaptions = #[
+      "The left generator a acts on its closed disk of radius 1.5 about −1. The points inside the \
+        disk, the origin among them (drawn in the color of the left disk), turn with it; the \
+        points outside it stay where they are.",
+      "a turns the disk a fifth of a turn clockwise about −1: the origin goes to a(0) = −1 + ζ⁴, \
+        and the points outside the left disk have not moved.",
+      "One step of the left generator: a turns the origin through 72° clockwise about −1, along \
+        the dashed arc, to a(0). The origin lies in both disks, a(0) in the left disk only."] ∧
+    (∀ k, generatorKey k =
+      { generatorStepFinal with
+        items := generatorKeyItems k,
+        info := { title := generatorCaptions.getD k "" } }) ∧
+    (∀ k, generatorKeyItems k = generatorBase ++
+      #[turningContent (if k == 0 then turnedSamples else turnedImages), fixedContent] ++
+      generatorCentres ++ generatorLabels ++ generatorNames) ∧
+    (∀ zs, turningContent zs =
+      ((group (#[Plane.Exact.segment leftCentre (zs.headD origin) |>.role leftRole |>.width 1.5,
+          Plane.Exact.point (zs.headD origin) |>.role leftRole] ++
+        (zs.drop 1).toArray.map fun w =>
+          Plane.Exact.point w |>.role leftRole |>.size 3 |>.incident .inside "the left circle"))
+        |>.named "points of the left disk, which a turns" |>.withId "disk")) ∧
+    fixedContent =
+      (group (fixedSamples.toArray.map fun w =>
+          Plane.Exact.point w |>.size 3 |>.incident .outside "the left circle")
+        |>.named "points outside the left disk, which a fixes" |>.withId "outside") ∧
+    turnedSamples =
+      [origin, leftCentre + phiInv * zeta 3, zeta 4 - Zeta5.ofInt 2, leftCentre + zeta 2 - zeta 3] ∧
+    fixedSamples = [phiInv, leftCentre + (Zeta5.ofInt 1 + phiInv) * zeta 2,
+      leftCentre + (Zeta5.ofInt 1 + phiInv) * zeta 3] ∧
+    turnedImages = turnedSamples.map Letter.a.rotate ∧
+    generatorTurn = ⟨ZetaFrac.ofZeta leftCentre, -1 / 5⟩ ∧
+    generatorMoves 0 = [("disk", .turn generatorTurn)] ∧
+    moveKinds (generatorMoves 1) = [("disk", "vanish"), ("outside", "vanish"),
+      ("image-spoke", "appear"), ("angle", "appear"), ("angle-label", "appear"), ("arc", "appear"),
+      ("origin", "appear"), ("image", "appear"), ("image-label", "appear")] ∧
+    generatorArrives = true ∧
+    turnedSamples.all (Letter.a.covers r2ThreeHalves) = true ∧
+    (turnedSamples.map (Letter.a.act r2ThreeHalves) == turnedImages) = true ∧
+    (turnedImages.headD origin == aZero) = true ∧
+    fixedSamples.all (fun z => !Letter.a.covers r2ThreeHalves z) = true ∧
+    (fixedSamples.map (Letter.a.act r2ThreeHalves) == fixedSamples) = true := by
+  refine ⟨by unfold generatorStep; with_reducible rfl, rfl, fun _ => rfl, fun _ => rfl,
+    fun _ => rfl, rfl, rfl, rfl, rfl, rfl, rfl, ?_⟩
+  repeat' apply And.intro
+  all_goals decide +kernel
+
 end TDCSGFigures
 ```
 
-{figref "word-steps"}[]: the figure `TDCSGFigures.wordSteps`
-and its theorem `TDCSGFigures.wordSteps_spec`.
+{figref "word-steps"}[]: the animation `TDCSGFigures.wordSteps`, an illustration, and the data of
+its key frames, `TDCSGFigures.wordSteps_keys`.
 
 ```Verso.Genre.Manual.InlineLean.lean
 namespace TDCSGFigures
 
 open PILean PILean.Plane PILean.Exact TDCSGFigures.Early
 
-/-- What `wordSteps` shows, frame by frame, and why. It is the stepper of the five frames
-`stepFrame 0, …, stepFrame 4` with the captions written out; every frame draws the items of
-`stepBase` (written out: the two disks of radius `2.1`, their lens, the centres recording where
-they stand, and the names), the turn of the frame's letter as an arc about its centre, or the note
-that it fixes the point, the earlier points and the current one, each recording exactly where it
-stands relative to the two disks and the lens (`recordSides`). The points are
+/-- The animation `wordSteps` and the data its key frames are drawn from. It has one panel whose
+keys are `stepKey k`, `k = 0, …, 4`, and whose steps are made from the declared moves `stepMoves`.
+Every key draws `stepBase` (written out: the two disks of radius `2.1`, their lens, the centres
+recording where they stand, and the names), then the circle about the centre of the last turn
+(`stepPivot`), at key `4` the segment from `-1` to `z₃` (`stepReach`), the points left behind,
+faint and labelled (`stepTrail`, each recording exactly where it stands relative to the two disks
+and the lens), and the point `z_k` (`stepMover`). The points are
 `z₀ = 0, z₁ = -1 + ζ⁴ = a(0), z₂ = b(z₁), z₃ = b(z₂), z₄ = a(z₃) = z₃`, written out in the basis
 `1, ζ, ζ², ζ³`; the letters `a, b, b` find their point in their closed disk of radius `2.1` and
-the last `a` does not (`|z₃ + 1|² > 441/100`), so it fixes `z₃`. Not stated: the layout, the
-lettering, the style's colour values and the pixels. -/
-theorem wordSteps_spec :
-    wordSteps = Plane.stepper (stepCaptions.mapIdx fun k c => (c, stepFrame k)) ∧
+the last `a` does not (`|z₃ + 1|² > 441/100`), so it fixes `z₃`. Step `k` turns the point by
+`stepTurn k`, about the centre of letter `k + 1` by `-1/5` of a full turn, when that letter acts,
+and fades the circles, the points left behind and the segment in and out; each declared move,
+applied exactly in `ℚ(ζ₅)` to the anchors of the actors of one key, gives those of the next
+(`stepsArrive`), so every turn carries `z_k` onto `z_{k+1}`. The captions are written out. Not
+stated: how the builders draw, the timing and the frames the browser draws between the key
+frames. -/
+theorem wordSteps_keys :
+    wordSteps.panels = #[{ motion :=
+      { keys := ((List.range 5).map stepKey).toArray,
+        steps := ((List.range 4).map (exactStep ∘ stepMoves)).toArray } }] ∧
+    wordSteps.captions = stepCaptions ∧
     stepCaptions = #[
-        "z₀ = 0, in both disks",
-        "a: z₀ is in the left disk; a turns it 72° clockwise about −1",
-        "b: z₁ is in the right disk; b turns it 72° clockwise about +1",
-        "b: z₂ is in the right disk; b turns it again",
-        "a: z₃ is outside the left disk; a leaves it where it is"] ∧
+      "z₀ = 0, in both disks. The word a b b a is applied to it at radius 2.1, letter by letter \
+        from left to right.",
+      "Letter 1, a: z₀ lies in the left disk, so a turns it a fifth of a turn clockwise about −1 \
+        (circled), to z₁.",
+      "Letter 2, b: z₁ lies in the right disk, so b turns it a fifth of a turn clockwise about +1 \
+        (circled), to z₂.",
+      "Letter 3, b: z₂ lies in the right disk, so b turns it again, to z₃.",
+      "Letter 4, a: z₃ lies outside the left disk, farther than 2.1 from −1 (dashed), so a leaves \
+        it where it is: z₄ = z₃."] ∧
     stepWord = [.a, .b, .b, .a] ∧ r2Step = rat (441 / 100) ∧
     stepBase = #[
       Plane.Exact.disk leftCentre (21 / 10 : Rat) |>.noFill |>.role leftRole
@@ -411,19 +667,56 @@ theorem wordSteps_spec :
         |>.named "the center −1"),
       withSidesStep rightCentre
         (Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1"),
-      Plane.Exact.label "−1" leftCentre .auto |>.role leftRole,
-      Plane.Exact.label "+1" rightCentre .auto |>.role rightRole,
+      Plane.Exact.label "−1" leftCentre .left (some 24) |>.role leftRole,
+      Plane.Exact.label "+1" rightCentre .right (some 24) |>.role rightRole,
       Plane.Exact.label "left disk, radius 2.1" ((-1 : Rat), (-5 / 2 : Rat)) |>.role leftRole,
       Plane.Exact.label "right disk, radius 2.1" ((1 : Rat), (5 / 2 : Rat)) |>.role rightRole] ∧
+    (∀ k, stepKey k =
+      { width := figureWidth, padding := 16, style := houseStyle, checks := .fail,
+        items := stepKeyItems k,
+        info := { title := s!"The point {stepName k} of 0 under a b b a at radius 2.1" } }) ∧
+    (∀ k, stepKeyItems k =
+      stepBase ++ stepPivot k ++ stepReach k ++ (stepTrailIndices k).toArray.map stepTrail ++
+        #[stepMover k]) ∧
+    (∀ k, stepPoint k = stepPoints.getD k origin) ∧
+    (∀ k, stepMover k = (Plane.Exact.point (stepPoint k) |>.size 5
+      |>.named "the point followed through the word" |>.withId "point")) ∧
+    (∀ j, stepTrail j =
+      ((group #[withSidesStep (stepPoint j) (Plane.Exact.point (stepPoint j) |>.faint),
+          Plane.Exact.label (stepName j) (stepPoint j) .auto])
+        |>.named (stepName j) |>.withId s!"trail-{j}")) ∧
+    (∀ k, stepTrailIndices k = (List.range k).filter fun j => !(stepPoint j == stepPoint k)) ∧
+    (∀ k, stepPivot k = if k == 0 || 3 < k then #[] else
+      let c := (stepWord.getD (k - 1) .a).centre
+      let left := c == leftCentre
+      #[Plane.Exact.circle c stepPivotRadius |>.role (if left then leftRole else rightRole)
+        |>.width 2 |>.named s!"a circle about the center {if left then "−1" else "+1"} of the \
+          last turn" |>.withId (if left then "pivot-left" else "pivot-right")]) ∧
+    (∀ k, stepReach k = if k == 4 then
+      #[Plane.Exact.segment leftCentre (stepPoint 3) |>.role leftRole |>.width 1.5 |>.dashed
+        |>.named "from −1 to z₃, longer than 2.1" |>.withId "reach"] else #[]) ∧
+    stepPivotRadius = 1 / 5 ∧
     (stepPoints == [⟨#[0, 0, 0, 0]⟩, ⟨#[-2, -1, -1, -1]⟩, ⟨#[3, 2, 2, 3]⟩, ⟨#[1, 0, 1, -2]⟩,
       ⟨#[1, 0, 1, -2]⟩]) = true ∧
     ((stepWord.zip stepPoints).map fun (l, z) => l.covers r2Step z) = [true, true, true, false] ∧
-    QSqrt.lt r2Step ((stepPoints.getD 3 origin) - leftCentre).normSq = true := by
-  refine ⟨rfl, rfl, rfl, rfl, rfl, ?_⟩
-  repeat' apply And.intro
+    QSqrt.lt r2Step ((stepPoints.getD 3 origin) - leftCentre).normSq = true ∧
+    (∀ k, stepTurn k = ⟨ZetaFrac.ofZeta (stepWord.getD k .a).centre, -1 / 5⟩) ∧
+    (stepWord.all fun l => l.turn == zeta 4) = true ∧
+    (∀ k, stepPivotId k =
+      if (stepWord.getD k .a).centre == leftCentre then "pivot-left" else "pivot-right") ∧
+    (List.range 3).map stepPivotId = ["pivot-left", "pivot-right", "pivot-right"] ∧
+    stepMoves 0 =
+      [("point", .turn (stepTurn 0)), (stepPivotId 0, .appear), ("trail-0", .appear)] ∧
+    stepMoves 1 = [("point", .turn (stepTurn 1)), (stepPivotId 1, .appear), ("trail-1", .appear),
+      (stepPivotId 0, .vanish)] ∧
+    stepMoves 2 = [("point", .turn (stepTurn 2)), ("trail-2", .appear)] ∧
+    stepMoves 3 = [("reach", .appear), (stepPivotId 2, .vanish)] ∧
+    stepsArrive = true := by
+  refine ⟨by unfold wordSteps; with_reducible rfl, by unfold wordSteps; with_reducible rfl, rfl,
+    rfl, rfl, rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl,
+    fun _ => rfl, fun _ => rfl, fun _ => rfl, rfl, ?_⟩
+  refine ⟨?_, ?_, ?_, fun _ => rfl, ?_, fun _ => rfl, ?_, rfl, rfl, rfl, rfl, ?_⟩
   all_goals decide +kernel
-
-figure_links wordSteps wordSteps_spec
 
 end TDCSGFigures
 ```
@@ -598,7 +891,8 @@ open PILean PILean.Plane PILean.Exact TDCSGFigures.Early
 
 /-- The three loops and the data their key frames are drawn from. The figures are `wordLoop 1`,
 `wordLoop 2`, `wordLoop 3`, the loop without the word strip (`wordLoopWith i false`): one panel
-whose keys are `wordKey i k` and whose steps are `wordStep i k`, with the captions `wordCaption i k`.
+whose keys are `wordKey i k` and whose steps are `wordStep i k`, with the captions
+`wordCaption i k`.
 Key `k` draws, over the disks, their lens, the chord and the piece (`wordUnder`), the image
 `[w_k(p), w_k(q)]` of the piece `[p, q]` after `k` letters (`wordSegment`, read from `wordPath i`,
 here written out in the basis `1, ζ, ζ², ζ³`), the circle about the centre of the turn before it
@@ -633,8 +927,11 @@ theorem wordLoop_figures :
     (∀ i k, wordStep i k false =
       { moves := #[("segment", Plane.Exact.turnAbout (wordTurn i k).centre (wordTurn i k).turns)] ++
           wordFades i k false }) := by
-  exact ⟨rfl, rfl, rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl,
-    fun _ _ => rfl, fun _ _ => rfl, fun _ _ => rfl⟩
+  exact ⟨by unfold wordLoop1; with_reducible rfl, by unfold wordLoop2; with_reducible rfl,
+    by unfold wordLoop3; with_reducible rfl, fun _ => by unfold wordLoop; with_reducible rfl,
+    fun _ => by unfold wordLoopWith; with_reducible rfl, fun _ => rfl, fun _ => rfl,
+    fun _ => by unfold wordLoopWith; with_reducible rfl, fun _ _ => rfl, fun _ _ => rfl,
+    fun _ _ => rfl⟩
 
 /-- The data of the key frames of the three loops (see `wordLoop_figures`). -/
 theorem wordLoop_keys :
@@ -661,70 +958,189 @@ theorem wordLoop_keys :
   repeat' apply And.intro
   all_goals decide +kernel
 
-/-- The caption of key `k ≥ 1` of each word names letter `k`, its turn's direction and its
-centre. -/
+/-- The caption of every key of the three loops, written as a function of the key's data: the
+piece and the word at the start; after letter `k`, the letter, the direction of its turn and its
+centre; the ends that lie on the circle of the next letter (`wordEqualities`); and at the last key
+the landing and the move of the piece. -/
 theorem wordLoop_captions :
-    [1, 2, 3].all (fun i => (List.range (wordPiece i).1.length).all fun k =>
-      let l := (wordPiece i).1.getD k .a
-      (wordCaption i (k + 1)).startsWith s!"Letter {k + 1}, {l.text}, turns the image a fifth \
-        of a turn {if l.turn == zeta 1 then "counterclockwise" else "clockwise"} about \
-        {centreName l.centre}") = true := by
-  decide +kernel
+    [1, 2, 3].map pieceText = ["[−E, (1 − φ)E]", "[(1 − φ)E, (3 − 2φ)E]", "[(3 − 2φ)E, E]"] ∧
+    (∀ i, shiftText i = if i == 3 then "(2φ − 4)E" else "(2φ − 2)E") ∧
+    (∀ c, centreName c = if c == leftCentre then "−1" else "+1") ∧
+    (∀ i, wordText i = " ".intercalate ((wordPiece i).1.map Letter.text)) ∧
+    (∀ i k, wordCaption i k =
+  let (w, _, _) := wordPiece i
+  let n := w.length
+  let ends := ((wordEqualities i).filter (·.1 == k)).map fun (_, _, isLeft) =>
+    if isLeft then "left" else "right"
+  let contact := match ends with
+    | [] => ""
+    | [c] => s!" One end lies on the {c} circle (dot): the disk test of letter {k + 1} holds with \
+        equality there."
+    | cs => s!" Both ends lie on the {cs.headD "left"} circle (dots): the disk test of letter \
+        {k + 1} holds with equality there."
+  let body :=
+    if k == 0 then
+      s!"The piece {pieceText i} of the chord (dashed) and word {i} = {wordText i}, its letters \
+        applied from left to right; a copy of the piece is turned."
+    else
+      let l := w.getD (k - 1) .a
+      let way := if l.turn == zeta 1 then "counterclockwise" else "clockwise"
+      s!"Letter {k}, {l.text}, turns the image a fifth of a turn {way} about \
+        {centreName l.centre} (circled)."
+  let landing := if k == n then s!" The image lies on the chord again: the piece moved by \
+      {shiftText i}." else ""
+  body ++ contact ++ landing) := by
+  exact ⟨rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ _ => rfl⟩
 
 end TDCSGFigures
 ```
 
-{figref "exchanged-intervals"}[] shows the exact endpoint order before and after the return.
+{figref "exchanged-intervals"}[]: the animation `TDCSGFigures.exchangedIntervals`, whose last key
+frame is the figure of the two rows, with its theorem `TDCSGFigures.exchangedIntervals_spec`, the
+exact endpoint order before and after the return; the other key frames and the slides are stated
+in `TDCSGFigures.exchangedIntervals_keys`.
 
 ```Verso.Genre.Manual.InlineLean.lean
 namespace TDCSGFigures
 
 open PILean PILean.Exact PILean.Plane
 
-/-- The two rows tile the same interval; the third image precedes the first and second. -/
+/-- The animation `exchangedIntervals` and the figure of the two rows, its last key frame. The
+animation has one panel whose keys are `intervalKey k`, `k = 0, …, 4`, the last one
+`exchangedIntervalsFinal`, and whose steps are made from the declared moves `intervalMoves`; its
+poster is the last key. The figure draws the pieces of the row before the return (height `1/2`)
+and of the row after (height `0`), each a segment from `(returnInterval i after).1` to
+`(returnInterval i after).2` with its number above it, the pieces after the return with their
+ids, and the names of the rows and of the ends. The two rows tile the same interval `[-1, 1]`:
+before the return in the order `1, 2, 3`, after it in the order `3, 1, 2`. Not stated: how the
+builders draw, the layout, the lettering, the style's colour values and the pixels. -/
 theorem exchangedIntervals_spec :
-    exchangedIntervals.items =
-      ((#[false, true].flatMap fun after => #[1, 2, 3].flatMap fun i => intervalBand i after) ++ #[
+    exchangedIntervals.panels = #[{ motion :=
+      { keys := ((List.range 5).map intervalKey).toArray,
+        steps := ((List.range 4).map fun k => exactStep (intervalMoves k)).toArray } }] ∧
+    intervalKey 4 = exchangedIntervalsFinal ∧ exchangedIntervals.poster = 4 ∧
+    exchangedIntervalsFinal.items =
+      ((#[false, true].flatMap fun after => #[1, 2, 3].flatMap fun i => intervalBand i after) ++
+        intervalNames) ∧
+    intervalNames = #[
         Plane.Exact.label "before" ((-5 / 4 : Rat), (1 / 2 : Rat)) .left,
         Plane.Exact.label "after" ((-5 / 4 : Rat), (0 : Rat)) .left,
         Plane.Exact.label "−1" ((-1 : Rat), (0 : Rat)) .below,
-        Plane.Exact.label "1" ((1 : Rat), (0 : Rat)) .below]) ∧
+        Plane.Exact.label "1" ((1 : Rat), (0 : Rat)) .below] ∧
+    (∀ i after, intervalBand i after =
+      let (a, b) := returnInterval i after
+      let y := intervalRowY after
+      let tag := fun (it : Item) (id : String) => if after then it.withId id else it
+      #[tag (Plane.Exact.segment (a, y) (b, y) |>.width 5 |>.role (pieceRole i)
+          |>.named s!"piece {i}, {if after then "after" else "before"} the word") s!"after-{i}",
+        tag (Plane.Exact.label (toString i) ((a + b) * rat (1 / 2), y) .above
+          |>.role (pieceRole i)) s!"after-label-{i}"]) ∧
+    (∀ after, intervalRowY after = rat (if after then (0 : Rat) else 1 / 2)) ∧
+    (∀ i after, returnInterval i after =
+      let shift := if !after then rat 0 else phi * rat 2 - rat (if i == 3 then 4 else 2)
+      (pieceEnds[i - 1]! + shift, pieceEnds[i]! + shift)) ∧
+    pieceEnds = #[rat (-1), rat 1 - phi, rat 3 - phi * rat 2, rat 1] ∧
     (returnInterval 1 false).1 = rat (-1) ∧ (returnInterval 3 false).2 = rat 1 ∧
     (returnInterval 1 false).2 = (returnInterval 2 false).1 ∧
     (returnInterval 2 false).2 = (returnInterval 3 false).1 ∧
     (returnInterval 3 true).1 = rat (-1) ∧ (returnInterval 2 true).2 = rat 1 ∧
     (returnInterval 3 true).2 = (returnInterval 1 true).1 ∧
     (returnInterval 1 true).2 = (returnInterval 2 true).1 := by
-  refine ⟨rfl, ?_⟩
+  refine ⟨by unfold exchangedIntervals; with_reducible rfl, rfl,
+    by unfold exchangedIntervals; with_reducible rfl, rfl, rfl, fun _ _ => rfl, fun _ => rfl,
+    fun _ _ => rfl, rfl, ?_⟩
   repeat' apply And.intro
   all_goals decide +kernel
 
 figure_links exchangedIntervals exchangedIntervals_spec
 
+/-- The key frames of `exchangedIntervals` before the last and its slides. Key `k ≤ 3` draws, in
+the frame of the figure of the two rows, the row before the return, the names, and a copy of each
+piece (`intervalCopy`): pieces `1, …, k` at their places in the row after the return, the others
+still on the row before. Step `k < 3` slides the copy of piece `k + 1` by `intervalSlide (k + 1)`,
+`(2φ - 2, -1/2)` for pieces `1` and `2` and `(2φ - 4, -1/2)` for piece `3`: the move of its word
+along the chord, as the return map `chordStep` applies word `i` to the midpoint of piece `i`, and
+the drop from one row to the other. Step `3` fades the copies out and the row after in. Each
+declared slide, applied exactly in `ℚ(√5)²` to the ends of the copies of one key, gives those of
+the next (`intervalArrives`). The captions are written out. Not stated: how the builders draw, the
+timing and the frames the browser draws between the key frames. -/
+theorem exchangedIntervals_keys :
+    exchangedIntervals.captions = intervalCaptions ∧
+    intervalCaptions = #[
+      "The three pieces of [−1, 1) before one return, in the order 1, 2, 3 (top row). The word \
+        of each piece moves it along the chord.",
+      "Word 1 moves piece 1, −1 ≤ t ≤ 1 − φ, by 2φ − 2 to the right.",
+      "Word 2 moves piece 2, 1 − φ < t < 3 − 2φ, by 2φ − 2 to the right, beside the image of \
+        piece 1.",
+      "Word 3 moves piece 3, 3 − 2φ ≤ t < 1, by 2φ − 4 to the left, to the left end of the \
+        interval.",
+      "After one return the pieces read 3, 1, 2 on the same interval. Joined into a circle of \
+        circumference two, the three moves are one rotation by 2φ − 2 = 2/φ."] ∧
+    (∀ k, k ≤ 3 → intervalKey k = 
+      { exchangedIntervalsFinal with
+        items := intervalKeyItems k,
+        info := { title := intervalCaptions.getD k "" } }) ∧
+    (∀ k, intervalKeyItems k = (#[1, 2, 3].flatMap fun i => intervalBand i false) ++
+      #[1, 2, 3].map (fun i => intervalCopy i (decide (i ≤ k))) ++ intervalNames) ∧
+    (∀ i moved, intervalCopy i moved =
+      let (a, b) := returnInterval i moved
+      let y := intervalRowY moved
+      Plane.Exact.segment (a, y) (b, y) |>.width 5 |>.role (pieceRole i)
+        |>.named s!"a copy of piece {i}, moved by word {i}" |>.withId s!"piece-{i}") ∧
+    (∀ k, k < 3 → intervalMoves k = [(s!"piece-{k + 1}", .slide (intervalSlide (k + 1)))]) ∧
+    moveKinds (intervalMoves 3) = [("piece-1", "vanish"), ("after-1", "appear"),
+      ("after-label-1", "appear"), ("piece-2", "vanish"), ("after-2", "appear"),
+      ("after-label-2", "appear"), ("piece-3", "vanish"), ("after-3", "appear"),
+      ("after-label-3", "appear")] ∧
+    (∀ i, intervalSlide i = ((returnInterval i true).1 - (returnInterval i false).1,
+      intervalRowY true - intervalRowY false)) ∧
+    [1, 2, 3].all (fun i => let v := intervalSlide i
+      v.1 == phi * rat 2 - rat (if i == 3 then 4 else 2) && v.2 == rat (-1 / 2)) = true ∧
+    [1, 2, 3].all (fun i =>
+      let m := ((returnInterval i false).1 + (returnInterval i false).2) * rat (1 / 2)
+      (chordStep m).1 == i && (chordStep m).2 - m == (intervalSlide i).1) = true ∧
+    intervalArrives = true := by
+  refine ⟨by unfold exchangedIntervals; with_reducible rfl, rfl, fun k hk => ?_, fun _ => rfl,
+    fun _ _ => rfl, fun k hk => ?_, ?_, fun _ => rfl, ?_⟩
+  · simp only [intervalKey, show ¬3 < k by omega, if_false]
+  · simp only [intervalMoves, hk, if_true]
+  all_goals first | decide +kernel | (repeat' apply And.intro) <;> decide +kernel
+
 end TDCSGFigures
 ```
 
-{figref "chord-orbit"}[]: the figure `TDCSGFigures.chordOrbit`
-and its theorem `TDCSGFigures.chordOrbit_spec`.
+{figref "chord-orbit"}[]: the animation `TDCSGFigures.chordOrbit`, whose last key frame is the
+figure of the first 24 returns, with its theorem `TDCSGFigures.chordOrbit_spec`; the other key
+frames and the hops are stated in `TDCSGFigures.chordOrbit_keys`.
 
 ```Verso.Genre.Manual.InlineLean.lean
 namespace TDCSGFigures
 
 open PILean PILean.Plane PILean.Exact TDCSGFigures.Early
 
-/-- What `chordOrbit` draws, item for item, and why. The items are the frame (`chordOrbitFrame`,
-written out: the bands of the three pieces, the pieces of `[-1, 1]` with their labels, the end `-1`
-in the range and the end `1` not, the axis with ticks at `-1, 1 - φ, 3 - 2φ, 1` and its name),
-the axis of steps (`stepAxis`, written out: the step number `k` downwards, ticks at
-`k = 0, 6, 12, 18, 24` and its name), then one point per row `k = 0, …, 24` at `(t_k, -k/20)`
-(`rowPoint`, written out), in the colour of word `w_k` and recording that it lies in the band of
-piece `w_k` and outside the other two. The rows are written out: `t_k = a + b√5` with the word
-applied next. The facts hold exactly in `ℚ(√5)`: every `t_k` lies in `[-1, 1)` and in the piece
-of its word (`t ≤ 1 - φ` for word 1, `1 - φ < t < 3 - 2φ` for word 2, `t ≥ 3 - 2φ` for word 3),
-`t_(k+1) = t_k + 2φ - 2` for words 1, 2 and `t_k + 2φ - 4` for word 3, and the 25 values are
-pairwise distinct. Not stated: how the builders and modifiers draw, the layout, the lettering, the
-style's colour values and the pixels. -/
+/-- The animation `chordOrbit` and the figure of the first 24 returns, its last key frame. The
+animation has one panel whose keys are `orbitKey k`, `k = 0, …, orbitHops + 1` (`orbitHops = 12`),
+the last one `chordOrbitFinal`, and whose steps are made from the declared moves `orbitMoves`; its
+poster is the last key. What `chordOrbitFinal` draws, item for item, and why: the frame
+(`chordOrbitFrame`, written out: the bands of the three pieces, the pieces of `[-1, 1]` with their
+labels, the end `-1` in the range and the end `1` not, the axis with ticks at
+`-1, 1 - φ, 3 - 2φ, 1` and its name), the axis of steps (`stepAxis`, written out: the step number
+`k` downwards, ticks at `k = 0, 6, 12, 18, 24` and its name), then one point per row
+`k = 0, …, 24` at `(t_k, -k/20)` (`rowPoint`, written out, with its id), in the colour of word
+`w_k` and recording that it lies in the band of piece `w_k` and outside the other two. The rows
+are written out: `t_k = a + b√5` with the word applied next. The facts hold exactly in `ℚ(√5)`:
+every `t_k` lies in `[-1, 1)` and in the piece of its word (`t ≤ 1 - φ` for word 1,
+`1 - φ < t < 3 - 2φ` for word 2, `t ≥ 3 - 2φ` for word 3), `t_(k+1) = t_k + 2φ - 2` for words 1, 2
+and `t_k + 2φ - 4` for word 3, and the 25 values are pairwise distinct. Not stated: how the
+builders and modifiers draw, the layout, the lettering, the style's colour values and the
+pixels. -/
 theorem chordOrbit_spec :
+    chordOrbit.panels = #[{ motion :=
+      { keys := ((List.range (orbitHops + 2)).map orbitKey).toArray,
+        steps := ((List.range (orbitHops + 1)).map fun k =>
+          exactStep (orbitMoves k)).toArray } }] ∧
+    orbitHops = 12 ∧ orbitKey (orbitHops + 1) = chordOrbitFinal ∧
+    chordOrbit.poster = orbitHops + 1 ∧ chordOrbitFinal.items = chordOrbitItems ∧
     orbitSteps = 24 ∧ pieceEnds = #[rat (-1), rat 1 - phi, rat 3 - phi * rat 2, rat 1] ∧
     (∀ k : Nat, rowY k = rat (-(k : Rat) / 20)) ∧ chordRowY = rat (3 / 20) ∧
     axisY = rat (-((orbitSteps : Rat) + 2) / 20) ∧
@@ -737,7 +1153,8 @@ theorem chordOrbit_spec :
         |>.named s!"t{subscript k} = {phiText t}, word {w} next"
         |>.incident (if w == 1 then .inside else .outside) "the band of piece 1"
         |>.incident (if w == 2 then .inside else .outside) "the band of piece 2"
-        |>.incident (if w == 3 then .inside else .outside) "the band of piece 3")) ∧
+        |>.incident (if w == 3 then .inside else .outside) "the band of piece 3"
+        |>.withId s!"row-{k}")) ∧
     chordOrbitFrame = #[band 1, band 2, band 3,
       Plane.Exact.segment (tPoint pieceEnds[0]! chordRowY) (tPoint pieceEnds[1]! chordRowY)
         |>.role (pieceRole 1)
@@ -789,7 +1206,7 @@ theorem chordOrbit_spec :
       (stepTicks.toArray.map fun k =>
         Plane.Exact.label s!"{k}" (tPoint stepAxisX (rowY k)) .left) ++
       #[Plane.Exact.label "step k" (tPoint (stepAxisX - rat (1 / 5)) (rowY 12)) .left] ∧
-    chordOrbit.items = chordOrbitFrame ++ stepAxis ++
+    chordOrbitItems = chordOrbitFrame ++ stepAxis ++
       (chordRows orbitSteps).mapIdx (fun k (w, t) => rowPoint k w t) ∧
     chordRows 24 = #[(3, ⟨0, 0⟩), (1, ⟨-3, 1⟩), (3, ⟨-4, 2⟩), (2, ⟨-7, 3⟩), (3, ⟨-8, 4⟩),
       (3, ⟨-11, 5⟩), (2, ⟨-14, 6⟩), (3, ⟨-15, 7⟩), (3, ⟨-18, 8⟩), (1, ⟨-21, 9⟩), (3, ⟨-22, 10⟩),
@@ -805,15 +1222,71 @@ theorem chordOrbit_spec :
       (chordRows 24)[k + 1]!.2 ==
         t + phi * rat 2 - (if w == 3 then rat 4 else rat 2)) = true ∧
     ((chordRows 24).map (phiForm ·.2)).toList.eraseDups.length = 25 := by
-  refine ⟨rfl, rfl, fun _ => rfl, rfl, rfl, fun _ => rfl, fun _ _ _ => rfl, rfl, rfl, rfl, rfl,
-    rfl, ?_⟩
+  refine ⟨by unfold chordOrbit; with_reducible rfl, rfl, rfl,
+    by unfold chordOrbit; with_reducible rfl, rfl, rfl, rfl, fun _ => rfl, rfl, rfl, fun _ => rfl,
+    fun _ _ _ => rfl, rfl, rfl, rfl, rfl, rfl, ?_⟩
   repeat' apply And.intro
   all_goals decide +kernel
 
 figure_links chordOrbit chordOrbit_spec
 
+/-- The key frames of `chordOrbit` before the last and its hops. Key `k ≤ orbitHops` draws, in the
+frame of the figure of the returns, the frame, the axis of steps, the points of rows `0, …, k - 1`
+and the point that hops at row `k`, on `t_k` (`orbitHopper`). Step `k < orbitHops` slides it by
+`(t_{k+1} - t_k, -1/20)`, one return: the move `2φ - 2` or `2φ - 4` of the word applied at `t_k`
+(`chordStep`) and one row down, and fades in the point of row `k` that it leaves; step
+`orbitHops` fades it out and the rows from `orbitHops` on in. Each declared move, applied exactly
+in `ℚ(√5)²` to the anchors of the actors of one key, gives those of the next (`orbitArrives`). The
+captions, built from the rows (`orbitCaption`), are written out. Not stated: how the builders
+draw, the timing and the frames the browser draws between the key frames. -/
+theorem chordOrbit_keys :
+    (∀ k, k ≤ orbitHops → orbitKey k = 
+      { chordOrbitFinal with
+        items := orbitKeyItems k,
+        info := { title := orbitCaption k } }) ∧
+    (∀ k, orbitKeyItems k = chordOrbitFrame ++ stepAxis ++
+      ((chordRows orbitSteps).extract 0 k).mapIdx (fun j (w, t) => rowPoint j w t) ++
+      #[orbitHopper k]) ∧
+    (∀ k, orbitHopper k =
+      (Plane.Exact.point (tPoint ((chordRows orbitSteps).getD k (0, rat 0)).2 (rowY k)) |>.size 5
+        |>.named "the point tE of the orbit, one return per hop" |>.withId "hop")) ∧
+    (∀ k, k < orbitHops → orbitMoves k =
+      [("hop", .slide (((chordRows orbitSteps).getD (k + 1) (0, rat 0)).2 -
+          ((chordRows orbitSteps).getD k (0, rat 0)).2, rowY (k + 1) - rowY k)),
+        (s!"row-{k}", .appear)]) ∧
+    moveKinds (orbitMoves orbitHops) = [("hop", "vanish")] ++
+      (List.range 13).map (fun j => (s!"row-{12 + j}", "appear")) ∧
+    (List.range orbitHops).all (fun k =>
+      let (w, t) := (chordRows orbitSteps).getD k (0, rat 0)
+      ((chordRows orbitSteps).getD (k + 1) (0, rat 0)).2 - t == (chordStep t).2 - t &&
+        (chordStep t).1 == w) = true ∧
+    orbitArrives = true ∧
+    chordOrbit.captions = ((List.range (orbitHops + 2)).map orbitCaption).toArray ∧
+    (∀ w, orbitShiftText w = if w == 3 then "2φ − 4" else "2φ − 2") ∧
+    (∀ k, orbitCaption k =
+  let rows := chordRows orbitSteps
+  let (w, t) := rows.getD k (0, rat 0)
+  if k == 0 then
+    s!"The orbit of 0 along the chord at the critical radius: the parameter t of the point tE, \
+      −1 ≤ t < 1, one row per return k, from the top. t₀ = 0 lies in piece {w}: word {w} \
+      applies next."
+  else if k ≤ orbitHops then
+    let w' := (rows.getD (k - 1) (0, rat 0)).1
+    s!"Return {k}: word {w'} moved the point by {orbitShiftText w'}, to \
+      t{subscript k} = {phiText t}, in piece {w}: word {w} applies next."
+  else
+    s!"The returns t₀, …, t₂₄, the last {orbitSteps - orbitHops} shown at once. Each point lies in \
+      the band of the word applied next, which adds 2φ − 2 modulo 2; the rotation is \
+      irrational, so the points never repeat.") := by
+  refine ⟨fun k hk => ?_, fun _ => rfl, fun _ => rfl, fun k hk => ?_, ?_, ?_, ?_,
+    by unfold chordOrbit; with_reducible rfl, fun _ => rfl, fun _ => rfl⟩
+  · simp only [orbitKey, show ¬orbitHops < k by omega, if_false]
+  · simp only [orbitMoves, hk, if_true]
+  all_goals decide +kernel
+
 end TDCSGFigures
 ```
+
 
 # The figure of Part II
 
@@ -968,6 +1441,7 @@ namespace TDCSGFigures.Lift
 
 open PILean PILean.Plane PILean.Exact TDCSGFigures
 
+open FramePairConfig in
 /-- The frame pair and the data its key frames are drawn from. The figure is the motion of the
 default configuration (`FramePairConfig.motion`): the word `a a b a b a a b b a b b` applied to
 `z = 0` at `r = 1.95`, without the word strip; its two panels' keys are the key figures
@@ -1016,6 +1490,39 @@ theorem framePair_keys :
       if moves.isEmpty then MotionStep.idle else { moves }) ∧
     framePair.captions =
       ((List.range ({} : FramePairConfig).keyCount).map ({} : FramePairConfig).keyCaption).toArray ∧
+    FramePairConfig.nbsp = " " ∧
+    (∀ s, whereText s =
+  let n := ("," ++ nbsp).intercalate (s.n.toList.map fun k =>
+    if k < 0 then s!"−{-k}" else toString k)
+  s!"(n{nbsp}={nbsp}({n}), j{nbsp}={nbsp}{s.j})") ∧
+    (∀ cfg : FramePairConfig, ∀ j, cfg.keyCaption j =
+  let r := cfg.keyRef j
+  let k := r.state
+  let s := cfg.stateAt k
+  if k == 0 then
+    "Start: z = 0, so x = 1/2. Left: the disks halved, with centers 0 and 1, and the point " ++
+      "(y + 1)/2. Right: the window about x, the point fixed at x, and the left and right " ++
+      "centers P(n) and P(n + eⱼ) with the halved disks riding on them; n is the integer label " ++
+      "of the left center, j the index of the direction from the left to the right center " ++
+      s!"{whereText s}."
+  else
+    let l := cfg.letterOf (k - 1)
+    let (own, other, ownName) := match l with
+      | .a | .aInv => ("left", "right", "0")
+      | .b | .bInv => ("right", "left", "1")
+    let (pointWay, centreWay) := match l with
+      | .a | .b => ("clockwise", "counterclockwise")
+      | .aInv | .bInv => ("counterclockwise", "clockwise")
+    let letter := s!"Letter {k}, {l.text},"
+    if s.acted then
+      s!"{letter} acts: the point turns a fifth of a turn {pointWay} about the {own} center " ++
+        s!"{ownName}; in the moving frame the {other} center turns a fifth of a turn " ++
+        s!"{centreWay} about the {own} center. {whereText s}"
+    else if r.mark then
+      s!"{letter} does not act: the point lies outside the {own} disk, and in the moving frame " ++
+        s!"the {own} center lies outside the window; a ring marks that center in both panels, " ++
+        s!"and nothing moves. {whereText s}"
+    else s!"{letter} did not act: the state is unchanged. {whereText s}") ∧
     (states.map (·.n) == [#[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0],
       #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[1, -1, 0, 0, 0],
       #[1, 0, -1, 0, 0], #[1, 0, -1, 0, 0], #[1, 0, 0, -1, 0], #[1, 0, 0, 0, -1]]) = true ∧
@@ -1036,8 +1543,11 @@ theorem framePair_keys :
       (({} : FramePairConfig).keyCaption j).startsWith h) = true ∧
     ({} : FramePairConfig).keyCount = 16 ∧ ({} : FramePairConfig).allArrive = true ∧
     ({} : FramePairConfig).ringsPlaced = true := by
-  refine ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl,
-    fun _ => rfl, fun _ _ _ _ => rfl, rfl, ?_⟩
+  refine ⟨by unfold framePair; with_reducible rfl, rfl, rfl, rfl, rfl, rfl,
+    by unfold framePair FramePairConfig.motion; with_reducible rfl, fun _ => rfl, fun _ => rfl,
+    fun _ => rfl, fun _ => rfl, fun _ _ _ _ => rfl,
+    by unfold framePair FramePairConfig.motion; with_reducible rfl, rfl, fun _ => rfl,
+    fun _ _ => rfl, ?_⟩
   repeat' apply And.intro
   all_goals decide +kernel
 
@@ -1470,38 +1980,164 @@ figure_links componentOfZero componentOfZero_spec
 end TDCSGFigures.Confinement
 ```
 
-{figref "walk-to-leaf"}[]: the figure `TDCSGFigures.Confinement.walkToLeaf`
-and its theorem `TDCSGFigures.Confinement.walkToLeaf_spec`.
+{figref "walk-to-leaf"}[]: the animation `TDCSGFigures.Confinement.walkToLeaf`, an illustration,
+and the data of its key frames, `TDCSGFigures.Confinement.walkToLeaf_keys`.
 
 ```Verso.Genre.Manual.InlineLean.lean
 namespace TDCSGFigures.Confinement
 
 open PILean PILean.Plane PILean.Exact TDCSGFigures
 
-/-- What `walkToLeaf` shows. It is the stepper of `walkFrames`: four frames, built by `walkFrame`,
-that draw the path `path` of 15 labels up to `n + e₂ = (0, 3, -4, 4, -2)`, then up to the leaf
-`n = (0, 3, -5, 4, -2)`, then with the candidates `n + eₖ` (`k ≠ 2`), then with the step back.
-The data are checked exactly at `r = 2.13`, `x = 1/5`: the path starts at `0`, consecutive labels
-differ by one unit vector, every label lies in the window, so the path is a path of the centre
-graph; `n` has weight zero, its level `n₂ = -5` is good, and its candidates `n + e₀`, `n + e₁`,
-`n + e₃`, `n + e₄` lie outside the window, so `n + e₂` is its only neighbour. Not stated: the
-items of each frame, the layout and the pixels. -/
-theorem walkToLeaf_spec :
-    walkToLeaf = Plane.stepper walkFrames ∧ walkFrames.map (·.1) = #[
-      "the walk from 0 lowers n₂ from 0 to −4", "it crosses the good level n₂ = −5 into n",
-      "n is a leaf: its other candidates lie outside the window", "the walk can only step back"] ∧
-    leafN = #[0, 3, -5, 4, -2] ∧ path.length = 15 ∧
+/-- The animation `walkToLeaf` and the data its key frames are drawn from. It has one panel whose
+keys are `walkKey k`, `k = 0, …, 16`, and whose steps are made from the declared moves
+`walkMoves`. Key `k` draws the window, the edges and labels of the path `path` up to `path[k]`
+(`walkShown`), from key `15` on the candidates `n + eₖ` (`k ≠ 2`) of the leaf with their spokes,
+at key `16` the step back, and a circle about `P(walkAt k)`, the label where the walk is: `path[k]`
+up to the leaf, the leaf at key `15`, `n + e₂` at key `16`. Step `k` slides the circle from
+`P(walkAt k)` to `P(walkAt (k + 1))` when they differ, by `±ζʲ` for a step `±eⱼ` of the path, and
+fades in what the next key shows first; each declared slide, applied exactly in `ℚ(ζ₅)` to the
+anchors of the actors of one key, gives those of the next (`walkArrives`). The data are checked
+exactly at `r = 2.13`, `x = 1/5`: the path starts at `0`, consecutive labels differ by one unit
+vector, every label lies in the window, so the path is a path of the centre graph; `n` has weight
+zero, its level `n₂ = -5` is good, and its candidates `n + e₀`, `n + e₁`, `n + e₃`, `n + e₄` lie
+outside the window, so `n + e₂` is its only neighbour. The captions are written out. Not stated:
+how the builders draw, the layout, the timing and the frames the browser draws between the key
+frames. -/
+theorem walkToLeaf_keys :
+    walkToLeaf.panels = #[{ motion :=
+      { keys := ((List.range walkKeyCount).map walkKey).toArray,
+        steps := ((List.range (walkKeyCount - 1)).map fun k =>
+          exactStep (walkMoves k)).toArray } }] ∧
+    walkKeyCount = 17 ∧
+    (∀ k, walkAt k = if k ≤ path.length - 1 then path.getD k zeroLabel
+      else if k == path.length then leafN else beforeLeaf) ∧
+    (∀ k, walkShown k = min (k + 1) path.length) ∧
+    (∀ k, walker k = (Plane.Exact.circle (proj (walkAt k)) walkerRadius |>.width 2
+      |>.named "a circle about the label where the walk is" |>.withId "walker")) ∧
+    walkerRadius = 1 / 20 ∧
+    (∀ k, walkKey k =
+  let shown := walkShown k
+  let ps := path.take shown
+  let steps := ps.zip ps.tail
+  let candidates := decide (path.length ≤ k)
+  let back := decide (path.length + 1 ≤ k)
+  let window := "the window"
+  { width := figureWidth
+    view := some walkView
+    padding := 16
+    style := partTwoStyle
+    checks := .fail
+    items := #[
+      Plane.Exact.disk ((walkX, 0) : Rat × Rat) (213 / 200 : Rat) |>.role windowRole
+        |>.fillOpacity 0.07 |>.named window
+        |>.describedBy "the closed disk |w − x| ≤ r/2, r = 2.13, x = 1/5"
+        |>.declRef `TDCSG.Five.InWindow,
+      Plane.Exact.point ((walkX, 0) : Rat × Rat) |>.role windowRole |>.marker .cross
+        |>.named "the window center x = 1/5" |>.incident .inside window] ++
+      (steps.toArray.mapIdx fun i (a, b) =>
+        let last := b == leafN
+        Plane.Exact.segment (proj a) (proj b) |>.width (if last then 3.5 else 1.5)
+          |>.named (if last then
+              "the step from n + e₂ to n: it lowers n₂ from −4 to the good level −5"
+            else s!"the step from {labelText a} to {labelText b}")
+          |>.declRef (if last then `TDCSG.Five.leaf_of_crossing else `TDCSG.Five.centerGraph)
+          |>.withId s!"edge-{i}") ++
+      (if candidates then (List.range 5).toArray.filterMap fun j =>
+        if j == 2 then none else
+          some (Plane.Exact.segment (proj leafN) (proj (shift leafN j 1)) |>.faint |>.dashed
+            |>.named s!"the rejected step from n to n + e{sub j}" |>.withId s!"reject-{j}")
+        else #[]) ++
+      (ps.toArray.mapIdx fun i n =>
+        labelPoint n (walkSide n) window walkMarkerSize |>.withId s!"label-{i}") ++
+      (if candidates then (List.range 5).toArray.filterMap fun j =>
+        if j == 2 then none else
+          let m := shift leafN j 1
+          some (Plane.Exact.point (proj m) |>.faint |>.marker .ring |>.size walkMarkerSize
+            |>.named s!"n + e{sub j} = {labelText m}, outside the window"
+            |>.incident (walkSide m) window |>.withId s!"candidate-{j}") else #[]) ++
+      (if back then #[Plane.Exact.arrow (proj leafN) (proj beforeLeaf) |>.width 2
+          |>.named "the only step from n: back to n + e₂"
+          |>.declRef `SimpleGraph.Reachable.mem_or_exists_adj_of_leaf |>.withId "back"]
+        else #[]) ++
+      #[walker k] ++ #[
+      Plane.Exact.label "0" origin (.toward (Plane.deg 200)) (some 14) |>.role leftRole,
+      Plane.Exact.label "window" ((rat (1 / 5), rat (23 / 20)) : QSqrt5 × QSqrt5)
+        |>.role windowRole,
+      Plane.Exact.label "dots: weight 0 (left centers)"
+        ((rat (2 / 5), rat (-29 / 20)) : QSqrt5 × QSqrt5) |>.role leftRole,
+      Plane.Exact.label "squares: weight 1 (right centers)"
+        ((rat (2 / 5), rat (-8 / 5)) : QSqrt5 × QSqrt5) |>.role rightRole,
+      Plane.Exact.label "×: the window center x = 1/5"
+        ((rat (2 / 5), rat (-7 / 4)) : QSqrt5 × QSqrt5) |>.role windowRole] ++
+      (if shown ≥ path.length - 1 then #[Plane.Exact.label "n + e₂" (proj beforeLeaf) .auto
+        |>.role rightRole |>.withId "name-before"] else #[]) ++
+      (if shown ≥ path.length then #[Plane.Exact.label "n" (proj leafN)
+          (.toward (Plane.deg (-36))) (some 14) |>.role leftRole
+          |>.withId "name-leaf",
+        Plane.Exact.label "n₂ = −5 at n: a good level"
+          ((rat (2 / 5), rat (-19 / 10)) : QSqrt5 × QSqrt5) |>.role goodRole
+          |>.withId "good-level"] else #[]) ++
+      (if candidates then (List.range 5).toArray.filterMap fun j =>
+        if j == 2 then none else
+          some (Plane.Exact.label s!"n + e{sub j}" (proj (shift leafN j 1)) .auto |>.faint
+            |>.withId s!"candidate-label-{j}")
+        else #[])
+    info := { title := s!"The walk at key {k}" } }) ∧
+    (∀ k, walkNameIds k =
+  (if path.length - 2 ≤ k then ["name-before"] else []) ++
+    (if path.length - 1 ≤ k then ["name-leaf", "good-level"] else []) ++
+    (if path.length ≤ k then [0, 1, 3, 4].map (s!"candidate-label-{·}") else [])) ∧
+    (∀ k, walkMoves k =
+  let slide :=
+    ("walker", ExactMove.slide (ZetaFrac.ofZeta (proj (walkAt (k + 1)) - proj (walkAt k))))
+  let names := ((walkNameIds (k + 1)).filter (!(walkNameIds k).contains ·)).map (·, .appear)
+  if k + 1 < path.length then
+    [slide, (s!"edge-{k}", .appear), (s!"label-{k + 1}", .appear)] ++ names
+  else if k + 1 == path.length then
+    ([0, 1, 3, 4].map (s!"reject-{·}", .appear)) ++
+      ([0, 1, 3, 4].map (s!"candidate-{·}", .appear)) ++ names
+  else [slide, ("back", .appear)]) ∧
+    (List.range (path.length - 1)).all (fun k =>
+      let (j, s) := stepDir (path.getD k zeroLabel) (path.getD (k + 1) zeroLabel)
+      proj (path.getD (k + 1) zeroLabel) - proj (path.getD k zeroLabel) ==
+        Zeta5.ofInt s * zeta j && (s == 1 || s == -1)) = true ∧
+    (proj beforeLeaf - proj leafN == zeta 2) = true ∧
+    walkArrives = true ∧
+    leafN = #[0, 3, -5, 4, -2] ∧ beforeLeaf = shift leafN 2 1 ∧ path.length = 15 ∧
     path.head? = some zeroLabel ∧ path.getLast? = some leafN ∧
     path.all (fun n => inWindow walkRadiusSq walkX n) = true ∧
     (path.zip path.tail).all (fun (a, b) => (List.range 5).any fun j =>
       b == shift a j 1 || b == shift a j (-1)) = true ∧
     weight leafN = 0 ∧ isGoodLevel walkRadiusSq walkX 2 (-5) = some true ∧
-    [0, 1, 3, 4].all (fun j => !inWindow walkRadiusSq walkX (shift leafN j 1)) = true := by
-  refine ⟨rfl, by simp [walkFrames], rfl, ?_⟩
+    [0, 1, 3, 4].all (fun j => !inWindow walkRadiusSq walkX (shift leafN j 1)) = true ∧
+    walkToLeaf.captions = ((List.range walkKeyCount).map walkCaption).toArray ∧
+    (∀ k, stepText k =
+  let (j, sgn) := stepDir (path.getD k zeroLabel) (path.getD (k + 1) zeroLabel)
+  s!"{if sgn == 1 then "+" else "−"} e{sub j}") ∧
+    (∀ k, walkCaption k =
+  let n := path.getD k zeroLabel
+  if k == 0 then
+    "A walk in the center graph at r = 2.13, x = 1/5, from the label 0, along a path that a \
+      breadth-first search found; the circle marks where the walk is. Each step adds or removes \
+      one unit vector eⱼ, and every label lies in the window."
+  else if k + 2 < path.length then
+    s!"Move {k}: {stepText (k - 1)}, to {labelText n}; n₂ = {intText (n.getD 2 0)}."
+  else if k + 2 == path.length then
+    s!"Move {k}: {stepText (k - 1)}, to n + e₂ = {labelText n}: n₂ has fallen from 0 to −4."
+  else if k + 1 == path.length then
+    s!"Move {k}: {stepText (k - 1)}, into n = {labelText n}: the step crosses the good level −5 \
+      of n₂."
+  else if k == path.length then
+    "n is a leaf: its other candidates n + eₖ, k ≠ 2, lie outside the window (open rings at the \
+      ends of dashed spokes)."
+  else
+    "From the leaf n the only step leads back to n + e₂, as the one-step lemma requires.") := by
+  refine ⟨by unfold walkToLeaf; with_reducible rfl, rfl, ?_⟩
   repeat' apply And.intro
-  all_goals decide +kernel
-
-figure_links walkToLeaf walkToLeaf_spec
+  all_goals first
+    | (intro _; rfl)
+    | (unfold walkToLeaf; with_reducible rfl)
+    | decide +kernel
 
 end TDCSGFigures.Confinement
 ```

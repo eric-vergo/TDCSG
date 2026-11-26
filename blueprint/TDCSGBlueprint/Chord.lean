@@ -99,11 +99,15 @@ moved by $`(2\varphi-4)E`: it changes direction after the third letter, and its 
 around the end of the interval.
 :::
 
-:::figure TDCSGFigures.exchangedIntervals (label := "exchanged-intervals") (inline := true) (links := TDCSGFigures.exchangedIntervals_spec) (alt := "Before the return the pieces read 1, 2, 3. After the return they read 3, 1, 2 on the same interval.")
-Read each row from $`-1` to $`1`. Pieces 1 and 2 travel along different routes through the disks but
-land side by side, with the same displacement. Piece 3 wraps past the right end and reappears at
-the left. If you join the two ends of the interval to make a circle of circumference two, all
-three moves become the same rotation by $`2/\varphi`. Repeating a return adds that distance again.
+:::figure TDCSGFigures.exchangedIntervals (label := "exchanged-intervals") (links := TDCSGFigures.exchangedIntervals_spec) (alt := "Before the return the pieces read 1, 2, 3. A copy of each piece slides down to the row after the return, pieces 1 and 2 to the right and piece 3 to the left end; after the return they read 3, 1, 2 on the same interval.")
+Read each row from $`-1` to $`1`. A copy of each piece slides from the row before the return to the
+row after it, by the move of its word: pieces 1 and 2 travel along different routes through the
+disks but land side by side, with the same displacement $`2\varphi-2`. Piece 3 moves by
+$`2\varphi-4` and reappears at the left. If you join the two ends of the interval to make a circle
+of circumference two, all three moves become the same rotation by $`2/\varphi`. Repeating a return
+adds that distance again. The key frames are exact and the last one is the figure its theorem
+states (`TDCSGFigures.exchangedIntervals_spec`; the slides, each the move of its word, in
+`TDCSGFigures.exchangedIntervals_keys`); between them the browser slides the copies.
 :::
 
 :::theorem "threshold_infinite" (lean := "TDCSG.Five.exists_mem_orbit, TDCSG.Five.infinite_orbit_zero, TDCSG.Five.infinite_GG") (uses := "word_action, infinite_of_orbit, generated_by_two")
@@ -121,13 +125,17 @@ forces $`k=l` because $`\varphi` is irrational. The points $`t_kE` are distinct 
 An infinite orbit forces an infinite group.
 :::
 
-:::figure TDCSGFigures.chordOrbit (label := "chord-orbit") (inline := true) (links := TDCSGFigures.chordOrbit_spec) (alt := "The orbit of zero along the chord: 25 rows, one per step k from 0 to 24, each with one point on the parameter line from minus one to one, and three vertical bands for the pieces of the three words.")
+:::figure TDCSGFigures.chordOrbit (label := "chord-orbit") (links := TDCSGFigures.chordOrbit_spec) (alt := "The orbit of zero along the chord: a point hops down 25 rows, one per return k from 0 to 24, each hop moving it along the parameter line from minus one to one and leaving a point in the row it leaves; three vertical bands mark the pieces of the three words.")
 The returns $`t_0E,t_1E,\ldots,t_{24}E` of the orbit of zero to the chord, one row per step $`k`
-from the top (the axis on the left), on the parameter line $`t\mapsto tE`, $`-1\le t<1`. The bands
-mark the pieces of the three words, cut at $`t=1-\varphi` and $`t=3-2\varphi`; each point lies in
-the band of the word applied next, which adds $`2\varphi-2` modulo $`2`. The end $`t=-1` (filled)
-belongs to the range and the end $`t=1` (open ring) does not; the rotation is irrational, so the
-points never repeat.
+from the top (the axis on the left), on the parameter line $`t\mapsto tE`, $`-1\le t<1`. A point
+hops from row to row, one return per hop, and leaves behind it the point of the row in the color of
+the word applied next; after twelve hops the other rows appear at once. The bands mark the pieces
+of the three words, cut at $`t=1-\varphi` and $`t=3-2\varphi`; each point lies in the band of the
+word applied next, which adds $`2\varphi-2` modulo $`2`. The end $`t=-1` (filled) belongs to the
+range and the end $`t=1` (open ring) does not; the rotation is irrational, so the points never
+repeat. The key frames are exact and the last one is the figure its theorem states
+(`TDCSGFigures.chordOrbit_spec`; the hops in `TDCSGFigures.chordOrbit_keys`); between them the
+browser slides the point.
 :::
 
 {figref "chord-orbit"}[] shows successive returns to the chord, one entire word per step.

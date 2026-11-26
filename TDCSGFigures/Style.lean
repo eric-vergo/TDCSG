@@ -14,9 +14,9 @@ every point, disk, centre, radius and region carries a label.
 Colours are named roles of the style (`PILean.PlaneRole`), each with a light and a dark value, so
 that a page in its dark theme shows the dark values, not an inverted picture. The left disk and
 everything that belongs to it (its centre, its radius, the points on its circle, the weight-zero
-labels) take the role `left`; the right disk and what belongs to it take `right`. The two are blue and rust;
-the light values are darkened enough for labels on white and on the tint of the lens, the dark
-values lightened for the dark page. The style keeps PILean's default light colours
+labels) take the role `left`; the right disk and what belongs to it take `right`. The two are blue
+and rust; the light values are darkened enough for labels on white and on the tint of the lens, the
+dark values lightened for the dark page. The style keeps PILean's default light colours
 (`Style.light`) beside its roles, so it has a dark twin (`Style.darkTwin?`) and inline pictures
 follow the page's theme.
 

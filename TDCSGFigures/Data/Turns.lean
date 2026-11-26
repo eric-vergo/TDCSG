@@ -10,8 +10,8 @@ import TDCSGFigures.Data.PartTwo
 A turn about an exact centre by an exact fraction of a full turn (`ExactTurn`), applied exactly to
 points of `ℚ(ζ₅)` (`ZetaFrac.turnAbout`, `turnFactor`). The animations declare their moves with
 it, and their exact arrival checks apply the same declared turns to the exact anchors of their key
-frames: `TDCSGFigures.wordArrives` for the three words, `TDCSGFigures.Lift.FramePairConfig.allArrive`
-for the frame pair.
+frames: `TDCSGFigures.wordArrives` for the three words,
+`TDCSGFigures.Lift.FramePairConfig.allArrive` for the frame pair.
 -/
 
 namespace TDCSGFigures
