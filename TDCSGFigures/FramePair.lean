@@ -4,6 +4,8 @@ Authors: Eric Vergo, Claude Opus 5.5
 -/
 import PILean.Trust.Attr
 import TDCSGFigures.Lift
+import TDCSGFigures.Data.Turns
+import TDCSGFigures.WordStrip
 
 /-!
 # The key figures of the frame pair
@@ -74,6 +76,9 @@ structure FramePairConfig where
   width : Float := figureWidth / 2
   /-- The page width of the panels stacked. -/
   narrowWidth : Float := narrowWidth
+  /-- Whether the word is written under the left panel with the current letter marked (an option,
+  off on the site; `TDCSGFigures.WordStrip`). -/
+  strip : Bool := false
 
 /-- A key of the animation: the state after `state` letters, with the mark of the idle letter
 before it shown (`mark`) or not. -/
@@ -144,26 +149,10 @@ def _root_.TDCSGFigures.Early.Letter.turns (l : Letter) : Rat :=
   | .a | .b => -1 / 5
   | .aInv | .bInv => 1 / 5
 
-/-- `ζᵏ` for a turn by `k/5` of a full turn (counter-clockwise), `none` for any other fraction. -/
-def turnFactor (q : Rat) : Option Zeta5 :=
-  if q.den == 5 || q.den == 1 then
-    let k := (q * 5).num
-    some (zeta (k % 5).toNat)
-  else none
-
 /-! ### Exact points -/
 
 /-- The window centre `x = 1/2` as a point of `ℚ(ζ₅)`. -/
 def windowCentre : ZetaFrac := ⟨Zeta5.ofInt 1, 2⟩
-
-/-- Equality of two numbers of `ℚ(ζ₅)` given over denominators, exact. -/
-def ZetaFrac.same (p q : ZetaFrac) : Bool :=
-  p.num * Zeta5.ofInt q.den == q.num * Zeta5.ofInt p.den
-
-/-- `c + τ (p - c)`: `p` turned about `c` by the factor `τ`, exact. -/
-def ZetaFrac.turnAbout (c : ZetaFrac) (τ : Zeta5) (p : ZetaFrac) : ZetaFrac :=
-  ⟨c.num * Zeta5.ofInt p.den + τ * (p.num * Zeta5.ofInt c.den - c.num * Zeta5.ofInt p.den),
-    c.den * p.den⟩
 
 /-- Where a point stands relative to the closed disk of radius `ρ` about `c`, decided exactly. -/
 def sideTo (p c : ZetaFrac) (ρ : Rat) : Plane.Incidence :=
@@ -364,13 +353,6 @@ end FramePairConfig
 
 /-! ### The moves -/
 
-/-- A turn about an exact centre by an exact fraction of a full turn (counter-clockwise). -/
-structure ExactTurn where
-  /-- The centre, in the panel's own coordinates. -/
-  centre : ZetaFrac
-  /-- The fraction of a full turn. -/
-  turns : Rat
-
 /-- What a step between two keys does: the turn of a letter that acts, or the mark of a letter
 that does not act appearing or vanishing. -/
 inductive StepPhase where
@@ -491,13 +473,35 @@ def arrivesWith (actors : Panel → Nat → List Actor) (k : Nat) : Bool :=
 def allArriveWith (actors : Panel → Nat → List Actor) : Bool :=
   (List.range (cfg.keyCount - 1)).all (cfg.arrivesWith actors)
 
+/-- Whether the ring of every letter that does not act is where it belongs, decided exactly: in
+the key that shows it, the left panel's ring lies about the halved centre `(c + 1)/2` of the
+letter's disk (`0` or `1`), the right panel's about the centre `P(m)` of that disk in the moving
+frame (`m` the label of the letter's centre, `State.labelOf`), and that centre lies outside the
+window (`inWindowFrom` is false); with the actors given by `actors`. -/
+def ringsPlacedWith (actors : Panel → Nat → List Actor) : Bool :=
+  (List.range cfg.keyCount).all fun j =>
+    let r := cfg.keyRef j
+    if !r.mark then true
+    else
+      let s := cfg.stateAt (r.state - 1)
+      let l := cfg.letterOf (r.state - 1)
+      let ringAt := fun (p : Panel) (c : ZetaFrac) =>
+        (actors p j).any fun a => a.id == s!"idle-{r.state}" &&
+          a.anchors.length == 1 && a.anchors.all (ZetaFrac.same · c)
+      ringAt .left (halved l.centre) && ringAt .right (ZetaFrac.ofZeta (proj (s.labelOf l))) &&
+        !inWindowFrom cfg.r2 origin (s.labelOf l)
+
+/-- `ringsPlacedWith` for the actors the key figures draw (`actorsAt`). -/
+def ringsPlaced : Bool := cfg.ringsPlacedWith cfg.actorsAt
+
 /-- Whether every declared move of the frame pair carries key `k` onto key `k + 1` exactly, for
-the actors the key figures draw (`actorsAt`). The general statements behind it:
+the actors the key figures draw (`actorsAt`), and every ring sits about its letter's centre
+(`ringsPlaced`). The general statements behind it:
 `TDCSG.Five.halved_genA`, `halved_genB`, `halved_permA_symm`, `halved_permB_symm` (left panel),
 `TDCSG.Five.two_mul_sub_proj_genA`, `two_mul_sub_proj_genB`, `two_mul_sub_proj_permA_symm`,
 `two_mul_sub_proj_permB_symm`, `frameMap_genA_halved` and `framePicture_genA_genB` (right
 panel). -/
-def allArrive : Bool := cfg.allArriveWith cfg.actorsAt
+def allArrive : Bool := cfg.allArriveWith cfg.actorsAt && cfg.ringsPlaced
 
 /-- Whether every actor of every key, drawn (`Actor.item`), gives back its base title
 (`baseTitle`). -/
@@ -538,8 +542,8 @@ def keyCaption (j : Nat) : String :=
       | .a | .aInv => ("left", "right", "0")
       | .b | .bInv => ("right", "left", "1")
     let (pointWay, centreWay) := match l with
-      | .a | .b => ("clockwise", "counter-clockwise")
-      | .aInv | .bInv => ("counter-clockwise", "clockwise")
+      | .a | .b => ("clockwise", "counterclockwise")
+      | .aInv | .bInv => ("counterclockwise", "clockwise")
     let letter := s!"Letter {k}, {l.text},"
     if s.acted then
       s!"{letter} acts: the point turns a fifth of a turn {pointWay} about the {own} center " ++
@@ -555,7 +559,35 @@ end FramePairConfig
 
 /-! ### The key figures -/
 
-/-- A key of a panel: the fixed items, then the actors drawn from `actorsAt`. -/
+namespace FramePairConfig
+
+variable (cfg : FramePairConfig)
+
+/-- Where the word strip is written under the left panel: its centre, height and gap. -/
+def stripAt : Rat × Rat × Rat := (1 / 2, -27 / 20, 1 / 4)
+
+/-- The ids of the strip's marks that key `j` must show: the mark under the letter that leads to
+its state, none at the start or without the strip. -/
+def stripMarkIds (j : Nat) : List String :=
+  let k := (cfg.keyRef j).state
+  if cfg.strip && k > 0 then [s!"strip-{k - 1}"] else []
+
+/-- The word strip of key `j` (with `strip`): the letters, a letter that does not act faint, and
+the mark under the letter of the key. -/
+def stripItems (j : Nat) : Array Item :=
+  if !cfg.strip then #[]
+  else
+    let (cx, y, gap) := stripAt
+    let n := cfg.word.length
+    let idle := (List.range n).map fun i => !(cfg.stateAt (i + 1)).acted
+    let marks := (cfg.stripMarkIds j).toArray.map fun _ =>
+      stripMark n ((cfg.keyRef j).state - 1) cx y gap leftRole
+    stripLetters (cfg.word.map Letter.text) idle cx y gap leftRole ++ marks
+
+end FramePairConfig
+
+/-- A key of a panel: the fixed items, then the actors drawn from `actorsAt`, and in the left
+panel the word strip (`stripItems`). -/
 def FramePairConfig.keyFigure (cfg : FramePairConfig) (p : Panel) (fixed : Array Item)
     (k : Nat) : Plane.Figure :=
   { width := cfg.width
@@ -563,7 +595,8 @@ def FramePairConfig.keyFigure (cfg : FramePairConfig) (p : Panel) (fixed : Array
     padding := 16
     style := partTwoStyle
     checks := .fail
-    items := fixed ++ (cfg.actorsAt p k).toArray.map Actor.item
+    items := fixed ++ (cfg.actorsAt p k).toArray.map Actor.item ++
+      (if p == .left then cfg.stripItems k else #[])
     info := { title := cfg.keyCaption k } }
 
 /-- Key `k` of the left panel: the fixed disks, then the actors of `leftActors`. -/
@@ -578,6 +611,11 @@ def FramePairConfig.centreKey (cfg : FramePairConfig) (k : Nat) : Plane.Figure :
     |>.width 3 |>.named "the window"
     |>.describedBy "the closed disk |w − x| ≤ r/2 about x = 1/2" |>.declRef `TDCSG.Five.InWindow]
   cfg.keyFigure .right fixed k
+
+/-- Whether, with the word strip, every left key shows exactly the mark of its letter
+(`stripMarkIds`). -/
+def FramePairConfig.stripMarks (cfg : FramePairConfig) : Bool :=
+  (List.range cfg.keyCount).all fun j => stripIds (cfg.halvedKey j).items == cfg.stripMarkIds j
 
 /-! ### Views and legends -/
 

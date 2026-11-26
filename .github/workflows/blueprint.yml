@@ -104,6 +104,12 @@ jobs:
           # compared with the site's figures folder.
           python3 scripts/check-pages.py _out/site/html-multi --release
 
+      - name: Restore the browser of the animation checks
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-1.65.0-chromium-${{ runner.os }}-${{ runner.arch }}
+
       - name: Check the animations in a browser against Lean's expectations
         run: |
           lake exe tdcsg-motion-out "$RUNNER_TEMP/motion-out"

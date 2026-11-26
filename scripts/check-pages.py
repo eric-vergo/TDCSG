@@ -7,14 +7,15 @@ an accessible name, no active markup, Lean links that land on an element of an e
 the Blueprint's numbering: "Figure k" on the unnumbered pages, "Figure c.k" in chapter c, each
 counter running 1, 2, … without gaps or repeats; no page may show any other image than a figure's
 own page (`div.pilean-figure-page`) shows of its files. It runs PILean's
-checks: `pilean-verify` (the folder agrees with its manifest), the site check of PILean's Verso
-adapter (every inline picture is the body of a file the manifest lists, with the theme rules the
-manifest records, a moving picture element for element), the markup check (nothing active in a
+checks (`tools/site/` of the `pilean` package): `pilean-verify` (the folder agrees with its
+manifest), the inline check (every inline picture is the body of a file the manifest lists, with
+the theme rules the manifest records, a moving picture element for element), the markup check (nothing active in a
 figure, nothing at all in an animation), the figures' pages against the manifest (with an
-animation's words, its table of steps and its captioned stills), and a fresh render compared with
-the folder (`--check-figures`, through the site's generator). Every animation must be recorded as
-checked strictly (`checks` `fail`, `errorsLeft` 0), with a narrow rendition and exactly the files of
-its stills.
+animation's words, its table of steps, its stills and exactly the files of a motion), and a fresh
+render compared with the folder (`--check-figures`, through the site's generator). Every animation
+must be recorded as checked strictly (`checks` `fail`, `errorsLeft` 0), as an illustration and
+with a narrow rendition. A link to a place in its own page (`#…`) must name an element the page
+has, except `#bp-motion`, the animations switch that Verso Blueprint's script puts in the menu.
 With `--release` it also checks the hosted verification record, the source links at the verified
 commit, and that the site's kernel replay accepted every node and calls each judged theorem proved.
 """
@@ -53,7 +54,7 @@ verification_urls = set()
 pages = list(site.rglob("index.html"))
 assert site / "index.html" in pages
 pilean_dir = site / "-verso-data" / "pilean-figures"
-pilean_tests = repo_root / ".lake/packages/pilean-verso/verso/example/tests"
+pilean_tests = repo_root / ".lake/packages/pilean/tools/site"
 # PILean figure blocks: (page, declaration, number, caption text, accessible names, inline
 # pictures) in document order within each page.
 pilean_figures = []
@@ -67,6 +68,10 @@ active_markup = []
 other_images = []
 # Inline pictures on the figures' own pages (the frames of an explorer).
 figure_page_inline = []
+# Links to a place in the same page: (page, fragment). `#bp-motion` names the animations switch,
+# which Verso Blueprint's script adds to the page menu, and `#` the top of the page.
+same_page_links = []
+SAME_PAGE_FREE = {"#", "#bp-motion"}
 
 
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source",
@@ -198,6 +203,8 @@ class Resources(HTMLParser):
             linked_declarations.update(decls)
         for key in ("src", "href"):
             value = attrs.get(key)
+            if key == "href" and value and value.startswith("#") and value not in SAME_PAGE_FREE:
+                same_page_links.append((page, unquote(value[1:])))
             if not value or value.startswith("#"):
                 continue
             url = urlsplit(urljoin(self.base, value))
@@ -288,6 +295,14 @@ for page in pages:
         attached_to_proof.update(re.findall(r'<span class="bp_code_decl_name"><code>([^<]+)</code>',
                                             items))
 
+dead = []
+texts = {}
+for link_page, fragment in same_page_links:
+    text = texts.setdefault(link_page, link_page.read_text())
+    if f'id="{fragment}"' not in text and f'name="{fragment}"' not in text:
+        dead.append(f"{link_page.relative_to(site)}: #{fragment}")
+assert not dead, f"links to places the page does not have: {sorted(set(dead))[:10]}"
+
 missing = proof_declarations - linked_declarations - attached_to_proof
 assert not missing, f"declarations of a proof listed nowhere: {sorted(missing)}"
 
@@ -302,20 +317,8 @@ manifest_decls = {entry["decl"] for entry in pilean_manifest["files"]}
 assert manifest_decls, "the PILean manifest lists no figure"
 
 
-def motion_files(stem, keys):
-    """The files of an animation of `keys` key frames written as `stem`: the animated SVG, its
-    narrow rendition, the still of each key at both widths, the contact sheet and the poster, each
-    with its dark twin."""
-    names = {f"{stem}{w}.svg" for w in ("", "-narrow")}
-    names |= {f"{stem}{w}-key-{k}.{x}" for w in ("", "-narrow") for k in range(keys)
-              for x in ("svg", "png")}
-    names |= {f"{stem}-keys.{x}" for x in ("svg", "png", "pdf")}
-    names |= {f"{stem}-poster.{x}" for x in ("png", "pdf")}
-    dark = {re.sub(r"\.(\w+)$", r"-dark.\1", n) for n in names}
-    return names | dark
-
-
-# Every animation is checked strictly and has its narrow rendition and the files of its stills.
+# Every animation is checked strictly, is an illustration and has its narrow rendition (that its
+# files are exactly those of a motion is PILean's page check, below).
 motions = {}
 for entry in pilean_manifest["files"]:
     if entry.get("kind") == "motion":
@@ -327,11 +330,6 @@ for decl, entries in sorted(motions.items()):
         f"narrow rendition: {first}"
     assert all(e.get("standing") == "illustration" for e in entries), \
         f"{decl}: an animation must be an illustration"
-    stem = first["path"].rsplit("/", 1)[0] + "/" + decl
-    paths = {e["path"] for e in entries}
-    want = motion_files(stem, first["keys"])
-    assert paths == want, f"{decl}: files missing {sorted(want - paths)[:4]}, " \
-        f"extra {sorted(paths - want)[:4]}"
     assert first["captions"] == first["keys"], f"{decl}: one caption per key"
 shown = [fig["decl"] for _, fig in pilean_figures]
 assert set(shown) == manifest_decls, \
@@ -376,7 +374,8 @@ out = run("the inline-picture check", ["python3", "-I", str(pilean_tests / "inli
 match = re.search(r"(\d+) of (\d+) inline pictures match", out)
 assert match and int(match.group(1)) == int(match.group(2)) == \
     inline_pictures + len(figure_page_inline) and inline_pictures > 0, out
-out = run("the markup check", ["python3", "-I", str(pilean_tests / "markup_check.py"), str(site)])
+out = run("the markup check", ["python3", "-I", str(pilean_tests / "markup_check.py"), str(site),
+                                "--min", str(len(pilean_figures))])
 match = re.search(r"(\d+) motions with nothing active", out)
 assert match and int(match.group(1)) >= len(motions), out
 run("the figures' pages", ["python3", "-I", str(pilean_tests / "page_check.py"), str(site)])

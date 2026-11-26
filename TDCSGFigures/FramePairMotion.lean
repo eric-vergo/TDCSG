@@ -70,22 +70,36 @@ def stepTimings : Array PanelTiming :=
     if s.acts then { duration := some motionPacing.turn, easing := some motionPacing.easing }
     else { duration := some motionPacing.fade, easing := some .linear }
 
+/-- The keys of the left panel: the left key figures (`keys`), each without a view of its own. -/
+def leftKeys : Array Figure := cfg.keys.map fun p => { p.1 with view := none }
+
+/-- The keys of the right panel: the right key figures (`keys`), each without a view of its own. -/
+def rightKeys : Array Figure := cfg.keys.map fun p => { p.2 with view := none }
+
+/-- The steps of the left panel: the declared moves of `frameSteps`, and the marks of the word
+strip appearing and vanishing (`stripMarkIds`). -/
+def leftSteps : Array MotionStep :=
+  cfg.frameSteps.toArray.mapIdx fun j s =>
+    let now := cfg.stripMarkIds j
+    let next := cfg.stripMarkIds (j + 1)
+    panelStep s.leftTurn s.leftTurning (s.appearLeft ++ next.filter (!now.contains ·))
+      (s.vanishLeft ++ now.filter (!next.contains ·))
+
+/-- The steps of the right panel: the declared moves of `frameSteps`. -/
+def rightSteps : Array MotionStep :=
+  cfg.frameSteps.toArray.map fun s =>
+    panelStep s.rightTurn s.rightTurning s.appearRight s.vanishRight
+
 /-- The frame pair as two panels on one clock (see the module docstring). -/
 def motion : MotionPanels :=
   let ks := cfg.keys
-  let unviewed := fun (f : Figure) => { f with view := none }
-  let lefts := ks.map fun (l, _) => unviewed l
-  let rights := ks.map fun (_, r) => unviewed r
-  let steps := cfg.frameSteps.toArray
-  let leftSteps := steps.map fun s => panelStep s.leftTurn s.leftTurning s.appearLeft s.vanishLeft
-  let rightSteps := steps.map fun s =>
-    panelStep s.rightTurn s.rightTurning s.appearRight s.vanishRight
   let (lw, rw) := match ks[0]? with
     | some (l, r) => (l.width, r.width)
     | none => (cfg.width, cfg.width)
   let gap : Float := 24
-  { panels := #[{ title := "Traditional view", motion := { keys := lefts, steps := leftSteps } },
-      { title := "Moving frame", motion := { keys := rights, steps := rightSteps } }]
+  { panels := #[
+      { title := "Traditional view", motion := { keys := cfg.leftKeys, steps := cfg.leftSteps } },
+      { title := "Moving frame", motion := { keys := cfg.rightKeys, steps := cfg.rightSteps } }]
     captions := ((List.range cfg.keyCount).map cfg.keyCaption).toArray
     pacing := motionPacing
     timing := cfg.stepTimings

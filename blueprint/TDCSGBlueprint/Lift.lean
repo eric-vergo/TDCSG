@@ -90,7 +90,7 @@ starting frame onto the moving frame: the halved centers $`0` and $`1` go to $`P
 $`P(n+e_j)`, and the halved point $`(y+1)/2` goes to $`x`. A letter that acts turns the point in
 one frame and the pair of centers in the other.
 
-:::lemma_ "frame_pair" (lean := "TDCSG.Five.framePicture_genA_genB, TDCSG.Five.halved_genA, TDCSG.Five.halved_genB, TDCSG.Five.frameMap_succ_zeta_pow_four_mul, TDCSG.Five.frameMap_add_basis_sub_basis_succ") (uses := "center_projection, unit_step")
+:::lemma_ "frame_pair" (lean := "TDCSG.Five.framePicture_genA_genB, TDCSG.Five.halved_genA, TDCSG.Five.halved_genB, TDCSG.Five.frameMap_succ_zeta_pow_four_mul, TDCSG.Five.frameMap_add_basis_sub_basis_succ, TDCSG.Five.proj_add_basis_succ_sub, TDCSG.Five.proj_add_basis_sub_basis_succ_sub") (uses := "disk_rotation, center_projection, unit_step")
 Let $`y` be framed by $`(n,j)`, that is $`2(x-P(n))=\zeta^j(y+1)`, and let $`T_{n,j}(w)=P(n)+\zeta^jw`.
 Then $`T_{n,j}` sends $`0`, $`1` and $`(y+1)/2` to $`P(n)`, $`P(n+e_j)` and $`x`. If $`a` acts at
 $`y`, the halved point turns about $`0` by $`\zeta^4`, a fifth of a turn clockwise, and
@@ -108,7 +108,7 @@ with the label $`n+e_j-e_{j+1}`. So the updated motion sends the turned picture 
 points of the moving frame, with the turned center in place of the old one.
 :::
 
-:::figure TDCSGFigures.Lift.framePair (label := "frame-pair") (alt := "Two panels on one clock. Left: two disks about 0 and 1, fixed, and a point that turns by fifths about the center of one of them. Right: a fixed window about x = 1/2 with a point at x, and a pair of centers with disks riding on them that turns by fifths about one of the centers. Some letters do not act; then a ring marks a center and nothing moves.")
+:::figure TDCSGFigures.Lift.framePair (label := "change-of-frame") (alt := "Two panels on one clock. Left: two disks about 0 and 1, fixed, and a point that turns by fifths about the center of one of them. Right: a fixed window about x = 1/2 with a point at x, and a pair of centers with disks riding on them that turns by fifths about one of the centers. Some letters do not act; then a ring marks a center and nothing moves.")
 The word $`aababaabbabb` applied to $`z=0` at $`r=1.95`, in both frames on one clock. Left, the
 traditional view, halved by $`w\mapsto(w+1)/2`: the disks about $`0` and $`1` stay, and the point
 $`(y+1)/2` turns a fifth of a turn clockwise about the center of the disk of each letter that
@@ -120,7 +120,7 @@ the moving frame that center lies outside the window, exactly when the point lie
 disk, as the framing equation requires.
 :::
 
-The key frames of {figref "frame-pair"}[] are exact: each is drawn from the states of the word
+The key frames of {figref "change-of-frame"}[] are exact: each is drawn from the states of the word
 computed in $`\mathbb Z[\zeta]`, and each turn of a fifth carries one key frame onto the next,
 as {bpref "frame_pair"}[] says. Between two key frames the browser turns the drawn items about the
 stated center.

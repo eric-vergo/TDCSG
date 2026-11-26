@@ -143,7 +143,8 @@ def main (args : List String) : IO UInt32 := do
   if let "--frame-pair" :: word :: rest := args then
     let dir : System.FilePath := match rest with | ["--out", d] => d | _ => "out"
     IO.FS.createDirAll dir
-    let c : TDCSGFigures.Lift.FramePairConfig := { word := TDCSGFigures.Lift.parseWord word }
+    let w ← IO.ofExcept (TDCSGFigures.Lift.parseWord word)
+    let c : TDCSGFigures.Lift.FramePairConfig := { word := w }
     let errors ← renderMotion dir s!"framePair-{word}" c.motion
     for e in errors do IO.println s!"  {e}"
     IO.println s!"framePair-{word}: {c.keyCount} keys, {errors.size} errors, exact arrival \

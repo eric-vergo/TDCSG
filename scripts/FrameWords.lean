@@ -109,7 +109,7 @@ def fullTurn (w : List Letter) : Bool :=
 /-- Prints the reports and the search results. -/
 def report : IO Unit := do
   for w in ["abab", "aababaabbabb", "ababbab", "aabaaa", "aabaaabbbbb"] do
-    IO.println (wordReport r2 (parseWord w))
+    IO.println (wordReport r2 (← IO.ofExcept (parseWord w)))
     IO.println ""
   let st := State.start origin
   let (h0, c0) := reach st

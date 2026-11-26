@@ -39,7 +39,9 @@ main .prev-next-buttons .where {
 /* The reading pages share the classic edition's paper, serif text and ruled figure plates. */
 html {
   --td-paper: #faf8f3;
-  --td-plate: #fffdf8;
+  /* The plate is the pictures' own background (PILean's white and its dark twin), so that every
+     figure kind, inline, as a file, moving or still, sits on it without a box of its own. */
+  --td-plate: #ffffff;
   --td-tint: #f1eee5;
   --td-rule: #c6c8bd;
   --td-ink: #202925;
@@ -54,14 +56,14 @@ html {
   --td-ui: var(--verso-structure-font-family);
 }
 html[data-theme="dark"] {
-  --td-paper: #191f20; --td-plate: #202828; --td-tint: #2d3734; --td-rule: #596460;
+  --td-paper: #191f20; --td-plate: #16181c; --td-tint: #2d3734; --td-rule: #596460;
   --td-ink: #ecede7; --td-muted: #bdc9c5; --td-accent: #e3b28b;
   --td-left: #85bed1; --td-right: #eeac83; --td-piece: #86d8b9;
   --td-piece-two: #e2c048; --td-piece-three: #ec8cc8;
 }
 @media (prefers-color-scheme: dark) {
   html:not([data-theme="light"]) {
-    --td-paper: #191f20; --td-plate: #202828; --td-tint: #2d3734; --td-rule: #596460;
+    --td-paper: #191f20; --td-plate: #16181c; --td-tint: #2d3734; --td-rule: #596460;
     --td-ink: #ecede7; --td-muted: #bdc9c5; --td-accent: #e3b28b;
     --td-left: #85bed1; --td-right: #eeac83; --td-piece: #86d8b9;
     --td-piece-two: #e2c048; --td-piece-three: #ec8cc8;
@@ -95,5 +97,4 @@ main .pilean-figure-caption {
 }
 main .pilean-figure-number { color: var(--td-ink); }
 main .pilean-figure-source { justify-content: flex-start; font-family: var(--td-ui); }
-main .pilean-inline-svg > g > path:first-of-type[fill="#ffffff"] { fill: var(--td-plate); }
 main:has(.pilean-figure) .bp_sbs_informal .bp_kind_theorem_content { border-bottom: 1px solid var(--td-rule); padding-bottom: .55rem; }

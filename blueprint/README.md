@@ -9,7 +9,11 @@ lake exe vbp check
 python3 -m http.server --directory _out/site/html-multi 8000
 ```
 
-Open [the local site](http://localhost:8000/). The first command elaborates the
+Open [the local site](http://localhost:8000/). The source links under the figures and in the
+Lean panels name the commit the checkout is at; on a tree with changes not yet committed they lead
+to that commit's lines, so commit before building a site that others read.
+
+The first command elaborates the
 chapters and their linked Lean declarations. The generator writes a multipage
 site, sidebar, searchable Lean panels, dependency graph and Project Stats page.
 The Pages deployment serves the same directory under the repository prefix.
@@ -99,17 +103,20 @@ Blueprint statements, so they add no node to the dependency graph and are not pa
 replay; `lake build TDCSGBlueprint` checks them.
 
 `scripts/check-pages.py` reads the manifest, requires a visible numbered caption, an accessible
-name and gapless numbering, allows no other image in the pages, follows the Lean links, requires
-every animation to be recorded as checked strictly (`checks` `fail`, no error left) with its narrow
-rendition and the files of its stills, and runs `lake exe pilean-verify` and the site checks of
-PILean's Verso adapter: every inline picture, moving ones included, against its file
-(`inline_check.py`), nothing active in a figure or an animation (`markup_check.py`), each figure's
-page against the manifest, with an animation's words, its table of steps and its captioned stills
-(`page_check.py`); and a fresh render of the figures compared with the site's folder.
+name and gapless numbering, allows no other image in the pages, follows the Lean links and every
+link to a place in the same page, requires every animation to be recorded as checked strictly
+(`checks` `fail`, no error left), as an illustration and with its narrow rendition, and calls
+PILean's site checks (`tools/site/` of the `pilean` package): `pilean-verify`, every inline
+picture, moving ones included, against its file (`inline_check.py`), nothing active in a figure
+or an animation (`markup_check.py`), each figure's page against the manifest, with an animation's
+words, its table of steps, its stills and its files (`page_check.py`); and a fresh render of the
+figures compared with the site's folder.
 
-`scripts/check-motion.py` checks the animations in a headless Chromium against exact expectations
-written from Lean, with PILean's browser checks (its docstring lists them). It needs Playwright for
-Python with its Chromium:
+`scripts/check-motion.py` calls PILean's browser checks of animations, on standalone files
+(`tools/motion-browser-check.py`) and on the site's pages (`tools/site/motion_browser.py`), with
+the exact expectations `lake exe tdcsg-motion-out` writes from Lean, and adds the positions in the
+dark theme, the width against the text column and that the site has no script of its own for a
+figure. It needs Playwright for Python with its Chromium:
 
 ```sh
 lake exe tdcsg-motion-out /tmp/motion-out
@@ -133,7 +140,15 @@ build refuses an animation not checked strictly. The animations share one timing
 linked to them, and the data of their key frames are stated on the page of the figures' theorems
 (`wordLoop_keys`, `framePair_keys`). The site ships no script of its own for them: the moving
 pictures are SMIL in the page, and what hides them is the stylesheet of PILean's adapter and the
-motion switch of Verso Blueprint.
+motion switch of Verso Blueprint. The figures keep the anchors of the steppers they replaced
+(`#word-trace` for Figure 3.2, `#change-of-frame` for Figure 4.2), and the site build writes a
+page at each old figure page's address that sends the reader on (`movedFigures` in
+`BlueprintMain.lean`).
+
+Both kinds of animation have a word strip, off on the site: the word written under the picture
+with the letter of the current key marked (`FramePairConfig.strip`, `wordLoopWith i true`,
+`TDCSGFigures/WordStrip.lean`), checked like the rest by PILean's engine and by
+`TDCSGTests.FramePair`.
 
 ### Adding a figure
 

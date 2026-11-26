@@ -3,6 +3,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo, Claude Opus 5.5
 -/
 import TDCSGFigures.FramePairMotion
+import TDCSGFigures.Chord
 
 /-!
 # The declared moves of the frame pair arrive exactly
@@ -69,6 +70,35 @@ theorem misplaced_fails :
     ({ word := [.a, .b, .a, .b] } : FramePairConfig).allArriveWith
       (misplaced { word := [.a, .b, .a, .b] }) = false := by
   decide +kernel
+
+/-- The actors of the figure's word with the ring of each idle letter drawn, in the moving frame,
+about the other centre of the pair. -/
+def ringElsewhere (p : Panel) (k : Nat) : List Actor :=
+  let cfg : FramePairConfig := {}
+  (cfg.actorsAt p k).map fun a =>
+    if p == .right && a.id.startsWith "idle-" then
+      let (l, r) := cfg.centresAt (cfg.keyRef k).state
+      { a with anchors := a.anchors.map fun c => if ZetaFrac.same c l then r else l }
+    else a
+
+/-- A ring about the wrong centre fails the check of the rings. -/
+theorem ringElsewhere_fails :
+    ({} : FramePairConfig).ringsPlacedWith ringElsewhere = false := by
+  decide +kernel
+
+/-- The word strip, an option off on the site, marks the letter of every key, for the frame pair
+and for the three words. -/
+theorem strip_marks :
+    ({ strip := true } : FramePairConfig).stripMarkIds 4 = ["strip-2"] ∧
+      ({} : FramePairConfig).stripMarkIds 4 = [] := by
+  decide +kernel
+
+-- The marks the strip draws are those `stripMarkIds` names, and the animations with the strip pass
+-- every check of PILean's engine; checked by evaluation (the drawing is in floating point).
+#guard ({ strip := true } : FramePairConfig).stripMarks
+#guard wordStripMarks 1 && wordStripMarks 2 && wordStripMarks 3
+#guard ({ strip := true } : FramePairConfig).motion.problems.isEmpty
+#guard [1, 2, 3].all fun i => (wordLoopWith i true).problems.isEmpty
 
 -- Every drawn actor of the figure's word gives back its base title. The drawing goes through
 -- floating point, which the kernel does not reduce, so this is checked by evaluation when the

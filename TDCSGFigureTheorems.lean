@@ -33,8 +33,10 @@ The animations (the three words of chapter 3 and the frame pair of chapter 4) ar
 no theorem is linked to them. Each is drawn from exact key frames, which its stills show; between
 two key frames the browser turns the drawn items about the stated centres, and that motion is not
 part of any statement. What the key frames show, and that each declared turn carries one key frame
-onto the next exactly, is stated here as a plain theorem about the data they are drawn from
-(`TDCSGFigures.wordLoop_keys`, `TDCSGFigures.Lift.framePair_keys`).
+onto the next exactly, is stated here as a plain theorem, which also states that the figure
+shown is made of exactly those key frames, moves and captions (`TDCSGFigures.wordLoop_figures`,
+`TDCSGFigures.wordLoop_keys`, `TDCSGFigures.wordLoop_captions`,
+`TDCSGFigures.Lift.framePair_keys`).
 
 The theorems are not statements of the proof, and they are not nodes of the dependency graph.
 
@@ -584,27 +586,57 @@ figure_links chordPieces chordPieces_spec
 end TDCSGFigures
 ```
 
-{figref "word-loop-1"}[], {figref "word-loop-2"}[] and {figref "word-loop-3"}[]: the animations
-`TDCSGFigures.wordLoop1`, `TDCSGFigures.wordLoop2` and `TDCSGFigures.wordLoop3`, illustrations, and
-the data of their key frames, `TDCSGFigures.wordLoop_keys`.
+{figref "word-trace"}[], {figref "word-trace-2"}[] and {figref "word-trace-3"}[]: the animations
+`TDCSGFigures.wordLoop1`, `TDCSGFigures.wordLoop2` and `TDCSGFigures.wordLoop3`, illustrations:
+what they are made of (`TDCSGFigures.wordLoop_figures`), the data of their key frames
+(`TDCSGFigures.wordLoop_keys`) and their captions (`TDCSGFigures.wordLoop_captions`).
 
 ```Verso.Genre.Manual.InlineLean.lean
 namespace TDCSGFigures
 
 open PILean PILean.Plane PILean.Exact TDCSGFigures.Early
 
-/-- The data that the key frames of the three loops are drawn from. Key `k` of word `i`
-(`wordKey i k`) draws the image `[w_k(p), w_k(q)]` of the piece `[p, q]` of word `i` after `k`
-letters (`wordPath i`), here written out in the basis `1, ζ, ζ², ζ³`, over the disks, their lens,
-the chord and the piece; the ends lying on a boundary circle before a letter (`wordEqualities i`)
-are marked in the key that shows them. Before every letter both current ends lie in the letter's
-closed disk of radius `R` (`wordChecks`), so the letter turns the whole segment, as in
-`TDCSG.Five.applyWord_chord`, and its turn about its centre, the move declared between key `k`
-and key `k + 1` (`wordStep i k`), carries both ends of image `k` exactly onto those of image
-`k + 1` (`wordTurnsArrive`); the tests that hold with equality are those before letters 3, 4 of
-word 1, letters 2, 3 of word 2 and letters 1, 2, 5, 6 of word 3. The last images are the pieces
-moved by `(2φ - 2)E` (words 1, 2) and `(2φ - 4)E` (word 3). Not stated: the drawing, the timing
+/-- The three loops and the data their key frames are drawn from. The figures are `wordLoop 1`,
+`wordLoop 2`, `wordLoop 3`, the loop without the word strip (`wordLoopWith i false`): one panel
+whose keys are `wordKey i k` and whose steps are `wordStep i k`, with the captions `wordCaption i k`.
+Key `k` draws, over the disks, their lens, the chord and the piece (`wordUnder`), the image
+`[w_k(p), w_k(q)]` of the piece `[p, q]` after `k` letters (`wordSegment`, read from `wordPath i`,
+here written out in the basis `1, ζ, ζ², ζ³`), the circle about the centre of the turn before it
+(`wordPivot`) and the ends lying on a boundary circle before the next letter (`wordContacts`, from
+`wordEqualities i`). Step `k` turns the image by the declared turn `wordTurn i k` and fades the
+other marks in and out (`wordFades`); that declared turn, applied exactly in `ℚ(ζ₅)`, carries both
+ends of image `k` onto those of image `k + 1` (`wordArrives`). Before every letter both current
+ends lie in the letter's closed disk of radius `R` (`wordChecks`), so the letter turns the whole
+segment, as in `TDCSG.Five.applyWord_chord`; the tests that hold with equality are those before
+letters 3, 4 of word 1, letters 2, 3 of word 2 and letters 1, 2, 5, 6 of word 3. The caption of key
+`k ≥ 1` names letter `k`, its turn and its direction. The last images are the pieces moved by
+`(2φ - 2)E` (words 1, 2) and `(2φ - 4)E` (word 3). Not stated: how the builders draw, the timing
 and the frames the browser draws between the key frames. -/
+theorem wordLoop_figures :
+    wordLoop1 = wordLoop 1 ∧ wordLoop2 = wordLoop 2 ∧ wordLoop3 = wordLoop 3 ∧
+    (∀ i, wordLoop i = wordLoopWith i false) ∧
+    (∀ i, (wordLoopWith i false).panels =
+      #[{ motion := { keys := wordLoopKeys i false, steps := wordLoopSteps i false } }]) ∧
+    (∀ i, wordLoopKeys i false =
+      ((List.range ((wordPiece i).1.length + 1)).map (wordKey i · false)).toArray) ∧
+    (∀ i, wordLoopSteps i false =
+      ((List.range (wordPiece i).1.length).map (wordStep i · false)).toArray) ∧
+    (∀ i, (wordLoopWith i false).captions =
+      ((List.range ((wordPiece i).1.length + 1)).map (wordCaption i)).toArray) ∧
+    (∀ i k, (wordKey i k false).items =
+      wordUnder i ++ (#[wordSegment i k] ++ wordPivot i k ++ wordContacts i k ++ #[]) ++
+        wordOver i false) ∧
+    (∀ i k, wordSegment i k =
+      (Plane.Exact.segment ((wordPath i).getD k (origin, origin)).1
+        ((wordPath i).getD k (origin, origin)).2 |>.role (pieceRole i) |>.width 4
+        |>.named s!"the image of the piece of word {i}" |>.withId "segment")) ∧
+    (∀ i k, wordStep i k false =
+      { moves := #[("segment", Plane.Exact.turnAbout (wordTurn i k).centre (wordTurn i k).turns)] ++
+          wordFades i k false }) := by
+  exact ⟨rfl, rfl, rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl,
+    fun _ _ => rfl, fun _ _ => rfl, fun _ _ => rfl⟩
+
+/-- The data of the key frames of the three loops (see `wordLoop_figures`). -/
 theorem wordLoop_keys :
     (wordPath 1 == [(⟨#[0, -1, 1, 0]⟩, ⟨#[-1, 1, -1, 1]⟩), (⟨#[-1, 1, -1, 1]⟩, ⟨#[-2, -1, 0, -2]⟩),
       (⟨#[-2, -1, 0, -2]⟩, ⟨#[1, 1, 1, 2]⟩), (⟨#[3, -1, 1, 2]⟩, ⟨#[-1, -2, -1, -1]⟩),
@@ -617,7 +649,7 @@ theorem wordLoop_keys :
       (⟨#[-1, -1, -1, -2]⟩, ⟨#[3, -1, 1, 2]⟩), (⟨#[1, 2, 1, 1]⟩, ⟨#[-3, 2, -3, -1]⟩),
       (⟨#[0, -1, 1, 0]⟩, ⟨#[2, -3, 3, -2]⟩)]) = true ∧
     wordChecks 1 = true ∧ wordChecks 2 = true ∧ wordChecks 3 = true ∧
-    wordTurnsArrive 1 = true ∧ wordTurnsArrive 2 = true ∧ wordTurnsArrive 3 = true ∧
+    wordArrives 1 = true ∧ wordArrives 2 = true ∧ wordArrives 3 = true ∧
     (wordEqualities 1).map (·.1) = [2, 3] ∧ (wordEqualities 2).map (·.1) = [1, 2] ∧
     (wordEqualities 3).map (·.1) = [0, 1, 4, 5] ∧
     ((wordPath 1).getLast? == some (-chordEnd + (phiInv + phiInv) * chordEnd,
@@ -628,6 +660,16 @@ theorem wordLoop_keys :
       chordEnd + (phiInv + phiInv) * chordEnd - Zeta5.ofInt 2 * chordEnd)) = true := by
   repeat' apply And.intro
   all_goals decide +kernel
+
+/-- The caption of key `k ≥ 1` of each word names letter `k`, its turn's direction and its
+centre. -/
+theorem wordLoop_captions :
+    [1, 2, 3].all (fun i => (List.range (wordPiece i).1.length).all fun k =>
+      let l := (wordPiece i).1.getD k .a
+      (wordCaption i (k + 1)).startsWith s!"Letter {k + 1}, {l.text}, turns the image a fifth \
+        of a turn {if l.turn == zeta 1 then "counterclockwise" else "clockwise"} about \
+        {centreName l.centre}") = true := by
+  decide +kernel
 
 end TDCSGFigures
 ```
@@ -918,7 +960,7 @@ figure_links unitSteps unitSteps_spec
 end TDCSGFigures.Lift
 ```
 
-{figref "frame-pair"}[]: the animation `TDCSGFigures.Lift.framePair`, an illustration, and the
+{figref "change-of-frame"}[]: the animation `TDCSGFigures.Lift.framePair`, an illustration, and the
 data of its key frames, `TDCSGFigures.Lift.framePair_keys`.
 
 ```Verso.Genre.Manual.InlineLean.lean
@@ -926,22 +968,54 @@ namespace TDCSGFigures.Lift
 
 open PILean PILean.Plane PILean.Exact TDCSGFigures
 
-/-- The data that the key frames of `framePair` are drawn from (`FramePairConfig.keys` of the
-default configuration): the word `a a b a b a a b b a b b` applied to `z = 0` at `r = 1.95`, and
-its states after `0, 1, …, 12` letters, computed exactly: the labels `n` of the current left
+/-- The frame pair and the data its key frames are drawn from. The figure is the motion of the
+default configuration (`FramePairConfig.motion`): the word `a a b a b a a b b a b b` applied to
+`z = 0` at `r = 1.95`, without the word strip; its two panels' keys are the key figures
+`FramePairConfig.keys`, its steps are made by `panelStep` from the declared moves
+`FramePairConfig.frameSteps`, and its captions are `FramePairConfig.keyCaption` of each key.
+The states after `0, 1, …, 12` letters are computed exactly: the labels `n` of the current left
 centre and the direction indices `j`, written out; the letters `3`, `5` and `10` do not act, every
 other letter does (the exact disk test `Early.Letter.covers`); every state satisfies the framing
-equation `2 (x - P(n)) = ζʲ (y + 1)` of `TDCSG.Five.Framed` exactly. The animation has sixteen
-keys, one per state and one more for each letter that does not act, which shows its ring; and
-every declared move, a fifth of a turn of the point about the centre of the letter's halved disk
-on the left, of the body of centres and riding disks about the active centre on the right, or a
-ring appearing or vanishing, carries the items of one key onto those of the next exactly in
-`ℚ(ζ₅)` (`FramePairConfig.allArrive`; the general statements are `TDCSG.Five.halved_genA`,
-`TDCSG.Five.halved_genB` and `TDCSG.Five.framePicture_genA_genB`). Not stated: the drawing, the
-timing and the frames the browser draws between the key frames. -/
+equation `2 (x - P(n)) = ζʲ (y + 1)` of `TDCSG.Five.Framed` exactly. The sixteen keys, written out,
+are one per state and one more, showing the ring, for each letter that does not act; the caption
+of each key begins with its letter and what it does. Every declared move, a fifth of a turn of
+the point about the centre of the letter's halved disk on the left, of the body of centres and
+riding disks about the active centre on the right, or a ring appearing or vanishing, carries the
+items of one key onto those of the next exactly in `ℚ(ζ₅)`, and each ring lies about the centre
+of its letter's disk in both panels, a centre outside the window (`FramePairConfig.allArrive`,
+`ringsPlaced`; the general statements are `TDCSG.Five.halved_genA`, `TDCSG.Five.halved_genB` and
+`TDCSG.Five.framePicture_genA_genB`). Not stated: how the builders draw, the layout, the timing
+and the frames the browser draws between the key frames. -/
 theorem framePair_keys :
-    word = [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b] ∧ radius = 39 / 20 ∧
+    framePair = ({} : FramePairConfig).motion ∧
     ({} : FramePairConfig).word = word ∧ ({} : FramePairConfig).radius = radius ∧
+    ({} : FramePairConfig).strip = false ∧
+    word = [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b] ∧ radius = 39 / 20 ∧
+    framePair.panels =
+      #[{ title := "Traditional view",
+          motion := { keys := ({} : FramePairConfig).leftKeys,
+                      steps := ({} : FramePairConfig).leftSteps } },
+        { title := "Moving frame",
+          motion := { keys := ({} : FramePairConfig).rightKeys,
+                      steps := ({} : FramePairConfig).rightSteps } }] ∧
+    (∀ cfg : FramePairConfig, cfg.leftKeys = cfg.keys.map fun p => { p.1 with view := none }) ∧
+    (∀ cfg : FramePairConfig, cfg.rightKeys = cfg.keys.map fun p => { p.2 with view := none }) ∧
+    (∀ cfg : FramePairConfig, cfg.leftSteps = cfg.frameSteps.toArray.mapIdx fun j s =>
+      let now := cfg.stripMarkIds j
+      let next := cfg.stripMarkIds (j + 1)
+      panelStep s.leftTurn s.leftTurning (s.appearLeft ++ next.filter (!now.contains ·))
+        (s.vanishLeft ++ now.filter (!next.contains ·))) ∧
+    (∀ cfg : FramePairConfig, cfg.rightSteps = cfg.frameSteps.toArray.map fun s =>
+      panelStep s.rightTurn s.rightTurning s.appearRight s.vanishRight) ∧
+    (∀ t turning appear vanish, panelStep t turning appear vanish =
+      let turns : Array (String × Move) := match t with
+        | some t => turning.toArray.map fun id => (id, Plane.Exact.turnAbout t.centre t.turns)
+        | none => #[]
+      let moves := turns ++ appear.toArray.map (·, Move.appear) ++
+        vanish.toArray.map (·, Move.vanish)
+      if moves.isEmpty then MotionStep.idle else { moves }) ∧
+    framePair.captions =
+      ((List.range ({} : FramePairConfig).keyCount).map ({} : FramePairConfig).keyCaption).toArray ∧
     (states.map (·.n) == [#[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0],
       #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[1, -1, 0, 0, 0],
       #[1, 0, -1, 0, 0], #[1, 0, -1, 0, 0], #[1, 0, 0, -1, 0], #[1, 0, 0, 0, -1]]) = true ∧
@@ -949,8 +1023,21 @@ theorem framePair_keys :
     states.map (·.acted) =
       [true, true, true, false, true, false, true, true, true, true, false, true, true] ∧
     states.all State.framed = true ∧
-    ({} : FramePairConfig).keyCount = 16 ∧ ({} : FramePairConfig).allArrive = true := by
-  refine ⟨rfl, rfl, rfl, rfl, ?_⟩
+    (({} : FramePairConfig).keyRefs.map fun r => (r.state, r.mark)) =
+      [(0, false), (1, false), (2, false), (3, true), (3, false), (4, false), (5, true),
+        (5, false), (6, false), (7, false), (8, false), (9, false), (10, true), (10, false),
+        (11, false), (12, false)] ∧
+    ((List.range 16).zip ["Start:", "Letter 1, a, acts:", "Letter 2, a, acts:",
+        "Letter 3, b, does not act:", "Letter 3, b, did not act:", "Letter 4, a, acts:",
+        "Letter 5, b, does not act:", "Letter 5, b, did not act:", "Letter 6, a, acts:",
+        "Letter 7, a, acts:", "Letter 8, b, acts:", "Letter 9, b, acts:",
+        "Letter 10, a, does not act:", "Letter 10, a, did not act:", "Letter 11, b, acts:",
+        "Letter 12, b, acts:"]).all (fun (j, h) =>
+      (({} : FramePairConfig).keyCaption j).startsWith h) = true ∧
+    ({} : FramePairConfig).keyCount = 16 ∧ ({} : FramePairConfig).allArrive = true ∧
+    ({} : FramePairConfig).ringsPlaced = true := by
+  refine ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl,
+    fun _ => rfl, fun _ _ _ _ => rfl, rfl, ?_⟩
   repeat' apply And.intro
   all_goals decide +kernel
 

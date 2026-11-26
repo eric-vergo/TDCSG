@@ -280,10 +280,12 @@ def wordReport (r2 : QSqrt5) (w : List Letter) (z : Zeta5 := origin) : String :=
     s!"largest |P − x| ≈ {dec e.centreSq} (squared {qText e.centreSq}); " ++
     s!"closes: {e.closed}; steps hold: {stepsHold r2 w z}"]
 
-/-- A word written in the letters `a`, `b`, `A = a⁻¹`, `B = b⁻¹`; other characters are skipped. -/
-def parseWord (s : String) : List Letter :=
-  s.toList.filterMap fun
-    | 'a' => some .a | 'b' => some .b | 'A' => some .aInv | 'B' => some .bInv | _ => none
+/-- A word written in the letters `a`, `b`, `A = a⁻¹`, `B = b⁻¹`; an error names any other
+character. -/
+def parseWord (s : String) : Except String (List Letter) :=
+  s.toList.mapM fun
+    | 'a' => .ok .a | 'b' => .ok .b | 'A' => .ok .aInv | 'B' => .ok .bInv
+    | c => .error s!"{s}: the letter {c.quote} is none of a, b, A = a⁻¹, B = b⁻¹"
 
 /-- The inverse of a word: its letters inverted, in the reverse order. -/
 def inverseWord (w : List Letter) : List Letter :=
