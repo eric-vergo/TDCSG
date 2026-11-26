@@ -216,8 +216,8 @@ def diskSizes (c : Lift.FramePairConfig) : String :=
 letter does not), `aababaabbabb` (three do not) and `aabaaabbbbb` (closed: its last key is its
 first), each with the right panel `R1` and `R3` (`R2` for the twelve-letter word), trails off and
 on, the views shared and cropped (wide-right for the two long words), the idle mark as an outline
-(as a ring for the twelve-letter word), and the left panel halved (full size for `abab` and the
-twelve-letter word). -/
+(as a ring for the twelve-letter word, also wide-right), and the left panel halved (full size for
+`abab` and the twelve-letter word). -/
 def motionVariants : Array Lift.FramePairConfig :=
   let w := Lift.parseWord
   let twelve := w "aababaabbabb"
@@ -227,14 +227,18 @@ def motionVariants : Array Lift.FramePairConfig :=
     { word := w "abab", view := .cropped },
     { word := w "ababbab" }, { word := w "ababbab", trails := true },
     { word := w "ababbab", right := .bodiesGraph }, { word := w "ababbab", view := .cropped },
-    { word := twelve }, { word := twelve, trails := true }, { word := twelve, right := .bodiesGraph },
-    { word := twelve, right := .bodiesGraph, trails := true }, { word := twelve, right := .centres },
+    { word := twelve }, { word := twelve, trails := true },
+    { word := twelve, right := .bodiesGraph },
+    { word := twelve, right := .bodiesGraph, trails := true },
+    { word := twelve, right := .centres },
     { word := twelve, view := .cropped }, { word := twelve, view := .wideRight },
     { word := twelve, right := .bodiesGraph, view := .wideRight },
     { word := twelve, right := .centres, view := .wideRight },
-    { word := twelve, idleMark := .ring }, { word := twelve, left := .full },
+    { word := twelve, idleMark := .ring },
+    { word := twelve, idleMark := .ring, view := .wideRight }, { word := twelve, left := .full },
     { word := twelve, left := .full, view := .wideRight },
-    { word := closed }, { word := closed, trails := true }, { word := closed, right := .bodiesGraph },
+    { word := closed }, { word := closed, trails := true },
+    { word := closed, right := .bodiesGraph },
     { word := closed, view := .cropped }, { word := closed, view := .wideRight },
     { word := closed, right := .bodiesGraph, view := .wideRight }]
 
@@ -339,15 +343,16 @@ def segmentsJson (c : Lift.FramePairConfig) (r : Plane.MotionPanelsReport) : Str
 /-- The page of `--motion-variants`, with a marker where the data goes. -/
 def motionPage : String := include_str "FramePairPreview.html"
 
-/-- Whether the word is closed: its last key draws what its first does (the panels' actors, with
-their anchors, are the same), so that the loop needs no reset. -/
+/-- Whether the variant's loop is closed: its last key draws what its first does (in both panels
+the same actors in order, of the same kinds and base titles at the same exact anchors; the ids
+may differ, as a centre-graph edge's id names its key), so that the loop needs no reset. -/
 def closedWord (c : Lift.FramePairConfig) : Bool :=
   let last := c.word.length
   [Lift.Panel.left, .right].all fun p =>
     let a := c.actorsAt p 0
     let b := c.actorsAt p last
     a.length == b.length && (a.zip b).all fun (x, y) =>
-      x.id == y.id && x.anchors.length == y.anchors.length &&
+      x.kind == y.kind && x.base == y.base && x.anchors.length == y.anchors.length &&
         (x.anchors.zip y.anchors).all fun (p, q) => Lift.ZetaFrac.same p q
 
 /-- One variant of `--motion-variants` written: its four SVGs (wide and narrow, light and dark)

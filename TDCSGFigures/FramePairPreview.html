@@ -159,7 +159,11 @@ const DEFAULTS = { turn: 1.1, hold: 0.5, idle: 0.9, firstHold: 1.5, lastHold: 2,
   speed: 1, easing: "spline", spline: [0.45, 0, 0.55, 1] };
 const STORE = "frame-pair-preview-settings";
 
-const state = Object.assign({}, DEFAULTS, { variant: VARIANTS.length ? VARIANTS[0].id : "",
+// the variant shown first: the twelve-letter word with ringed idle letters and a wider right
+// panel, when it is in the list
+const FIRST = "aababaabbabb-R1-notrails-halved-ring-wideright";
+const state = Object.assign({}, DEFAULTS, {
+  variant: VARIANTS.some(v => v.id === FIRST) ? FIRST : VARIANTS.length ? VARIANTS[0].id : "",
   layout: "wide", theme: "light", stills: false, seamTouched: {} });
 
 function loadSettings() {
@@ -189,7 +193,10 @@ function ease(x) {
   const [x1, y1, x2, y2] = controls();
   if (state.easing === "linear") return x;
   let lo = 0, hi = 1;
-  for (let i = 0; i < 64; i++) { const m = (lo + hi) / 2; if (bez(x1, x2, m) < x) lo = m; else hi = m; }
+  for (let i = 0; i < 64; i++) {
+    const m = (lo + hi) / 2;
+    if (bez(x1, x2, m) < x) lo = m; else hi = m;
+  }
   return bez(y1, y2, (lo + hi) / 2);
 }
 
@@ -265,7 +272,8 @@ function showVariant() {
   panels = svg ? Array.from(svg.querySelectorAll("[data-pilean-panel]")) : [];
   document.getElementById("title").textContent = variant.title;
   document.getElementById("info").textContent =
-    `${variant.id} · ${size[0]} × ${size[1]} px · SVG ${variant.bytes[state.layout + (state.theme === "dark" ? "Dark" : "")]} bytes` +
+    `${variant.id} · ${size[0]} × ${size[1]} px · SVG ` +
+    `${variant.bytes[state.layout + (state.theme === "dark" ? "Dark" : "")]} bytes` +
     (variant.closed ? " · closed word: the last key equals the first" : "");
   buildTimeline();
   drawTicks();
@@ -285,7 +293,9 @@ function render(t) {
   const u = ((t % timeline.cycle) + timeline.cycle) % timeline.cycle;
   document.getElementById("clock").textContent =
     `${u.toFixed(2)} / ${timeline.cycle.toFixed(2)} s`;
-  if (!scrubbing) document.getElementById("scrub").value = String(Math.round(1000 * u / timeline.cycle));
+  if (!scrubbing) {
+    document.getElementById("scrub").value = String(Math.round(1000 * u / timeline.cycle));
+  }
   window.previewNow = { t: u, canon, opacity, kind: seg.kind, key: k };
 }
 function loopTime(now) { return playing ? (now - origin) / 1000 * state.speed : pausedAt; }
@@ -385,7 +395,9 @@ function fillVariantPickers() {
     }
     all.appendChild(g);
   }
-  all.addEventListener("change", () => { state.variant = all.value; applySeamDefault(); changed(true); });
+  all.addEventListener("change", () => {
+    state.variant = all.value; applySeamDefault(); changed(true);
+  });
 }
 // the variant with `dim` = `value` that agrees with the current one in the most other dimensions
 function pickNearest(dim, value) {
@@ -395,7 +407,9 @@ function pickNearest(dim, value) {
     const get = DIMS.find(d => d[0] === dim)[1];
     if (get(v) !== value) continue;
     let s = 0;
-    for (const [d, g] of DIMS) if (d !== dim && g(v) === g(cur)) s += 10 - DIMS.findIndex(x => x[0] === d);
+    for (const [d, g] of DIMS) {
+      if (d !== dim && g(v) === g(cur)) s += 10 - DIMS.findIndex(x => x[0] === d);
+    }
     if (s > score) { score = s; best = v; }
   }
   if (best) { state.variant = best.id; applySeamDefault(); changed(true); }
@@ -415,7 +429,8 @@ function fillSliders() {
     row.className = "row";
     row.innerHTML = `<label for="r-${key}">${name}</label>` +
       `<input type="range" id="r-${key}" min="${min}" max="${max}" step="${step}">` +
-      `<input type="number" id="n-${key}" min="${min}" max="${max}" step="${step}" aria-label="${name}">`;
+      `<input type="number" id="n-${key}" min="${min}" max="${max}" step="${step}" ` +
+      `aria-label="${name}">`;
     box.appendChild(row);
     const r = row.querySelector("input[type=range]"), n = row.querySelector("input[type=number]");
     const set = x => {
@@ -426,7 +441,10 @@ function fillSliders() {
         state.speed = v;
         if (playing) origin = now - u * 1000 / v;
       } else state[key] = v;
-      if (key === "seam" && variant) { state.seamTouched = state.seamTouched || {}; state.seamTouched[variant.word] = v; }
+      if (key === "seam" && variant) {
+        state.seamTouched = state.seamTouched || {};
+        state.seamTouched[variant.word] = v;
+      }
       changed(false);
     };
     r.addEventListener("input", () => set(r.value));
@@ -445,7 +463,9 @@ function fillSliders() {
   }
   document.getElementById("easing").addEventListener("change", e => {
     state.easing = e.target.value;
-    if (state.easing === "spline" && !Array.isArray(state.spline)) state.spline = DEFAULTS.spline.slice();
+    if (state.easing === "spline" && !Array.isArray(state.spline)) {
+      state.spline = DEFAULTS.spline.slice();
+    }
     changed(false);
   });
   ["x1", "y1", "x2", "y2"].forEach((id, i) => {
@@ -471,7 +491,9 @@ function fillSliders() {
     document.getElementById("copied").textContent = ok ? "copied" : "select the text and copy";
   });
   document.getElementById("reset").addEventListener("click", () => {
-    for (const k of Object.keys(DEFAULTS)) state[k] = Array.isArray(DEFAULTS[k]) ? DEFAULTS[k].slice() : DEFAULTS[k];
+    for (const k of Object.keys(DEFAULTS)) {
+      state[k] = Array.isArray(DEFAULTS[k]) ? DEFAULTS[k].slice() : DEFAULTS[k];
+    }
     state.seamTouched = {};
     applySeamDefault();
     changed(false);
@@ -479,7 +501,8 @@ function fillSliders() {
 }
 function changed(newPicture) {
   // keep the place in the loop as a fraction of the cycle when the timing changes
-  const frac = timeline.cycle > 0 ? (loopTime(performance.now()) % timeline.cycle) / timeline.cycle : 0;
+  const c = timeline.cycle;
+  const frac = c > 0 ? (loopTime(performance.now()) % c) / c : 0;
   if (newPicture) showVariant(); else { buildTimeline(); drawTicks(); syncControls(); }
   seek(frac * timeline.cycle);
   document.documentElement.dataset.theme = state.theme;
@@ -496,14 +519,19 @@ function syncControls() {
   ["x1", "y1", "x2", "y2"].forEach((id, i) => { document.getElementById(id).value = c[i]; });
   for (const [dim, get] of DIMS) document.getElementById("d-" + dim).value = get(variant);
   document.getElementById("variant").value = variant.id;
-  for (const el of document.querySelectorAll("input[name=layout]")) el.checked = el.value === state.layout;
-  for (const el of document.querySelectorAll("input[name=theme]")) el.checked = el.value === state.theme;
+  for (const el of document.querySelectorAll("input[name=layout], input[name=theme]")) {
+    el.checked = el.value === state[el.name];
+  }
   document.getElementById("showStills").checked = !!state.stills;
   document.getElementById("chosen").value = chosenText();
 }
 
 // ---- the chosen values as Lean ----
-function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) [a, b] = [b, a % b]; return a || 1; }
+function gcd(a, b) {
+  a = Math.abs(a); b = Math.abs(b);
+  while (b) [a, b] = [b, a % b];
+  return a || 1;
+}
 function rat(x) {
   const n = Math.round(x * 100), g = gcd(n, 100);
   const p = n / g, q = 100 / g;
