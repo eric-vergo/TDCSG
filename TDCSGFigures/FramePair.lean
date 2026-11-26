@@ -27,32 +27,44 @@ figures draw the actors from it (`Actor.item`), and the exact arrival check
 checked.
 
 **What stays the same across keys.** A moving item keeps its id, its kind of drawing, its look and
-its base title (`Actor.base`) in every key. The incidences it records (`Item.incident`, decided
-exactly on every key) and the words they append to its title change from key to key;
-`baseTitle` recovers the base title from a drawn item by removing those words, which
+its base title (`Actor.base`) in every key that shows it. The incidences it records
+(`Item.incident`, decided exactly on every key) and the words they append to its title change from
+key to key; `baseTitle` recovers the base title from a drawn item by removing those words, which
 `Item.incident` appends as `, <relation> <title>` once per record, in the order of the look's
 records. What depends on the step is said in the caption (`keyCaption`) and the legends.
 
-**Idle letters.** A letter that does not act is shown, during its step, by a dashed outline over
-its disk (left panel) and over its riding disk (right panel), an actor of its own that appears in
-that step and vanishes in the next; or, as an alternative (`IdleMark.ring`), by a dashed ring
-about the disk's centre.
+**Keys.** The states after `0, 1, …, |w|` letters (`stateAt`) give the keys, one per state,
+except that a letter that does not act gets two: a key with its mark shown, then the state's key
+without it (`keyRefs`). So the step of an idle letter is self-contained: its mark appears, is held,
+and vanishes before the next letter moves.
+
+**Idle letters.** The mark of a letter that does not act (`IdleMark`): a dashed ring about the
+centre of its disk (left panel) and of its riding disk (right panel), by default; or a dashed
+circle just outside the disk's outline (`IdleMark.outline`, `outlineGap` outside it, so that it
+does not lie on the outline). It is an actor of its own, shown only in the key with the mark, so
+nothing turns while it is shown.
 
 **Trails.** Earlier points (left) and earlier centres (right) as faint dots without halo under the
-strokes, shown from the key where the position is left except while it is occupied again; or, in
-the right panel, as faint arcs of the paths the centres swept (`TrailStyle.arcs`).
+strokes, shown from the state where the position is left, except while it is occupied again, for
+`trailLength` letters (a short tail), or for good when `trailLength` is `none`; or, in the right
+panel, as faint arcs of the paths the centres swept (`TrailStyle.arcs`), for as long.
+
+**The centre-graph edge** (`RightStyle.bodiesGraph`) is one actor, `"graph-edge"`, shown while both
+centres lie in the window: it turns with the body while it stays shown, and appears or vanishes
+only when that condition changes.
 
 **Views** (`ViewStyle`): one view for all keys of a panel, both panels at one unit length (the
 full-size left panel at half): the same width for both (`shared`), each cropped to its own extent
 (`cropped`), or the two side by side in twice the panel width (`wideRight`). Each panel's height is
 its own, so a narrow, stacked rendition has no empty band.
 
-`frameSteps cfg` declares the moves between consecutive keys (`FrameStep`) in each panel's own
-coordinates, and `FramePairConfig.allArrive` checks in exact arithmetic that each declared turn
-carries the actors' anchors in key `k` onto those in key `k + 1`; the general statements are
-`TDCSG.Five.framePicture_genA_genB`, `TDCSG.Five.framePicture_symm`,
-`TDCSG.Five.two_mul_sub_proj_genA`, `TDCSG.Five.two_mul_sub_proj_genB`, `TDCSG.Five.halved_genA`,
-`TDCSG.Five.halved_genB` and `TDCSG.Five.frameMap_genA_halved`.
+`frameSteps cfg` declares the moves between consecutive keys (`FrameStep`: a turn, or a mark that
+appears or vanishes) in each panel's own coordinates, and `FramePairConfig.allArrive` checks in
+exact arithmetic that each declared turn carries the actors' anchors in key `k` onto those in key
+`k + 1`; the general statements are `TDCSG.Five.framePicture_genA_genB`,
+`TDCSG.Five.framePicture_symm`, `TDCSG.Five.two_mul_sub_proj_genA`,
+`TDCSG.Five.two_mul_sub_proj_genB`, `TDCSG.Five.halved_genA`, `TDCSG.Five.halved_genB` and
+`TDCSG.Five.frameMap_genA_halved`.
 
 Nothing here is a figure of the site; `tdcsg-figure-preview --frame-pair-keys` draws the keys, and
 `TDCSGFigures.FramePairMotion` animates them.
@@ -85,10 +97,10 @@ inductive LeftScale where
   | full
   deriving BEq, Inhabited, Repr
 
-/-- How an idle letter is marked: a dashed outline over its disk, or a dashed ring about the
-disk's centre. -/
+/-- How an idle letter is marked: a dashed ring about the disk's centre, or a dashed circle just
+outside the disk's outline. -/
 inductive IdleMark where
-  /-- A dashed outline over the disk. -/
+  /-- A dashed circle just outside the disk's outline (`outlineGap`). -/
   | outline
   /-- A dashed ring about the centre. -/
   | ring
@@ -127,13 +139,24 @@ structure FramePairConfig where
   /-- The scale of the left panel. -/
   left : LeftScale := .halved
   /-- How an idle letter is marked. -/
-  idleMark : IdleMark := .outline
+  idleMark : IdleMark := .ring
+  /-- For how many letters a trail mark stays after its position is left; `none`: for good. -/
+  trailLength : Option Nat := some 3
   /-- The views of the panels. -/
   view : ViewStyle := .shared
   /-- The page width of one panel, side by side. -/
   width : Float := figureWidth / 2
   /-- The page width of one panel, stacked. -/
   narrowWidth : Float := narrowWidth
+
+/-- A key of the animation: the state after `state` letters, with the mark of the idle letter
+before it shown (`mark`) or not. -/
+structure KeyRef where
+  /-- The number of letters applied. -/
+  state : Nat
+  /-- Whether the mark of the letter before it, which does not act, is shown. -/
+  mark : Bool := false
+  deriving BEq, Inhabited, Repr
 
 /-- The two panels. -/
 inductive Panel where
@@ -159,8 +182,8 @@ def states : List State := statesFor cfg.r2 cfg.word
 /-- The state at key `k`. -/
 def stateAt (k : Nat) : State := cfg.states.getD k (State.start origin)
 
-/-- The number of keys, `|w| + 1`. -/
-def keyCount : Nat := cfg.word.length + 1
+/-- The number of states, `|w| + 1`. -/
+def stateCount : Nat := cfg.word.length + 1
 
 /-- Whether the right panel draws the halved disks riding on the centres and the point. -/
 def riding : Bool := cfg.right != .centres
@@ -168,8 +191,27 @@ def riding : Bool := cfg.right != .centres
 /-- The letter of step `k`, from key `k` to key `k + 1`. -/
 def letterOf (k : Nat) : Letter := cfg.word.getD k .a
 
-/-- Whether the letter before key `k` did not act (`k ≥ 1`). -/
+/-- Whether the letter before state `k` did not act (`k ≥ 1`). -/
 def idleAt (k : Nat) : Bool := k ≥ 1 && !(cfg.stateAt k).acted
+
+/-- The keys (see the module docstring): state `0`, then for each letter the state it reaches,
+preceded by the same state with the letter's mark shown when the letter does not act. -/
+def keyRefs : List KeyRef :=
+  ⟨0, false⟩ :: (List.range cfg.word.length).flatMap fun i =>
+    if cfg.idleAt (i + 1) then [⟨i + 1, true⟩, ⟨i + 1, false⟩] else [⟨i + 1, false⟩]
+
+/-- The number of keys: one per state, and one more for each letter that does not act. -/
+def keyCount : Nat := cfg.keyRefs.length
+
+/-- Key `j`. -/
+def keyRef (j : Nat) : KeyRef := cfg.keyRefs.getD j ⟨0, false⟩
+
+/-- Whether a trail mark that appeared at state `a` is shown at state `k`: from `a` on, for
+`trailLength` letters. -/
+def trailShown (a k : Nat) : Bool :=
+  a ≤ k && match cfg.trailLength with
+    | some n => k < a + n
+    | none => true
 
 /-- Whether both centres lie in the window at key `k`. -/
 def bothInWindow (k : Nat) : Bool :=
@@ -333,36 +375,41 @@ def recordsOf (p : ZetaFrac) (circles : List (String × ZetaFrac × Rat))
 
 /-! ### Trails -/
 
-/-- The trail marks of a list of positions per key: each position held at key `i` and no longer at
-key `i + 1` gives a mark from key `i + 1` on, once; the marks with their first key. -/
-def trailMarks (held : Nat → List ZetaFrac) (keys : Nat) : List (ZetaFrac × Nat) :=
+/-- The trail marks of a list of positions per state: each position held at state `i` and no longer
+at state `i + 1` gives a mark from state `i + 1` on (once per position when `once`, else each time
+it is left); the marks with their first state. -/
+def trailMarks (held : Nat → List ZetaFrac) (keys : Nat) (once : Bool := true) :
+    List (ZetaFrac × Nat) :=
   (List.range keys).foldl (fun acc k =>
     if k == 0 then acc
     else
       let gone := (held (k - 1)).filter fun p => !(held k).any (ZetaFrac.same p)
-      gone.foldl (fun acc p => if acc.any (ZetaFrac.same p ·.1) then acc else acc ++ [(p, k)]) acc)
+      gone.foldl (fun acc p =>
+        if once && acc.any (ZetaFrac.same p ·.1) then acc else acc ++ [(p, k)]) acc)
     []
 
 namespace FramePairConfig
 
 variable (cfg : FramePairConfig)
 
-/-- The point of the left panel at key `k`. -/
+/-- The point of the left panel at state `k`. -/
 def pointAt (k : Nat) : ZetaFrac := cfg.leftPoint (cfg.stateAt k).y
 
-/-- The centres of the right panel at key `k`. -/
+/-- The centres of the right panel at state `k`. -/
 def centresAt (k : Nat) : ZetaFrac × ZetaFrac :=
   let s := cfg.stateAt k
   (ZetaFrac.ofZeta s.leftCentre, ZetaFrac.ofZeta s.rightCentre)
 
 /-- The trail marks of the left panel: earlier points. -/
 def pointTrail : List (ZetaFrac × Nat) :=
-  if cfg.trails then trailMarks (fun k => [cfg.pointAt k]) cfg.keyCount else []
+  if cfg.trails then trailMarks (fun k => [cfg.pointAt k]) cfg.stateCount cfg.trailLength.isNone
+  else []
 
 /-- The trail marks of the right panel: earlier centres. -/
 def centreTrail : List (ZetaFrac × Nat) :=
   if cfg.trails then
-    trailMarks (fun k => [(cfg.centresAt k).1, (cfg.centresAt k).2]) cfg.keyCount
+    trailMarks (fun k => [(cfg.centresAt k).1, (cfg.centresAt k).2]) cfg.stateCount
+      cfg.trailLength.isNone
   else []
 
 /-- The turn of step `k` in the right panel when its letter acts: the active centre (the centre
@@ -372,11 +419,12 @@ def bodyTurnOf (k : Nat) : Option (ZetaFrac × Rat) :=
   let l := cfg.letterOf k
   if l.covers cfg.r2 s.y then some (ZetaFrac.ofZeta (proj (s.labelOf l)), -l.turns) else none
 
-/-- The arcs swept by the centres before key `k`: for each acting step `i < k`, the arc of radius
-`1` about the active centre from the turning centre's place at key `i` to its place at key
-`i + 1` (counter-clockwise, so from the later place for a clockwise turn). -/
+/-- The arcs swept by the centres before state `k` and still shown there (`trailShown`): for each
+acting letter `i < k`, the arc of radius `1` about the active centre from the turning centre's place
+at state `i` to its place at state `i + 1` (counter-clockwise, so from the later place for a
+clockwise turn). -/
 def sweepsBefore (k : Nat) : List (Nat × ZetaFrac × ZetaFrac × ZetaFrac) :=
-  ((List.range k).filterMap fun i =>
+  (((List.range k).filter fun i => cfg.trailShown (i + 1) k).filterMap fun i =>
     (cfg.bodyTurnOf i).map fun (c, q) =>
       let l := cfg.letterOf i
       let pick := fun (j : Nat) => if sideIndex l == 0 then (cfg.centresAt j).2
@@ -391,42 +439,57 @@ end FramePairConfig
 /-- The radius of the ring of `IdleMark.ring`, at the unit length of the right panel. -/
 def ringRadius : Rat := 1 / 4
 
+/-- How far outside the disk's outline the dashed circle of `IdleMark.outline` lies, at the unit
+length of the right panel. -/
+def outlineGap : Rat := 1 / 16
+
 namespace FramePairConfig
 
 variable (cfg : FramePairConfig)
 
-/-- The dashed mark of the idle letter before key `k`, about the centre `c` of its disk of radius
-`ρ` titled `name`: an outline over the disk, or a ring about the centre. -/
-def idleActor (k : Nat) (c : ZetaFrac) (ρ ringρ : Rat) (role : String) (name : String) : Actor :=
+/-- The dashed mark of the idle letter before state `k`, about the centre `c` of its disk of radius
+`ρ` titled `name`: a circle `gap` outside the disk's outline, or a ring of radius `ringρ` about the
+centre. -/
+def idleActor (k : Nat) (c : ZetaFrac) (ρ ringρ gap : Rat) (role : String) (name : String) :
+    Actor :=
   match cfg.idleMark with
   | .outline =>
-    { id := s!"idle-{k}", kind := .outline ρ (some role) 2.5 true,
-      base := s!"{name}, dashed: its letter does not act", anchors := [c] }
+    { id := s!"idle-{k}", kind := .outline (ρ + gap) (some role) 2 true,
+      base := s!"a dashed circle about {name}: its letter does not act", anchors := [c] }
   | .ring =>
     { id := s!"idle-{k}", kind := .outline ringρ (some role) 2 true,
       base := s!"a ring about the center of {name}: its letter does not act", anchors := [c] }
 
-/-- The circles of the idle mark of key `k` in the left panel, for the records of the points. -/
-def leftIdleCircle (k : Nat) : List (String × ZetaFrac × Rat) :=
-  if cfg.idleAt k then
+/-- The ring radius and the outline gap of the left panel's idle mark: those of the right panel,
+twice as large for a full-size left panel. -/
+def leftMarkSizes : Rat × Rat :=
+  match cfg.left with
+  | .halved => (ringRadius, outlineGap)
+  | .full => (2 * ringRadius, 2 * outlineGap)
+
+/-- The circles of the idle mark of key `r` in the left panel, for the records of the points. -/
+def leftIdleCircle (r : KeyRef) : List (String × ZetaFrac × Rat) :=
+  let k := r.state
+  if r.mark then
     let (name, c, ρ) := cfg.leftDisks.getD (sideIndex (cfg.letterOf (k - 1)))
       ("", ZetaFrac.ofZeta origin, 0)
-    let ringρ : Rat := match cfg.left with | .halved => ringRadius | .full => 2 * ringRadius
-    let a := cfg.idleActor k c ρ ringρ "" name
+    let (ringρ, gap) := cfg.leftMarkSizes
+    let a := cfg.idleActor k c ρ ringρ gap "" name
     match a.kind with
     | .outline r .. => [(a.base, c, r)]
     | _ => []
   else []
 
-/-- The actors of the left panel at key `k`, in drawing order: trail marks, the fixed centres,
+/-- The actors of the left panel at key `r`, in drawing order: trail marks, the fixed centres,
 the idle mark, the point. -/
-def leftActors (k : Nat) : List Actor :=
+def leftActors (r : KeyRef) : List Actor :=
+  let k := r.state
   let disks := cfg.leftDisks
-  let idle := cfg.leftIdleCircle k
+  let idle := cfg.leftIdleCircle r
   let circles := disks ++ idle
   let (n0, n1) := cfg.leftNames
   let trail := cfg.pointTrail.zipIdx.filterMap fun ((q, a), i) =>
-    if a ≤ k && !(ZetaFrac.same q (cfg.pointAt k)) then
+    if cfg.trailShown a k && !(ZetaFrac.same q (cfg.pointAt k)) then
       some { id := s!"trail-point-{i}", kind := .dot 3 none true false,
              base := "an earlier point", anchors := [q], records := recordsOf q circles [] }
     else none
@@ -436,11 +499,11 @@ def leftActors (k : Nat) : List Actor :=
     ({ id := s!"center-{i}", kind := .dot 4 (some role) false false, base := name,
        anchors := [c], records := recordsOf c circles [] } : Actor))
   let idleA : List Actor :=
-    if cfg.idleAt k then
+    if r.mark then
       let i := sideIndex (cfg.letterOf (k - 1))
       let (name, c, ρ) := disks.getD i ("", ZetaFrac.ofZeta origin, 0)
-      let ringρ : Rat := match cfg.left with | .halved => ringRadius | .full => 2 * ringRadius
-      [cfg.idleActor k c ρ ringρ (if i == 0 then leftRole else rightRole) name]
+      let (ringρ, gap) := cfg.leftMarkSizes
+      [cfg.idleActor k c ρ ringρ gap (if i == 0 then leftRole else rightRole) name]
     else []
   let p := cfg.pointAt k
   let pt := match cfg.left with | .halved => "(y + 1)/2" | .full => "y"
@@ -454,9 +517,10 @@ def edgeName : String := "the unit edge from the left to the right center"
 /-- The title of a centre-graph edge. -/
 def graphEdgeName : String := "an edge of the center graph: both centers lie in the window"
 
-/-- The actors of the right panel at key `k`, in drawing order: trail marks, the riding disks, the
+/-- The actors of the right panel at key `r`, in drawing order: trail marks, the riding disks, the
 idle mark, the edge and the centre-graph edge, the point at `x`, the centres. -/
-def rightActors (k : Nat) : List Actor :=
+def rightActors (r : KeyRef) : List Actor :=
+  let k := r.state
   let (pl, pr) := cfg.centresAt k
   let x := windowCentre
   let ρ := cfg.half
@@ -465,12 +529,12 @@ def rightActors (k : Nat) : List Actor :=
     if cfg.riding then [("the left disk, riding", pl, ρ), ("the right disk, riding", pr, ρ)]
     else []
   let idle : List Actor :=
-    if cfg.idleAt k then
+    if r.mark then
       let i := sideIndex (cfg.letterOf (k - 1))
       let (c, role, name) := if i == 0 then (pl, leftRole, "the left disk, riding")
         else (pr, rightRole, "the right disk, riding")
       [{ cfg with idleMark := if cfg.riding then cfg.idleMark else .ring }.idleActor k c ρ
-        ringRadius role name]
+        ringRadius outlineGap role name]
     else []
   let idleCircles : List (String × ZetaFrac × Rat) := idle.filterMap fun a =>
     match a.kind with
@@ -483,7 +547,7 @@ def rightActors (k : Nat) : List Actor :=
     if !cfg.trails then []
     else match cfg.trailStyle with
       | .dots => cfg.centreTrail.zipIdx.filterMap fun ((q, a), i) =>
-        if a ≤ k && !(ZetaFrac.same q pl) && !(ZetaFrac.same q pr) then
+        if cfg.trailShown a k && !(ZetaFrac.same q pl) && !(ZetaFrac.same q pr) then
           some { id := s!"trail-center-{i}", kind := .dot 3 none true false,
                  base := "an earlier center", anchors := [q], records := recordsOf q circles [] }
         else none
@@ -500,7 +564,7 @@ def rightActors (k : Nat) : List Actor :=
   let edges : List Actor :=
     [{ id := "edge", kind := .stroke none 1.5 false, base := edgeName, anchors := [pl, pr] }] ++
     (if cfg.showsGraphEdge k then
-      [{ id := s!"graph-edge-{k}", kind := .stroke (some windowRole) 4 false,
+      [{ id := "graph-edge", kind := .stroke (some windowRole) 4 false,
          base := graphEdgeName, anchors := [pl, pr], decl := some `TDCSG.Five.centerGraph }]
      else [])
   let xActor : Actor :=
@@ -520,11 +584,11 @@ def rightActors (k : Nat) : List Actor :=
       records := recordsOf pr (others pr) [] }]
   trail ++ disks ++ idle ++ edges ++ [xActor] ++ centres
 
-/-- The actors of a panel at key `k` (`leftActors`, `rightActors`): the one list that the key
-figures draw and the arrival check reads. -/
+/-- The actors of a panel at key `j` (`leftActors`, `rightActors` of `keyRef j`): the one list
+that the key figures draw and the arrival check reads. -/
 def actorsAt : Panel → Nat → List Actor
-  | .left, k => cfg.leftActors k
-  | .right, k => cfg.rightActors k
+  | .left, j => cfg.leftActors (cfg.keyRef j)
+  | .right, j => cfg.rightActors (cfg.keyRef j)
 
 end FramePairConfig
 
@@ -537,16 +601,29 @@ structure ExactTurn where
   /-- The fraction of a full turn. -/
   turns : Rat
 
-/-- What happens between key `k` and key `k + 1`, in each panel's own coordinates: the letter,
-whether it acts, the turn of the left panel (of the actor `"point"` about the centre of the
-letter's disk as drawn there: `0`, `1` halved, `−1`, `1` full size; by `-1/5` for `a` and `b`,
-`1/5` for their inverses) and the turn of the right panel (about the centre of the letter's disk
-at key `k`, by `1/5`, or `-1/5` for an inverse), the actors each turns, and the actors that appear
-and vanish in each panel. -/
+/-- What a step between two keys does: the turn of a letter that acts, or the mark of a letter
+that does not act appearing or vanishing. -/
+inductive StepPhase where
+  /-- A letter acts: both panels turn. -/
+  | turn
+  /-- A letter does not act: its mark appears. -/
+  | markAppears
+  /-- The mark of a letter that does not act vanishes. -/
+  | markVanishes
+  deriving DecidableEq, Inhabited, Repr
+
+/-- What happens between key `j` and key `j + 1`, in each panel's own coordinates: the letter, what
+the step does, whether the letter acts, the turn of the left panel (of the actor `"point"` about the
+centre of the letter's disk as drawn there: `0`, `1` halved, `−1`, `1` full size; by `-1/5` for `a`
+and `b`, `1/5` for their inverses) and the turn of the right panel (about the centre of the letter's
+disk before the turn, by `1/5`, or `-1/5` for an inverse), the actors each turns, and the actors
+that appear and vanish in each panel. -/
 structure FrameStep where
   /-- The letter. -/
   letter : Letter
-  /-- Whether it acts. -/
+  /-- What the step does. -/
+  phase : StepPhase
+  /-- Whether the letter acts (then the step turns). -/
   acts : Bool
   /-- The turn of the left panel, when the letter acts. -/
   leftTurn : Option ExactTurn
@@ -569,33 +646,43 @@ namespace FramePairConfig
 
 variable (cfg : FramePairConfig)
 
-/-- The moves of step `k`, from key `k` to key `k + 1`, with the actors given by `actors` (the
-appearances and disappearances are read from it). -/
-def frameStepWith (actors : Panel → Nat → List Actor) (k : Nat) : FrameStep :=
-  let s := cfg.stateAt k
-  let l := cfg.letterOf k
-  let acts := l.covers cfg.r2 s.y
+/-- The moves of step `j`, from key `j` to key `j + 1`, with the actors given by `actors` (the
+appearances and disappearances are read from it): the letter `i` that leads to the state of key
+`j + 1`; a turn when the two keys show different states (the letter acts), the mark appearing when
+key `j + 1` shows it, the mark vanishing when both keys show one state. The right panel turns the
+edge, the other centre with its riding disk and the centre-graph edge when both keys show it. -/
+def frameStepWith (actors : Panel → Nat → List Actor) (j : Nat) : FrameStep :=
+  let r := cfg.keyRef j
+  let r' := cfg.keyRef (j + 1)
+  let i := r'.state - 1
+  let s := cfg.stateAt i
+  let l := cfg.letterOf i
+  let phase : StepPhase :=
+    if r.state == r'.state then .markVanishes else if r'.mark then .markAppears else .turn
+  let acts := phase == .turn && l.covers cfg.r2 s.y
   let ids := fun (p : Panel) (j : Nat) => (actors p j).map (·.id)
   let diff := fun (xs ys : List String) => ys.filter fun id => !xs.contains id
-  let i := sideIndex l
-  let other := if i == 0 then ["right", "right-disk"] else ["left", "left-disk"]
-  { letter := l, acts
+  let side := sideIndex l
+  let other := if side == 0 then ["right", "right-disk"] else ["left", "left-disk"]
+  { letter := l, phase, acts
     leftTurn := if acts then
-      some ⟨(cfg.leftDisks.getD i ("", ZetaFrac.ofZeta origin, 0)).2.1, l.turns⟩ else none
+      some ⟨(cfg.leftDisks.getD side ("", ZetaFrac.ofZeta origin, 0)).2.1, l.turns⟩ else none
     leftTurning := if acts then ["point"] else []
-    rightTurn := (cfg.bodyTurnOf k).map fun (c, q) => ⟨c, q⟩
+    rightTurn := if acts then (cfg.bodyTurnOf i).map fun (c, q) => ⟨c, q⟩ else none
     rightTurning := if acts then
-      ("edge" :: other).filter fun id => (ids .right k).contains id else []
-    appearLeft := diff (ids .left k) (ids .left (k + 1))
-    vanishLeft := diff (ids .left (k + 1)) (ids .left k)
-    appearRight := diff (ids .right k) (ids .right (k + 1))
-    vanishRight := diff (ids .right (k + 1)) (ids .right k) }
+      ("edge" :: "graph-edge" :: other).filter fun id =>
+        (ids .right j).contains id && (ids .right (j + 1)).contains id
+      else []
+    appearLeft := diff (ids .left j) (ids .left (j + 1))
+    vanishLeft := diff (ids .left (j + 1)) (ids .left j)
+    appearRight := diff (ids .right j) (ids .right (j + 1))
+    vanishRight := diff (ids .right (j + 1)) (ids .right j) }
 
-/-- The moves of step `k` (`frameStepWith actorsAt`). -/
-def frameStep (k : Nat) : FrameStep := cfg.frameStepWith cfg.actorsAt k
+/-- The moves of step `j` (`frameStepWith actorsAt`). -/
+def frameStep (j : Nat) : FrameStep := cfg.frameStepWith cfg.actorsAt j
 
-/-- The steps of the word, one fewer than the keys. -/
-def frameSteps : List FrameStep := (List.range cfg.word.length).map cfg.frameStep
+/-- The steps between consecutive keys, one fewer than the keys. -/
+def frameSteps : List FrameStep := (List.range (cfg.keyCount - 1)).map cfg.frameStep
 
 /-- Whether, in one panel, the turn `turn` of the actors `turning` carries the actors of `before`
 onto those of `after`: every actor in both has the same kind and base title, a turning actor's
@@ -627,11 +714,12 @@ def arrivesWith (actors : Panel → Nat → List Actor) (k : Nat) : Bool :=
       (actors .left k) (actors .left (k + 1)) &&
     panelArrives st.rightTurn st.rightTurning st.appearRight st.vanishRight
       (actors .right k) (actors .right (k + 1)) &&
+    (st.acts == (st.phase == .turn)) &&
     (st.acts || (st.leftTurn.isNone && st.rightTurn.isNone))
 
 /-- Whether every step of the variant arrives, with the actors given by `actors`. -/
 def allArriveWith (actors : Panel → Nat → List Actor) : Bool :=
-  (List.range cfg.word.length).all (cfg.arrivesWith actors)
+  (List.range (cfg.keyCount - 1)).all (cfg.arrivesWith actors)
 
 /-- Whether every declared move of the variant carries key `k` onto key `k + 1` exactly, for the
 actors the key figures draw (`actorsAt`). The general statements behind it:
@@ -659,10 +747,10 @@ def whereText (s : State) : String :=
     if k < 0 then s!"−{-k}" else toString k)
   s!"(n{nbsp}={nbsp}({n}), j{nbsp}={nbsp}{s.j})"
 
-/-- The caption of key `k`: the start, explaining `n` and `j`, or what the letter before it did,
+/-- The caption of state `k`: the start, explaining `n` and `j`, or what the letter before it did,
 with the size and direction of the turns, whether the centre-graph edge appears or vanishes, and
 `n` and `j` in a trailing parenthesis; plain words, from the states. -/
-def keyCaption (k : Nat) : String :=
+def stateCaption (k : Nat) : String :=
   let s := cfg.stateAt k
   let (n0, n1) := cfg.leftNames
   let total := cfg.word.length
@@ -688,7 +776,8 @@ def keyCaption (k : Nat) : String :=
       else if !cfg.showsGraphEdge k && cfg.showsGraphEdge (k - 1) then
         " The center-graph edge vanishes."
       else ""
-    let mark := match cfg.idleMark with | .outline => "dashed" | .ring => "ringed"
+    let mark := match cfg.idleMark with
+      | .outline => "marked by a dashed circle" | .ring => "ringed"
     let body := if s.acted then
       s!"{l.text} acts: the point turns a fifth of a turn {pointWay} about the {own} center " ++
         s!"{ownName}; in the moving frame the {other} center turns a fifth of a turn " ++
@@ -697,6 +786,10 @@ def keyCaption (k : Nat) : String :=
       s!"{l.text} does not act: the point is outside the {own} disk ({mark}), and the {own} " ++
         "center is outside the window; nothing moves."
     s!"Step {k} of {total}: {body}{graph} {whereText s}"
+
+/-- The caption of key `j`: that of its state (`stateCaption`), so the key that shows an idle
+letter's mark and the key after it say the same; "Step k of n" counts letters. -/
+def keyCaption (j : Nat) : String := cfg.stateCaption (cfg.keyRef j).state
 
 end FramePairConfig
 

@@ -23,7 +23,8 @@ after the variant, with contact sheets (`sheet*.html`: one row per key, the two 
 caption), prints their layout problems, whether every declared move arrives exactly
 (`FramePairConfig.allArrive`) and the disks' diameters in pixels, and exits with status 1 if one
 fails. The options: `--word W` (letters `a`, `b`, `A = a⁻¹`, `B = b⁻¹`; `abab` by default),
-`--variant R1|R2|R3`, `--trails`, `--trail-arcs`, `--full`, `--idle outline|ring` and
+`--variant R1|R2|R3`, `--trails` (the last three positions), `--full-trails` (every earlier
+position), `--trail-arcs`, `--full`, `--idle ring|outline` and
 `--view shared|cropped|wide-right`.
 
 `tdcsg-figure-preview --motion-variants DIR` animates the variants of the frame pair in
@@ -135,6 +136,8 @@ def parseFramePair : List String → Lift.FramePairConfig → Except String Lift
   | "--variant" :: "R2" :: rest, c => parseFramePair rest { c with right := .centres }
   | "--variant" :: "R3" :: rest, c => parseFramePair rest { c with right := .bodiesGraph }
   | "--trails" :: rest, c => parseFramePair rest { c with trails := true }
+  | "--full-trails" :: rest, c =>
+    parseFramePair rest { c with trails := true, trailLength := none }
   | "--full" :: rest, c => parseFramePair rest { c with left := .full }
   | "--trail-arcs" :: rest, c => parseFramePair rest { c with trailStyle := .arcs }
   | "--idle" :: "outline" :: rest, c => parseFramePair rest { c with idleMark := .outline }
@@ -152,7 +155,8 @@ def variantName (c : Lift.FramePairConfig) : String :=
   s!"{w}-{r}-{if c.trails then "trails" else "notrails"}-" ++
     (match c.left with | .halved => "halved" | .full => "full") ++
     (if c.trails && c.trailStyle == .arcs then "-arcs" else "") ++
-    (match c.idleMark with | .outline => "" | .ring => "-ring") ++
+    (if c.trails && c.trailLength.isNone then "-full" else "") ++
+    (match c.idleMark with | .outline => "-outline" | .ring => "") ++
     (match c.view with | .shared => "" | .cropped => "-cropped" | .wideRight => "-wideright")
 
 /-- A contact sheet: one row per key with the pictures `left` and `right` (file names relative to
@@ -214,15 +218,17 @@ def diskSizes (c : Lift.FramePairConfig) : String :=
 
 /-- The variants of `--motion-variants`: the words `abab` (every letter acts), `ababbab` (one
 letter does not), `aababaabbabb` (three do not) and `aabaaabbbbb` (closed: its last key is its
-first), each with the right panel `R1` and `R3` (`R2` for the twelve-letter word), trails off and
-on, the views shared and cropped (wide-right for the two long words), the idle mark as an outline
-(as a ring for the twelve-letter word, also wide-right), and the left panel halved (full size for
-`abab` and the twelve-letter word). -/
+first), each with the right panel `R1` and `R3` (`R2` for the twelve-letter word), without and with
+trails (a tail of the last three positions; every earlier position for `abab` only), the views
+shared and cropped (wide-right for the two long words), the idle mark as a ring (as a dashed circle
+outside the disk for the twelve-letter word), and the left panel halved (full size for `abab` and
+the twelve-letter word). -/
 def motionVariants : Array Lift.FramePairConfig :=
   let w := Lift.parseWord
   let twelve := w "aababaabbabb"
   let closed := w "aabaaabbbbb"
   #[{ word := w "abab" }, { word := w "abab", trails := true },
+    { word := w "abab", trails := true, trailLength := none },
     { word := w "abab", right := .bodiesGraph }, { word := w "abab", left := .full },
     { word := w "abab", view := .cropped },
     { word := w "ababbab" }, { word := w "ababbab", trails := true },
@@ -234,9 +240,9 @@ def motionVariants : Array Lift.FramePairConfig :=
     { word := twelve, view := .cropped }, { word := twelve, view := .wideRight },
     { word := twelve, right := .bodiesGraph, view := .wideRight },
     { word := twelve, right := .centres, view := .wideRight },
-    { word := twelve, idleMark := .ring },
-    { word := twelve, idleMark := .ring, view := .wideRight }, { word := twelve, left := .full },
-    { word := twelve, left := .full, view := .wideRight },
+    { word := twelve, idleMark := .outline },
+    { word := twelve, idleMark := .outline, view := .wideRight },
+    { word := twelve, left := .full }, { word := twelve, left := .full, view := .wideRight },
     { word := closed }, { word := closed, trails := true },
     { word := closed, right := .bodiesGraph },
     { word := closed, view := .cropped }, { word := closed, view := .wideRight },
@@ -325,17 +331,19 @@ def browserExpectations (name : String) (r : Plane.MotionPanelsReport) : String 
     s!"\"panels\": [{", ".intercalate panels}], \"phase\": [{", ".intercalate phase}]}\n"
 
 /-- The segments of a picture's timeline as JSON: each rest with its key, each move with its
-step and whether its letter acts (`turn`) or not (`idle`), with its start and duration in
-seconds. -/
+step and what it does (`turn`, or the mark of a letter that does not act: `appear`, `vanish`),
+with its start and duration in seconds. -/
 def segmentsJson (c : Lift.FramePairConfig) (r : Plane.MotionPanelsReport) : String :=
-  let acts := c.frameSteps.toArray.map (·.acts)
+  let phases := c.frameSteps.toArray.map (·.phase)
   let one := fun (s : Anim.Segment) =>
     let time := s!"\"start\": {jsonNum (Exact.toFloat s.start)}, " ++
       s!"\"duration\": {jsonNum (Exact.toFloat s.dur)}"
     match s.kind with
     | .rest k => s!"\{\"kind\": \"rest\", \"key\": {k}, {time}}"
     | .move j =>
-      s!"\{\"kind\": \"{if acts.getD j true then "turn" else "idle"}\", \"step\": {j}, {time}}"
+      let kind := match phases.getD j .turn with
+        | .turn => "turn" | .markAppears => "appear" | .markVanishes => "vanish"
+      s!"\{\"kind\": \"{kind}\", \"step\": {j}, {time}}"
     | .seamIn => s!"\{\"kind\": \"seamIn\", {time}}"
     | .seamOut => s!"\{\"kind\": \"seamOut\", {time}}"
   "[" ++ ", ".intercalate (r.timeline.segments.toList.map one) ++ "]"
@@ -347,7 +355,7 @@ def motionPage : String := include_str "FramePairPreview.html"
 the same actors in order, of the same kinds and base titles at the same exact anchors; the ids
 may differ, as a centre-graph edge's id names its key), so that the loop needs no reset. -/
 def closedWord (c : Lift.FramePairConfig) : Bool :=
-  let last := c.word.length
+  let last := c.keyCount - 1
   [Lift.Panel.left, .right].all fun p =>
     let a := c.actorsAt p 0
     let b := c.actorsAt p last
@@ -398,16 +406,20 @@ def renderMotionVariant (dir : System.FilePath) (c : Lift.FramePairConfig) :
   let right := match c.right with | .bodies => "R1" | .centres => "R2" | .bodiesGraph => "R3"
   let view := match c.view with
     | .shared => "shared" | .cropped => "cropped" | .wideRight => "wideRight"
-  let idle := match c.idleMark with | .outline => "dashed" | .ring => "ring"
+  let idle := match c.idleMark with | .outline => "outline" | .ring => "ring"
   let left := match c.left with | .halved => "halved" | .full => "full"
+  let trails := if !c.trails then "none"
+    else match c.trailLength with | some n => s!"last {n}" | none => "full"
   let obj := fun (xs : List String) => "{" ++ ", ".intercalate xs ++ "}"
   let entry := obj [s!"\"id\": {jsonString id}", s!"\"word\": {jsonString c.wordText}",
     s!"\"title\": {jsonString c.motion.info.title}",
     s!"\"closed\": {closedWord c}",
-    "\"options\": " ++ obj [s!"\"right\": \"{right}\"", s!"\"trails\": {c.trails}",
+    "\"options\": " ++ obj [s!"\"right\": \"{right}\"", s!"\"trails\": \"{trails}\"",
       s!"\"view\": \"{view}\"", s!"\"idle\": \"{idle}\"", s!"\"left\": \"{left}\""],
     "\"steps\": [" ++ ", ".intercalate (c.frameSteps.map fun s =>
       s!"\{\"letter\": {jsonString s.letter.text}, \"acts\": {s.acts}}") ++ "]",
+    s!"\"letters\": {c.word.length}",
+    s!"\"trailLength\": {match c.trailLength with | some n => toString n | none => "null"}",
     s!"\"segments\": {segments}",
     "\"captions\": [" ++ ", ".intercalate ((List.range c.keyCount).map fun k =>
       jsonString (c.keyCaption k)) ++ "]",

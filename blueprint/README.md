@@ -159,15 +159,19 @@ lake env lean scripts/FrameWords.lean
 ```
 
 `TDCSGFigures/FramePair.lean` draws the two frames as key figures for an animation, one pair per
-rest of a word. `FramePairConfig.actorsAt` lists, for each panel and key, every moving item (an
+rest of a word: one key per state, and for a letter that does not act one more key, which shows
+its mark before the state's own key, so that the mark appears and vanishes while nothing turns. `FramePairConfig.actorsAt` lists, for each panel and key, every moving item (an
 actor) with its id, its kind of drawing, its stable base title and its exact anchor points; the
 key figures (`halvedKey`, `centreKey`, in their views with legends by `keys`) draw the actors from
 it, and `allArrive` checks against the same list that each declared turn of `frameSteps`, in each
-panel's own coordinates, carries key `k` onto key `k + 1` exactly. The words' pins are in
+panel's own coordinates, carries key `k` onto key `k + 1` exactly (and that the steps of an idle letter only fade its mark
+in and out). The words' pins are in
 `TDCSGTests/FramePair.lean`. The variants: the word and radius, the right panel (`R1` centres with
-riding disks, `R2` centres and edge, `R3` with the centre-graph edge), trails (dots, or arcs of the
-paths the centres swept), a full-size left panel, the mark of an idle letter (a dashed outline over
-its disk, or a ring about its centre) and the views (both panels of one width, each cropped to its
+riding disks, `R2` centres and edge, `R3` with the centre-graph edge, one edge that turns with the
+body while both centres stay in the window), trails (dots, or arcs of the paths the centres swept;
+the last `trailLength` positions, three by default, or all), a full-size left panel, the mark of an
+idle letter (a dashed ring about its centre, or a dashed circle just outside its disk) and the
+views (both panels of one width, each cropped to its
 extent, or side by side with a wider right panel; one unit length throughout). To look at them
 (outside the repository; nothing goes into the site):
 
@@ -180,8 +184,8 @@ writes the keys of both panels (light, dark, narrow) and contact sheets `DIR/<va
 and prints the disks' diameters in pixels.
 
 `TDCSGFigures/FramePairMotion.lean` animates the keys: `FramePairConfig.motion` is a PILean
-`MotionPanels`, the two panels side by side in one SVG on one clock, one step per letter, the
-moves those of `frameSteps` (the point turns in the left panel, the body of centres in the
+`MotionPanels`, the two panels side by side in one SVG on one clock, one step per letter that acts
+and two per letter that does not, the moves those of `frameSteps` (the point turns in the left panel, the body of centres in the
 right, idle marks and trails fade in and out), checked by PILean's engine (arrival within 0.01 px,
 the rests against the key stills, the written SVG against the baked frames, nothing leaving its
 panel while it turns). The exact pins above say that the declared moves carry each key onto the
@@ -194,8 +198,9 @@ lake exe tdcsg-figure-preview --motion-variants DIR
 
 writes one animated SVG per variant and rendition (wide, narrow, light, dark) at a canonical
 pacing to `DIR/svg`, `DIR/variants.json`, and `DIR/index.html`, a page that plays the chosen
-variant re-timed (turn, hold, idle step, first and last hold, seam, easing, speed), scrubs
-through the loop, shows the stills, and prints the chosen values as Lean to copy. `DIR/check`
+variant re-timed (turn, hold, the fade of an idle mark, first and last hold, seam, easing, speed),
+scrubs through the loop, shows the stills, and prints the chosen values as Lean to copy; with the
+system's reduced-motion setting on it says so and still plays. `DIR/check`
 holds the files of PILean's browser check, `python3 tools/motion-browser-check.py DIR/check`
 from a PILean checkout.
 

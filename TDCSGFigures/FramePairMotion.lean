@@ -9,20 +9,21 @@ import TDCSGFigures.FramePair
 
 The key figures of the frame pair (`FramePairConfig.keys`) as a `PILean.Plane.MotionPanels`: the
 traditional view (left) and the moving frame (right) side by side in one picture, one step per
-letter of the word, both panels moving at once (`FramePairConfig.motion`).
+letter that acts and two per letter that does not (its mark appears, then vanishes), both panels
+moving at once (`FramePairConfig.motion`).
 
 * **Moves.** The moves of each step are those of `FramePairConfig.frameSteps`, in each panel's own
   coordinates: in the left panel the actor `"point"` turns by the step's exact `leftTurn` (about
   the centre of the letter's disk, by `-1/5` for `a` and `b`, `1/5` for their inverses); in the
-  right panel the turning actors of the body (the edge, the other centre and its riding disk) turn
-  about the active centre by `rightTurn`; the actors the step's key adds or drops (the mark of an
-  idle letter, trail marks, the edge of the centre graph) appear or vanish. A panel whose step has
-  no move idles while the other moves.
+  right panel the turning actors of the body (the edge, the other centre and its riding disk, and
+  the centre-graph edge while it stays shown) turn about the active centre by `rightTurn`; the
+  actors the step's key adds or drops (the mark of an idle letter, trail marks, the edge of the
+  centre graph) appear or vanish. A panel whose step has no move idles while the other moves.
 * **Timing.** Every step gets its duration from the pacing explicitly (`MotionPanels.timing`): a
-  letter that acts takes `Pacing.turn` with `Pacing.easing`; a letter that does not act takes
-  `Pacing.idle`, not eased (its mark fades in, nothing turns). So the pacing's `turn`, `idle`,
-  `hold`, `firstHold`, `lastHold`, `easing` and `seam` are the whole timing, and `fade` and
-  `slide` play no part.
+  letter that acts takes `Pacing.turn` with `Pacing.easing`; the mark of a letter that does not act
+  fades in and later out in `Pacing.fade` each, not eased, and is held in between for `Pacing.hold`
+  like any key. So the pacing's `turn`, `fade`, `hold`, `firstHold`, `lastHold`, `easing` and
+  `seam` are the whole timing, and `idle` and `slide` play no part.
 * **Views.** No key sets a view of its own: the engine lays each panel out in one view for all its
   keys and for what its turns sweep (`Motion.sweptItems`), at one unit length in both panels
   (`PanelScale.common`); a full-size left panel is drawn at half the unit length of the right
@@ -76,11 +77,11 @@ def wordText : String :=
     | .a => "a" | .b => "b" | .aInv => "A" | .bInv => "B")
 
 /-- The timing of each step under `pacing`: `turn` with the pacing's easing for a letter that
-acts, `idle` and not eased for one that does not. -/
+acts, `fade` and not eased for the mark of one that does not appearing or vanishing. -/
 def stepTimings (pacing : Pacing) : Array PanelTiming :=
   cfg.frameSteps.toArray.map fun s =>
     if s.acts then { duration := some pacing.turn, easing := some pacing.easing }
-    else { duration := some pacing.idle, easing := some .linear }
+    else { duration := some pacing.fade, easing := some .linear }
 
 /-- The frame pair as two panels on one clock under `pacing` (see the module docstring), in the
 house style's dark twin when `dark`. -/
@@ -116,7 +117,7 @@ def motionWith (pacing : Pacing) (dark : Bool := false) : MotionPanels :=
                 s!"two frames on one clock. Left: {leftText} turns a fifth of a turn about " ++
                 "the center of the disk of each letter that acts. Right: " ++ rightText ++
                 " turns a fifth of a turn the other way about the active center. A letter " ++
-                "that does not act is marked and nothing moves." }
+                "that does not act is marked while nothing moves." }
     checks := .fail
     gap
     scale := if cfg.left == .full then .independent else .common
