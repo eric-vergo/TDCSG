@@ -92,7 +92,7 @@ root = "TDCSGFigures.Preview"
 # words for the figures that neither the figures library nor the blueprint builds.
 [[lean_lib]]
 name = "TDCSGTests"
-roots = ["TDCSGTests.FrameWords"]
+roots = ["TDCSGTests.FrameWords", "TDCSGTests.FramePair"]
 
 [[lean_exe]]
 name = "tdcsg-test"
