@@ -158,6 +158,27 @@ in `TDCSGFigures/Lift.lean`, other candidate words in `TDCSGTests/FrameWords.lea
 lake env lean scripts/FrameWords.lean
 ```
 
+`TDCSGFigures/FramePair.lean` draws the two frames as key figures for an animation, one pair per
+rest of a word. `FramePairConfig.actorsAt` lists, for each panel and key, every moving item (an
+actor) with its id, its kind of drawing, its stable base title and its exact anchor points; the
+key figures (`halvedKey`, `centreKey`, in their views with legends by `keys`) draw the actors from
+it, and `allArrive` checks against the same list that each declared turn of `frameSteps`, in each
+panel's own coordinates, carries key `k` onto key `k + 1` exactly. The words' pins are in
+`TDCSGTests/FramePair.lean`. The variants: the word and radius, the right panel (`R1` centres with
+riding disks, `R2` centres and edge, `R3` with the centre-graph edge), trails (dots, or arcs of the
+paths the centres swept), a full-size left panel, the mark of an idle letter (a dashed outline over
+its disk, or a ring about its centre) and the views (both panels of one width, each cropped to its
+extent, or side by side with a wider right panel; one unit length throughout). To look at them
+(outside the repository; nothing goes into the site):
+
+```sh
+lake exe tdcsg-figure-preview --frame-pair-keys DIR --word aababaabbabb --variant R3 --trails \
+  --view wide-right
+```
+
+writes the keys of both panels (light, dark, narrow) and contact sheets `DIR/<variant>/sheet*.html`,
+and prints the disks' diameters in pixels.
+
 ### Drawing figures in a worktree
 
 The folder `figures/` is a small Lake workspace that builds `TDCSGFigures` and the preview tool
