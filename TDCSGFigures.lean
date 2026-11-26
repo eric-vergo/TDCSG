@@ -32,8 +32,10 @@ chapter 3, `TDCSGFigures.Lift`, `TDCSGFigures.Lens`, `TDCSGFigures.Levels` and
 `TDCSGFigures.Confinement` for chapters 4 to 7, and `TDCSGFigures.OtherOrders` for chapter 9.
 `TDCSGFigures.ProofDiagrams` draws the interval exchange, the coordinate bounds and the
 classification at the critical radius. `TDCSGFigures.FramePair` holds the key figures of the two
-frames of chapter 4 for an animation, and `TDCSGFigures.FramePairMotion` animates them as two
-panels on one clock (neither yet a figure of the site). The library needs neither
+frames of chapter 4, and `TDCSGFigures.FramePairMotion` animates them as two panels on one clock
+(`TDCSGFigures.Lift.framePair`, an animation of the site). The animations are marked
+`@[figure illustration]`: no theorem is linked to them, and the data of their key frames are
+stated on the page of the figures' theorems. The library needs neither
 Mathlib nor Verso. The specification theorem `<name>_spec` of each figure,
 which writes out what it draws, is stated and proved on the blueprint's page of the figures'
 theorems, `TDCSGFigureTheorems`, and attached to the figure there.

@@ -29,6 +29,13 @@ lettering, the color values and the pixels. PILean attaches each theorem to its 
 `figure_links`, which accepts only a theorem whose statement names the figure and which depends on
 no axiom beyond `propext`, `Classical.choice` and `Quot.sound`.
 
+The animations (the three words of chapter 3 and the frame pair of chapter 4) are illustrations:
+no theorem is linked to them. Each is drawn from exact key frames, which its stills show; between
+two key frames the browser turns the drawn items about the stated centres, and that motion is not
+part of any statement. What the key frames show, and that each declared turn carries one key frame
+onto the next exactly, is stated here as a plain theorem about the data they are drawn from
+(`TDCSGFigures.wordLoop_keys`, `TDCSGFigures.Lift.framePair_keys`).
+
 The theorems are not statements of the proof, and they are not nodes of the dependency graph.
 
 # The figures of the front page
@@ -577,32 +584,28 @@ figure_links chordPieces chordPieces_spec
 end TDCSGFigures
 ```
 
-{figref "word-trace"}[]: the figure `TDCSGFigures.wordTrace`
-and its theorem `TDCSGFigures.wordTrace_spec`.
+{figref "word-loop-1"}[], {figref "word-loop-2"}[] and {figref "word-loop-3"}[]: the animations
+`TDCSGFigures.wordLoop1`, `TDCSGFigures.wordLoop2` and `TDCSGFigures.wordLoop3`, illustrations, and
+the data of their key frames, `TDCSGFigures.wordLoop_keys`.
 
 ```Verso.Genre.Manual.InlineLean.lean
 namespace TDCSGFigures
 
 open PILean PILean.Plane PILean.Exact TDCSGFigures.Early
 
-/-- What `wordTrace` shows, frame by frame, and why. It is the stepper of `traceFrame 1`,
-`traceFrame 2`, `traceFrame 3` with the captions written out. Frame `i` draws the two disks and
-their lens, the chord thin, and the segments `[w_k(p), w_k(q)]` of `wordPath i` for
-`k = 0, 1, …`: the piece `[p, q]` of word `i` (`k = 0`, dashed), its images after `k` letters, the
-last one on the chord; each labelled `k`; and the ends lying on a boundary circle before a letter
-(`wordEqualities i`), each recording exactly where it stands relative to both disks and the lens.
-The images are written out in the basis `1, ζ, ζ², ζ³`. Before every letter both current ends
-lie in the letter's closed disk of radius `R` (`wordChecks`), so the letter turns the whole
-segment, as in `TDCSG.Five.applyWord_chord`; the tests that hold with equality are those before
-letters 3, 4 of word 1, letters 2, 3 of word 2 and letters 1, 2, 5, 6 of word 3. The last images
-are the pieces moved by `(2φ - 2)E` (words 1, 2) and `(2φ - 4)E` (word 3). Not stated: the
-layout, the lettering, the style's colour values and the pixels. -/
-theorem wordTrace_spec :
-    wordTrace = Plane.stepper (traceCaptions.mapIdx fun k c => (c, traceFrame (k + 1))) ∧
-    traceCaptions = #[
-        "word 1 = a⁻¹ a⁻¹ b⁻¹ a⁻¹ b⁻¹ moves its piece by (2φ − 2)E",
-        "word 2 = a b a b b moves its piece by (2φ − 2)E",
-        "word 3 = a b a b⁻¹ a⁻¹ b⁻¹ moves its piece by (2φ − 4)E"] ∧
+/-- The data that the key frames of the three loops are drawn from. Key `k` of word `i`
+(`wordKey i k`) draws the image `[w_k(p), w_k(q)]` of the piece `[p, q]` of word `i` after `k`
+letters (`wordPath i`), here written out in the basis `1, ζ, ζ², ζ³`, over the disks, their lens,
+the chord and the piece; the ends lying on a boundary circle before a letter (`wordEqualities i`)
+are marked in the key that shows them. Before every letter both current ends lie in the letter's
+closed disk of radius `R` (`wordChecks`), so the letter turns the whole segment, as in
+`TDCSG.Five.applyWord_chord`, and its turn about its centre, the move declared between key `k`
+and key `k + 1` (`wordStep i k`), carries both ends of image `k` exactly onto those of image
+`k + 1` (`wordTurnsArrive`); the tests that hold with equality are those before letters 3, 4 of
+word 1, letters 2, 3 of word 2 and letters 1, 2, 5, 6 of word 3. The last images are the pieces
+moved by `(2φ - 2)E` (words 1, 2) and `(2φ - 4)E` (word 3). Not stated: the drawing, the timing
+and the frames the browser draws between the key frames. -/
+theorem wordLoop_keys :
     (wordPath 1 == [(⟨#[0, -1, 1, 0]⟩, ⟨#[-1, 1, -1, 1]⟩), (⟨#[-1, 1, -1, 1]⟩, ⟨#[-2, -1, 0, -2]⟩),
       (⟨#[-2, -1, 0, -2]⟩, ⟨#[1, 1, 1, 2]⟩), (⟨#[3, -1, 1, 2]⟩, ⟨#[-1, -2, -1, -1]⟩),
       (⟨#[-3, 2, -3, -1]⟩, ⟨#[0, 1, -1, 0]⟩), (⟨#[2, -3, 3, -2]⟩, ⟨#[1, -1, 1, -1]⟩)]) = true ∧
@@ -614,6 +617,7 @@ theorem wordTrace_spec :
       (⟨#[-1, -1, -1, -2]⟩, ⟨#[3, -1, 1, 2]⟩), (⟨#[1, 2, 1, 1]⟩, ⟨#[-3, 2, -3, -1]⟩),
       (⟨#[0, -1, 1, 0]⟩, ⟨#[2, -3, 3, -2]⟩)]) = true ∧
     wordChecks 1 = true ∧ wordChecks 2 = true ∧ wordChecks 3 = true ∧
+    wordTurnsArrive 1 = true ∧ wordTurnsArrive 2 = true ∧ wordTurnsArrive 3 = true ∧
     (wordEqualities 1).map (·.1) = [2, 3] ∧ (wordEqualities 2).map (·.1) = [1, 2] ∧
     (wordEqualities 3).map (·.1) = [0, 1, 4, 5] ∧
     ((wordPath 1).getLast? == some (-chordEnd + (phiInv + phiInv) * chordEnd,
@@ -622,11 +626,8 @@ theorem wordTrace_spec :
       cutG + (phiInv + phiInv) * chordEnd)) = true ∧
     ((wordPath 3).getLast? == some (cutG + (phiInv + phiInv) * chordEnd - Zeta5.ofInt 2 * chordEnd,
       chordEnd + (phiInv + phiInv) * chordEnd - Zeta5.ofInt 2 * chordEnd)) = true := by
-  refine ⟨rfl, rfl, ?_⟩
   repeat' apply And.intro
   all_goals decide +kernel
-
-figure_links wordTrace wordTrace_spec
 
 end TDCSGFigures
 ```
@@ -917,40 +918,41 @@ figure_links unitSteps unitSteps_spec
 end TDCSGFigures.Lift
 ```
 
-{figref "change-of-frame"}[]: the figure `TDCSGFigures.Lift.changeOfFrame`
-and its theorem `TDCSGFigures.Lift.changeOfFrame_spec`.
+{figref "frame-pair"}[]: the animation `TDCSGFigures.Lift.framePair`, an illustration, and the
+data of its key frames, `TDCSGFigures.Lift.framePair_keys`.
 
 ```Verso.Genre.Manual.InlineLean.lean
 namespace TDCSGFigures.Lift
 
 open PILean PILean.Plane PILean.Exact TDCSGFigures
 
-/-- What `changeOfFrame` shows. It is the stepper of `frames`, one frame for each of the states
-after `0, 1, 2, 3, 4` of the letters `a, b, a, b` applied to `z = 0` at `r = 1.95`: frame `k` is
-`frame k` with the caption `stepCaption k`. The states are computed exactly: the points
-`y₀ = 0, y₁, …, y₄` of `ℤ[ζ₅]`, the labels `n` of the current left centre
-`0, 0, e₁ - e₂, e₁ - e₂, e₁ - e₂ + e₃ - e₄` and the direction indices `j = 0, 1, 2, 3, 4`; every
-letter acts (the exact disk test `Early.Letter.covers` holds), and every state satisfies the
-framing equation `2 (x - P(n)) = ζʲ (y + 1)` of `TDCSG.Five.Framed` exactly. The current left and
-right centres `P(n)` and `P(n + eⱼ)` drawn in the moving frame lie in the window in every state,
-as the chapter's invariant requires of an acting letter's centre. Not stated: the items of each
-frame (built by `frame` from these data), the layout and the pixels. -/
-theorem changeOfFrame_spec :
-    changeOfFrame = Plane.stepper frames ∧
-    frames = (List.range 5).toArray.map (fun k =>
-      (stepCaption k (states.getD k ⟨origin, zeroLabel, 0, true⟩), frame k)) ∧
-    word = [.a, .b, .a, .b] ∧
-    (states.map (·.n) == [#[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 1, -1, 0, 0],
-      #[0, 1, -1, 0, 0], #[0, 1, -1, 1, -1]]) = true ∧
-    states.map (·.j) = [0, 1, 2, 3, 4] ∧
-    states.all (·.acted) = true ∧ states.all State.framed = true ∧
-    states.all (fun s => inWindow radiusSq centreX s.n &&
-      inWindow radiusSq centreX (shift s.n s.j 1)) = true := by
-  refine ⟨rfl, rfl, rfl, ?_⟩
+/-- The data that the key frames of `framePair` are drawn from (`FramePairConfig.keys` of the
+default configuration): the word `a a b a b a a b b a b b` applied to `z = 0` at `r = 1.95`, and
+its states after `0, 1, …, 12` letters, computed exactly: the labels `n` of the current left
+centre and the direction indices `j`, written out; the letters `3`, `5` and `10` do not act, every
+other letter does (the exact disk test `Early.Letter.covers`); every state satisfies the framing
+equation `2 (x - P(n)) = ζʲ (y + 1)` of `TDCSG.Five.Framed` exactly. The animation has sixteen
+keys, one per state and one more for each letter that does not act, which shows its ring; and
+every declared move, a fifth of a turn of the point about the centre of the letter's halved disk
+on the left, of the body of centres and riding disks about the active centre on the right, or a
+ring appearing or vanishing, carries the items of one key onto those of the next exactly in
+`ℚ(ζ₅)` (`FramePairConfig.allArrive`; the general statements are `TDCSG.Five.halved_genA`,
+`TDCSG.Five.halved_genB` and `TDCSG.Five.framePicture_genA_genB`). Not stated: the drawing, the
+timing and the frames the browser draws between the key frames. -/
+theorem framePair_keys :
+    word = [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b] ∧ radius = 39 / 20 ∧
+    ({} : FramePairConfig).word = word ∧ ({} : FramePairConfig).radius = radius ∧
+    (states.map (·.n) == [#[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0],
+      #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[1, -1, 0, 0, 0],
+      #[1, 0, -1, 0, 0], #[1, 0, -1, 0, 0], #[1, 0, 0, -1, 0], #[1, 0, 0, 0, -1]]) = true ∧
+    states.map (·.j) = [0, 1, 2, 2, 3, 3, 4, 0, 1, 2, 2, 3, 4] ∧
+    states.map (·.acted) =
+      [true, true, true, false, true, false, true, true, true, true, false, true, true] ∧
+    states.all State.framed = true ∧
+    ({} : FramePairConfig).keyCount = 16 ∧ ({} : FramePairConfig).allArrive = true := by
+  refine ⟨rfl, rfl, rfl, rfl, ?_⟩
   repeat' apply And.intro
   all_goals decide +kernel
-
-figure_links changeOfFrame changeOfFrame_spec
 
 end TDCSGFigures.Lift
 ```

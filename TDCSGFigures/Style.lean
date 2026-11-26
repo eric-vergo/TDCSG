@@ -31,6 +31,7 @@ green.
 * `partTwoStyle`, with the roles `windowRole` and `goodRole` of the figures of Part II.
 * `radiusStyle`, with the roles `finiteRole` and `infiniteRole` of the radius line.
 * `figureWidth`, `narrowWidth`: the page widths of a figure and of its narrow rendition.
+* `motionPacing`: the timing of the animations.
 -/
 
 namespace TDCSGFigures
@@ -74,6 +75,13 @@ def figureWidth : Float := 600
 
 /-- The width of a figure's narrow rendition, for screens up to 560 pixels wide. -/
 def narrowWidth : Float := 340
+
+/-- The timing of the animations: a turn in 1.6 s, eased in and out (`spline 0.45 0 0.55 1`);
+each key held 0.9 s, the first 2 s and the last 2.5 s; a mark that only appears or vanishes fading
+in 0.4 s; the loop closed by a crossfade of 0.4 s. -/
+def motionPacing : PILean.Anim.Pacing :=
+  { turn := 1.6, fade := 0.4, hold := 0.9, firstHold := 2, lastHold := 2.5,
+    easing := .spline 0.45 0 0.55 1, seam := .crossfade 0.4 }
 
 /-! ### Roles of the figures of Part II -/
 

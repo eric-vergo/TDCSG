@@ -73,15 +73,30 @@ endpoints are the claimed translates, and the composite of rotations is the tran
 them. The kernel decides every check.
 :::
 
-:::figure_explorer TDCSGFigures.wordTrace (label := "word-trace") (links := TDCSGFigures.wordTrace_spec) (alt := "Three frames, one per word. Each shows a piece of the chord, dashed, numbered 0, and its images after each letter, numbered by the letters applied, until the last image lies on the chord again.")
-Follow each word from left to right. The ring marks the active center. An inverse letter turns
-counterclockwise. The interval under each animation records the starting piece and its landing.
-The still traces show the same journey all at once. The piece of the chord that word $`i` acts
-on is numbered 0 and drawn dashed; its image after $`k` letters is numbered $`k`, and the last image
-lies on the chord again, moved by $`(2\varphi-2)E` for the first two words and by $`(2\varphi-4)E`
-for the third. Before every letter both ends of the current segment lie in that letter's closed
-disk, so the letter turns the whole segment; the marked ends lie on a boundary circle, where a disk
-test holds with equality.
+{figref "word-loop-1"}[], {figref "word-loop-2"}[] and {figref "word-loop-3"}[] follow the three
+words letter by letter. The piece of the chord stays, dashed; a copy of it turns a fifth of a turn
+about $`-1` or $`+1` for each letter, clockwise for $`a` and $`b` and counterclockwise for their
+inverses, until it lies on the chord again. A small circle marks the center of the last turn.
+Before every letter both ends of the current segment lie in that letter's closed disk, so the
+letter turns the whole segment; a dot marks an end that lies on a boundary circle, where the disk
+test of the next letter holds with equality. The key frames, the images after each letter, are
+exact; between them the browser turns the segment about the stated center.
+
+:::figure TDCSGFigures.wordLoop1 (label := "word-loop-1") (alt := "Two crossing circles about minus one and one, their lens and the chord. A short segment at the left end of the chord turns five times by a fifth of a turn, about minus one or one, and lands on the chord further right.")
+Word 1, $`a^{-1}a^{-1}b^{-1}a^{-1}b^{-1}`, carries the piece $`[-E,(1-\varphi)E]` back into the
+chord, moved by $`(2\varphi-2)E`. Every letter turns counterclockwise. Two ends touch a boundary
+circle, before the third and the fourth letter.
+:::
+
+:::figure TDCSGFigures.wordLoop2 (label := "word-loop-2") (alt := "Two crossing circles about minus one and one, their lens and the chord. A segment in the middle of the chord turns five times by a fifth of a turn, about minus one or one, and lands on the chord beside the landing of the first word.")
+Word 2, $`ababb`, carries the piece $`[(1-\varphi)E,(3-2\varphi)E]` back into the chord, moved
+by $`(2\varphi-2)E`, and lands beside the image of the first piece. Every letter turns clockwise.
+:::
+
+:::figure TDCSGFigures.wordLoop3 (label := "word-loop-3") (alt := "Two crossing circles about minus one and one, their lens and the chord. The longest segment, at the right end of the chord, turns six times by a fifth of a turn, three times clockwise and then three times counterclockwise, and lands on the chord at its left end.")
+Word 3, $`abab^{-1}a^{-1}b^{-1}`, carries the piece $`[(3-2\varphi)E,E]` back into the chord,
+moved by $`(2\varphi-4)E`: it changes direction after the third letter, and its landing wraps
+around the end of the interval.
 :::
 
 :::figure TDCSGFigures.exchangedIntervals (label := "exchanged-intervals") (inline := true) (links := TDCSGFigures.exchangedIntervals_spec) (alt := "Before the return the pieces read 1, 2, 3. After the return they read 3, 1, 2 on the same interval.")

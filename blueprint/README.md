@@ -73,7 +73,11 @@ fingerprints and the source record of each file, and fails the build when a figu
 
 A chapter shows a figure with `:::figure` (inline, so that the picture follows the page's theme
 and its elements link to Lean) or `:::figure_explorer` (a slider or stepper), with a label, a text
-alternative, the theorem it proves and the caption as the body. Figures are numbered as the
+alternative, the theorem it proves and the caption as the body. An animation (a PILean
+`MotionPanels` marked `@[figure illustration]`) is shown with `:::figure` too, always inline: it
+loops on its own clock with no controls and no script, and shows its key frames as stills, each
+with its caption, while it is hovered or focused, when the reader turns animations off with the
+switch beside the theme control or the system asks for reduced motion, and in print. Figures are numbered as the
 Blueprint numbers its statements: "Figure 5.1" is the first figure of chapter 5, and the figures
 of the unnumbered pages (the front page and the two part pages) are numbered 1 to 4. Prose refers
 to a figure by its label, `{figref "lens-estimate"}[]`, which renders its current number.
@@ -95,26 +99,41 @@ Blueprint statements, so they add no node to the dependency graph and are not pa
 replay; `lake build TDCSGBlueprint` checks them.
 
 `scripts/check-pages.py` reads the manifest, requires a visible numbered caption, an accessible
-name and gapless numbering, allows no other image in the pages, follows the Lean links, and runs
-`lake exe pilean-verify`, the inline-picture check of PILean's Verso adapter and a fresh render of
-the figures compared with the site's folder.
+name and gapless numbering, allows no other image in the pages, follows the Lean links, requires
+every animation to be recorded as checked strictly (`checks` `fail`, no error left) with its narrow
+rendition and the files of its stills, and runs `lake exe pilean-verify` and the site checks of
+PILean's Verso adapter: every inline picture, moving ones included, against its file
+(`inline_check.py`), nothing active in a figure or an animation (`markup_check.py`), each figure's
+page against the manifest, with an animation's words, its table of steps and its captioned stills
+(`page_check.py`); and a fresh render of the figures compared with the site's folder.
 
-Chapter 3 progressively enhances the three PILean frames of `wordTrace` with a looping
-illustration for each word. The player turns each rendered segment about the active center and
-snaps to the next checked path at the end of the letter. The generator supplies the letters and
-interval coordinates from Lean. The original numbered traces remain available in the chapter.
-With reduced motion, each word has a labeled still for every turn.
-
-With the site served locally and Playwright Core available to Node, run the browser check against
-the site root (including its prefix if it has one):
+`scripts/check-motion.py` checks the animations in a headless Chromium against exact expectations
+written from Lean, with PILean's browser checks (its docstring lists them). It needs Playwright for
+Python with its Chromium:
 
 ```sh
-node scripts/check-word-motion.cjs http://localhost:8000/
+lake exe tdcsg-motion-out /tmp/motion-out
+python3 scripts/check-pages.py _out/site/html-multi
+python3 scripts/check-motion.py _out/site/html-multi /tmp/motion-out [SHOTS]
 ```
 
-Set `CHROMIUM` to an installed Chromium executable when using a browser outside Playwright's cache.
-The check compares both ends of every animated turn with the checked PILean paths, follows the
-chapter links and exercises playback, offscreen suspension, mobile widths and reduced motion.
+The release workflow runs both after the build.
+
+### Animations
+
+The three words of chapter 3 (`TDCSGFigures.wordLoop1`, `wordLoop2`, `wordLoop3` in
+`TDCSGFigures/Chord.lean`) and the frame pair of chapter 4 (`TDCSGFigures.Lift.framePair` in
+`TDCSGFigures/FramePairMotion.lean`) are animations drawn by PILean from exact key frames: each key
+is a `Plane.Figure` of exact data, and each step between two keys declares its moves, a turn of
+named items by a fifth of a full turn about an exact centre, or an item that appears or vanishes.
+PILean checks, at the strict level, that each declared turn carries one key onto the next, that
+every rest shows its key's still and that the written SVG draws what its plan says; the site
+build refuses an animation not checked strictly. The animations share one timing,
+`TDCSGFigures.motionPacing` in `TDCSGFigures/Style.lean`. They are illustrations: no theorem is
+linked to them, and the data of their key frames are stated on the page of the figures' theorems
+(`wordLoop_keys`, `framePair_keys`). The site ships no script of its own for them: the moving
+pictures are SMIL in the page, and what hides them is the stylesheet of PILean's adapter and the
+motion switch of Verso Blueprint.
 
 ### Adding a figure
 
@@ -141,68 +160,50 @@ chapter links and exercises playback, offscreen suspension, mobile widths and re
    (links := TDCSGFigures.name_spec) (alt := "…")` or `:::figure_explorer`, the caption as the
    body; the chapter imports `TDCSGFigureTheorems`.
 
+An animation is a `Plane.MotionPanels` (one panel, or several on one clock) whose keys are drawn
+as in step 2 and whose steps declare their moves, with `pacing := motionPacing`,
+`checks := .fail`, `width := figureWidth` and `narrowWidth := some narrowWidth`, marked
+`@[figure illustration]`; its captions, one per key, carry no counter ("Step k of N" is added by
+the page). State the data of its key frames in a plain theorem on the page of the figures'
+theorems, add it to `previews` and to `motions` in `TDCSGTests/MotionOut.lean`, and show it with
+`:::figure TDCSGFigures.name (label := "…") (alt := "…")`.
+
 ### The frame pair for other words
 
-The two frames of chapter 4 (`changeOfFrame`) are computed by `TDCSGFigures.Lift.statesFor` in
+The two frames of chapter 4 are computed by `TDCSGFigures.Lift.statesFor` in
 `TDCSGFigures/Data/Frames.lean` for any squared radius in `ℚ(√5)`, starting point of `ℤ[ζ₅]` and
 word in `a`, `b`, `a⁻¹`, `b⁻¹`. `stepsHold` checks the geometry of every step exactly; the general
 statements are `TDCSG.Five.framePicture_genA_genB`, `framePicture_symm`, `two_mul_sub_proj_genA`,
 `two_mul_sub_proj_genB`, `halved_genA` and `halved_genB`. `wordReport` lists, letter by letter,
 whether a letter acts and the exact margin of its disk's centre against the window, and how far the
 orbit reaches in both frames; `wordSummary` collects what a pin states. The figure's word is pinned
-in `TDCSGFigures/Lift.lean`, other candidate words in `TDCSGTests/FrameWords.lean`, which
-`lake test` builds. `scripts/FrameWords.lean`, outside every build, searches the words in `a` and
-`b` at `r = 1.95` for words with letters that do not act and for words whose orbit closes:
+in `TDCSGFigures/Lift.lean`, other words in `TDCSGTests/FrameWords.lean`, which `lake test` builds.
+`scripts/FrameWords.lean`, outside every build, searches the words in `a` and `b` at `r = 1.95` for
+words with letters that do not act and for words whose orbit closes:
 
 ```sh
 lake env lean scripts/FrameWords.lean
 ```
 
-`TDCSGFigures/FramePair.lean` draws the two frames as key figures for an animation, one pair per
-rest of a word: one key per state, and for a letter that does not act one more key, which shows
-its mark before the state's own key, so that the mark appears and vanishes while nothing turns. `FramePairConfig.actorsAt` lists, for each panel and key, every moving item (an
-actor) with its id, its kind of drawing, its stable base title and its exact anchor points; the
-key figures (`halvedKey`, `centreKey`, in their views with legends by `keys`) draw the actors from
-it, and `allArrive` checks against the same list that each declared turn of `frameSteps`, in each
-panel's own coordinates, carries key `k` onto key `k + 1` exactly (and that the steps of an idle letter only fade its mark
-in and out). The words' pins are in
-`TDCSGTests/FramePair.lean`. The variants: the word and radius, the right panel (`R1` centres with
-riding disks, `R2` centres and edge, `R3` with the centre-graph edge, one edge that turns with the
-body while both centres stay in the window), trails (dots, or arcs of the paths the centres swept;
-the last `trailLength` positions, three by default, or all), a full-size left panel, the mark of an
-idle letter (a dashed ring about its centre, or a dashed circle just outside its disk) and the
-views (both panels of one width, each cropped to its
-extent, or side by side with a wider right panel; one unit length throughout). To look at them
+`TDCSGFigures/FramePair.lean` draws the two frames as key figures for any word and radius
+(`FramePairConfig`, whose defaults are the figure): one key per state, and for a letter that does
+not act one more key, which shows its ring before the state's own key, so that the ring appears
+and vanishes while nothing turns. `FramePairConfig.actorsAt` lists, for each panel and key, every
+moving item (an actor) with its id, its kind of drawing, its stable base title and its exact
+anchor points; the key figures draw the actors from it, and `allArrive` checks against the same
+list that each declared turn of `frameSteps`, in each panel's own coordinates, carries key `k` onto
+key `k + 1` exactly. `TDCSGFigures/FramePairMotion.lean` makes the keys a PILean `MotionPanels`,
+the two panels side by side in one SVG on one clock (stacked at the narrow width). The pins of
+other words are in `TDCSGTests/FramePair.lean`. To look at the frame pair of another word
 (outside the repository; nothing goes into the site):
 
 ```sh
-lake exe tdcsg-figure-preview --frame-pair-keys DIR --word aababaabbabb --variant R3 --trails \
-  --view wide-right
+lake exe tdcsg-figure-preview --frame-pair aababb --out DIR
 ```
 
-writes the keys of both panels (light, dark, narrow) and contact sheets `DIR/<variant>/sheet*.html`,
-and prints the disks' diameters in pixels.
-
-`TDCSGFigures/FramePairMotion.lean` animates the keys: `FramePairConfig.motion` is a PILean
-`MotionPanels`, the two panels side by side in one SVG on one clock, one step per letter that acts
-and two per letter that does not, the moves those of `frameSteps` (the point turns in the left panel, the body of centres in the
-right, idle marks and trails fade in and out), checked by PILean's engine (arrival within 0.01 px,
-the rests against the key stills, the written SVG against the baked frames, nothing leaving its
-panel while it turns). The exact pins above say that the declared moves carry each key onto the
-next; the engine's checks say that the picture draws those moves. To compare the variants in
-motion and choose a pacing (outside the repository; nothing goes into the site):
-
-```sh
-lake exe tdcsg-figure-preview --motion-variants DIR
-```
-
-writes one animated SVG per variant and rendition (wide, narrow, light, dark) at a canonical
-pacing to `DIR/svg`, `DIR/variants.json`, and `DIR/index.html`, a page that plays the chosen
-variant re-timed (turn, hold, the fade of an idle mark, first and last hold, seam, easing, speed),
-scrubs through the loop, shows the stills, and prints the chosen values as Lean to copy; with the
-system's reduced-motion setting on it says so and still plays. `DIR/check`
-holds the files of PILean's browser check, `python3 tools/motion-browser-check.py DIR/check`
-from a PILean checkout.
+writes its animated SVG (light and dark) and its key stills, wide and narrow, prints the engine's
+errors and notes and whether every declared move arrives exactly, and exits with status 1 if one
+fails.
 
 ### Drawing figures in a worktree
 
@@ -223,9 +224,10 @@ lake exe tdcsg-figure-preview --out out NAME     # every figure when no NAME is 
 ```
 
 The preview tool writes `out/NAME[-frame-K][-narrow][-dark].{svg,png}` (light, dark, narrow and
-narrow dark; each frame of an explorer as its slider shows it) and prints every layout problem
-of the figure at both widths, whatever its checks level; it exits with status 1 when there is
-one. The site build applies the same checks. `figures/lean-toolchain` must name the toolchain of
+narrow dark; each frame of an explorer as its slider shows it; for an animation its animated SVG
+and `NAME[-narrow]-key-K.{svg,png}`) and prints every layout problem of the figure at both
+widths, whatever its checks level; it exits with status 1 when there is one. The site build
+applies the same checks. `figures/lean-toolchain` must name the toolchain of
 the root `lean-toolchain`. The specification theorems are not part of this workspace: they live on
 the page `TDCSGFigureTheorems`, which needs Verso, and `lake build TDCSGBlueprint` checks them.
 

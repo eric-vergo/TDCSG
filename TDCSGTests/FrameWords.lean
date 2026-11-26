@@ -7,24 +7,24 @@ import TDCSGFigures.Lift
 /-!
 # Words for the frame pair of chapter 4
 
-Pins, by `decide +kernel`, of words in which some letters do not act, at `r = 1.95` from `z = 0`
+Pins, by `decide +kernel`, of words, most with letters that do not act, at `r = 1.95` from `z = 0`
 (`TDCSGFigures.Lift.radiusSq`): for each word one summary (`TDCSGFigures.Lift.wordSummary`) of its
 idle positions, the geometry of every step (`State.stepHolds`), whether the orbit closes and its
-squared extents `|(y + 1)/2|²` and `|P - x|²` in the two frames. These words are candidates for
-the figure, found by `scripts/FrameWords.lean`; the figure's own word is pinned in
-`TDCSGFigures.Lift`. This module is built by the test driver, not by the figures or the blueprint.
+squared extents `|(y + 1)/2|²` and `|P - x|²` in the two frames. These are other words for the
+frame pair, found by `scripts/FrameWords.lean`; the figure's own word, `a a b a b a a b b a b b`,
+is pinned in `TDCSGFigures.Lift.wordSummary_word`. This module is built by the test driver, not by
+the figures or the blueprint.
 -/
 
 namespace TDCSGTests.FrameWords
 
 open PILean.Exact TDCSGFigures.Lift TDCSGFigures.Early
 
-/-- `a a b a b a a b b a b b`: the letters `3`, `5` and `10` do not act; the orbit does not close;
-it reaches `|(y + 1)/2|² = |P - x|² = 3/2 + √5/4` (about `1.43²`), the squared distance of each
-idle letter's centre from `x`. -/
-theorem wordSummary_aababaabbabb :
-    wordSummary radiusSq [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b] =
-      ⟨[3, 5, 10], true, false, ⟨3 / 2, 1 / 4⟩, ⟨3 / 2, 1 / 4⟩⟩ := by
+/-- `a b a b`: every letter acts, every step has the geometry of `State.stepHolds`, the orbit does
+not close, and it reaches `|(y + 1)/2|² = 21/4 - 2√5` (about `0.88²`) and `|P - x|² = 3/2 - √5/4`
+(about `0.97²`). -/
+theorem wordSummary_abab :
+    wordSummary radiusSq [.a, .b, .a, .b] = ⟨[], true, false, ⟨21 / 4, -2⟩, ⟨3 / 2, -1 / 4⟩⟩ := by
   decide +kernel
 
 /-- `a b a b b a b`, `a b a b` continued: only the letter `6` does not act; the orbit does not

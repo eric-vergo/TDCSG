@@ -9,8 +9,12 @@ counter running 1, 2, … without gaps or repeats; no page may show any other im
 own page (`div.pilean-figure-page`) shows of its files. It runs PILean's
 checks: `pilean-verify` (the folder agrees with its manifest), the site check of PILean's Verso
 adapter (every inline picture is the body of a file the manifest lists, with the theme rules the
-manifest records) and a fresh render compared with the folder (`--check-figures`, through the
-site's generator).
+manifest records, a moving picture element for element), the markup check (nothing active in a
+figure, nothing at all in an animation), the figures' pages against the manifest (with an
+animation's words, its table of steps and its captioned stills), and a fresh render compared with
+the folder (`--check-figures`, through the site's generator). Every animation must be recorded as
+checked strictly (`checks` `fail`, `errorsLeft` 0), with a narrow rendition and exactly the files of
+its stills.
 With `--release` it also checks the hosted verification record, the source links at the verified
 commit, and that the site's kernel replay accepted every node and calls each judged theorem proved.
 """
@@ -78,6 +82,8 @@ class Resources(HTMLParser):
         # The open elements of the current PILean figure or figures list, and its record.
         self.pilean = None
         self.pilean_stack = []
+        # The depth of the open `div.pilean-motion` in the current figure, if any.
+        self.motion = None
         self.part = None
         self.hidden = 0
         # The open `div` elements inside a figure's own page (`div.pilean-figure-page`), whose
@@ -117,7 +123,11 @@ class Resources(HTMLParser):
                 fig["inline"] += 1
                 if attrs.get("role") == "img":
                     fig["names"].append(attrs.get("aria-label", ""))
-            if tag == "img":
+            if tag == "div" and "pilean-motion" in classes and self.motion is None:
+                self.motion = len(self.pilean_stack)
+            # The stills of an animation are pictures of its key frames with an empty `alt`: each
+            # still's caption, beside it, is its text, and the moving picture has the name.
+            if tag == "img" and self.motion is None:
                 fig["names"].append(attrs.get("alt", ""))
             if tag == "a" and "pilean-repo-link" in classes:
                 pilean_repo_links.add(attrs.get("href", ""))
@@ -138,6 +148,8 @@ class Resources(HTMLParser):
             self.hidden -= hid
             if self.part and len(self.pilean_stack) <= self.part[1]:
                 self.part = None
+            if self.motion is not None and len(self.pilean_stack) <= self.motion:
+                self.motion = None
             if open_tag == tag:
                 break
         if not self.pilean_stack:
@@ -285,9 +297,42 @@ assert not other_images, f"images outside PILean figures: {other_images}"
 
 # The figures drawn by PILean, against the manifest of the files the site build rendered.
 pilean_manifest = json.loads((pilean_dir / "manifest.json").read_text())
-assert pilean_manifest["format"] == "pilean-manifest-3", pilean_manifest["format"]
+assert pilean_manifest["format"] == "pilean-manifest-4", pilean_manifest["format"]
 manifest_decls = {entry["decl"] for entry in pilean_manifest["files"]}
 assert manifest_decls, "the PILean manifest lists no figure"
+
+
+def motion_files(stem, keys):
+    """The files of an animation of `keys` key frames written as `stem`: the animated SVG, its
+    narrow rendition, the still of each key at both widths, the contact sheet and the poster, each
+    with its dark twin."""
+    names = {f"{stem}{w}.svg" for w in ("", "-narrow")}
+    names |= {f"{stem}{w}-key-{k}.{x}" for w in ("", "-narrow") for k in range(keys)
+              for x in ("svg", "png")}
+    names |= {f"{stem}-keys.{x}" for x in ("svg", "png", "pdf")}
+    names |= {f"{stem}-poster.{x}" for x in ("png", "pdf")}
+    dark = {re.sub(r"\.(\w+)$", r"-dark.\1", n) for n in names}
+    return names | dark
+
+
+# Every animation is checked strictly and has its narrow rendition and the files of its stills.
+motions = {}
+for entry in pilean_manifest["files"]:
+    if entry.get("kind") == "motion":
+        motions.setdefault(entry["decl"], []).append(entry)
+for decl, entries in sorted(motions.items()):
+    first = entries[0]
+    assert all(e.get("checks") == "fail" and e.get("errorsLeft") == 0 and e.get("narrow") is True
+               for e in entries), f"{decl}: an animation not checked strictly or without its " \
+        f"narrow rendition: {first}"
+    assert all(e.get("standing") == "illustration" for e in entries), \
+        f"{decl}: an animation must be an illustration"
+    stem = first["path"].rsplit("/", 1)[0] + "/" + decl
+    paths = {e["path"] for e in entries}
+    want = motion_files(stem, first["keys"])
+    assert paths == want, f"{decl}: files missing {sorted(want - paths)[:4]}, " \
+        f"extra {sorted(paths - want)[:4]}"
+    assert first["captions"] == first["keys"], f"{decl}: one caption per key"
 shown = [fig["decl"] for _, fig in pilean_figures]
 assert set(shown) == manifest_decls, \
     f"figures in the pages {sorted(set(shown))} differ from the manifest's {sorted(manifest_decls)}"
@@ -331,6 +376,10 @@ out = run("the inline-picture check", ["python3", "-I", str(pilean_tests / "inli
 match = re.search(r"(\d+) of (\d+) inline pictures match", out)
 assert match and int(match.group(1)) == int(match.group(2)) == \
     inline_pictures + len(figure_page_inline) and inline_pictures > 0, out
+out = run("the markup check", ["python3", "-I", str(pilean_tests / "markup_check.py"), str(site)])
+match = re.search(r"(\d+) motions with nothing active", out)
+assert match and int(match.group(1)) >= len(motions), out
+run("the figures' pages", ["python3", "-I", str(pilean_tests / "page_check.py"), str(site)])
 out = run("the fresh render (--check-figures)",
           ["lake", "lean", "BlueprintMain.lean", "--", "--run", "BlueprintMain.lean",
            "--check-figures", str(pilean_dir)])
@@ -371,4 +420,4 @@ if "--release" in sys.argv[2:]:
         assert 1 <= int(match.group(2)) <= len(lines), f"{href}: line outside the file"
     check_repository_links(record["commit"], os.environ["GITHUB_RUN_ID"])
 print(f"Checked {len(pages)} pages and {len(pilean_figures)} PILean figures "
-      f"({inline_pictures} inline pictures) under {prefix}.")
+      f"({inline_pictures} inline pictures, {len(motions)} animations) under {prefix}.")
