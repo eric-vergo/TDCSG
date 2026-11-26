@@ -16,6 +16,13 @@ the light style and its dark twin). It prints every layout problem the figure's 
 checks level, and exits with status 1 if there is one. The site build renders the same figures
 with the files, fingerprints and manifest of `PILeanVerso.withFigures`; these previews are only
 for looking.
+
+`tdcsg-figure-preview --frame-pair-keys DIR [--word W] [--variant R1|R2|R3] [--trails] [--full]`
+draws the key figures of the frame pair (`TDCSGFigures.Lift.FramePairConfig.keys`) for the word
+`W` (letters `a`, `b`, `A = a⁻¹`, `B = b⁻¹`; `abab` by default) as pictures of each panel in a
+folder of `DIR` named after the variant, with contact sheets (`sheet*.html`: one row per key, the
+two panels and the caption), prints their layout problems and whether every declared move
+arrives exactly (`FramePairConfig.allArrive`), and exits with status 1 if one fails.
 -/
 
 namespace TDCSGFigures.Preview
@@ -99,11 +106,84 @@ def parse : List String → System.FilePath × Array String →
   | "--out" :: [], _ => .error "--out needs a folder"
   | n :: rest, (d, ns) => parse rest (d, ns.push n)
 
+/-! ### The key figures of the frame pair -/
+
+/-- Text with `&`, `<`, `>` and `"` escaped for HTML. -/
+def htmlEscape (t : String) : String :=
+  t.replace "&" "&amp;" |>.replace "<" "&lt;" |>.replace ">" "&gt;" |>.replace "\"" "&quot;"
+
+/-- The options of `--frame-pair-keys`: the word, the right panel's style (`R1`, `R2`, `R3`),
+trails, and the full-size left panel. -/
+def parseFramePair : List String → Lift.FramePairConfig → Except String Lift.FramePairConfig
+  | [], c => .ok c
+  | "--word" :: w :: rest, c => parseFramePair rest { c with word := Lift.parseWord w }
+  | "--variant" :: "R1" :: rest, c => parseFramePair rest { c with right := .bodies }
+  | "--variant" :: "R2" :: rest, c => parseFramePair rest { c with right := .centres }
+  | "--variant" :: "R3" :: rest, c => parseFramePair rest { c with right := .bodiesGraph }
+  | "--trails" :: rest, c => parseFramePair rest { c with trails := true }
+  | "--full" :: rest, c => parseFramePair rest { c with left := .full }
+  | a :: _, _ => .error s!"--frame-pair-keys: unknown option {a}"
+
+/-- The name of a variant's folder: word, right style, trails, left scale. -/
+def variantName (c : Lift.FramePairConfig) : String :=
+  let w := String.join (c.word.map fun l => match l with
+    | .a => "a" | .b => "b" | .aInv => "A" | .bInv => "B")
+  let r := match c.right with | .bodies => "R1" | .centres => "R2" | .bodiesGraph => "R3"
+  s!"{w}-{r}-{if c.trails then "trails" else "notrails"}-" ++
+    (match c.left with | .halved => "halved" | .full => "full")
+
+/-- A contact sheet: one row per key with the pictures `left` and `right` (file names relative to
+the sheet) and the caption. -/
+def contactSheet (title : String) (rows : Array (String × String × String)) (dark : Bool)
+    (stacked : Bool) : String :=
+  let bg := if dark then "#1b1d21" else "#ffffff"
+  let fg := if dark then "#e6e6e6" else "#1b1d21"
+  let cell := fun (f : String) => s!"<img src=\"{htmlEscape f}\" alt=\"\">"
+  let body := String.join (rows.toList.map fun (l, r, cap) =>
+    if stacked then
+      s!"<tr><td>{cell l}<br>{cell r}</td><td>{htmlEscape cap}</td></tr>\n"
+    else s!"<tr><td>{cell l}</td><td>{cell r}</td><td>{htmlEscape cap}</td></tr>\n")
+  s!"<!doctype html><html><head><meta charset=\"utf-8\"><title>{htmlEscape title}</title>" ++
+    s!"<style>body\{background:{bg};color:{fg};font:14px sans-serif}td\{vertical-align:top;" ++
+    "padding:6px}td:last-child{max-width:22em}</style></head><body>" ++
+    s!"<h1>{htmlEscape title}</h1><table>\n{body}</table></body></html>\n"
+
+/-- Writes the keys of both panels of a variant as pictures (light, dark, narrow, narrow dark) in a
+folder of `dir` named after the variant, with three contact sheets, and returns the layout
+problems and whether every step arrives exactly. -/
+def renderFramePair (dir : System.FilePath) (c : Lift.FramePairConfig) :
+    IO (Array String × Bool) := do
+  let out := dir / variantName c
+  IO.FS.createDirAll out
+  let mut problems : Array String := #[]
+  let mut rows : Array (String × String × String) := #[]
+  for (k, (l, r)) in c.keys.mapIdx fun k p => (k, p) do
+    problems := problems ++ ((← render out s!"left-{k}" l).map (s!"left key {k}: " ++ ·))
+    problems := problems ++ ((← render out s!"right-{k}" r).map (s!"right key {k}: " ++ ·))
+    rows := rows.push (s!"left-{k}", s!"right-{k}", c.keyCaption k)
+  let title := s!"Frame pair keys: {variantName c}"
+  let sheet := fun (suffix : String) => rows.map fun (l, r, cap) =>
+    (s!"{l}{suffix}.png", s!"{r}{suffix}.png", cap)
+  IO.FS.writeFile (out / "sheet.html") (contactSheet title (sheet "") false false)
+  IO.FS.writeFile (out / "sheet-dark.html") (contactSheet title (sheet "-dark") true false)
+  IO.FS.writeFile (out / "sheet-narrow.html")
+    (contactSheet title (sheet "-narrow") false true)
+  IO.FS.writeFile (out / "sheet-narrow-dark.html")
+    (contactSheet title (sheet "-narrow-dark") true true)
+  return (problems, c.allArrive)
+
 end TDCSGFigures.Preview
 
 open PILean TDCSGFigures.Preview in
 /-- Renders the previews (see the module docstring). -/
 def main (args : List String) : IO UInt32 := do
+  if let "--frame-pair-keys" :: dir :: rest := args then
+    let c ← IO.ofExcept (parseFramePair rest {})
+    let (ps, ok) ← renderFramePair dir c
+    for p in ps do IO.println s!"  {p}"
+    IO.println (s!"{variantName c}: {c.keyCount} keys, {ps.size} layout problems, " ++
+      s!"exact arrival {ok}")
+    return if ps.isEmpty && ok then 0 else 1
   let (dir, names) ← IO.ofExcept (parse args ("out", #[]))
   let unknown := names.filter fun n => !previews.any (·.1 == n)
   if !unknown.isEmpty then
