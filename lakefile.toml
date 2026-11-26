@@ -31,7 +31,7 @@ rev = "94cea086b880f61f5b3847d30151b8e5f80e1259"
 [[require]]
 name = "VersoBlueprint"
 git = "https://github.com/eric-vergo/verso-blueprint.git"
-rev = "cc82fb88974659b6890997a1975d21f7cd4d280c"
+rev = "11afe5e30105914a412551f4e0c042710345c459"
 
 # PILean draws the figures; the Verso adapter puts them in the site, the LeAnTeX adapter typesets
 # their labels. The figures library imports PILean directly, so `pilean` is required here rather
@@ -39,18 +39,18 @@ rev = "cc82fb88974659b6890997a1975d21f7cd4d280c"
 [[require]]
 name = "pilean"
 git = "https://github.com/eric-vergo/PILean"
-rev = "08710ac3a706b85c19d6f7a8317df15cfc259d96"
+rev = "67270543a94dd5cab90ff4808fe1e11f164f86de"
 
 [[require]]
 name = "pilean-verso"
 git = "https://github.com/eric-vergo/PILean"
-rev = "08710ac3a706b85c19d6f7a8317df15cfc259d96"
+rev = "67270543a94dd5cab90ff4808fe1e11f164f86de"
 subDir = "verso"
 
 [[require]]
 name = "pilean-leantex"
 git = "https://github.com/eric-vergo/PILean"
-rev = "08710ac3a706b85c19d6f7a8317df15cfc259d96"
+rev = "67270543a94dd5cab90ff4808fe1e11f164f86de"
 subDir = "leantex"
 
 # Mathlib is required last so that its pins of shared dependencies (ProofWidgets, Plausible)
@@ -97,6 +97,11 @@ roots = ["TDCSGTests.FrameWords", "TDCSGTests.FramePair"]
 [[lean_exe]]
 name = "tdcsg-test"
 root = "TDCSGTests.Main"
+
+# Writes what the browser checks of the animations expect (`scripts/check-motion.py`).
+[[lean_exe]]
+name = "tdcsg-motion-out"
+root = "TDCSGTests.MotionOut"
 
 # The blueprint's page of the figures' theorems. It sits at the repository root so that the
 # source links of the theorems, which PILean derives from module names, name the right file.

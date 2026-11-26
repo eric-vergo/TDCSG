@@ -2,22 +2,25 @@
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Eric Vergo, Claude Opus 5.5
 -/
-import TDCSGFigures.FramePair
+import TDCSGFigures.FramePairMotion
+import TDCSGFigures.Chord
 
 /-!
 # The declared moves of the frame pair arrive exactly
 
-For the words of the frame pair at `r = 1.95` from `z = 0`, checked by `decide +kernel`: every
+For words of the frame pair at `r = 1.95` from `z = 0`, checked by `decide +kernel`: every
 declared turn of every step (`TDCSGFigures.Lift.FramePairConfig.frameSteps`), applied exactly in
 `ℤ[ζ₅]` to the anchors of the actors that the key figures draw (`FramePairConfig.actorsAt`) in key
 `k`, gives their anchors in key `k + 1` (`FramePairConfig.allArrive`), in each panel's own
-coordinates: with and without the riding disks, with the left panel halved and full size, with the
-idle marks as outlines and as rings, with trails as dots and as arcs. A misplaced actor makes the
-check fail. Every drawn actor gives back its base title (`FramePairConfig.baseTitlesRecoverable`,
-checked by evaluation, since the drawing goes through floating point).
-The letters that act are the ones pinned in `TDCSGTests.FrameWords`. This is the exact counterpart
-of the floating-point arrival check of an animation; the general statements behind it are
-`TDCSG.Five.framePicture_genA_genB` and `TDCSG.Five.halved_genA` with their companions.
+coordinates. A misplaced actor makes the check fail. Every drawn actor gives back its base title
+(`FramePairConfig.baseTitlesRecoverable`, checked by evaluation, since the drawing goes through
+floating point). The letters that act are the ones pinned in `TDCSGTests.FrameWords` and
+`TDCSGFigures.Lift.wordSummary_word`. This is the exact counterpart of the floating-point arrival
+check of an animation; the general statements behind it are `TDCSG.Five.framePicture_genA_genB`
+and `TDCSG.Five.halved_genA` with their companions. The animation made from these moves
+(`FramePairConfig.motion`) passes the checks of PILean's motion engine for the figure's word and
+for `a b a b`, checked by evaluation. The figure's own key data are stated in
+`TDCSGFigures.Lift.framePair_keys`, on the page of the figures' theorems.
 -/
 
 namespace TDCSGTests.FramePair
@@ -30,51 +33,33 @@ theorem turnFactor_fifths :
       (turnFactor (1 / 5) == some (zeta 1)) = true := by
   decide +kernel
 
-/-- `a b a b`: every step arrives in every variant of the panels; every letter acts. -/
+/-- `a b a b`: every step arrives; every letter acts. -/
 theorem frameSteps_abab :
     ({ word := [.a, .b, .a, .b] } : FramePairConfig).allArrive = true ∧
-      ({ word := [.a, .b, .a, .b], right := .centres } : FramePairConfig).allArrive = true ∧
-      ({ word := [.a, .b, .a, .b], left := .full, trails := true } : FramePairConfig).allArrive =
-        true ∧
       (({ word := [.a, .b, .a, .b] } : FramePairConfig).frameSteps.map (·.acts)) =
         [true, true, true, true] := by
   decide +kernel
 
-/-- `a a b a b a a b b a b b`: every step arrives, with trails and centre-graph edges, and with the
-left panel full size and the idle marks as rings; the letters `3`, `5` and `10` do not act. -/
-theorem frameSteps_aababaabbabb :
-    ({ word := [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b], right := .bodiesGraph,
-        trails := true } : FramePairConfig).allArrive = true ∧
-    ({ word := [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b], left := .full,
-        idleMark := .ring } : FramePairConfig).allArrive = true ∧
-    (({ word := [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b] } : FramePairConfig).frameSteps.map
-      (·.acts)) = [true, true, false, true, false, true, true, true, true, false, true, true] := by
-  decide +kernel
-
-/-- `a b a b b a b`: every step arrives; the letter `6` does not act. -/
+/-- `a b a b b a b`: every step arrives; the letter `6` does not act (two steps). -/
 theorem frameSteps_ababbab :
     ({ word := [.a, .b, .a, .b, .b, .a, .b] } : FramePairConfig).allArrive = true ∧
     (({ word := [.a, .b, .a, .b, .b, .a, .b] } : FramePairConfig).frameSteps.map (·.acts)) =
-      [true, true, true, true, true, false, true] := by
+      [true, true, true, true, true, false, false, true] := by
   decide +kernel
 
-/-- `a a b a a a b b b b b`: every step arrives, with trails as arcs; the letter `3` does not
-act. -/
+/-- `a a b a a a b b b b b`: every step arrives; the letter `3` does not act (two steps). -/
 theorem frameSteps_aabaaabbbbb :
-    ({ word := [.a, .a, .b, .a, .a, .a, .b, .b, .b, .b, .b], trails := true,
-        trailStyle := .arcs } : FramePairConfig).allArrive = true ∧
+    ({ word := [.a, .a, .b, .a, .a, .a, .b, .b, .b, .b, .b] } : FramePairConfig).allArrive = true ∧
     (({ word := [.a, .a, .b, .a, .a, .a, .b, .b, .b, .b, .b] } : FramePairConfig).frameSteps.map
-      (·.acts)) = [true, true, false, true, true, true, true, true, true, true, true] := by
+      (·.acts)) = [true, true, false, false, true, true, true, true, true, true, true, true] := by
   decide +kernel
 
-/-- The inverse letters: the twelve-letter word followed by its inverse arrives at every step. -/
+/-- The inverse letters: the figure's word followed by its inverse arrives at every step. -/
 theorem frameSteps_inverse :
-    ({ word := [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b] ++
-        inverseWord [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b] } :
-      FramePairConfig).allArrive = true := by
+    ({ word := word ++ inverseWord word } : FramePairConfig).allArrive = true := by
   decide +kernel
 
-/-- The actors of `a b a b` with the right riding disk drawn at the left centre. -/
+/-- The actors of a frame pair with the right riding disk drawn at the left centre. -/
 def misplaced (cfg : FramePairConfig) (p : Panel) (k : Nat) : List Actor :=
   (cfg.actorsAt p k).map fun a =>
     if a.id == "right-disk" then { a with anchors := [(cfg.centresAt k).1] } else a
@@ -86,14 +71,45 @@ theorem misplaced_fails :
       (misplaced { word := [.a, .b, .a, .b] }) = false := by
   decide +kernel
 
-/-- `a a b a b a a b b a b b` with trails and centre-graph edges. -/
-def twelveLetters : FramePairConfig :=
-  { word := [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b], right := .bodiesGraph,
-    trails := true }
+/-- The actors of the figure's word with the ring of each idle letter drawn, in the moving frame,
+about the other centre of the pair. -/
+def ringElsewhere (p : Panel) (k : Nat) : List Actor :=
+  let cfg : FramePairConfig := {}
+  (cfg.actorsAt p k).map fun a =>
+    if p == .right && a.id.startsWith "idle-" then
+      let (l, r) := cfg.centresAt (cfg.keyRef k).state
+      { a with anchors := a.anchors.map fun c => if ZetaFrac.same c l then r else l }
+    else a
 
--- Every drawn actor of `a a b a b a a b b a b b` (with trails, centre-graph edges and idle marks)
--- gives back its base title. The drawing goes through floating point, which the kernel does not
--- reduce, so this is checked by evaluation when the module is built.
-#guard twelveLetters.baseTitlesRecoverable
+/-- A ring about the wrong centre fails the check of the rings. -/
+theorem ringElsewhere_fails :
+    ({} : FramePairConfig).ringsPlacedWith ringElsewhere = false := by
+  decide +kernel
+
+/-- The word strip, an option off on the site, marks the letter of every key, for the frame pair
+and for the three words. -/
+theorem strip_marks :
+    ({ strip := true } : FramePairConfig).stripMarkIds 4 = ["strip-2"] ∧
+      ({} : FramePairConfig).stripMarkIds 4 = [] := by
+  decide +kernel
+
+-- The marks the strip draws are those `stripMarkIds` names, and the animations with the strip pass
+-- every check of PILean's engine; checked by evaluation (the drawing is in floating point).
+#guard ({ strip := true } : FramePairConfig).stripMarks
+#guard wordStripMarks 1 && wordStripMarks 2 && wordStripMarks 3
+#guard ({ strip := true } : FramePairConfig).motion.problems.isEmpty
+#guard [1, 2, 3].all fun i => (wordLoopWith i true).problems.isEmpty
+
+-- Every drawn actor of the figure's word gives back its base title. The drawing goes through
+-- floating point, which the kernel does not reduce, so this is checked by evaluation when the
+-- module is built.
+#guard ({} : FramePairConfig).baseTitlesRecoverable
+
+-- The animation of the frame pair passes every check of PILean's engine, with no error and no
+-- note, for the figure (`framePair`, and its narrow rendition) and for `a b a b`. The engine's
+-- checks are in floating point, so these are checked by evaluation when the module is built.
+#guard framePair.report.problems.isEmpty
+#guard (framePair.narrow.map (·.report.problems.isEmpty)) == some true
+#guard ({ word := [.a, .b, .a, .b] } : FramePairConfig).motion.problems.isEmpty
 
 end TDCSGTests.FramePair

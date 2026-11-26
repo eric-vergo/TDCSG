@@ -39,7 +39,9 @@ main .prev-next-buttons .where {
 /* The reading pages share the classic edition's paper, serif text and ruled figure plates. */
 html {
   --td-paper: #faf8f3;
-  --td-plate: #fffdf8;
+  /* The plate is the pictures' own background (PILean's white and its dark twin), so that every
+     figure kind, inline, as a file, moving or still, sits on it without a box of its own. */
+  --td-plate: #ffffff;
   --td-tint: #f1eee5;
   --td-rule: #c6c8bd;
   --td-ink: #202925;
@@ -54,14 +56,14 @@ html {
   --td-ui: var(--verso-structure-font-family);
 }
 html[data-theme="dark"] {
-  --td-paper: #191f20; --td-plate: #202828; --td-tint: #2d3734; --td-rule: #596460;
+  --td-paper: #191f20; --td-plate: #16181c; --td-tint: #2d3734; --td-rule: #596460;
   --td-ink: #ecede7; --td-muted: #bdc9c5; --td-accent: #e3b28b;
   --td-left: #85bed1; --td-right: #eeac83; --td-piece: #86d8b9;
   --td-piece-two: #e2c048; --td-piece-three: #ec8cc8;
 }
 @media (prefers-color-scheme: dark) {
   html:not([data-theme="light"]) {
-    --td-paper: #191f20; --td-plate: #202828; --td-tint: #2d3734; --td-rule: #596460;
+    --td-paper: #191f20; --td-plate: #16181c; --td-tint: #2d3734; --td-rule: #596460;
     --td-ink: #ecede7; --td-muted: #bdc9c5; --td-accent: #e3b28b;
     --td-left: #85bed1; --td-right: #eeac83; --td-piece: #86d8b9;
     --td-piece-two: #e2c048; --td-piece-three: #ec8cc8;
@@ -95,76 +97,4 @@ main .pilean-figure-caption {
 }
 main .pilean-figure-number { color: var(--td-ink); }
 main .pilean-figure-source { justify-content: flex-start; font-family: var(--td-ui); }
-main .pilean-figure-frame:has(.word-plate) { display: block; background: transparent; padding: 0; border: 0; }
-.word-plate, .word-traces { margin-block: 1rem; }
-main .word-plate {
-  background: var(--td-plate); border: 1px solid var(--td-rule); padding: 0;
-  color: var(--td-ink); min-width: 0;
-}
-.word-plate:nth-of-type(2) { --td-piece: var(--td-piece-two); }
-.word-plate:nth-of-type(3) { --td-piece: var(--td-piece-three); }
-.word-plate .word-heading, .word-controls {
-  display: flex; align-items: center; gap: .5rem; padding: .6rem 1rem;
-  font: 500 .9rem var(--td-ui); position: static; background: transparent;
-}
-.word-plate .word-heading { justify-content: space-between; border-bottom: 1px solid var(--td-rule); }
-.word-plate .word-heading a { color: var(--td-piece); text-underline-offset: .2em; }
-.word-formula { display: flex; gap: .25em; font: 1.35rem var(--td-type); }
-.word-formula i { padding: 0 .13em; border-bottom: 2px solid transparent; }
-.word-formula .current { border-color: var(--td-piece); background: var(--td-tint); }
-.word-scene { display: block; margin: .4rem auto; width: 100%; max-height: 24rem; }
-.word-scene text { font: 17px var(--td-type); fill: var(--td-ink); }
-.word-plate .left-disk path { stroke: var(--td-left); }
-.word-plate .right-disk path { stroke: var(--td-right); stroke-dasharray: 7 3; }
-.word-plate .chord path { stroke: var(--td-muted); }
-.word-plate .left-center path:last-child { fill: var(--td-left); }
-.word-plate .right-center path:last-child { fill: var(--td-right); }
-.word-origin, .word-segment, .word-pivot { fill: none; stroke-linecap: round; }
-.word-origin { stroke: var(--td-muted); stroke-width: 4; stroke-dasharray: 3 5; }
-.word-segment { stroke: var(--td-piece); stroke-width: 6; }
-.word-pivot { stroke: var(--td-piece); stroke-width: 2.6; }
-.word-scale { padding: .55rem 1rem; border-top: 1px solid var(--td-rule); font: .85rem var(--td-ui); }
-.word-ruler { position: relative; margin: 2.5rem .75rem 0; border-bottom: 1px solid var(--td-muted); }
-.word-ruler span { position: absolute; bottom: -2px; text-align: center; color: var(--td-ink); padding-bottom: .2rem; }
-.word-source { border-bottom: 4px dotted var(--td-muted); }
-.word-landing { border-bottom: 4px solid var(--td-piece); }
-.word-limits { display: flex; justify-content: space-between; margin-inline: .45rem; }
-.word-limits span { text-align: center; }
-.word-limits span::before { content: ""; display: block; width: 1px; height: .35rem; background: var(--td-muted); margin: 0 auto .15rem; }
-.word-controls { background: var(--td-tint); border-top: 1px solid var(--td-rule); }
-.word-controls span { margin-left: auto; color: var(--td-muted); }
-.word-controls button {
-  padding: .4rem .7rem; border: 1px solid var(--td-rule); border-radius: 3px;
-  background: var(--td-plate); color: var(--td-ink); font: inherit; cursor: pointer;
-}
-.word-controls button:focus-visible, .word-traces summary:focus-visible { outline: 2px solid var(--td-piece); outline-offset: 2px; }
-.word-plate [hidden] { display: none; }
-main .word-stills { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); list-style: none; padding: .7rem; gap: .55rem; }
-main .word-stills[hidden] { display: none; }
-main .word-stills li { font: .85rem var(--td-ui); margin: 0; }
-.word-stills svg { display: block; width: 100%; }
-.word-traces summary { font: .9rem var(--td-ui); cursor: pointer; color: var(--td-muted); }
-@media (max-width: 35rem) {
-  .word-controls, .word-plate .word-heading { padding: .5rem .6rem; }
-  .word-controls { font-size: .8rem; }
-  main .word-stills { grid-template-columns: repeat(2,minmax(0,1fr)); }
-}
-.word-scale .word-source { bottom: .8rem; }
-.word-scale .word-landing { padding-bottom: 0; line-height: 1; }
-.word-scale .word-ruler { margin-top: 2.8rem; }
-.word-scene[data-active="left"] .left-disk path, .word-scene[data-active="right"] .right-disk path { stroke-width: 3; }
-.word-scene .word-contact path:last-child { fill: var(--td-plate); stroke: var(--td-piece); stroke-width: 2px; }
-main .word-plate .word-note { margin: 0; padding: .65rem 1rem; font: 1rem/1.45 var(--td-type); }
-main .pilean-inline-svg > g > path:first-of-type[fill="#ffffff"] { fill: var(--td-plate); }
 main:has(.pilean-figure) .bp_sbs_informal .bp_kind_theorem_content { border-bottom: 1px solid var(--td-rule); padding-bottom: .55rem; }
-
-@media (max-width: 35rem) {
-  /* The disk geometry scales to the column; keep its four mathematical labels readable. */
-  .word-scene text {
-    font-size: 26px;
-    paint-order: stroke;
-    stroke: var(--td-plate);
-    stroke-width: 2px;
-    stroke-linejoin: round;
-  }
-}

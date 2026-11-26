@@ -12,12 +12,10 @@ import TDCSGFigures.Style
 * `unitSteps`: the window `|w - x| ≤ r/2` at `x = 1/2`, `r = 1.95`, the five unit steps from the
   current left centre `0` to the projections `ζʲ = P(eⱼ)` of the labels `eⱼ`, and which of them end
   in the window (`1`, `ζ`, `ζ⁴`), decided exactly in `ℚ(√5)` (`unitSteps_spec`).
-* `changeOfFrame`: a stepper through the letters `a, b, a, b` applied to the point `0` at
-  `r = 1.95`. Each step shows, side by side, the two disks in the halved starting frame
-  `w ↦ (w + 1)/2` (centres `0` and `1`, radius `r/2`, the point `(y + 1)/2` moving) and the moving
-  frame of the chapter's proof (the window about `x = 1/2` fixed, the left and right centres
-  `P(n)` and `P(n + eⱼ)` moving by unit steps), the states being `statesFor radiusSq word`. The
-  framing equation `2 (x - P(n)) = ζʲ (y + 1)` of `TDCSG.Five.Framed` holds (`changeOfFrame_spec`).
+* The frame pair (`TDCSGFigures.Lift.framePair`, in `TDCSGFigures.FramePairMotion`) follows the
+  word `word`, `a a b a b a a b b a b b`, applied to the point `0` at `r = 1.95`, in two frames at
+  once; this module holds its data: the word, the states `statesFor radiusSq word` and the pin
+  `wordSummary_word` (the letters `3`, `5` and `10` do not act).
 -/
 
 namespace TDCSGFigures.Lift
@@ -122,15 +120,12 @@ def unitSteps : Plane.Figure where
     Plane.Exact.label "window |w − x| ≤ r/2" ((6 / 5 : Rat), (-11 / 10 : Rat)) |>.role windowRole]
   info := { title := "The five unit steps from the left center 0 and the window at x = 1/2" }
 
-/-! ### The change of frame -/
+/-! ### The word of the frame pair -/
 
-/-- The letters applied to `z = 0`, in order. -/
-def word : List Early.Letter := [.a, .b, .a, .b]
+/-- The letters applied to `z = 0`, in order: `a a b a b a a b b a b b`. -/
+def word : List Early.Letter := [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b]
 
-/-- The letter `l` applied to a state at `r = 1.95` (`State.applyAt`). -/
-def State.apply (s : State) (l : Early.Letter) : State := s.applyAt radiusSq l
-
-/-- The states after `0, 1, …, 4` letters, starting from `y = 0`, `n = 0`, `j = 0`
+/-- The states after `0, 1, …, 12` letters, starting from `y = 0`, `n = 0`, `j = 0`
 (`TDCSG.Five.framed_self`). -/
 def states : List State := statesFor radiusSq word
 
@@ -138,24 +133,16 @@ def states : List State := statesFor radiusSq word
 `1 - 2 P(n) = ζʲ (y + 1)`, checked exactly in `ℤ[ζ₅]` (`State.framedFrom`). -/
 def State.framed (s : State) : Bool := s.framedFrom origin
 
-/-- The word of `changeOfFrame` at `r = 1.95` from `z = 0`: every letter acts, every step has the
-geometry of `State.stepHolds`, the orbit does not close, and it reaches
-`|(y + 1)/2|² = 21/4 - 2√5` (about `0.88²`) and `|P - x|² = 3/2 - √5/4` (about `0.97²`). -/
+/-- The word of the frame pair at `r = 1.95` from `z = 0`: the letters `3`, `5` and `10` do not
+act, every step has the geometry of `State.stepHolds`, the orbit does not close, and it reaches
+`|(y + 1)/2|² = |P - x|² = 3/2 + √5/4` (about `1.43²`), the squared distance of each idle letter's
+centre from `x`. -/
 theorem wordSummary_word :
-    wordSummary radiusSq word = ⟨[], true, false, ⟨21 / 4, -2⟩, ⟨3 / 2, -1 / 4⟩⟩ := by
+    wordSummary radiusSq word = ⟨[3, 5, 10], true, false, ⟨3 / 2, 1 / 4⟩, ⟨3 / 2, 1 / 4⟩⟩ := by
   decide +kernel
-
-/-- The rational shift of the moving frame's picture to the right of the halved frame's. -/
-def shiftX : Rat := 3
 
 /-- The halved image `(y + 1)/2` of a point. -/
 def halved (y : Zeta5) : ZetaFrac := ⟨y + Zeta5.ofInt 1, 2⟩
-
-/-- A point of the moving frame, drawn shifted by `shiftX`. -/
-def moved (p : Zeta5) : ZetaFrac := (ZetaFrac.ofZeta p).shiftRe shiftX
-
-/-- The window centre of the moving frame, drawn shifted. -/
-def movedX : Rat × Rat := (centreX + shiftX, 0)
 
 /-- Where a squared distance `d2` stands relative to the squared radius `r2`. -/
 def sideOfSq (d2 r2 : QSqrt5) : Side :=
@@ -167,119 +154,5 @@ def windowDistSq (p : Zeta5) : QSqrt5 :=
 
 /-- `(r/2)²`. -/
 def halfRadiusSq : QSqrt5 := rat (halfRadius * halfRadius)
-
-/-- The integer vector of a label, as text. -/
-def labelText (n : Label) : String :=
-  "(" ++ ", ".intercalate (n.toList.map fun k => if k < 0 then s!"−{-k}" else toString k) ++ ")"
-
-/-- The letter that led to step `k` and whether it acted, as text. -/
-def stepCaption (k : Nat) (s : State) : String :=
-  if k == 0 then "the start: y = z = 0, n = 0, j = 0"
-  else
-    let c := word.getD (k - 1) .a
-    let centre := if c.centre == leftCentre then "−1" else "+1"
-    if s.acted then s!"{c.text} turns y about {centre}: n = {labelText s.n}, j = {s.j}"
-    else s!"{c.text} does not act"
-
-/-- The halved disks: the closed disk of radius `r/2` about `0` (the left disk, halved) and about
-`1` (the right disk, halved), outlined. -/
-def halvedDisks : Array Item := #[
-  Plane.Exact.disk origin halfRadius |>.noFill |>.role leftRole |>.named "the left disk, halved"
-    |>.describedBy "the closed disk |w + 1| ≤ r about −1, drawn as |w′| ≤ r/2 about 0",
-  Plane.Exact.disk rightCentre halfRadius |>.noFill |>.role rightRole
-    |>.named "the right disk, halved"
-    |>.describedBy "the closed disk |w − 1| ≤ r about 1, drawn as |w′ − 1| ≤ r/2 about 1",
-  Plane.Exact.point origin |>.role leftRole |>.named "the left center −1, halved to 0"
-    |>.incident .inside "the left disk, halved" |>.incident .outside "the right disk, halved",
-  Plane.Exact.point rightCentre |>.role rightRole |>.named "the right center 1, halved to 1"
-    |>.incident .outside "the left disk, halved" |>.incident .inside "the right disk, halved",
-  Plane.Exact.label "0" origin .left |>.role leftRole,
-  Plane.Exact.label "1" rightCentre .right |>.role rightRole,
-  Plane.Exact.label "the two disks, halved" ((1 / 2 : Rat), (27 / 20 : Rat)),
-  Plane.Exact.label "the moving frame" ((centreX + shiftX : Rat), (27 / 20 : Rat)),
-  Plane.Exact.label "grey: earlier points" ((1 / 2 : Rat), (-6 / 5 : Rat)) |>.faint,
-  Plane.Exact.label "grey: earlier centers" ((centreX + shiftX : Rat), (-6 / 5 : Rat)) |>.faint]
-
-/-- A point of the halved frame with where it stands relative to both halved disks, decided
-exactly. -/
-def halvedPoint (y : Zeta5) (it : Item) : Item :=
-  let p := halved y
-  let l := sideOfSq (p - ZetaFrac.ofZeta origin).normSq halfRadiusSq
-  let r := sideOfSq (p - ZetaFrac.ofZeta rightCentre).normSq halfRadiusSq
-  it |>.incident l.incidence "the left disk, halved"
-    |>.incident r.incidence "the right disk, halved"
-
-/-- A centre of the moving frame with where it stands relative to the window, decided exactly. -/
-def movedCentre (p : Zeta5) (it : Item) : Item :=
-  it |>.incident (sideOfSq (windowDistSq p) halfRadiusSq).incidence "the window"
-
-/-- The frame after `k` letters: the two halved disks with the current point `(y + 1)/2` and the
-earlier ones, and the moving frame with the fixed window, the current left and right centres
-`P(n)` and `P(n + eⱼ)`, the edge between them when both are in the window, and the earlier
-centres. -/
-def frame (k : Nat) : Plane.Figure :=
-  let ss := states.take (k + 1)
-  let s := ss.getLast?.getD ⟨origin, zeroLabel, 0, true⟩
-  let earlier := ss.dropLast
-  let right := shift s.n s.j 1
-  let pl := proj s.n
-  let pr := proj right
-  let bothIn := inWindow radiusSq centreX s.n && inWindow radiusSq centreX right
-  let trail : Array Item := (earlier.toArray.mapIdx fun i e =>
-    halvedPoint e.y (Plane.Exact.point (halved e.y) |>.faint |>.size 3
-      |>.named s!"the point after {i} letters"))
-  let pastCentres : Array Item := (earlier.toArray.flatMap fun e =>
-    #[proj e.n, proj (shift e.n e.j 1)]).foldl (fun acc p =>
-      if p == pl || p == pr || acc.any (·.1 == p) then acc else acc.push (p, ())) #[]
-    |>.mapIdx fun i (p, _) =>
-      movedCentre p (Plane.Exact.point (moved p) |>.faint |>.size 3
-        |>.named s!"an earlier center ({i + 1})")
-  { width := figureWidth
-    padding := 16
-    style := partTwoStyle
-    checks := .fail
-    items := halvedDisks ++ trail ++ #[
-      halvedPoint s.y (Plane.Exact.point (halved s.y) |>.size 5
-        |>.named s!"the current point (y + 1)/2 after {k} letters"),
-      Plane.Exact.label "(y + 1)/2" (halved s.y) .auto,
-      Plane.Exact.disk movedX halfRadius |>.role windowRole |>.fillOpacity 0.07
-        |>.named "the window" |>.describedBy "the closed disk |w − x| ≤ r/2 about x = 1/2"
-        |>.declRef `TDCSG.Five.InWindow] ++
-      (if bothIn then #[Plane.Exact.segment (moved pl) (moved pr) |>.width 2.5
-        |>.named s!"the edge from {labelText s.n} to {labelText right} of the center graph"
-        |>.declRef `TDCSG.Five.centerGraph] else #[]) ++ pastCentres ++ #[
-      let it := Plane.Exact.point movedX |>.role windowRole |>.marker .cross
-        |>.named "the window center x = 1/2, fixed" |>.incident .inside "the window"
-      -- At the start the edge from `0` to `e₀` runs along the real axis through `x = 1/2`.
-      if bothIn && pl == origin && pr == rightCentre then it.incident .on
-        s!"the edge from {labelText s.n} to {labelText right} of the center graph" else it,
-      Plane.Exact.label "x = 1/2" movedX .auto |>.role windowRole,
-      movedCentre pl (Plane.Exact.point (moved pl) |>.role leftRole |>.size 5
-        |>.named s!"the left center P(n), n = {labelText s.n}, weight 0"
-        |>.declRef `TDCSG.Five.Label.proj),
-      movedCentre pr (Plane.Exact.point (moved pr) |>.role rightRole |>.size 5
-        |>.named s!"the right center P(n + e{s.j}), n + e{s.j} = {labelText right}, weight 1"),
-      Plane.Exact.label "P(n)" (moved pl) .auto |>.role leftRole,
-      Plane.Exact.label s!"P(n + e{["₀", "₁", "₂", "₃", "₄"].getD s.j ""})" (moved pr) .auto
-        |>.role rightRole]
-    info := { title := stepCaption k s } }
-
-/-- The steps of `changeOfFrame`, with their captions. -/
-def frames : Array (String × Plane.Figure) :=
-  (List.range (word.length + 1)).toArray.map fun k =>
-    (stepCaption k (states.getD k ⟨origin, zeroLabel, 0, true⟩), frame k)
-
-/-- The letters `a, b, a, b` applied to `0` at `r = 1.95`, step by step: on the left the two disks
-in the halved starting frame with the moving point `(y + 1)/2`; on the right the moving frame, with
-the window about `x = 1/2` fixed and the left and right centres `P(n)`, `P(n + eⱼ)` moving by unit
-steps. -/
-@[figure]
-def changeOfFrame : Explorer := Plane.stepper frames
-
-end TDCSGFigures.Lift
-
-namespace TDCSGFigures.Lift
-
-open PILean PILean.Plane PILean.Exact TDCSGFigures
 
 end TDCSGFigures.Lift
