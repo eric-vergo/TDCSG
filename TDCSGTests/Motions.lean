@@ -120,6 +120,14 @@ theorem crossing_wrongSlide :
       else Levels.crossMoves k) Levels.crossActors = false := by
   decide +kernel
 
+/-- The first layer of the component found with one of its labels left out of the declared
+appearances misses its key. -/
+theorem component_missingAppearance :
+    allArrive (Confinement.lastLayer + 1) (fun d => if d == 0 then
+      (Confinement.compMoves 0).filter (·.1 != "label-1") else Confinement.compMoves d)
+      Confinement.compActors = false := by
+  decide +kernel
+
 /-! ### The engine finds no error in any animation of the site -/
 
 /-- The animations of the site, with the names of their files in the site: the declaration's name,
@@ -139,7 +147,8 @@ def siteMotions : Array (String × PILean.Plane.MotionPanels) := #[
   ("walkToLeaf", Confinement.walkToLeaf),
   ("TDCSGFigures.orbitRadius", orbitRadius),
   ("lensRadius", Lens.lensRadius),
-  ("terminalCrossing", Levels.terminalCrossing)]
+  ("terminalCrossing", Levels.terminalCrossing),
+  ("componentOfZero", Confinement.componentOfZero)]
 
 /-- The errors PILean's engine reports for the animations of the site and their narrow renditions,
 each with the animation's name: every move drawn must land on its next key, every rest show its
@@ -264,5 +273,23 @@ end OrbitRadius
   "From the leaf n the only step leads back to n + e₂, as the one-step lemma requires. The \
     labels of the path are numbered 1 to 12 in the order of the walk; labels 13 and 14 are n + e₂ \
     and n."]
+
+#guard Confinement.componentOfZero.captions == #[
+  "The search for the component of 0 in the center graph at r = 1.95, x = 1/2 starts at the label \
+    0, inside the window |w − x| ≤ r/2.",
+  "Distance 1 from 0: 3 new labels, each joined by an edge to a label at distance 0; 4 labels in \
+    all. The tints mark the frontier.",
+  "Distance 2 from 0: 4 new labels, each joined by an edge to a label at distance 1; 8 labels in \
+    all. The tints mark the frontier.",
+  "Distance 3 from 0: 4 new labels, each joined by an edge to a label at distance 2; 12 labels in \
+    all. The tints mark the frontier.",
+  "Distance 4 from 0: 4 new labels, each joined by an edge to a label at distance 3; 16 labels in \
+    all. The tints mark the frontier.",
+  "Distance 5 from 0: 2 new labels, each joined by an edge to a label at distance 4; 18 labels in \
+    all. The tints mark the frontier. The search finds no further label: the component has 18 \
+    labels.",
+  "The component of 0 in the center graph at r = 1.95, x = 1/2: 18 labels, at most 5 edges from \
+    0, each drawn at its projection P(n) inside the window, dots for weight 0, squares for weight \
+    1, with the 19 edges of the graph among them. Every coordinate of every label is −1, 0 or 1."]
 
 end TDCSGTests.Motions

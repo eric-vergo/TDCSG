@@ -10,11 +10,14 @@ import TDCSGFigures.Data.Moves
 /-!
 # The figures of chapter 7, confinement
 
-* `componentOfZero`: the 18 labels reachable from `0` in the center graph at `r = 1.95`,
+* `componentOfZeroFinal`: the 18 labels reachable from `0` in the center graph at `r = 1.95`,
   `x = 1/2`, each drawn at its projection `P(n)` (a dot for weight zero, a square for weight one),
   with the edges of the graph and the window. For each coordinate `j` the good levels nearest the
   gap `|m| ≤ 2`, the candidates for the walls `lo` and `hi` of the confinement proof, are computed
   (`nearestWalls`) and stated with the figure, for its caption.
+* `componentOfZero`: an animation that finds the component layer by layer, by distance from `0`
+  (`compLayers`, checked to be the distances by `layersAreDistances`): each layer appears with the
+  edges that reach it, tinted while it is the frontier; its last key is `componentOfZeroFinal`.
 * `walkToLeaf`: an animation of a walk along a path of the center graph at `r = 2.13`, `x = 1/5`,
   found by a breadth-first search from `0` (an illustration): a circle slides from label to label,
   one step `±eⱼ` at a time (a slide by `±ζʲ`), and the edges and labels appear as it reaches them;
@@ -91,35 +94,202 @@ def wallText (j : Nat) : String :=
   let (lo, hi) := nearestWalls j
   s!"n{sub j}: {(lo.map intText).getD "none"}, {(hi.map intText).getD "none"}"
 
+/-! #### The layers of the component -/
+
+/-- The labels of the component of `0` by their distance from `0` in the center graph at
+`r = 1.95`, `x = 1/2`: `0`; `e₀`, `e₁`, `e₄`; and so on, 1, 3, 4, 4, 4 and 2 labels. -/
+def compLayers : List (List Label) := [
+  [#[0, 0, 0, 0, 0]],
+  [#[1, 0, 0, 0, 0], #[0, 1, 0, 0, 0], #[0, 0, 0, 0, 1]],
+  [#[0, 0, 0, -1, 1], #[1, -1, 0, 0, 0], #[0, 1, -1, 0, 0], #[1, 0, 0, 0, -1]],
+  [#[0, 0, 1, -1, 1], #[1, -1, 1, 0, 0], #[0, 1, -1, 1, 0], #[1, 0, 0, 1, -1]],
+  [#[0, -1, 1, -1, 1], #[1, -1, 1, -1, 0], #[0, 1, -1, 1, -1], #[1, 0, -1, 1, -1]],
+  [#[1, -1, 1, -1, 1], #[1, 1, -1, 1, -1]]]
+
+/-- The greatest distance from `0`: `5`. -/
+def lastLayer : Nat := compLayers.length - 1
+
+/-- The layer of `n`, its distance from `0` (`lastLayer + 1` if `n` is in no layer). -/
+def layerOf (n : Label) : Nat := (compLayers.findIdx? (·.contains n)).getD (lastLayer + 1)
+
+/-- Whether `n` and `m` are joined by an edge of the component. -/
+def joined (n m : Label) : Bool :=
+  compEdges.any fun (a, b) => (a == n && b == m) || (a == m && b == n)
+
+/-- Whether the layers are the distances from `0`: the first is `[0]`; they hold the labels of
+`compLabels`, each once; every edge joins two consecutive layers; every label of a layer after the
+first is joined to one of the layer before. Then, by induction on the distance, the layer of a
+label is its distance from `0`. -/
+def layersAreDistances : Bool :=
+  let all := compLayers.flatten
+  compLayers.head? == some [zeroLabel] &&
+    all.length == compLabels.length && compLabels.all all.contains &&
+    all.all (fun n => all.count n == 1) &&
+    compEdges.all (fun (a, b) => layerOf a + 1 == layerOf b || layerOf b + 1 == layerOf a) &&
+    compLayers.zipIdx.all fun (ls, d) =>
+      d == 0 || ls.all fun n => (compLayers.getD (d - 1) []).any (joined n)
+
+/-- The number of labels at distance at most `d`. -/
+def foundBy (d : Nat) : Nat := ((compLayers.take (d + 1)).map List.length).sum
+
+/-- The layer an edge of `compEdges` reaches: the larger distance of its ends. -/
+def edgeLayer (i : Nat) : Nat :=
+  let (a, b) := compEdges.getD i (zeroLabel, zeroLabel)
+  max (layerOf a) (layerOf b)
+
+/-! #### The items of the component -/
+
+/-- The window of the component. -/
+def compWindow : Item :=
+  Plane.Exact.disk ((compX, 0) : Rat × Rat) (39 / 40 : Rat) |>.role windowRole
+    |>.fillOpacity 0.07 |>.named "the window"
+    |>.describedBy "the closed disk |w − x| ≤ r/2, r = 1.95, x = 1/2"
+    |>.declRef `TDCSG.Five.InWindow |>.withId "window"
+
+/-- Edge `i` of `compEdges` (actor `edge-i`). -/
+def compEdge (i : Nat) : Item :=
+  let (n, m) := compEdges.getD i (zeroLabel, zeroLabel)
+  edgeItem n m |>.withId s!"edge-{i}"
+
+/-- Label `i` of `compLabels`, inside the window (actor `label-i`). -/
+def compLabel (i : Nat) : Item :=
+  labelPoint (compLabels.getD i zeroLabel) .inside "the window" |>.withId s!"label-{i}"
+
+/-- The window centre, recorded on the edge from `0` to `e₀` when that edge is drawn (`onEdge`). -/
+def compCentre (onEdge : Bool) : Item :=
+  let it := Plane.Exact.point ((compX, 0) : Rat × Rat) |>.role windowRole |>.marker .cross
+    |>.named "the window center x = 1/2" |>.incident .inside "the window"
+  (if onEdge then it.incident .on "the edge from (0, 0, 0, 0, 0) to (1, 0, 0, 0, 0)" else it)
+    |>.withId "centre"
+
+/-- The names `0` and `e₀` and the legend. -/
+def compNames : Array Item := #[
+  Plane.Exact.label "0" origin (.toward (Plane.deg 200)) |>.role leftRole |>.withId "name-0",
+  Plane.Exact.label "e₀" rightCentre .auto |>.role rightRole |>.withId "name-e0",
+  Plane.Exact.label "dots: weight 0 (left centers)" ((1 / 2 : Rat), (-9 / 8 : Rat))
+    |>.role leftRole |>.withId "legend-dots",
+  Plane.Exact.label "squares: weight 1 (right centers)" ((1 / 2 : Rat), (-5 / 4 : Rat))
+    |>.role rightRole |>.withId "legend-squares",
+  Plane.Exact.label "×: the window center x = 1/2" ((1 / 2 : Rat), (-11 / 8 : Rat))
+    |>.role windowRole |>.withId "legend-centre"]
+
+/-- The radius of the tint about a label of the frontier. -/
+def tintRadius : Rat := 1 / 16
+
+/-- The tint about label `i` of `compLabels` while it is on the frontier: a disk of radius
+`tintRadius` in the colour of the lens, without an outline, drawn under the labels (actor
+`tint-i`). -/
+def compTint (i : Nat) : Item :=
+  Plane.Exact.disk (proj (compLabels.getD i zeroLabel)) tintRadius |>.role lensRole |>.noOutline
+    |>.fillOpacity 0.3 |>.named "a tint about a label of the frontier" |>.withId s!"tint-{i}"
+
+/-- The numbers of the labels of `compLabels` at distance `d`. -/
+def layerIndices (d : Nat) : List Nat :=
+  (List.range compLabels.length).filter fun i => layerOf (compLabels.getD i zeroLabel) == d
+
+/-- The items of the component found up to distance `d` (all of it from `d = lastLayer`): the
+window, the edges with both ends at distance at most `d`, the tints of the labels at distance
+`d ≥ 1` when `tinted` (`0` has its name), the labels at distance at most `d`, the window centre
+(on the edge from `0` to `e₀` once it is drawn), the name `0`, the name `e₀` from distance `2`,
+where the last edge at `e₀` is drawn (its place is chosen where it first appears), and the
+legend. -/
+def compItems (d : Nat) (tinted : Bool) : Array Item :=
+  #[compWindow] ++
+    ((List.range compEdges.length).filter (edgeLayer · ≤ d)).toArray.map compEdge ++
+    (if tinted && 1 ≤ d then (layerIndices d).toArray.map compTint else #[]) ++
+    ((List.range compLabels.length).filter fun i =>
+      layerOf (compLabels.getD i zeroLabel) ≤ d).toArray.map compLabel ++
+    #[compCentre (1 ≤ d)] ++ compNames.filter fun it => 2 ≤ d || it.actorId? != some "name-e0"
+
 /-- The 18 labels reachable from 0 in the center graph at r = 1.95, x = 1/2, at their projections:
 dots for weight 0 (left centres), squares for weight 1 (right centres), with the edges, the
-window and its centre. -/
-@[figure]
-def componentOfZero : Plane.Figure where
+window and its centre; the last key of `componentOfZero`. -/
+def componentOfZeroFinal : Plane.Figure where
   width := figureWidth
   narrowWidth := some narrowWidth
   padding := 16
   style := partTwoStyle
   checks := .fail
-  items := #[
-    Plane.Exact.disk ((compX, 0) : Rat × Rat) (39 / 40 : Rat) |>.role windowRole
-      |>.fillOpacity 0.07 |>.named "the window"
-      |>.describedBy "the closed disk |w − x| ≤ r/2, r = 1.95, x = 1/2"
-      |>.declRef `TDCSG.Five.InWindow] ++
-    (compEdges.toArray.map fun (n, m) => edgeItem n m) ++
-    (compLabels.toArray.map fun n => labelPoint n .inside "the window") ++ #[
-    Plane.Exact.point ((compX, 0) : Rat × Rat) |>.role windowRole |>.marker .cross
-      |>.named "the window center x = 1/2" |>.incident .inside "the window"
-      |>.incident .on "the edge from (0, 0, 0, 0, 0) to (1, 0, 0, 0, 0)",
-    Plane.Exact.label "0" origin (.toward (Plane.deg 200)) |>.role leftRole,
-    Plane.Exact.label "e₀" rightCentre .auto |>.role rightRole,
-    Plane.Exact.label "dots: weight 0 (left centers)" ((1 / 2 : Rat), (-9 / 8 : Rat))
-      |>.role leftRole,
-    Plane.Exact.label "squares: weight 1 (right centers)" ((1 / 2 : Rat), (-5 / 4 : Rat))
-      |>.role rightRole,
-    Plane.Exact.label "×: the window center x = 1/2" ((1 / 2 : Rat), (-11 / 8 : Rat))
-      |>.role windowRole]
+  items := compItems lastLayer false
   info := { title := "The component of 0 in the center graph at r = 1.95, x = 1/2" }
+
+/-! #### The component found layer by layer -/
+
+/-- Key `d` of `componentOfZero`: the component found up to distance `d`, the labels at distance
+`d` tinted, for `d ≤ lastLayer`; then `componentOfZeroFinal`. -/
+def compKey (d : Nat) : Plane.Figure :=
+  if d ≤ lastLayer then { componentOfZeroFinal with items := compItems d true }
+  else componentOfZeroFinal
+
+/-- The ids of the actors of key `d` that come and go, with the exact points that fix them: the
+edges and labels found (their projections), the tints of the frontier, the name `e₀`; the window,
+its centre, the name `0` and the legend, drawn at every key, do not come and go. -/
+def compActors (d : Nat) : List (ExactActor ZetaFrac) :=
+  let z := fun (n : Label) => ZetaFrac.ofZeta (proj n)
+  let dd := min d lastLayer
+  (((List.range compEdges.length).filter (edgeLayer · ≤ dd)).map fun i =>
+      let (n, m) := compEdges.getD i (zeroLabel, zeroLabel)
+      ⟨s!"edge-{i}", [z n, z m]⟩) ++
+    (if 1 ≤ d && d ≤ lastLayer then (layerIndices d).map fun i =>
+      ⟨s!"tint-{i}", [z (compLabels.getD i zeroLabel)]⟩ else []) ++
+    (((List.range compLabels.length).filter fun i =>
+      layerOf (compLabels.getD i zeroLabel) ≤ dd).map fun i =>
+        ⟨s!"label-{i}", [z (compLabels.getD i zeroLabel)]⟩) ++
+    (if 2 ≤ d then [⟨"name-e0", []⟩] else [])
+
+/-- The declared moves of step `d` of `componentOfZero`: what key `d + 1` draws and key `d` does
+not appears, what key `d` draws and key `d + 1` does not vanishes. -/
+def compMoves (d : Nat) : List (String × ExactMove ZetaFrac) :=
+  let a := compActors d
+  let b := compActors (d + 1)
+  (a.filter (fun x => !b.any (·.id == x.id))).map (·.id, .vanish) ++
+    (b.filter (fun x => !a.any (·.id == x.id))).map (·.id, .appear)
+
+/-- Whether every declared move of `componentOfZero` carries the actors of one key onto those of
+the next, exactly in `ℚ(ζ₅)`. -/
+def compArrives : Bool := allArrive (lastLayer + 1) compMoves compActors
+
+/-- The component as a motion: the keys `compKey d`, the steps made from `compMoves`. -/
+def compMotion : Motion where
+  keys := ((List.range (lastLayer + 2)).map compKey).toArray
+  steps := ((List.range (lastLayer + 1)).map (exactStep ∘ compMoves)).toArray
+
+/-- The caption of key `d` of `componentOfZero`. -/
+def compCaption (d : Nat) : String :=
+  let k := (compLayers.getD d []).length
+  if d == 0 then
+    "The search for the component of 0 in the center graph at r = 1.95, x = 1/2 starts at the \
+      label 0, inside the window |w − x| ≤ r/2."
+  else if d ≤ lastLayer then
+    s!"Distance {d} from 0: {k} new {if k == 1 then "label" else "labels"}, each joined by an \
+      edge to a label at distance {d - 1}; {foundBy d} labels in all. The tints mark the \
+      frontier." ++
+    (if d == lastLayer then " The search finds no further label: the component has 18 \
+      labels." else "")
+  else
+    "The component of 0 in the center graph at r = 1.95, x = 1/2: 18 labels, at most 5 edges \
+      from 0, each drawn at its projection P(n) inside the window, dots for weight 0, squares for \
+      weight 1, with the 19 edges of the graph among them. Every coordinate of every label is \
+      −1, 0 or 1."
+
+/-- The component of 0 in the center graph at r = 1.95, x = 1/2, found by distance from 0: each
+layer appears tinted with the edges that reach it, until the 18 labels and 19 edges of the
+component are drawn. The last key frame is the figure of the component, `componentOfZeroFinal`. -/
+@[figure]
+def componentOfZero : MotionPanels where
+  panels := #[{ motion := compMotion }]
+  captions := ((List.range (lastLayer + 2)).map compCaption).toArray
+  pacing := { motionPacing with fade := 3 / 5, hold := 8 / 5 }
+  timing := ((List.range (lastLayer + 1)).map fun d => moveTiming (compMoves d)).toArray
+  info := { title := "The component of 0 in the center graph at r = 1.95, x = 1/2"
+            description := "The labels of the component of 0 in the center graph at r = 1.95, \
+              x = 1/2, found by distance from 0: each layer appears tinted with the edges that \
+              reach it, until the 18 labels and 19 edges of the component are drawn. The key \
+              frames are exact; between them the browser fades what comes and goes." }
+  checks := .fail
+  poster := lastLayer + 1
+  width := figureWidth
+  narrowWidth := some narrowWidth
 
 /-! ### A walk forced back at a leaf -/
 

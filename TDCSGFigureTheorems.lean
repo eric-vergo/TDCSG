@@ -43,7 +43,7 @@ theorem (`TDCSGFigures.wordLoop_keys`, `TDCSGFigures.Lift.framePair_keys`,
 `TDCSGFigures.wordSteps_spec` and `TDCSGFigures.Confinement.walkToLeaf_spec`, named `_spec`,
 though they are not linked). Each actor an animation moves is
 drawn at the exact anchors its arrival check reads. The captions are written out, or, where they
-are built from the data (the orbit on the chord, the walk), stated as functions of the data; the
+are built from the data (the orbit on the chord, the walk, the component of zero), stated as functions of the data; the
 kernel does not reduce the string functions they are built with, so their words are pinned by
 `#guard` lines in `TDCSGTests.Motions`; the test driver requires that PILean's engine finds no
 error in any animation. Where an animation replaced a
@@ -51,7 +51,8 @@ figure with a linked theorem, its last key frame is that figure, and the theorem
 the animation: it states that the last key frame is the figure and what the figure draws
 (`TDCSGFigures.generatorStep_spec`, `TDCSGFigures.extensionJump_spec`,
 `TDCSGFigures.disjointDisks_spec`, `TDCSGFigures.exchangedIntervals_spec`,
-`TDCSGFigures.chordOrbit_spec`, `TDCSGFigures.Levels.terminalCrossing_spec`); the lens of chapter 5 is linked to its theorem
+`TDCSGFigures.chordOrbit_spec`, `TDCSGFigures.Levels.terminalCrossing_spec`,
+`TDCSGFigures.Confinement.componentOfZero_spec`); the lens of chapter 5 is linked to its theorem
 `TDCSGFigures.Lens.lensRadius_spec`, which states its key frames and the pictures between them.
 The other animations (the
 orbit of zero on the front page, the word followed letter by letter and the three words of
@@ -3019,8 +3020,10 @@ tag := "theorems-confinement"
 file := "Theorems-confinement"
 %%%
 
-{figref "component-of-zero"}[]: the figure `TDCSGFigures.Confinement.componentOfZero`
-and its theorem `TDCSGFigures.Confinement.componentOfZero_spec`.
+{figref "component-of-zero"}[]: the animation `TDCSGFigures.Confinement.componentOfZero`, whose
+last key frame is the figure of the component, with its theorem
+`TDCSGFigures.Confinement.componentOfZero_spec`; the layers and the other key frames are stated in
+`TDCSGFigures.Confinement.componentOfZero_keys`.
 
 ```Verso.Genre.Manual.InlineLean.lean
 namespace TDCSGFigures.Confinement
@@ -3028,15 +3031,19 @@ namespace TDCSGFigures.Confinement
 open PILean PILean.Plane PILean.Exact TDCSGFigures
 
 set_option maxHeartbeats 4000000 in
-/-- What `componentOfZero` draws, and why its records are right. The items are the window, then
-an edge `edgeItem n m` for each edge of `compEdges`, a point `labelPoint n` for each label of
-`compLabels`, the window centre and the labels with the legend, in this order; the builders'
-definitions are stated. The component of `0` found by the exact search (`component`, every window
-test decided in `ℚ(√5)`) is the list of 18 labels written out, and its edges are the 18 written
-out, each from a weight-zero label `n` to `n + eⱼ`; every label lies inside the window, so each
-point's record holds. Every coordinate of every label is `-1`, `0` or `1`, and in each coordinate
-`j` the good levels nearest the gap `|m| ≤ 2` are those the caption states (`wallText`), with every
-label strictly inside the slab `lo < nⱼ ≤ hi` they bound. Not stated: how the builders and modifiers
+/-- The animation `componentOfZero` and the figure of the component, its last key frame. The
+animation has one panel, `compMotion`, whose last key is `componentOfZeroFinal`; its poster is that
+key and its checks are strict. The figure's items are `compItems lastLayer false`: the window, an
+edge `edgeItem n m` for each edge of `compEdges`, a point `labelPoint n` for each label of
+`compLabels`, the window centre (on the edge from `0` to `e₀`) and the labels with the legend, in
+this order, each with its id; the builders' definitions are stated, and at the last layer every
+edge and every label is drawn (`compItems lastLayer false` lists all 19 edges and all 18 labels,
+in order). The component of `0` found by the exact search (`component`, every window test decided
+in `ℚ(√5)`) is the list of 18 labels written out, and its edges are the 19 written out, each from a
+weight-zero label `n` to `n + eⱼ`; every label lies inside the window, so each point's record
+holds. Every coordinate of every label is `-1`, `0` or `1`, and in each coordinate `j` the good
+levels nearest the gap `|m| ≤ 2` are those the caption states (`wallText`), with every label
+strictly inside the slab `lo < nⱼ ≤ hi` they bound. Not stated: how the builders and modifiers
 draw, the layout, the lettering, the style's colour values and the pixels. -/
 theorem componentOfZero_spec :
     (∀ n m, edgeItem n m = (Plane.Exact.segment (proj n) (proj m) |>.width 1.5
@@ -3049,30 +3056,48 @@ theorem componentOfZero_spec :
       else (Plane.Exact.point (proj n) |>.size 4.5
         |>.named s!"the label {labelText n}, weight {weight n}" |>.incident rel w |>.role "right"
         |>.marker .square))) ∧
-    componentOfZero.items = #[
-      Plane.Exact.disk ((compX, 0) : Rat × Rat) (39 / 40 : Rat) |>.role "window"
-        |>.fillOpacity 0.07 |>.named "the window"
-        |>.describedBy "the closed disk |w − x| ≤ r/2, r = 1.95, x = 1/2"
-        |>.declRef `TDCSG.Five.InWindow] ++
-      (compEdges.toArray.map fun (n, m) => edgeItem n m) ++
-      (compLabels.toArray.map fun n => labelPoint n .inside "the window") ++ #[
-      Plane.Exact.point ((compX, 0) : Rat × Rat) |>.role "window" |>.marker .cross
+    componentOfZero.panels = #[{ motion := compMotion }] ∧
+    componentOfZero.poster = 6 ∧ componentOfZero.checks = .fail ∧
+    compMotion.keys = ((List.range 7).map compKey).toArray ∧
+    compKey 6 = componentOfZeroFinal ∧
+    componentOfZeroFinal.items = compItems lastLayer false ∧
+    (∀ d tinted, compItems d tinted =
+      #[compWindow] ++
+        ((List.range compEdges.length).filter (edgeLayer · ≤ d)).toArray.map compEdge ++
+        (if tinted && 1 ≤ d then (layerIndices d).toArray.map compTint else #[]) ++
+        ((List.range compLabels.length).filter fun i =>
+          layerOf (compLabels.getD i zeroLabel) ≤ d).toArray.map compLabel ++
+        #[compCentre (1 ≤ d)] ++
+        compNames.filter fun it => 2 ≤ d || it.actorId? != some "name-e0") ∧
+    lastLayer = 5 ∧
+    compWindow = (Plane.Exact.disk ((compX, 0) : Rat × Rat) (39 / 40 : Rat) |>.role "window"
+      |>.fillOpacity 0.07 |>.named "the window"
+      |>.describedBy "the closed disk |w − x| ≤ r/2, r = 1.95, x = 1/2"
+      |>.declRef `TDCSG.Five.InWindow |>.withId "window") ∧
+    (∀ i, compEdge i = (let (n, m) := compEdges.getD i (zeroLabel, zeroLabel)
+      edgeItem n m |>.withId s!"edge-{i}")) ∧
+    (∀ i, compLabel i =
+      (labelPoint (compLabels.getD i zeroLabel) .inside "the window" |>.withId s!"label-{i}")) ∧
+    (∀ onEdge, compCentre onEdge = (
+      let it := Plane.Exact.point ((compX, 0) : Rat × Rat) |>.role "window" |>.marker .cross
         |>.named "the window center x = 1/2" |>.incident .inside "the window"
-        |>.incident .on "the edge from (0, 0, 0, 0, 0) to (1, 0, 0, 0, 0)",
-      Plane.Exact.label "0" origin (.toward (Plane.deg 200)) |>.role "left",
-      Plane.Exact.label "e₀" rightCentre .auto |>.role "right",
+      (if onEdge then it.incident .on "the edge from (0, 0, 0, 0, 0) to (1, 0, 0, 0, 0)" else it)
+        |>.withId "centre")) ∧
+    compNames = #[
+      Plane.Exact.label "0" origin (.toward (Plane.deg 200)) |>.role "left" |>.withId "name-0",
+      Plane.Exact.label "e₀" rightCentre .auto |>.role "right" |>.withId "name-e0",
       Plane.Exact.label "dots: weight 0 (left centers)" ((1 / 2 : Rat), (-9 / 8 : Rat))
-        |>.role "left",
+        |>.role "left" |>.withId "legend-dots",
       Plane.Exact.label "squares: weight 1 (right centers)" ((1 / 2 : Rat), (-5 / 4 : Rat))
-        |>.role "right",
+        |>.role "right" |>.withId "legend-squares",
       Plane.Exact.label "×: the window center x = 1/2" ((1 / 2 : Rat), (-11 / 8 : Rat))
-        |>.role "window"] ∧
-    compLabels = [#[0, 0, 0, 0, 0], #[1, 0, 0, 0, 0], #[0, 1, 0, 0, 0], #[0, 0, 0, 0, 1],
+        |>.role "window" |>.withId "legend-centre"] ∧
+    (compLabels == [#[0, 0, 0, 0, 0], #[1, 0, 0, 0, 0], #[0, 1, 0, 0, 0], #[0, 0, 0, 0, 1],
       #[0, 0, 0, -1, 1], #[0, 0, 1, -1, 1], #[0, -1, 1, -1, 1], #[1, -1, 1, -1, 1],
       #[1, -1, 1, -1, 0], #[1, -1, 1, 0, 0], #[1, -1, 0, 0, 0], #[0, 1, -1, 0, 0],
       #[0, 1, -1, 1, 0], #[0, 1, -1, 1, -1], #[1, 1, -1, 1, -1], #[1, 0, -1, 1, -1],
-      #[1, 0, 0, 1, -1], #[1, 0, 0, 0, -1]] ∧
-    compEdges = [(#[0, 0, 0, 0, 0], #[1, 0, 0, 0, 0]), (#[0, 0, 0, 0, 0], #[0, 1, 0, 0, 0]),
+      #[1, 0, 0, 1, -1], #[1, 0, 0, 0, -1]] &&
+    compEdges == [(#[0, 0, 0, 0, 0], #[1, 0, 0, 0, 0]), (#[0, 0, 0, 0, 0], #[0, 1, 0, 0, 0]),
       (#[0, 0, 0, 0, 0], #[0, 0, 0, 0, 1]), (#[0, 0, 0, -1, 1], #[0, 0, 1, -1, 1]),
       (#[0, 0, 0, -1, 1], #[0, 0, 0, 0, 1]), (#[0, -1, 1, -1, 1], #[1, -1, 1, -1, 1]),
       (#[0, -1, 1, -1, 1], #[0, 0, 1, -1, 1]), (#[1, -1, 1, -1, 0], #[1, -1, 1, 0, 0]),
@@ -3081,23 +3106,122 @@ theorem componentOfZero_spec :
       (#[0, 1, -1, 0, 0], #[0, 1, -1, 1, 0]), (#[0, 1, -1, 1, -1], #[1, 1, -1, 1, -1]),
       (#[0, 1, -1, 1, -1], #[0, 1, -1, 1, 0]), (#[1, 0, -1, 1, -1], #[1, 1, -1, 1, -1]),
       (#[1, 0, -1, 1, -1], #[1, 0, 0, 1, -1]), (#[1, 0, 0, 0, -1], #[1, 0, 0, 1, -1]),
-      (#[1, 0, 0, 0, -1], #[1, 0, 0, 0, 0])] ∧
-    compLabels.all (fun n => inWindow compRadiusSq compX n) = true ∧
+      (#[1, 0, 0, 0, -1], #[1, 0, 0, 0, 0])] &&
+    compLabels.all (fun n => inWindow compRadiusSq compX n) &&
     compEdges.all (fun (n, m) => weight n == 0 &&
-      (List.range 5).any fun j => m == shift n j 1) = true ∧
-    compLabels.all (fun n => n.all fun c => -1 ≤ c && c ≤ 1) = true ∧
-    [wallText 0, wallText 1, wallText 2, wallText 3, wallText 4] =
-      ["n₀: −4, 4", "n₁: −3, 10", "n₂: −7, 6", "n₃: −7, 6", "n₄: −3, 10"] ∧
+      (List.range 5).any fun j => m == shift n j 1) &&
+    compLabels.all (fun n => n.all fun c => -1 ≤ c && c ≤ 1) &&
+    [wallText 0, wallText 1, wallText 2, wallText 3, wallText 4] ==
+      ["n₀: −4, 4", "n₁: −3, 10", "n₂: −7, 6", "n₃: −7, 6", "n₄: −3, 10"] &&
     (List.range 5).all (fun j => match nearestWalls j with
       | (some lo, some hi) => compLabels.all fun n => lo < n[j]! && n[j]! ≤ hi
-      | _ => false) = true := by
-  refine ⟨fun _ _ => rfl, fun n _ _ => ?_, rfl, ?_⟩
+      | _ => false) &&
+    (List.range compEdges.length).filter (edgeLayer · ≤ 5) == List.range 19 &&
+    (List.range compLabels.length).filter (fun i => layerOf (compLabels.getD i zeroLabel) ≤ 5) ==
+      List.range 18) = true := by
+  refine ⟨fun _ _ => rfl, fun n _ _ => ?_, ?_⟩
   · unfold labelPoint
     split <;> rfl
   repeat' apply And.intro
-  all_goals decide +kernel
+  all_goals first
+    | (intros; unfold componentOfZero; with_reducible rfl)
+    | (intros; unfold compMotion; with_reducible rfl)
+    | (intros; unfold compKey; rfl)
+    | (intros; unfold componentOfZeroFinal; with_reducible rfl)
+    | (intros; unfold compItems; with_reducible rfl)
+    | (intros; unfold compWindow; rfl)
+    | (intros; unfold compEdge; rfl)
+    | (intros; unfold compLabel; rfl)
+    | (intros; unfold compCentre; rfl)
+    | (intros; unfold compNames; rfl)
+    | decide +kernel
+    | rfl
 
 figure_links componentOfZero componentOfZero_spec
+
+set_option maxHeartbeats 4000000 in
+/-- The layers of `componentOfZero` and its key frames before the last, written out. The layers
+`compLayers` are the labels of the component by their distance from `0` in the center graph: the
+first is `[0]`, they hold the labels of `compLabels`, each once, every edge of `compEdges` joins two
+consecutive layers, and every label of a layer after the first is joined to one of the layer before
+(`layersAreDistances`, decided exactly); so the layer of a label is its distance from `0`, by
+induction on the distance. Key `d ≤ 5` is `compItems d true`: the window, the edges with both ends
+at distance at most `d` (`edgeLayer`), for `d ≥ 1` a tint about each label at distance `d`
+(`compTint`), drawn under the labels, the labels at distance at most `d`, the window centre (on the
+edge from `0` to `e₀` from `d = 1`), the name `0`, the name `e₀` from `d = 2`, and the legend. The
+moves of each step are the actors of one key absent from the next, which vanish, and those of the
+next absent from the one, which appear (`compMoves`); each actor that comes and goes is listed with
+the exact points that fix it (`compActors`: the projections of the ends of an edge, of a label, of
+a tinted label), and every declared move carries the actors of one key onto those of the next
+(`compArrives`). The captions are stated as a function of the layers; their words are pinned by
+evaluation in `TDCSGTests.Motions`. Not stated: how the builders draw, the layout, the timing and
+the frames the browser draws between the key frames. -/
+theorem componentOfZero_keys :
+    compLayers = [
+      [#[0, 0, 0, 0, 0]],
+      [#[1, 0, 0, 0, 0], #[0, 1, 0, 0, 0], #[0, 0, 0, 0, 1]],
+      [#[0, 0, 0, -1, 1], #[1, -1, 0, 0, 0], #[0, 1, -1, 0, 0], #[1, 0, 0, 0, -1]],
+      [#[0, 0, 1, -1, 1], #[1, -1, 1, 0, 0], #[0, 1, -1, 1, 0], #[1, 0, 0, 1, -1]],
+      [#[0, -1, 1, -1, 1], #[1, -1, 1, -1, 0], #[0, 1, -1, 1, -1], #[1, 0, -1, 1, -1]],
+      [#[1, -1, 1, -1, 1], #[1, 1, -1, 1, -1]]] ∧
+    (∀ n, layerOf n = (compLayers.findIdx? (·.contains n)).getD (lastLayer + 1)) ∧
+    (∀ n m, joined n m = compEdges.any fun (a, b) => (a == n && b == m) || (a == m && b == n)) ∧
+    (layersAreDistances = (
+      let all := compLayers.flatten
+      compLayers.head? == some [zeroLabel] &&
+        all.length == compLabels.length && compLabels.all all.contains &&
+        all.all (fun n => all.count n == 1) &&
+        compEdges.all (fun (a, b) => layerOf a + 1 == layerOf b || layerOf b + 1 == layerOf a) &&
+        compLayers.zipIdx.all fun (ls, d) =>
+          d == 0 || ls.all fun n => (compLayers.getD (d - 1) []).any (joined n))) ∧
+    (∀ i, edgeLayer i = (let (a, b) := compEdges.getD i (zeroLabel, zeroLabel)
+      max (layerOf a) (layerOf b))) ∧
+    (∀ d, layerIndices d =
+      (List.range compLabels.length).filter fun i => layerOf (compLabels.getD i zeroLabel) == d) ∧
+    tintRadius = 1 / 16 ∧
+    (∀ i, compTint i = (Plane.Exact.disk (proj (compLabels.getD i zeroLabel)) tintRadius
+      |>.role "lens" |>.noOutline |>.fillOpacity 0.3
+      |>.named "a tint about a label of the frontier" |>.withId s!"tint-{i}")) ∧
+    (∀ d, compKey d = if d ≤ lastLayer then { componentOfZeroFinal with items := compItems d true }
+      else componentOfZeroFinal) ∧
+    compMotion.steps = ((List.range 6).map (exactStep ∘ compMoves)).toArray ∧
+    (∀ d, compActors d = (
+      let z := fun (n : Label) => ZetaFrac.ofZeta (proj n)
+      let dd := min d lastLayer
+      (((List.range compEdges.length).filter (edgeLayer · ≤ dd)).map fun i =>
+          let (n, m) := compEdges.getD i (zeroLabel, zeroLabel)
+          (⟨s!"edge-{i}", [z n, z m]⟩ : ExactActor ZetaFrac)) ++
+        (if 1 ≤ d && d ≤ lastLayer then (layerIndices d).map fun i =>
+          ⟨s!"tint-{i}", [z (compLabels.getD i zeroLabel)]⟩ else []) ++
+        (((List.range compLabels.length).filter fun i =>
+          layerOf (compLabels.getD i zeroLabel) ≤ dd).map fun i =>
+            ⟨s!"label-{i}", [z (compLabels.getD i zeroLabel)]⟩) ++
+        (if 2 ≤ d then [⟨"name-e0", []⟩] else []))) ∧
+    (∀ d, compMoves d = (
+      let a := compActors d
+      let b := compActors (d + 1)
+      (a.filter (fun x => !b.any (·.id == x.id))).map (·.id, .vanish) ++
+        (b.filter (fun x => !a.any (·.id == x.id))).map (·.id, .appear))) ∧
+    componentOfZero.captions = ((List.range 7).map compCaption).toArray ∧
+    (layersAreDistances && compArrives &&
+      (List.range 6).map layerIndices ==
+        [[0], [1, 2, 3], [4, 10, 11, 17], [5, 9, 12, 16], [6, 8, 13, 15], [7, 14]] &&
+      (List.range 6).map foundBy == [1, 4, 8, 12, 16, 18]) = true := by
+  repeat' apply And.intro
+  all_goals first
+    | (intros; unfold layerOf; with_reducible rfl)
+    | (intros; unfold joined; with_reducible rfl)
+    | (intros; unfold layersAreDistances; with_reducible rfl)
+    | (intros; unfold edgeLayer; with_reducible rfl)
+    | (intros; unfold layerIndices; with_reducible rfl)
+    | (intros; unfold compTint; rfl)
+    | (intros; unfold compKey; with_reducible rfl)
+    | (intros; unfold compMotion; with_reducible rfl)
+    | (intros; unfold compActors; with_reducible rfl)
+    | (intros; unfold compMoves; with_reducible rfl)
+    | (intros; unfold componentOfZero; with_reducible rfl)
+    | decide +kernel
+    | rfl
 
 end TDCSGFigures.Confinement
 ```

@@ -22,16 +22,20 @@ depend on the starting point. With the description of orbit points by labels, th
 orbit by one number, and the orbit-bound lemma, in its two-disk form {bpref "two_disk_finite"}[],
 makes $`GG_5(r)` finite for every $`r<R`, where $`R=\sqrt{3+\varphi}`.
 
-:::figure TDCSGFigures.Confinement.componentOfZero (label := "component-of-zero") (inline := true) (links := TDCSGFigures.Confinement.componentOfZero_spec) (alt := "Eighteen labels inside a circular window joined by edges into a star-shaped cycle: dots for weight zero, squares for weight one; the labels 0 and e0 lie on the horizontal axis through the window center.")
+:::figure TDCSGFigures.Confinement.componentOfZero (label := "component-of-zero") (links := TDCSGFigures.Confinement.componentOfZero_spec) (alt := "Labels inside a circular window appear layer by layer, by their distance from the label 0: first 0, then the three labels joined to it, and so on, each new layer tinted with the edges that reach it, until eighteen labels joined by edges into a star-shaped pattern fill the window: dots for weight zero, squares for weight one; the labels 0 and e0 lie on the horizontal axis through the window center.")
 The component of the label $`0` in the center graph for $`x=1/2` and $`r=1.95`: 18 labels, each
 drawn at its projection $`P(n)` inside the window $`|w-x|\le r/2`, dots for weight zero (the left
-centers) and squares for weight one (the right centers); hovering over a label shows its integer
-vector. The labels $`0` and $`e_0` of the two initial centers project to $`0` and $`1`; each edge
-joins a weight-zero label $`n` to some $`n+e_j`, and segments that cross in the drawing do not meet
-in the graph. Every label of the component has all coordinates in $`\{-1,0,1\}`. For each
+centers) and squares for weight one (the right centers), found layer by layer by their distance
+from $`0` in the graph: 1, 3, 4, 4, 4 and 2 labels at distances 0 to 5, each layer tinted while it
+is the frontier. The labels $`0` and $`e_0` of the two initial centers project to $`0` and $`1`;
+each edge joins a weight-zero label $`n` to some $`n+e_j`, and segments that cross in the drawing do
+not meet in the graph. Every label of the component has all coordinates in $`\{-1,0,1\}`. For each
 coordinate $`j` the good levels $`lo\le-3` and $`hi\ge3` nearest $`0` are $`(lo,hi)=(-4,4)` for
 $`n_0`, $`(-3,10)` for $`n_1`, $`(-7,6)` for $`n_2` and $`n_3`, and $`(-3,10)` for $`n_4`, so every
-label lies strictly inside every slab $`lo<n_j\le hi`.
+label lies strictly inside every slab $`lo<n_j\le hi`. The key frames are exact and the last one is
+the figure its theorem states (`TDCSGFigures.Confinement.componentOfZero_spec`, the layers and the
+other frames in `TDCSGFigures.Confinement.componentOfZero_keys`); between them the browser fades
+what comes and goes.
 :::
 
 Here the window is $`x=1/2` and $`r=1.95`. Starting at zero, enumerate the integer labels
