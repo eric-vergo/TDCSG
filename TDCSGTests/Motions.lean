@@ -45,6 +45,16 @@ theorem generator_displaced :
       else generatorActors k) = false := by
   decide +kernel
 
+/-- The generator's turn declared as `4/5`, the same turn the other way round plus a full turn,
+arrives exactly, since the arrival check works modulo a full turn; the declared fractions, which
+`generatorStep_keys` writes out as `[-1/5]`, tell it apart. -/
+theorem generator_fourFifths :
+    let moves := fun k =>
+      if k == 0 then [("disk", ExactMove.turn ⟨ZetaFrac.ofZeta leftCentre, 4 / 5⟩)]
+      else generatorMoves k
+    allArrive 2 moves generatorActors = true ∧ (declaredTurns 2 moves == [-1 / 5]) = false := by
+  decide +kernel
+
 /-- The word `a b b a` with the second letter turning about `-1` misses its key. -/
 theorem steps_wrongCentre :
     allArrive 4 (fun k => if k == 1 then

@@ -162,19 +162,18 @@ illustrations (`@[figure illustration]`): no theorem is linked to them, and the 
 frames are stated in `wordLoop_keys`, `wordSteps_spec`, `framePair_keys` and `walkToLeaf_spec`.
 Each actor that moves is drawn at the exact anchors that its arrival check reads, and the theorems
 state those anchors.
-`TDCSGTests.Motions` proves that the exact arrival checks refuse a wrong centre, fraction, vector
-or position.
+The exact arrival check works modulo a full turn, so the sense and the size of every declared turn
+are pinned separately: each turn by a letter uses the letter's own fraction `Letter.turns`, whose
+factor and size `turnsAreFifths` states (`TDCSGFigures/Data/Turns.lean`), and each statement writes
+out the fractions its animation declares (`declaredTurns`). `TDCSGTests.Motions` proves that the
+exact arrival checks refuse a wrong centre, fraction, vector or position.
 
 The site ships no script of its own for the animations: the moving pictures are SMIL in the page,
 and what hides them is the stylesheet of PILean's adapter and the motion switch of Verso Blueprint.
 Each animation keeps the label, and so the anchor, of the figure at its place (`#word-trace` for
-Figure 3.2, `#change-of-frame` for Figure 4.2, and so on), and the site build
-writes a page that sends the reader on at the address of each figure page whose declaration has a
-new name (`movedFigures` in `BlueprintMain.lean`).
-
-The three words have a word strip, off on the site: the word written under the picture with the
-letter of the current key marked (`wordLoopWith i true`, `TDCSGFigures/WordStrip.lean`), checked
-like the rest by PILean's engine and by `TDCSGTests.FramePair`.
+Figure 3.2, `#change-of-frame` for Figure 4.2, and so on), and the site build writes a page that
+sends the reader on at the address of each figure page whose declaration has a new name
+(`movedFigures` in `BlueprintMain.lean`).
 
 ### Adding a figure
 

@@ -7,7 +7,6 @@ import TDCSGFigures.Data.Early
 import TDCSGFigures.Style
 import TDCSGFigures.Data.Turns
 import TDCSGFigures.Data.Moves
-import TDCSGFigures.WordStrip
 
 /-!
 # The figures of chapter 3, the chord and its three words
@@ -129,10 +128,11 @@ def pieceText : Nat → String
 def shiftText (i : Nat) : String := if i == 3 then "(2φ − 4)E" else "(2φ − 2)E"
 
 /-- The turn declared between key `k` and key `k + 1` of word `i`: about the centre of letter
-`k + 1`, by `-1/5` of a full turn for `a` and `b` (clockwise), `1/5` for their inverses. -/
+`k + 1`, by the letter's own fraction `Letter.turns`, `-1/5` of a full turn for `a` and `b`
+(clockwise), `1/5` for their inverses. -/
 def wordTurn (i k : Nat) : ExactTurn :=
   let l := (wordPiece i).1.getD k .a
-  ⟨ZetaFrac.ofZeta l.centre, if l.turn == zeta 1 then 1 / 5 else -1 / 5⟩
+  ⟨ZetaFrac.ofZeta l.centre, l.turns⟩
 
 /-- Whether the declared turn of every step of word `i` (`wordTurn`, applied exactly in `ℚ(ζ₅)`)
 carries both ends of the image of key `k` (`wordPath i`) onto those of key `k + 1`. -/
@@ -187,23 +187,10 @@ def wordContacts (i k : Nat) : Array Item :=
         |>.named s!"an end on {if isLeft then "the left" else "the right"} circle before \
           letter {j + 1}") |>.withId s!"contact-{m}"
 
-/-- Where the word strip of word `i` is written (`wordLoopWith … true`): its centre, height and
-gap. -/
-def wordStripAt : Rat × Rat × Rat := (1 / 4, -14 / 5, 11 / 20)
-
-/-- The mark of the word strip at key `k` of word `i` (`strip`): under the letter that turned the
-image into key `k`, from key `1` on. -/
-def wordStripMark (i k : Nat) (strip : Bool) : Array Item :=
-  if !strip || k == 0 then #[]
-  else
-    let (cx, y, gap) := wordStripAt
-    #[stripMark (wordPiece i).1.length (k - 1) cx y gap (pieceRole i)]
-
 /-- The actors of key `k` of word `i`, in drawing order: the image (`wordSegment`), the circle of
-the last turn (`wordPivot`), the marked ends (`wordContacts`) and, with the word strip, its
-mark. -/
-def wordActors (i k : Nat) (strip : Bool := false) : Array Item :=
-  #[wordSegment i k] ++ wordPivot i k ++ wordContacts i k ++ wordStripMark i k strip
+the last turn (`wordPivot`) and the marked ends (`wordContacts`). -/
+def wordActors (i k : Nat) : Array Item :=
+  #[wordSegment i k] ++ wordPivot i k ++ wordContacts i k
 
 /-- The items of word `i` that every key draws, under its actors: the disks and their lens, the
 chord thin and the piece of the word dashed. -/
@@ -215,23 +202,15 @@ def wordUnder (i : Nat) : Array Item :=
         |>.named s!"the piece {pieceText i} of word {i}"]
 
 /-- The items of word `i` that every key draws, over its actors: the centres, and below the disks
-which centre each letter turns about and the word, written out, or, with the word strip, letter
-by letter. The centres carry no labels of their own: the circle of the last turn lies about them,
-and a label beside a centre would overlap the chord, the lens or the other circle at the narrow
-width. -/
-def wordOver (i : Nat) (strip : Bool := false) : Array Item :=
-  let w := (wordPiece i).1
-  let (cx, y, gap) := wordStripAt
+which centre each letter turns about and the word, written out. The centres carry no labels of their
+own: the circle of the last turn lies about them, and a label beside a centre would overlap the
+chord, the lens or the other circle at the narrow width. -/
+def wordOver (i : Nat) : Array Item :=
   #[Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1",
     Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1",
     Plane.Exact.label "a, a⁻¹: about −1" ((-3 / 2 : Rat), (-23 / 10 : Rat)) |>.role leftRole,
-    Plane.Exact.label "b, b⁻¹: about +1" ((3 / 2 : Rat), (-23 / 10 : Rat)) |>.role rightRole] ++
-  if strip then
-    #[Plane.Exact.label s!"word {i}:" (stripX w.length 0 cx gap - gap * 3 / 5, y) .left
-      |>.role (pieceRole i) |>.declRef (wordDecl i)] ++
-      stripLetters (w.map Letter.text) [] cx y gap (pieceRole i)
-  else
-    #[Plane.Exact.label s!"word {i}: {wordText i}" ((0 : Rat), (-14 / 5 : Rat))
+    Plane.Exact.label "b, b⁻¹: about +1" ((3 / 2 : Rat), (-23 / 10 : Rat)) |>.role rightRole,
+    Plane.Exact.label s!"word {i}: {wordText i}" ((0 : Rat), (-14 / 5 : Rat))
       |>.role (pieceRole i) |>.declRef (wordDecl i)]
 
 /-- The caption of key `k` of word `i`, without a counter (a page numbers the keys itself): the
@@ -263,54 +242,48 @@ def wordCaption (i k : Nat) : String :=
 
 /-- Key `k` of word `i`: the disks, the lens, the chord and the piece; the image after `k`
 letters with its marks; the centres and the word. -/
-def wordKey (i k : Nat) (strip : Bool := false) : Plane.Figure :=
+def wordKey (i k : Nat) : Plane.Figure :=
   { width := figureWidth
     padding := 16
     style := houseStyle
     checks := .fail
-    items := wordUnder i ++ wordActors i k strip ++ wordOver i strip
+    items := wordUnder i ++ wordActors i k ++ wordOver i
     info := { title := wordCaption i k } }
 
 /-- The ids of the actors of key `k` of word `i`. -/
-def wordActorIds (i k : Nat) (strip : Bool := false) : Array String :=
-  (wordActors i k strip).filterMap fun it => match it with
+def wordActorIds (i k : Nat) : Array String :=
+  (wordActors i k).filterMap fun it => match it with
     | .shape _ _ info | .group _ info => if info.id.isEmpty then none else some info.id
 
 /-- The actors other than the image that appear and vanish between key `k` and key `k + 1` of
-word `i`: the circle of the last turn, the marked ends and the mark of the word strip. -/
-def wordFades (i k : Nat) (strip : Bool := false) : Array (String × Move) :=
-  let before := wordActorIds i k strip
-  let after := wordActorIds i (k + 1) strip
+word `i`: the circle of the last turn and the marked ends. -/
+def wordFades (i k : Nat) : Array (String × Move) :=
+  let before := wordActorIds i k
+  let after := wordActorIds i (k + 1)
   (after.filter (· != "segment") |>.filter (!before.contains ·)).map (·, Move.appear) ++
     (before.filter (· != "segment") |>.filter (!after.contains ·)).map (·, Move.vanish)
 
 /-- The moves from key `k` to key `k + 1` of word `i`: the image turns by the declared turn
 `wordTurn i k`, and the other actors appear and vanish with the keys that show them
 (`wordFades`). -/
-def wordStep (i k : Nat) (strip : Bool := false) : MotionStep :=
+def wordStep (i k : Nat) : MotionStep :=
   let t := wordTurn i k
-  { moves := #[("segment", Plane.Exact.turnAbout t.centre t.turns)] ++ wordFades i k strip }
-
-/-- Whether, with the word strip, key `k` of word `i` shows exactly the mark under letter `k`
-(none at key `0`). -/
-def wordStripMarks (i : Nat) : Bool :=
-  (List.range ((wordPiece i).1.length + 1)).all fun k =>
-    stripIds (wordActors i k true) == if k == 0 then [] else [s!"strip-{k - 1}"]
+  { moves := #[("segment", Plane.Exact.turnAbout t.centre t.turns)] ++ wordFades i k }
 
 /-- The keys of the loop of word `i`: `wordKey i k` for `k = 0, …, |w|`. -/
-def wordLoopKeys (i : Nat) (strip : Bool) : Array Plane.Figure :=
-  ((List.range ((wordPiece i).1.length + 1)).map (wordKey i · strip)).toArray
+def wordLoopKeys (i : Nat) : Array Plane.Figure :=
+  ((List.range ((wordPiece i).1.length + 1)).map (wordKey i)).toArray
 
 /-- The steps of the loop of word `i`: `wordStep i k` for `k = 0, …, |w| - 1`. -/
-def wordLoopSteps (i : Nat) (strip : Bool) : Array MotionStep :=
-  ((List.range (wordPiece i).1.length).map (wordStep i · strip)).toArray
+def wordLoopSteps (i : Nat) : Array MotionStep :=
+  ((List.range (wordPiece i).1.length).map (wordStep i)).toArray
 
 /-- The loop of word `i` (`1`, `2` or `3`) at the critical radius, as a picture of one panel with
 a narrow rendition: the image of its piece turned letter by letter until it lies on the chord
-again, in `motionPacing`; with the word strip when `strip`. -/
-def wordLoopWith (i : Nat) (strip : Bool) : MotionPanels :=
+again, in `motionPacing`. -/
+def wordLoop (i : Nat) : MotionPanels :=
   let n := (wordPiece i).1.length
-  { panels := #[{ motion := { keys := wordLoopKeys i strip, steps := wordLoopSteps i strip } }]
+  { panels := #[{ motion := { keys := wordLoopKeys i, steps := wordLoopSteps i } }]
     captions := ((List.range (n + 1)).map (wordCaption i)).toArray
     pacing := motionPacing
     info := { title := s!"Word {i} carries its piece back into the chord"
@@ -324,9 +297,6 @@ def wordLoopWith (i : Nat) (strip : Bool) : MotionPanels :=
     checks := .fail
     width := figureWidth
     narrowWidth := some narrowWidth }
-
-/-- The loop of word `i`, as the site shows it: without the word strip. -/
-def wordLoop (i : Nat) : MotionPanels := wordLoopWith i false
 
 /-- Word 1, `a⁻¹ a⁻¹ b⁻¹ a⁻¹ b⁻¹`, carries the piece `[−E, (1 − φ)E]` back into the chord, moved
 by `(2φ − 2)E`: an image of the piece turns a fifth of a turn about `−1` or `+1` per letter. -/

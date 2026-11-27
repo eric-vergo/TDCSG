@@ -189,8 +189,9 @@ def generatorKey (k : Nat) : Plane.Figure :=
 /-- The keys of `generatorStep`: two keys, then the figure `generatorStepFinal`. -/
 def generatorKeys : Array Plane.Figure := #[generatorKey 0, generatorKey 1, generatorStepFinal]
 
-/-- The turn of the left disk: about `-1`, by `-1/5` of a full turn (clockwise). -/
-def generatorTurn : ExactTurn := ⟨ZetaFrac.ofZeta leftCentre, -1 / 5⟩
+/-- The turn of the left disk: about `-1`, by the fraction of `a`, `-1/5` of a full turn
+(clockwise). -/
+def generatorTurn : ExactTurn := ⟨ZetaFrac.ofZeta leftCentre, Letter.a.turns⟩
 
 /-- The declared moves of the steps of `generatorStep`: the content of the left disk turns; then
 it and the points outside vanish while the marks of the turn, the origin, `a(0)` and its label
@@ -352,9 +353,11 @@ def stepKey (k : Nat) : Plane.Figure :=
     items := stepKeyItems k
     info := { title := s!"The point {stepName k} of 0 under a b b a at radius 2.1" } }
 
-/-- The turn of letter `k + 1` of `a b b a`: about its centre by `-1/5` of a full turn. -/
+/-- The turn of letter `k + 1` of `a b b a`: about its centre by its own fraction, `-1/5` of a
+full turn. -/
 def stepTurn (k : Nat) : ExactTurn :=
-  ⟨ZetaFrac.ofZeta (stepWord.getD k .a).centre, -1 / 5⟩
+  let l := stepWord.getD k .a
+  ⟨ZetaFrac.ofZeta l.centre, l.turns⟩
 
 /-- The id of the circle about the centre of letter `k + 1` of `a b b a`. -/
 def stepPivotId (k : Nat) : String :=

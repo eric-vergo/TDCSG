@@ -79,6 +79,17 @@ def ExactMove.kind : ExactMove α → String
   | .appear => "appear"
   | .vanish => "vanish"
 
+/-- The fraction of a full turn the move turns by, if it is a turn. -/
+def ExactMove.turns? : ExactMove α → Option Rat
+  | .turn t => some t.turns
+  | _ => none
+
+/-- The fractions of all the turns declared in the steps `k < n` (`moves k`), in order. The exact
+arrival check works modulo a full turn, so each animation's statement writes these out: they pin
+the sense and the size of every turn it declares. -/
+def declaredTurns (n : Nat) (moves : Nat → List (String × ExactMove α)) : List Rat :=
+  (List.range n).flatMap fun k => (moves k).filterMap (·.2.turns?)
+
 /-- The moves `moves` in words: each id with the kind of its move. -/
 def moveKinds (moves : List (String × ExactMove α)) : List (String × String) :=
   moves.map fun (id, m) => (id, m.kind)

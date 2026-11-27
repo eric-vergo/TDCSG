@@ -329,6 +329,7 @@ Zeta5.ofInt 12
       ("angle-label", "appear")] ∧
     (jumpInnerAnchors (Zeta5.ofInt 1)).length = 3 ∧ (jumpInnerAnchors (zeta 4)).length = 3 ∧
     jumpOuterAnchors.length = 4 ∧
+    declaredTurns 2 jumpMoves = [-1 / 5] ∧ turnsAreFifths = true ∧
     jumpArrives = true ∧
     QSqrt.lt barInner.normSq (rat 100) = true ∧ (barCut.normSq == rat 100) = true ∧
     QSqrt.lt (rat 100) barOuter.normSq = true ∧
@@ -546,10 +547,10 @@ if aFirst then 2 ≤ k else 1 ≤ k
     |>.withId s!"{t}-{if isX then "x" else "y"}"
     : Item)) ∧
     (∀ (aFirst : Bool), disjointTurnA aFirst = (
-⟨disjointHalf aFirst leftCentre, -1 / 5⟩
+⟨disjointHalf aFirst leftCentre, Letter.a.turns⟩
     : ExactTurn)) ∧
     (∀ (aFirst : Bool), disjointTurnB aFirst = (
-⟨disjointHalf aFirst rightCentre, -1 / 5⟩
+  ⟨disjointHalf aFirst rightCentre, Letter.b.turns⟩
     : ExactTurn)) ∧
     (disjointFinalIds = (
   ["B1", "B2", "gap", "gap-label", "arc-a", "arc-b", "centre-left", "centre-right", "x", "ax",
@@ -573,6 +574,8 @@ if aFirst then 2 ≤ k else 1 ≤ k
     [true, false].all (fun b => (List.range 3).all fun k =>
       (disjointMoverAnchors b true k).length == 2 && (disjointMoverAnchors b false k).length == 2 &&
         (disjointSceneAnchors b).length == 4) = true ∧
+    declaredTurns 3 disjointMoves = [-1 / 5, -1 / 5, -1 / 5, -1 / 5] ∧
+    Letter.a.turns = -1 / 5 ∧ Letter.b.turns = -1 / 5 ∧ turnsAreFifths = true ∧
     disjointArrives = true ∧
     (disjointX true 2 == disjointX false 2 && disjointY true 2 == disjointY false 2) = true ∧
     (Letter.a.rotate leftSample == leftCentre + phiInv * zeta 1) = true ∧
@@ -770,7 +773,7 @@ fixedSamples.map ZetaFrac.ofZeta
     |>.named "points outside the left disk, which a fixes" |>.withId "outside"
     : Item)) ∧
     (generatorTurn = (
-⟨ZetaFrac.ofZeta leftCentre, -1 / 5⟩
+⟨ZetaFrac.ofZeta leftCentre, Letter.a.turns⟩
     : ExactTurn)) ∧
     (∀ (k : Nat), generatorActors k = (
   let z := ZetaFrac.ofZeta
@@ -787,6 +790,7 @@ fixedSamples.map ZetaFrac.ofZeta
       ("origin", "appear"), ("image", "appear"), ("image-label", "appear")] ∧
     (turningAnchors turnedSamples).length = 6 ∧ (turningAnchors turnedImages).length = 6 ∧
     fixedAnchors.length = 3 ∧
+    declaredTurns 2 generatorMoves = [-1 / 5] ∧ Letter.a.turns = -1 / 5 ∧ turnsAreFifths = true ∧
     generatorArrives = true ∧
     turnedSamples.all (Letter.a.covers r2ThreeHalves) = true ∧
     (turnedSamples.map (Letter.a.act r2ThreeHalves) == turnedImages) = true ∧
@@ -941,7 +945,8 @@ if k == 4 then "z₄ = z₃" else stepName k
 1 / 5
     : Rat)) ∧
     (∀ (k : Nat), stepTurn k = (
-  ⟨ZetaFrac.ofZeta (stepWord.getD k .a).centre, -1 / 5⟩
+  let l := stepWord.getD k .a
+  ⟨ZetaFrac.ofZeta l.centre, l.turns⟩
     : ExactTurn)) ∧
     (∀ (k : Nat), stepPivotId k = (
   if (stepWord.getD k .a).centre == leftCentre then "pivot-left" else "pivot-right"
@@ -973,6 +978,8 @@ if k == 4 then "z₄ = z₃" else stepName k
     stepMoves 3 = [("reach", .appear), (stepPivotId 2, .vanish), ("name-3", .vanish),
       ("name-4", .appear)] ∧
     (List.range 5).all (fun k => (stepAnchors k).length == 1) = true ∧
+    declaredTurns 4 stepMoves = [-1 / 5, -1 / 5, -1 / 5] ∧
+    declaredTurns 4 stepMoves = (stepWord.take 3).map Letter.turns ∧ turnsAreFifths = true ∧
     stepsArrive = true := by
   repeat' apply And.intro
   all_goals first
@@ -1174,48 +1181,48 @@ namespace TDCSGFigures
 open PILean PILean.Plane PILean.Exact TDCSGFigures.Early
 
 /-- The three loops and the data their key frames are drawn from. The figures are `wordLoop 1`,
-`wordLoop 2`, `wordLoop 3`, the loop without the word strip (`wordLoopWith i false`): one panel
-whose keys are `wordKey i k` and whose steps are `wordStep i k`, with the captions
-`wordCaption i k`.
-Key `k` draws, over the disks, their lens, the chord and the piece (`wordUnder`), the image
-`[w_k(p), w_k(q)]` of the piece `[p, q]` after `k` letters (`wordSegment`, read from `wordPath i`,
-here written out in the basis `1, ζ, ζ², ζ³`), the circle about the centre of the turn before it
-(`wordPivot`) and the ends lying on a boundary circle before the next letter (`wordContacts`, from
-`wordEqualities i`). Step `k` turns the image by the declared turn `wordTurn i k` and fades the
-other marks in and out (`wordFades`); that declared turn, applied exactly in `ℚ(ζ₅)`, carries both
-ends of image `k` onto those of image `k + 1` (`wordArrives`). Before every letter both current
-ends lie in the letter's closed disk of radius `R` (`wordChecks`), so the letter turns the whole
-segment, as in `TDCSG.Five.applyWord_chord`; the tests that hold with equality are those before
-letters 3, 4 of word 1, letters 2, 3 of word 2 and letters 1, 2, 5, 6 of word 3. The caption of key
-`k ≥ 1` names letter `k`, its turn and its direction. The last images are the pieces moved by
-`(2φ - 2)E` (words 1, 2) and `(2φ - 4)E` (word 3). Not stated: how the builders draw, the timing
-and the frames the browser draws between the key frames. -/
+`wordLoop 2`, `wordLoop 3`: one panel whose keys are `wordKey i k` and whose steps are
+`wordStep i k`, with the captions `wordCaption i k`. Key `k` draws, over the disks, their lens, the
+chord and the piece (`wordUnder`), the image `[w_k(p), w_k(q)]` of the piece `[p, q]` after `k`
+letters (`wordSegment`, read from `wordPath i`, here written out in the basis `1, ζ, ζ², ζ³`), the
+circle about the centre of the turn before it (`wordPivot`) and the ends lying on a boundary circle
+before the next letter (`wordContacts`, from `wordEqualities i`). Step `k` turns the image by the
+declared turn `wordTurn i k`, about the centre of letter `k + 1` by the letter's own fraction
+`Letter.turns`, and fades the other marks in and out (`wordFades`); that declared turn, applied
+exactly in `ℚ(ζ₅)`, carries both ends of image `k` onto those of image `k + 1` (`wordArrives`), and
+its fraction, written out in `wordLoop_keys`, is the letter's fifth in the letter's sense
+(`turnsAreFifths`). Before every letter both current ends lie in the letter's closed disk of radius
+`R` (`wordChecks`), so the letter turns the whole segment, as in `TDCSG.Five.applyWord_chord`; the
+tests that hold with equality are those before letters 3, 4 of word 1, letters 2, 3 of word 2 and
+letters 1, 2, 5, 6 of word 3. The caption of key `k ≥ 1` names letter `k`, its turn and its
+direction. The last images are the pieces moved by `(2φ - 2)E` (words 1, 2) and `(2φ - 4)E`
+(word 3). Not stated: how the builders draw, the timing and the frames the browser draws between
+the key frames. -/
 theorem wordLoop_figures :
     wordLoop1 = wordLoop 1 ∧ wordLoop2 = wordLoop 2 ∧ wordLoop3 = wordLoop 3 ∧
-    (∀ i, wordLoop i = wordLoopWith i false) ∧
-    (∀ i, (wordLoopWith i false).panels =
-      #[{ motion := { keys := wordLoopKeys i false, steps := wordLoopSteps i false } }]) ∧
-    (∀ i, wordLoopKeys i false =
-      ((List.range ((wordPiece i).1.length + 1)).map (wordKey i · false)).toArray) ∧
-    (∀ i, wordLoopSteps i false =
-      ((List.range (wordPiece i).1.length).map (wordStep i · false)).toArray) ∧
-    (∀ i, (wordLoopWith i false).captions =
+    (∀ i, (wordLoop i).panels =
+      #[{ motion := { keys := wordLoopKeys i, steps := wordLoopSteps i } }]) ∧
+    (∀ i, wordLoopKeys i =
+      ((List.range ((wordPiece i).1.length + 1)).map (wordKey i)).toArray) ∧
+    (∀ i, wordLoopSteps i =
+      ((List.range (wordPiece i).1.length).map (wordStep i)).toArray) ∧
+    (∀ i, (wordLoop i).captions =
       ((List.range ((wordPiece i).1.length + 1)).map (wordCaption i)).toArray) ∧
-    (∀ i k, (wordKey i k false).items =
-      wordUnder i ++ (#[wordSegment i k] ++ wordPivot i k ++ wordContacts i k ++ #[]) ++
-        wordOver i false) ∧
+    (∀ i k, (wordKey i k).items =
+      wordUnder i ++ (#[wordSegment i k] ++ wordPivot i k ++ wordContacts i k) ++ wordOver i) ∧
     (∀ i k, wordSegment i k =
       (Plane.Exact.segment ((wordPath i).getD k (origin, origin)).1
         ((wordPath i).getD k (origin, origin)).2 |>.role (pieceRole i) |>.width 4
         |>.named s!"the image of the piece of word {i}" |>.withId "segment")) ∧
-    (∀ i k, wordStep i k false =
+    (∀ i k, wordStep i k =
       { moves := #[("segment", Plane.Exact.turnAbout (wordTurn i k).centre (wordTurn i k).turns)] ++
-          wordFades i k false }) := by
+          wordFades i k }) ∧
+    (∀ i k, wordTurn i k =
+      ⟨ZetaFrac.ofZeta ((wordPiece i).1.getD k .a).centre, ((wordPiece i).1.getD k .a).turns⟩) := by
   exact ⟨by unfold wordLoop1; with_reducible rfl, by unfold wordLoop2; with_reducible rfl,
     by unfold wordLoop3; with_reducible rfl, fun _ => by unfold wordLoop; with_reducible rfl,
-    fun _ => by unfold wordLoopWith; with_reducible rfl, fun _ => rfl, fun _ => rfl,
-    fun _ => by unfold wordLoopWith; with_reducible rfl, fun _ _ => rfl, fun _ _ => rfl,
-    fun _ _ => rfl⟩
+    fun _ => rfl, fun _ => rfl, fun _ => by unfold wordLoop; with_reducible rfl, fun _ _ => rfl,
+    fun _ _ => rfl, fun _ _ => rfl, fun _ _ => by unfold wordTurn; with_reducible rfl⟩
 
 /-- The data of the key frames of the three loops (see `wordLoop_figures`). -/
 theorem wordLoop_keys :
@@ -1229,6 +1236,13 @@ theorem wordLoop_keys :
       (⟨#[-3, 1, -1, -2]⟩, ⟨#[1, 1, 1, 2]⟩), (⟨#[2, 1, 0, 2]⟩, ⟨#[-2, -1, 0, -2]⟩),
       (⟨#[-1, -1, -1, -2]⟩, ⟨#[3, -1, 1, 2]⟩), (⟨#[1, 2, 1, 1]⟩, ⟨#[-3, 2, -3, -1]⟩),
       (⟨#[0, -1, 1, 0]⟩, ⟨#[2, -3, 3, -2]⟩)]) = true ∧
+    (List.range 5).map (fun k => (wordTurn 1 k).turns) = [1 / 5, 1 / 5, 1 / 5, 1 / 5, 1 / 5] ∧
+    (List.range 5).map (fun k => (wordTurn 2 k).turns) = [-1 / 5, -1 / 5, -1 / 5, -1 / 5, -1 / 5] ∧
+    (List.range 6).map (fun k => (wordTurn 3 k).turns) =
+      [-1 / 5, -1 / 5, -1 / 5, 1 / 5, 1 / 5, 1 / 5] ∧
+    [1, 2, 3].all (fun i => (List.range (wordPiece i).1.length).all fun k =>
+      (wordTurn i k).turns == ((wordPiece i).1.getD k .a).turns) = true ∧
+    turnsAreFifths = true ∧
     wordChecks 1 = true ∧ wordChecks 2 = true ∧ wordChecks 3 = true ∧
     wordArrives 1 = true ∧ wordArrives 2 = true ∧ wordArrives 3 = true ∧
     (wordEqualities 1).map (·.1) = [2, 3] ∧ (wordEqualities 2).map (·.1) = [1, 2] ∧

@@ -163,12 +163,6 @@ theorem no_arrows :
       ({ arrowMark := false } : FramePairConfig).keyCount = 13 := by
   decide +kernel
 
--- The three words' word strip, an option off on the site: its marks are those `wordStripMarks`
--- names, and the animations with it pass every check of PILean's engine; checked by evaluation
--- (the drawing is in floating point).
-#guard wordStripMarks 1 && wordStripMarks 2 && wordStripMarks 3
-#guard [1, 2, 3].all fun i => (wordLoopWith i true).problems.isEmpty
-
 /-- At `r = 1.95`, a word whose first two letters turn about different centres has its second
 letter decided by a margin under `0.005` (`marginsVisible`): for each of the eight such pairs,
 the margin `1/200` fails, while the figure's word at `r = 2.12` has every margin at least `0.08`.

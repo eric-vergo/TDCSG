@@ -431,11 +431,14 @@ the two turns, `disjointDisksFinal`, at full size. -/
 def disjointKeys : Array Plane.Figure :=
   #[disjointKey 0, disjointKey 1, disjointKey 2, disjointDisksFinal]
 
-/-- The turn of `a` in the copy of the order `aFirst`: about the copy of `-1` by `-1/5`. -/
-def disjointTurnA (aFirst : Bool) : ExactTurn := ⟨disjointHalf aFirst leftCentre, -1 / 5⟩
+/-- The turn of `a` in the copy of the order `aFirst`: about the copy of `-1` by the fraction of
+`a`, `-1/5`. -/
+def disjointTurnA (aFirst : Bool) : ExactTurn := ⟨disjointHalf aFirst leftCentre, Letter.a.turns⟩
 
-/-- The turn of `b` in the copy of the order `aFirst`: about the copy of `1` by `-1/5`. -/
-def disjointTurnB (aFirst : Bool) : ExactTurn := ⟨disjointHalf aFirst rightCentre, -1 / 5⟩
+/-- The turn of `b` in the copy of the order `aFirst`: about the copy of `1` by the fraction of
+`b`, `-1/5`. -/
+def disjointTurnB (aFirst : Bool) : ExactTurn :=
+  ⟨disjointHalf aFirst rightCentre, Letter.b.turns⟩
 
 /-- The ids of the items of the figure of the two turns, which appear at the last step. -/
 def disjointFinalIds : List String :=
