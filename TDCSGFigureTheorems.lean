@@ -349,7 +349,10 @@ Zeta5.ofInt 12
     | (intros; unfold jumpTurn; with_reducible rfl)
     | (intros; unfold jumpActors; with_reducible rfl)
     | decide +kernel
-    | rfl
+    | (simp only [generatorMoves]; done)
+    | (simp only [stepMoves]; done)
+    | (simp only [jumpMoves]; done)
+    | (simp only [disjointMoves]; done)
 
 end TDCSGFigures
 ```
@@ -596,7 +599,10 @@ if aFirst then 2 ≤ k else 1 ≤ k
     | (intros; unfold disjointFinalIds; with_reducible rfl)
     | (intros; unfold disjointActors; with_reducible rfl)
     | decide +kernel
-    | rfl
+    | (simp only [generatorMoves]; done)
+    | (simp only [stepMoves]; done)
+    | (simp only [jumpMoves]; done)
+    | (simp only [disjointMoves]; done)
 
 end TDCSGFigures
 ```
@@ -804,7 +810,10 @@ fixedSamples.map ZetaFrac.ofZeta
     | (intros; unfold generatorTurn; with_reducible rfl)
     | (intros; unfold generatorActors; with_reducible rfl)
     | decide +kernel
-    | rfl
+    | (simp only [generatorMoves]; done)
+    | (simp only [stepMoves]; done)
+    | (simp only [jumpMoves]; done)
+    | (simp only [disjointMoves]; done)
 
 end TDCSGFigures
 ```
@@ -987,7 +996,10 @@ if k == 4 then "z₄ = z₃" else stepName k
     | (intros; unfold stepPivotId; with_reducible rfl)
     | (intros; unfold stepActors; with_reducible rfl)
     | decide +kernel
-    | rfl
+    | (simp only [generatorMoves]; done)
+    | (simp only [stepMoves]; done)
+    | (simp only [jumpMoves]; done)
+    | (simp only [disjointMoves]; done)
 
 end TDCSGFigures
 ```
@@ -1411,7 +1423,10 @@ theorem exchangedIntervals_keys :
     | (intros; unfold intervalSlide; with_reducible rfl)
     | (intros; unfold intervalActors; with_reducible rfl)
     | decide +kernel
-    | rfl
+    | (simp only [generatorMoves]; done)
+    | (simp only [stepMoves]; done)
+    | (simp only [jumpMoves]; done)
+    | (simp only [disjointMoves]; done)
 
 end TDCSGFigures
 ```
@@ -1622,7 +1637,10 @@ if w == 3 then "2φ − 4" else "2φ − 2"
     | (intros; unfold orbitShiftText; with_reducible rfl)
     | (intros; unfold orbitCaption; with_reducible rfl)
     | decide +kernel
-    | rfl
+    | (simp only [generatorMoves]; done)
+    | (simp only [stepMoves]; done)
+    | (simp only [jumpMoves]; done)
+    | (simp only [disjointMoves]; done)
 
 end TDCSGFigures
 ```
@@ -2494,7 +2512,10 @@ min (k + 1) path.length
     | (intros; unfold stepText; with_reducible rfl)
     | (intros; unfold walkCaption; with_reducible rfl)
     | decide +kernel
-    | rfl
+    | (simp only [generatorMoves]; done)
+    | (simp only [stepMoves]; done)
+    | (simp only [jumpMoves]; done)
+    | (simp only [disjointMoves]; done)
 
 end TDCSGFigures.Confinement
 ```
