@@ -84,14 +84,10 @@ def page_checks(c, browser, base, url, expect, helpers):
         motion_browser.position_checks(c, page, sid, spec, f"{url} {name} (dark, 1440 px)")
     sizes = page.evaluate("""() => [...document.querySelectorAll('figure.pilean-figure')]
       .filter(f => f.querySelector('.pilean-motion')).map(f => {
-        // the text column: the most common width of the page's paragraphs (the front page's
-        // first paragraph is narrower than the column, and a few panels are wider)
-        const counts = new Map();
-        for (const p of f.closest('main').querySelectorAll('p')) {
-          const w = Math.round(p.getBoundingClientRect().width);
-          if (w > 0) counts.set(w, (counts.get(w) || 0) + 1);
-        }
-        const col = [...counts].reduce((a, b) => (b[1] > a[1] ? b : a), [0, 0])[0];
+        // the text column: the page's first paragraph outside a figure (on the front page the
+        // first paragraph is a figure's caption)
+        const p = [...f.closest('main').querySelectorAll('p')].find(q => !q.closest('figure'));
+        const col = p ? p.getBoundingClientRect().width : 0;
         return [f.getBoundingClientRect().width, col]; })""")
     for fig, col in sizes:
         print(f"{url}: figure {fig:.0f} px in a text column of {col:.0f} px")
