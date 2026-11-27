@@ -450,9 +450,14 @@ def chordOrbitFinal : Plane.Figure where
 /-- The number of returns the animation shows one by one; the rows after them appear at once. -/
 def orbitHops : Nat := 12
 
-/-- The point that hops (actor `"hop"`), at row `k`, on `t_k`. -/
+/-- The anchor of the point that hops at key `k`: row `k`, on `t_k`. The drawing (`orbitHopper`)
+and the exact arrival check read this same point. -/
+def orbitHopAnchors (k : Nat) : List (QSqrt5 × QSqrt5) :=
+  [tPoint ((chordRows orbitSteps).getD k (0, rat 0)).2 (rowY k)]
+
+/-- The point that hops (actor `"hop"`), drawn at `orbitHopAnchors k`. -/
 def orbitHopper (k : Nat) : Item :=
-  Plane.Exact.point (tPoint ((chordRows orbitSteps).getD k (0, rat 0)).2 (rowY k)) |>.size 5
+  Plane.Exact.point ((orbitHopAnchors k).headD (rat 0, rat 0)) |>.size 5
     |>.named "the point tE of the orbit, one return per hop" |>.withId "hop"
 
 /-- The items of key `k ≤ orbitHops` of `chordOrbit`: the frame, the axis of steps, the rows before
@@ -509,7 +514,7 @@ def orbitActors (k : Nat) : List (ExactActor (QSqrt5 × QSqrt5)) :=
   let rows := chordRows orbitSteps
   let shown := if k ≤ orbitHops then k else orbitSteps + 1
   ((List.range shown).map fun j => ⟨s!"row-{j}", [tPoint (rows.getD j (0, rat 0)).2 (rowY j)]⟩) ++
-    (if k ≤ orbitHops then [⟨"hop", [tPoint (rows.getD k (0, rat 0)).2 (rowY k)]⟩] else [])
+    (if k ≤ orbitHops then [⟨"hop", orbitHopAnchors k⟩] else [])
 
 /-- Whether every declared move of `chordOrbit` carries the actors of one key onto those of the
 next, exactly in `ℚ(√5)²`. -/

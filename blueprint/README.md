@@ -75,16 +75,16 @@ the pages use with `PILeanVerso.withFigures` into `-verso-data/pilean-figures` w
 fingerprints and the source record of each file, and fails the build when a figure with
 `checks := .fail` has a layout problem (at its full and its narrow width, in both themes).
 
-A chapter shows a figure with `:::figure` (inline, so that the picture follows the page's theme
-and its elements link to Lean) or `:::figure_explorer` (a slider or stepper), with a label, a text
+A chapter shows a figure with `:::figure` (inline, so that the picture follows the page's theme and
+its elements link to Lean) or `:::figure_explorer` (a slider or stepper), with a label, a text
 alternative, the theorem it proves and the caption as the body. An animation (a PILean
 `MotionPanels` marked `@[figure illustration]`) is shown with `:::figure` too, always inline: it
-loops on its own clock with no controls and no script, and shows its key frames as stills, each
-with its caption, while it is hovered or focused, when the reader turns animations off with the
-switch beside the theme control or the system asks for reduced motion, and in print. Figures are numbered as the
-Blueprint numbers its statements: "Figure 5.1" is the first figure of chapter 5, and the figures
-of the unnumbered pages (the front page and the two part pages) are numbered 1 to 4. Prose refers
-to a figure by its label, `{figref "lens-estimate"}[]`, which renders its current number.
+loops on its own clock with no controls and no script, and shows its key frames as stills, each with
+its caption, while it is hovered or focused, when the reader turns animations off with the switch
+beside the theme control or the system asks for reduced motion, and in print. Figures are numbered
+as the Blueprint numbers its statements: "Figure 5.1" is the first figure of chapter 5, and the
+figures of the unnumbered pages (the front page and the two part pages) are numbered 1 to 4. Prose
+refers to a figure by its label, `{figref "lens-estimate"}[]`, which renders its current number.
 
 Under each figure the page shows its number and caption, then a source line: the declaration,
 its file and line linked to the repository at the build's commit, the fingerprint, and the
@@ -157,15 +157,17 @@ the reduced-motion view and print show first, and the theorem `<name>_spec` stay
 that the last key frame is the figure and what the figure draws. The other key frames, the moves
 and the captions are stated in a plain theorem `<name>_keys`. The other animations are
 illustrations (`@[figure illustration]`): no theorem is linked to them, and the data of their key
-frames are stated in `wordLoop_keys`, `wordSteps_keys`, `framePair_keys` and `walkToLeaf_keys`.
+frames are stated in `wordLoop_keys`, `wordSteps_spec`, `framePair_keys` and `walkToLeaf_spec`.
+Each actor that moves is drawn at the exact anchors that its arrival check reads, and the theorems
+state those anchors.
 `TDCSGTests.Motions` proves that the exact arrival checks refuse a wrong centre, fraction, vector
 or position.
 
 The site ships no script of its own for the animations: the moving pictures are SMIL in the page,
 and what hides them is the stylesheet of PILean's adapter and the motion switch of Verso Blueprint.
-The figures keep the anchors of the figures and steppers they replaced, and the site build writes
-a page at the address of each figure page whose declaration was renamed that sends the reader on
-(`movedFigures` in `BlueprintMain.lean`).
+Each animation keeps the label, and so the anchor, of the figure at its place, and the site build
+writes a page that sends the reader on at the address of each figure page whose declaration has a
+new name (`movedFigures` in `BlueprintMain.lean`).
 
 Both kinds of animation have a word strip, off on the site: the word written under the picture
 with the letter of the current key marked (`FramePairConfig.strip`, `wordLoopWith i true`,
@@ -201,14 +203,16 @@ An animation is a `Plane.MotionPanels` (one panel, or several on one clock) whos
 as in step 2 and whose steps declare their moves, exactly (`exactStep`, with `moveTiming` for its
 timing), with `pacing := motionPacing`, `checks := .fail`, `width := figureWidth` and
 `narrowWidth := some narrowWidth`, marked `@[figure illustration]`; its captions, one per key,
-carry no counter ("Step k of N" is added by the page). State in a plain theorem on the page of the
-figures' theorems that the figure is made of its keys and steps (`by unfold name; with_reducible
-rfl`, which fails at once when they differ), what each key draws, the declared moves, that they
-arrive exactly (`allArrive … = true`) and each caption as a function of its key's data; add it to
-`previews` and to `motions` in `TDCSGTests/MotionOut.lean`, and show it with
-`:::figure TDCSGFigures.name (label := "…") (alt := "…")`. An animation that replaces a figure with
-a linked theorem keeps its name and label, ends on that figure (and shows it as its poster), and
-keeps its theorem linked, as above.
+carry no counter ("Step k of N" is added by the page). Draw each actor that moves at the exact
+anchors its arrival check reads (one list for both, as `turningAnchors` does). State in a plain
+theorem on the page of the figures' theorems that the figure is made of its keys and steps
+(`by unfold name; with_reducible rfl`, which fails at once when they differ), what each key draws,
+the anchors, the declared moves, that they arrive exactly (`allArrive … = true`) and each caption as
+a function of its key's data; add it to `previews` and to `siteMotions` in
+`TDCSGTests/Motions.lean`, whose `#guard` requires that PILean's engine finds no error in it, and
+show it with `:::figure TDCSGFigures.name (label := "…") (alt := "…")`. An animation that replaces
+a figure with a linked theorem keeps its name and label, ends on that figure, at its size (and
+shows it as its poster), and keeps its theorem linked, as above.
 
 ### The frame pair for other words
 

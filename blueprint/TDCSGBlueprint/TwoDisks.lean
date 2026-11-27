@@ -100,7 +100,7 @@ through $`72^\circ` about its center, circled, when the point lies in that lette
 and leaves it where it is otherwise. Here $`a`, $`b`, $`b` find their point in their disk, and the
 last $`a` meets $`z_3` outside the left disk (dashed: farther than $`2.1` from $`-1`), so
 $`z_4=z_3`. The points left behind stay faint. The key frames are exact
-(`TDCSGFigures.wordSteps_keys`); between them the browser turns the point about the circled center.
+(`TDCSGFigures.wordSteps_spec`); between them the browser turns the point about the circled center.
 :::
 
 :::lemma_ "two_disk_support" (lean := "TDCSG.diskUnion, TDCSG.ballUnion_eq_diskUnion, TDCSG.apply_eq_of_notMem_diskUnion, TDCSG.apply_mem_diskUnion") (uses := "group_orbit, compound_support")

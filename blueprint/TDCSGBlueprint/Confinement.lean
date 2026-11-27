@@ -97,7 +97,7 @@ is reached (dots for weight zero, squares for weight one). It lowers the coordin
 $`0` to $`-4`, then crosses the good level $`-5` into the label $`n=(0,3,-5,4,-2)` at the window's
 edge. The other candidates $`n+e_k`, $`k\ne2`, lie outside the window (open rings at the ends of
 dashed spokes), so $`n` is a leaf and the walk can only step back to $`n+e_2`, as the one-step lemma
-requires. The key frames are exact (`TDCSGFigures.Confinement.walkToLeaf_keys`); between them the
+requires. The key frames are exact (`TDCSGFigures.Confinement.walkToLeaf_spec`); between them the
 browser slides the circle along the edges.
 :::
 

@@ -60,12 +60,18 @@ def exchangedIntervalsFinal : Plane.Figure where
     #[1, 2, 3].flatMap fun i => intervalBand i after) ++ intervalNames
   info := { title := "The three pieces before and after one return" }
 
-/-- The copy of piece `i` that slides (actor `"piece-<i>"`): at the row before the return until
-its word has moved it, at its place in the row after from then on. -/
-def intervalCopy (i : Nat) (moved : Bool) : Item :=
+/-- The anchors of the copy of piece `i`: its ends, on the row before the return until its word
+has moved it, at its place in the row after from then on. The drawing (`intervalCopy`) and the
+exact arrival check read these same points. -/
+def intervalCopyAnchors (i : Nat) (moved : Bool) : List (QSqrt5 × QSqrt5) :=
   let (a, b) := returnInterval i moved
-  let y := intervalRowY moved
-  Plane.Exact.segment (a, y) (b, y) |>.width 5 |>.role (pieceRole i)
+  [(a, intervalRowY moved), (b, intervalRowY moved)]
+
+/-- The copy of piece `i` that slides (actor `"piece-<i>"`), drawn at
+`intervalCopyAnchors i moved`. -/
+def intervalCopy (i : Nat) (moved : Bool) : Item :=
+  let e := fun (j : Nat) => (intervalCopyAnchors i moved).getD j (rat 0, rat 0)
+  Plane.Exact.segment (e 0) (e 1) |>.width 5 |>.role (pieceRole i)
     |>.named s!"a copy of piece {i}, moved by word {i}" |>.withId s!"piece-{i}"
 
 /-- The items of key `k ≤ 3` of `exchangedIntervals`: the row before the return, the copies of the
@@ -109,10 +115,7 @@ def intervalMoves (k : Nat) : List (String × ExactMove (QSqrt5 × QSqrt5)) :=
 to key `3`, the ends of the pieces of the row after and the points of their labels at key `4`. -/
 def intervalActors (k : Nat) : List (ExactActor (QSqrt5 × QSqrt5)) :=
   if k ≤ 3 then
-    [1, 2, 3].map fun i =>
-      let moved := decide (i ≤ k)
-      let (a, b) := returnInterval i moved
-      ⟨s!"piece-{i}", [(a, intervalRowY moved), (b, intervalRowY moved)]⟩
+    [1, 2, 3].map fun i => ⟨s!"piece-{i}", intervalCopyAnchors i (decide (i ≤ k))⟩
   else
     [1, 2, 3].flatMap fun i =>
       let (a, b) := returnInterval i true

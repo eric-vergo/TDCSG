@@ -296,16 +296,17 @@ the identity has every $`\hat h_i` trivial, and then every $`h_i` trivial by inj
 extension.
 :::
 
-:::figure TDCSGFigures.disjointDisks (label := "disjoint-disks") (links := TDCSGFigures.disjointDisks_spec) (alt := "Two panels on one clock, each with two disjoint closed disks, of radius 4/5 about minus one and 7/10 about one, and a point in each. Left: the left point turns 72 degrees clockwise about minus one, then the right point about one. Right: the same two turns in the other order. Both panels end in the same picture, with the arcs of the two turns.")
+:::figure TDCSGFigures.disjointDisks (label := "disjoint-disks") (links := TDCSGFigures.disjointDisks_spec) (alt := "Two small copies of two disjoint closed disks, of radius 4/5 about minus one and 7/10 about one, each with a point in each disk. In the left copy the left point turns 72 degrees clockwise about minus one, then the right point about one; in the right copy the same two turns happen in the other order. Both copies end in the same picture, which gives way to the full-size figure with the arcs of the two turns.")
 Two disjoint closed disks, $`B_1` of radius $`4/5` about $`-1` and $`B_2` of radius $`7/10` about
 $`1`, each turned clockwise through $`72^\circ` by its own generator, in both orders on one clock:
-$`a` then $`b` on the left, $`b` then $`a` on the right. The turn $`a` of $`B_1` moves $`x` to
-$`a(x)` and fixes every point outside $`B_1`, such as $`y`; the turn $`b` of $`B_2` moves $`y` to
-$`b(y)` and fixes $`x`. Both orders end in the same picture. Since $`4/5+7/10<2` the dashed gap
-separates the disks, the turns move disjoint sets of points and commute, and the group they
-generate is $`C_5\times C_5`. The key frames are exact, both panels end in the figure its theorem
-states (`TDCSGFigures.disjointDisks_spec`, the other frames in `TDCSGFigures.disjointDisks_keys`),
-and between them the browser turns the drawn points about the centers.
+$`a` then $`b` in the copy on the left, $`b` then $`a` in the copy on the right. The turn $`a` of
+$`B_1` moves $`x` to $`a(x)` and fixes every point outside $`B_1`, such as $`y`; the turn $`b` of
+$`B_2` moves $`y` to $`b(y)` and fixes $`x`. Both orders end in the same picture, the last frame.
+Since $`4/5+7/10<2` the dashed gap separates the disks, the turns move disjoint sets of points and
+commute, and the group they generate is $`C_5\times C_5`. The key frames are exact, and the last
+one is the figure its theorem states (`TDCSGFigures.disjointDisks_spec`, the other frames in
+`TDCSGFigures.disjointDisks_keys`); between them the browser turns the drawn points about the
+centers.
 :::
 
 :::lemma_ "uniform_orbits" (lean := "MulAction.finite_of_encard_orbit_le")

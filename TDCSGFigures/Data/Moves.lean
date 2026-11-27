@@ -21,7 +21,9 @@ animation read one list.
 
 The points are either of `ℚ(ζ₅)` (`ZetaFrac`, in which turns by fifths are exact) or of
 `ℚ(√5)²` (`QSqrt5 × QSqrt5`, for the diagrams on a parameter line, which only slide);
-`ExactPlane` gives each its equality, sum and turns.
+`ExactPlane` gives each its equality, sum and turns. `ExactMove.toMove_turn` and its companions
+state what the engine is given: the exact turn's centre and fraction, sign included, and the exact
+slide's vector.
 
 `moveTiming` is the timing of a step under `motionPacing`: a turn or a slide eased, a step that
 only fades not eased.
@@ -93,14 +95,35 @@ def ExactMove.toMove [PlanePoint α] : ExactMove α → Move
 def exactStep [PlanePoint α] (moves : List (String × ExactMove α)) : MotionStep :=
   { moves := moves.toArray.map fun (id, m) => (id, m.toMove) }
 
+/-- The engine turns by the exact turn's own centre and fraction, sign included. -/
+theorem ExactMove.toMove_turn [PlanePoint α] (t : ExactTurn) :
+    (ExactMove.turn t : ExactMove α).toMove = .turn (PlanePoint.toPoint t.centre) t.turns := rfl
+
+/-- The engine slides along the page vector of the exact vector. -/
+theorem ExactMove.toMove_slide [PlanePoint α] (v : α) :
+    (ExactMove.slide v).toMove = .slide (PlanePoint.toPoint v) := rfl
+
+/-- An appearance is an appearance. -/
+theorem ExactMove.toMove_appear [PlanePoint α] :
+    (ExactMove.appear : ExactMove α).toMove = .appear := rfl
+
+/-- A disappearance is a disappearance. -/
+theorem ExactMove.toMove_vanish [PlanePoint α] :
+    (ExactMove.vanish : ExactMove α).toMove = .vanish := rfl
+
+/-- The step the animation declares holds the exact moves, each read by `ExactMove.toMove`, in
+order. -/
+theorem exactStep_moves [PlanePoint α] (moves : List (String × ExactMove α)) :
+    (exactStep moves).moves = moves.toArray.map (fun (id, m) => (id, m.toMove)) := rfl
+
 /-- Whether the anchors `ps`, each moved by `f`, are the anchors `qs`, exactly. -/
 def landsBy [ExactPlane α] (f : α → Option α) (ps qs : List α) : Bool :=
   ps.length == qs.length && (ps.zip qs).all fun (p, q) => (f p).any (ExactPlane.same · q)
 
 /-- Whether the moves `moves` carry the actors `before` of one key onto the actors `after` of the
-next, exactly: an actor turned or slid lands on its anchors in `after`; an actor no move names is
-in `after` with the same anchors; one that vanishes is not in `after`; an actor of `after` that
-is not in `before` appears; and every move names an actor of one of the two keys. -/
+next, exactly: an actor turned or slid has anchors and lands on its anchors in `after`; an actor no
+move names is in `after` with the same anchors; one that vanishes is not in `after`; an actor of
+`after` that is not in `before` appears; and every move names an actor of one of the two keys. -/
 def stepArrives [ExactPlane α] (moves : List (String × ExactMove α))
     (before after : List (ExactActor α)) : Bool :=
   let find : List (ExactActor α) → String → Option (ExactActor α) := fun xs id =>
@@ -108,8 +131,10 @@ def stepArrives [ExactPlane α] (moves : List (String × ExactMove α))
   let moveOf : String → Option (ExactMove α) := fun id => (moves.find? (·.1 == id)).map (·.2)
   before.all (fun a => match moveOf a.id, find after a.id with
     | some .vanish, none => true
-    | some (.turn t), some b => landsBy (ExactPlane.turn t) a.anchors b.anchors
-    | some (.slide v), some b => landsBy (fun p => some (ExactPlane.add p v)) a.anchors b.anchors
+    | some (.turn t), some b =>
+      !a.anchors.isEmpty && landsBy (ExactPlane.turn t) a.anchors b.anchors
+    | some (.slide v), some b =>
+      !a.anchors.isEmpty && landsBy (fun p => some (ExactPlane.add p v)) a.anchors b.anchors
     | none, some b => landsBy some a.anchors b.anchors
     | _, _ => false) &&
   after.all (fun b => (find before b.id).isSome ||

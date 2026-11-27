@@ -14,8 +14,11 @@ a turn, a vector of a slide or the place of an actor, and proves, by `decide +ke
 check then fails. The figures' own statements are on the page of the figures' theorems
 (`TDCSGFigures.generatorStep_keys` and the other `_keys` theorems).
 
-The `#guard` lines pin the captions of the animations whose captions are built from their data,
-word for word, by evaluation.
+A `#guard` line requires that PILean's engine reports no error for any animation of the site, wide
+or narrow, so that a drawn move that misses its key stops the build. The other `#guard` lines pin
+the captions of the animations whose captions are built from their data,
+word for word, by evaluation: the kernel does not reduce the string functions these captions are
+built with, so the theorems state the caption functions and these lines their texts.
 -/
 
 namespace TDCSGTests.Motions
@@ -63,10 +66,18 @@ theorem jump_wrongFraction :
       jumpActors = false := by
   decide +kernel
 
-/-- In the panel `b`, then `a`, turning `x` first misses its key. -/
+/-- In the copy of `b`, then `a`, turning `x` first misses its key. -/
 theorem disjoint_wrongOrder :
-    allArrive 3 (fun k => if k == 0 then [("x-moving", .turn disjointTurnA)]
-      else disjointMoves false k) (disjointActors false) = false := by
+    allArrive 3 (fun k => if k == 0 then
+      [("ab-x", .turn (disjointTurnA true)), ("ba-x", .turn (disjointTurnA false))]
+      else disjointMoves k) disjointActors = false := by
+  decide +kernel
+
+/-- An actor whose anchors are left out is caught: the copy of `a`, then `b` with no anchors for
+its moving `x` fails the check. -/
+theorem disjoint_emptyAnchors :
+    allArrive 3 disjointMoves (fun k => (disjointActors k).map fun a =>
+      if a.id == "ab-x" then { a with anchors := [] } else a) = false := by
   decide +kernel
 
 /-- Piece 3 of the interval exchange slid by `2φ - 2` instead of `2φ - 4` misses its key. -/
@@ -89,6 +100,30 @@ theorem walk_wrongVector :
       [("walker", .slide (ZetaFrac.ofZeta (-zeta 1))), ("edge-0", .appear), ("label-1", .appear)]
       else Confinement.walkMoves k) Confinement.walkActors = false := by
   decide +kernel
+
+/-! ### The engine finds no error in any animation of the site -/
+
+/-- The animations of the site, with the names of their files in the site: the declaration's name,
+without the name of its module where the module's name begins it (`walkToLeaf`, declared in
+`TDCSGFigures.Confinement`). -/
+def siteMotions : Array (String × PILean.Plane.MotionPanels) := #[
+  ("TDCSGFigures.wordLoop1", wordLoop1),
+  ("TDCSGFigures.wordLoop2", wordLoop2),
+  ("TDCSGFigures.wordLoop3", wordLoop3),
+  ("TDCSGFigures.Lift.framePair", Lift.framePair),
+  ("TDCSGFigures.extensionJump", extensionJump),
+  ("TDCSGFigures.disjointDisks", disjointDisks),
+  ("TDCSGFigures.generatorStep", generatorStep),
+  ("TDCSGFigures.wordSteps", wordSteps),
+  ("TDCSGFigures.exchangedIntervals", exchangedIntervals),
+  ("TDCSGFigures.chordOrbit", chordOrbit),
+  ("walkToLeaf", Confinement.walkToLeaf)]
+
+-- Every animation of the site, and its narrow rendition, has no error in PILean's engine: every
+-- move it draws lands on its next key, every rest shows its still, the writer agrees with the
+-- baker. A drawn move that differs from the exact one it is made from stops the build here.
+#guard siteMotions.all fun (_, P) =>
+  P.report.errors.isEmpty && (P.narrow.map (·.report.errors.isEmpty)).getD true
 
 /-! ### The captions built from data, word for word -/
 
@@ -128,6 +163,7 @@ theorem walk_wrongVector :
   "Move 14: − e₂, into n = (0, 3, −5, 4, −2): the step crosses the good level −5 of n₂.",
   "n is a leaf: its other candidates n + eₖ, k ≠ 2, lie outside the window (open rings at the \
     ends of dashed spokes).",
-  "From the leaf n the only step leads back to n + e₂, as the one-step lemma requires."]
+  "From the leaf n the only step leads back to n + e₂, as the one-step lemma requires. The \
+    labels of the path are numbered in the order of the walk."]
 
 end TDCSGTests.Motions

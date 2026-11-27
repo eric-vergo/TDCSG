@@ -23,7 +23,7 @@ import TDCSGFigures.Style
 Every point is exact in `ℤ[ζ₅]`, every radius rational, and every incidence the figures record is
 decided exactly in `ℚ(√5)`; every declared move is checked exactly (`generatorArrives`,
 `stepsArrive`). The statements are `generatorStep_spec`, `generatorStep_keys` and
-`wordSteps_keys`.
+`wordSteps_spec`.
 -/
 
 namespace TDCSGFigures
@@ -126,22 +126,40 @@ def fixedSamples : List Zeta5 :=
 /-- The points of `turnedSamples` after the turn by `a`, `-1 + ζ⁴ (z + 1)`. -/
 def turnedImages : List Zeta5 := turnedSamples.map Letter.a.rotate
 
-/-- The content of the left disk that turns (actor `"disk"`), with the samples at `zs`: the
-segment from the first to `-1`, the first as a point and the others as small dots, each recording
-that it lies inside the left disk. -/
-def turningContent (zs : List Zeta5) : Item :=
-  let z := zs.headD origin
-  (group (#[Plane.Exact.segment z leftCentre |>.role leftRole |>.width 1.5,
-      Plane.Exact.point z |>.role leftRole] ++
-    (zs.drop 1).toArray.map fun w =>
+/-- The anchors of the content of the left disk that turns, with the samples at `zs`: the first
+sample and `-1` (the ends of its segment), then every sample (the first one's point and the
+dots). The drawing (`turningContentAt`) and the exact arrival check read these same points. -/
+def turningAnchors (zs : List Zeta5) : List ZetaFrac :=
+  let z := ZetaFrac.ofZeta (zs.headD origin)
+  [z, ZetaFrac.ofZeta leftCentre] ++ zs.map ZetaFrac.ofZeta
+
+/-- The content of the left disk that turns (actor `"disk"`), drawn at the anchors `as`
+(`turningAnchors`): the segment between the first two, the third as a point and the others as
+small dots, each recording that it lies inside the left disk. -/
+def turningContentAt (as : List ZetaFrac) : Item :=
+  let o := ZetaFrac.ofZeta origin
+  (group (#[Plane.Exact.segment (as.getD 0 o) (as.getD 1 o) |>.role leftRole |>.width 1.5,
+      Plane.Exact.point (as.getD 2 o) |>.role leftRole] ++
+    (as.drop 3).toArray.map fun w =>
       Plane.Exact.point w |>.role leftRole |>.size 3 |>.incident .inside "the left circle"))
     |>.named "points of the left disk, which a turns" |>.withId "disk"
 
-/-- The points outside the left disk (actor `"outside"`), each recording that it lies outside. -/
+/-- The content of the left disk with the samples at `zs`. -/
+def turningContent (zs : List Zeta5) : Item := turningContentAt (turningAnchors zs)
+
+/-- The anchors of the points outside the left disk. -/
+def fixedAnchors : List ZetaFrac := fixedSamples.map ZetaFrac.ofZeta
+
+/-- The points outside the left disk (actor `"outside"`), drawn at `fixedAnchors`, each recording
+that it lies outside. -/
 def fixedContent : Item :=
-  group (fixedSamples.toArray.map fun w =>
+  group (fixedAnchors.toArray.map fun w =>
       Plane.Exact.point w |>.size 3 |>.incident .outside "the left circle")
     |>.named "points outside the left disk, which a fixes" |>.withId "outside"
+
+/-- The samples of the left disk at key `k`: `turnedSamples` before the turn, `turnedImages` after
+it. -/
+def generatorSamples (k : Nat) : List Zeta5 := if k == 0 then turnedSamples else turnedImages
 
 /-- The items of key `k` of `generatorStep`, `k ≤ 1`: the content of the left disk, the origin and
 the samples inside it, before (`k = 0`) or after the turn, and the points outside it, between the
@@ -149,7 +167,7 @@ base and the centres of `generatorStepFinal`, in place of its marks of the turn,
 `a(0)` and its label. -/
 def generatorKeyItems (k : Nat) : Array Item :=
   generatorBase ++
-    #[turningContent (if k == 0 then turnedSamples else turnedImages), fixedContent] ++
+    #[turningContent (generatorSamples k), fixedContent] ++
     generatorCentres ++ generatorLabels ++ generatorNames
 
 /-- The captions of the keys of `generatorStep`. -/
@@ -184,16 +202,14 @@ def generatorMoves : Nat → List (String × ExactMove ZetaFrac)
       ("image-label", .appear)]
 
 /-- The exact anchors of the actors of key `k` of `generatorStep`: at keys `0` and `1`, the
-content of the disk (the first sample and the centre, the ends of the segment, then the samples,
-`turnedSamples` before the turn and `turnedImages` after) and the points
-outside; at key `2`, the marks of the turn (the ends of the segment and of the arc, the centre of
-the angle and of its label), the origin, `a(0)` and its label. -/
+content of the disk (`turningAnchors` of the samples of the key) and the points outside
+(`fixedAnchors`), the same points the key draws; at key `2`, the marks of the turn (the ends of
+the segment and of the arc, the centre of the angle and of its label), the origin, `a(0)` and its
+label, which only appear. -/
 def generatorActors (k : Nat) : List (ExactActor ZetaFrac) :=
   let z := ZetaFrac.ofZeta
-  let samples := if k == 0 then turnedSamples else turnedImages
   if k ≤ 1 then
-    [⟨"disk", [z (samples.headD origin), z leftCentre] ++ samples.map z⟩,
-      ⟨"outside", fixedSamples.map z⟩]
+    [⟨"disk", turningAnchors (generatorSamples k)⟩, ⟨"outside", fixedAnchors⟩]
   else
     [⟨"image-spoke", [z leftCentre, z aZero]⟩, ⟨"angle", [z leftCentre]⟩,
       ⟨"angle-label", [z leftCentre]⟩, ⟨"arc", [z origin, z aZero]⟩, ⟨"origin", [z origin]⟩,
@@ -258,16 +274,30 @@ def stepPoint (k : Nat) : Zeta5 := stepPoints.getD k origin
 /-- Whether letter `k + 1` of `a b b a` turns `z_k` (`Letter.covers`, decided exactly). -/
 def stepActs (k : Nat) : Bool := (stepWord.getD k .a).covers r2Step (stepPoint k)
 
-/-- The point that follows the word (actor `"point"`), at `z_k`. -/
-def stepMover (k : Nat) : Item :=
-  Plane.Exact.point (stepPoint k) |>.size 5 |>.named "the point followed through the word"
-    |>.withId "point"
+/-- The anchor of `z_k`: the point that the point following the word, its name at key `k` and the
+point left behind there are drawn at, and that the exact arrival check reads. -/
+def stepAnchors (k : Nat) : List ZetaFrac := [ZetaFrac.ofZeta (stepPoint k)]
 
-/-- The point `z_j` left behind (actor `"trail-<j>"`): faint, with its label, recording where it
-stands relative to the disks. -/
+/-- The point that follows the word (actor `"point"`), at `stepAnchors k`. -/
+def stepMover (k : Nat) : Item :=
+  Plane.Exact.point ((stepAnchors k).headD (ZetaFrac.ofZeta origin)) |>.size 5
+    |>.named "the point followed through the word" |>.withId "point"
+
+/-- The name of the point at key `k`: `z_k`, and `z₄ = z₃` at the last key. -/
+def stepLabelText (k : Nat) : String := if k == 4 then "z₄ = z₃" else stepName k
+
+/-- The name of the point that follows the word at key `k` (actor `"name-<k>"`), at
+`stepAnchors k`. -/
+def stepLabel (k : Nat) : Item :=
+  Plane.Exact.label (stepLabelText k) ((stepAnchors k).headD (ZetaFrac.ofZeta origin)) .auto
+    |>.bold |>.withId s!"name-{k}"
+
+/-- The point `z_j` left behind (actor `"trail-<j>"`), at `stepAnchors j`: faint, with its label,
+recording where it stands relative to the disks. -/
 def stepTrail (j : Nat) : Item :=
-  (group #[withSidesStep (stepPoint j) (Plane.Exact.point (stepPoint j) |>.faint),
-      Plane.Exact.label (stepName j) (stepPoint j) .auto])
+  let p := (stepAnchors j).headD (ZetaFrac.ofZeta origin)
+  (group #[withSidesStep (stepPoint j) (Plane.Exact.point p |>.faint),
+      Plane.Exact.label (stepName j) p .auto])
     |>.named (stepName j) |>.withId s!"trail-{j}"
 
 /-- The points left behind at key `k`: `z_j` for `j < k` with `z_j ≠ z_k`. -/
@@ -299,7 +329,7 @@ def stepReach (k : Nat) : Array Item :=
 /-- The items of key `k` of `wordSteps`. -/
 def stepKeyItems (k : Nat) : Array Item :=
   stepBase ++ stepPivot k ++ stepReach k ++ (stepTrailIndices k).toArray.map stepTrail ++
-    #[stepMover k]
+    #[stepMover k, stepLabel k]
 
 /-- The captions of the keys of `wordSteps`. -/
 def stepCaptions : Array String := #[
@@ -333,17 +363,20 @@ def stepPivotId (k : Nat) : String :=
 /-- The declared moves from key `k` to key `k + 1` of `wordSteps`: for the three letters that act,
 the point turns by `stepTurn k`, the circle about the letter's centre appears unless it is already
 there and the circle of the letter before vanishes, and the point left behind appears; for the
-last letter, which does not act, the segment from `-1` to `z₃` appears and the circle vanishes. -/
+last letter, which does not act, the segment from `-1` to `z₃` appears and the circle vanishes.
+At every step the name of the point fades out and the next one in. -/
 def stepMoves : Nat → List (String × ExactMove ZetaFrac)
-  | 0 => [("point", .turn (stepTurn 0)), (stepPivotId 0, .appear), ("trail-0", .appear)]
+  | 0 => [("point", .turn (stepTurn 0)), (stepPivotId 0, .appear), ("trail-0", .appear),
+      ("name-0", .vanish), ("name-1", .appear)]
   | 1 => [("point", .turn (stepTurn 1)), (stepPivotId 1, .appear), ("trail-1", .appear),
-      (stepPivotId 0, .vanish)]
-  | 2 => [("point", .turn (stepTurn 2)), ("trail-2", .appear)]
-  | _ => [("reach", .appear), (stepPivotId 2, .vanish)]
+      (stepPivotId 0, .vanish), ("name-1", .vanish), ("name-2", .appear)]
+  | 2 => [("point", .turn (stepTurn 2)), ("trail-2", .appear), ("name-2", .vanish),
+      ("name-3", .appear)]
+  | _ => [("reach", .appear), (stepPivotId 2, .vanish), ("name-3", .vanish), ("name-4", .appear)]
 
 /-- The exact anchors of the actors of key `k` of `wordSteps`: the circle about the centre of
-letter `k`, the segment from `-1` to `z₃` at key `4`, the points left behind and the point
-`z_k`. -/
+letter `k`, the segment from `-1` to `z₃` at key `4`, the points left behind, the point `z_k` and
+its name, the last three at the anchors they are drawn at (`stepAnchors`). -/
 def stepActors (k : Nat) : List (ExactActor ZetaFrac) :=
   let z := ZetaFrac.ofZeta
   let pivot : List (ExactActor ZetaFrac) :=
@@ -353,8 +386,8 @@ def stepActors (k : Nat) : List (ExactActor ZetaFrac) :=
       [⟨if c == leftCentre then "pivot-left" else "pivot-right", [z c]⟩]
   let reach : List (ExactActor ZetaFrac) :=
     if k == 4 then [⟨"reach", [z leftCentre, z (stepPoint 3)]⟩] else []
-  pivot ++ reach ++ (stepTrailIndices k).map (fun j => ⟨s!"trail-{j}", [z (stepPoint j)]⟩) ++
-    [⟨"point", [z (stepPoint k)]⟩]
+  pivot ++ reach ++ (stepTrailIndices k).map (fun j => ⟨s!"trail-{j}", stepAnchors j⟩) ++
+    [⟨"point", stepAnchors k⟩, ⟨s!"name-{k}", stepAnchors k⟩]
 
 /-- Whether every declared move of `wordSteps` carries the actors of one key onto those of the
 next, exactly in `ℚ(ζ₅)`. -/
