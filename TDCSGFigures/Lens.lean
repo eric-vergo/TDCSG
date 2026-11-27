@@ -129,9 +129,11 @@ structure Setting (β : Type) where
   /-- Whether the margin `η` is wide enough to be drawn as a dimension line. -/
   showMargin : Bool
   /-- Whether the picture is a key of a loop (`TDCSGFigures.Lens.LensLoopConfig`): the items that
-  change with the radius are actors (`Setting.act`), the titles of the circles and of the cut do
-  not name the radius (so that the circles can be drawn alike at every radius but for their path
-  data), the real axis is a segment across the box, and the radius is written at the top left. -/
+  change with the radius are actors (`Setting.act`), and the labels of `0`, `u` and `c₁`, which
+  are placed anew at each radius, are an actor of each radius and crossfade; the titles of the
+  circles and of the cut do not name the radius (so that the circles can be drawn alike at every
+  radius but for their path data), the real axis is a segment across the box, and the radius is
+  written at the top left. -/
   motion : Bool := false
   /-- What the ids of the actors end with, in a loop. -/
   idSuffix : String := ""
@@ -150,7 +152,8 @@ def Setting.atR {β : Type} (st : Setting β) : String :=
 outlined (`κ - η` dashed), the real axis, the two disks and their lens, the foot of `u` on the
 real axis, the margin `η` between the cuts as a dimension line (when `showMargin`), a radius `r/2`
 of `|v| ≤ r/2`, the points `0`, `u`, `c₁`, the tip and `v*`, and their labels, each beside what it
-names; in a key of a loop (`Setting.motion`), the radius at the top left. -/
+names; in a key of a loop (`Setting.motion`), the radius at the top left, and neither the name
+`η` of the margin nor `η = 0` at `R`, which the captions of the loop give. -/
 def lensItems {β : Type} [RealValue β] (st : Setting β) : Array Item :=
   let kc := cut st.r2
   let foot : QSqrt5 × QSqrt5 := (cosine, ⟨0, 0⟩)
@@ -183,8 +186,8 @@ def lensItems {β : Type} [RealValue β] (st : Setting β) : Array Item :=
       |>.declRef `TDCSG.Five.IsGoodLevel |> st.act "margin",
     Plane.Exact.tickAt (kc, marginY) (kc, marginY) (kappa, marginY) |> st.act "margin-tick-cut",
     Plane.Exact.tickAt (kappa, marginY) (kc, marginY) (kappa, marginY)
-      |> st.act "margin-tick-kappa",
-    Plane.Exact.labelBeside "η" (kc, marginY) (kappa, marginY) |> st.act "margin-label"]
+      |> st.act "margin-tick-kappa"] ++
+    (if st.motion then #[] else #[Plane.Exact.labelBeside "η" (kc, marginY) (kappa, marginY)])
     else #[]) ++ #[
     Plane.segment ⟨0, 0⟩ (radiusEnd (RealValue.toFloat st.half)) |>.role windowRole |>.width 1.5
       |>.dashed |>.named "a radius r/2 of the disk |v| ≤ r/2" |> st.act "radius",
@@ -208,9 +211,9 @@ def lensItems {β : Type} [RealValue β] (st : Setting β) : Array Item :=
       |>.incident .outside "the lens" |>.incident .on "the half-plane Re v ≥ κ"
       |>.incident .inside "the half-plane Re v ≥ κ − η" |> st.act "vstar",
     Plane.Exact.label "v∗" vStar .auto |> st.act "vstar-label"] else #[]) ++ #[
-    Plane.Exact.label "0" origin .auto |>.role windowRole,
-    Plane.Exact.label "u = ζ" (zeta 1) .auto |>.role windowRole,
-    Plane.Exact.label "c₁" foot .auto,
+    Plane.Exact.label "0" origin .auto |>.role windowRole |> st.act s!"label-0-r{st.rText}",
+    Plane.Exact.label "u = ζ" (zeta 1) .auto |>.role windowRole |> st.act s!"label-u-r{st.rText}",
+    Plane.Exact.label "c₁" foot .auto |> st.act s!"label-c1-r{st.rText}",
     Plane.label (if st.critical then "tip = v∗" else "tip") st.tipXY .auto
       |> st.act (if st.critical then "tip-label-critical" else "tip-label"),
     Plane.Exact.label "lens" ((rat (1 / 10), rat (11 / 20)) : QSqrt5 × QSqrt5) |>.role lensRole,
@@ -218,9 +221,8 @@ def lensItems {β : Type} [RealValue β] (st : Setting β) : Array Item :=
       |>.role windowRole,
     Plane.Exact.label "|v − u| ≤ r/2" ((rat (9 / 20), rat (3 / 2)) : QSqrt5 × QSqrt5)
       |>.role windowRole,
-    Plane.Exact.label (if st.critical then "Re v ≥ κ, η = 0" else "Re v ≥ κ")
-      ((kappa, cutLabelY) : QSqrt5 × QSqrt5) .right
-      |> st.act (if st.critical then "kappa-label-critical" else "kappa-label")] ++
+    Plane.Exact.label (if st.critical && !st.motion then "Re v ≥ κ, η = 0" else "Re v ≥ κ")
+      ((kappa, cutLabelY) : QSqrt5 × QSqrt5) .right |> st.act "kappa-label"] ++
   (if st.critical then #[] else #[
     Plane.Exact.label "Re v ≥ κ − η →" ((kc, cutLabelY) : QSqrt5 × QSqrt5) .left
       |> st.act "cut-label"]) ++

@@ -24,6 +24,7 @@ def variants : Array (String × MotionPanels × Bool) := #[
   ("orbitDepthPair", depthPair.motion, depthPair.enough && depthPair.arrives),
   ("orbitGrowthFive", growthFive.motion, growthFive.nested && growthFive.arrives),
   ("lensMorph", lensMorph.motion, lensMorph.keyFacts),
+  ("lensZoom", lensZoom.motion, lensZoom.keyFacts),
   ("lensFade", lensFade.motion, lensFade.keyFacts)]
 
 end TDCSGFigures.LoopVariants

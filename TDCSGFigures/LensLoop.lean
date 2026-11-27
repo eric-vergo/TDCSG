@@ -56,6 +56,66 @@ structure LensLoopConfig where
   stepTime : Rat := 6 / 5
   /-- The rest at every key but the first and the last, in seconds. -/
   hold : Rat := 3 / 2
+  /-- Whether a second panel shows the neighbourhood of the tip enlarged (`zoomItems`). -/
+  zoom : Bool := false
+
+/-! ### The neighbourhood of the tip, enlarged -/
+
+/-- The right edge of the half-planes in the enlarged panel, whose box (about
+`[0.84, 1.09] × [0.08, 0.32]`) the arcs through the tip fix on the left. -/
+def zoomRight : QSqrt5 := rat (109 / 100)
+
+/-- The bottom of the enlarged box. -/
+def zoomBottom : QSqrt5 := rat (2 / 25)
+
+/-- The top of the enlarged box. -/
+def zoomTop : QSqrt5 := rat (8 / 25)
+
+/-- The half-plane `Re v ≥ a` as far as the enlarged box shows it. -/
+def zoomHalfPlane (a : QSqrt5) : List (QSqrt5 × QSqrt5) :=
+  [(a, zoomBottom), (zoomRight, zoomBottom), (zoomRight, zoomTop), (a, zoomTop)]
+
+/-- The width of the enlarged panel, in pixels. -/
+def zoomWidth : Float := 216
+
+/-- Half the angle of the arcs of the two circles drawn about the tip, in radians. -/
+def zoomArc : Float := 0.11
+
+/-- The angle of the point `p` seen from `c`, in radians. -/
+def angleFrom (c p : Point) : Float := Float.atan2 (p.y - c.y) (p.x - c.x)
+
+/-- The items of the enlarged panel at the setting `st` (`r²` is `st.r2`): the half-plane
+`Re v ≥ κ` and, below `R`, `Re v ≥ κ - η` (dashed edge), within the box; the arcs of the circles
+`|v| = r/2` and `|v − u| = r/2` through the tip (exact centres and radius; the angles only choose
+the piece drawn); the tip, recording that it lies on both circles and where it stands relative to
+the half-planes, unlabelled (the panel's title names it, and a label beside it would run into an
+arc or a half-plane at some radius); and the labels of the edges. Its actors have the ids of
+the whole picture's: the tip and its label slide, the rest morphs. -/
+def zoomItems (st : Setting (SqrtOf QSqrt5)) : Array Item :=
+  let kc := cut st.r2
+  let t := st.tipXY
+  let a0 := angleFrom ⟨0, 0⟩ t
+  let au := angleFrom (PlanePoint.toPoint (zeta 1)) t
+  #[Plane.Exact.polygon (zoomHalfPlane kappa) |>.faint |>.filled |>.width 1 |>.fillOpacity 0.18
+      |>.named "the half-plane Re v ≥ κ"] ++
+  (if st.critical then #[] else #[
+    Plane.Exact.polygon (zoomHalfPlane kc) |>.faint |>.filled |>.width 1 |>.dashed
+      |>.fillOpacity 0.16 |>.named "the half-plane Re v ≥ κ − η" |> st.act "cut"]) ++ #[
+    Plane.Exact.arc origin st.half (a0 - zoomArc) (a0 + zoomArc) |>.role windowRole
+      |>.named "the circle |v| = r/2" |> st.act "disk-0",
+    Plane.Exact.arc (zeta 1) st.half (au - zoomArc) (au + zoomArc) |>.role windowRole |>.dashed
+      |>.named "the circle |v − u| = r/2" |> st.act "disk-u",
+    st.act "tip" (Plane.Exact.point (tipOf (hSqOf st.r2)) |>.size 5
+      |>.named "the tip of the lens: its corner of largest real part"
+      |>.incident .on "the circle |v| = r/2" |>.incident .on "the circle |v − u| = r/2"
+      |> fun it => if st.critical then it.incident .on "the half-plane Re v ≥ κ"
+        else
+          let i := if st.r2 == criticalSq then Plane.Incidence.on else .outside
+          it.incident i "the half-plane Re v ≥ κ − η" |>.incident i "the half-plane Re v ≥ κ"),
+    Plane.Exact.label "κ" ((kappa, zoomTop) : QSqrt5 × QSqrt5) .aboveRight
+      |> st.act "kappa-label"] ++
+  (if st.critical then #[] else #[
+    Plane.Exact.label "κ − η" ((kc, zoomTop) : QSqrt5 × QSqrt5) .aboveLeft |> st.act "cut-label"])
 
 namespace LensLoopConfig
 
@@ -85,7 +145,13 @@ def setting (k : Nat) : Setting (SqrtOf QSqrt5) :=
           |>.incident .on "the half-plane Re v ≥ κ" }
 
 /-- Key `k`: the lens picture of its setting, without a view of its own. -/
-def key (k : Nat) : Plane.Figure := { lensFigure (cfg.setting k) false with view := none }
+def key (k : Nat) : Plane.Figure :=
+  { lensFigure (cfg.setting k) false with
+    view := none, width := if cfg.zoom then figureWidth - 24 - zoomWidth else figureWidth }
+
+/-- Key `k` of the enlarged panel. -/
+def zoomKey (k : Nat) : Plane.Figure :=
+  { cfg.key k with items := zoomItems (cfg.setting k), width := zoomWidth }
 
 /-- The ids of the actors of the figure `f`. -/
 def actorIds (f : Plane.Figure) : Array String := f.items.filterMap (·.actorId?)
@@ -100,21 +166,29 @@ def tipAt (k : Nat) : SurdPoint := tipOf (hSqOf (cfg.r2At k))
 the tip moves on (`tipOf` is `u/2 + h (s, -c₁)`, so the tip moves on the perpendicular bisector
 of `0` and `u`) and the other actors of both keys morph (they stay otherwise); those of key `j`
 alone vanish, those of key `j + 1` alone appear. -/
-def moves (j : Nat) : Array (String × Move) :=
-  let a := actorIds (cfg.key j)
-  let b := actorIds (cfg.key (j + 1))
+def movesOf (keyAt : Nat → Plane.Figure) (j : Nat) : Array (String × Move) :=
+  let a := actorIds (keyAt j)
+  let b := actorIds (keyAt (j + 1))
   let slide := Plane.Exact.slideFromTo (cfg.tipAt j) (cfg.tipAt (j + 1))
   (if cfg.grows j then (a.filter b.contains).map fun id =>
       (id, if id == "tip" || id == "tip-label" then slide else Move.morph) else #[]) ++
     (a.filter (!b.contains ·)).map (·, Move.vanish) ++
     (b.filter (!a.contains ·)).map (·, Move.appear)
 
+/-- The squared radius at the fraction `q` of step `j`: `(1 - q) r_j² + q r_{j+1}²`. -/
+def r2Between (j : Nat) (q : Rat) : QSqrt5 := cfg.r2At j * rat (1 - q) + cfg.r2At (j + 1) * rat q
+
 /-- The picture at the fraction `q` of step `j`: the lens picture at the squared radius
-`(1 - q) r_j² + q r_{j+1}²`. -/
+`r2Between j q`. -/
 def between (j : Nat) (q : Rat) : Option Plane.Figure :=
   if cfg.grows j then
-    let r2 := cfg.r2At j * rat (1 - q) + cfg.r2At (j + 1) * rat q
-    some { cfg.key j with items := lensItems (loopSetting r2 "" false "") }
+    some { cfg.key j with items := lensItems (loopSetting (cfg.r2Between j q) "" false "") }
+  else none
+
+/-- The enlarged panel at the fraction `q` of step `j`. -/
+def zoomBetween (j : Nat) (q : Rat) : Option Plane.Figure :=
+  if cfg.grows j then
+    some { cfg.zoomKey j with items := zoomItems (loopSetting (cfg.r2Between j q) "" false "") }
   else none
 
 /-- The facts each key shows, exactly: below `R`, the tip lies on both circles and left of
@@ -137,7 +211,8 @@ def caption (k : Nat) : String :=
     if k == 0 then
       s!"The lens of the closed disks |v| ≤ r/2 and |v − u| ≤ r/2 at r = {t}, with the \
         half-planes Re v ≥ κ − η (dashed edge) and Re v ≥ κ, η = (3 + φ − r²)/16, and v∗ on \
-        Re v = κ. The tip of the lens lies left of the dashed edge, at least η from it." ++ disk
+        Re v = κ; the bar at the top spans the margin η between the edges. The tip of the lens \
+        lies left of the dashed edge, at least η from it." ++ disk
     else
       s!"r = {t}: the strip between the edges is narrower, and the tip has moved right; it \
         stays at least η left of the dashed edge." ++ disk
@@ -150,13 +225,23 @@ def caption (k : Nat) : String :=
         edge. Below R it stays at least η left of the dashed edge."
 
 /-- The loop as a picture of one panel (without a narrow rendition, which only a picture of
-panels side by side needs). -/
+panels side by side needs), or, with `zoom`, of two: the lens beside the neighbourhood of its
+tip, enlarged, on one clock, stacked at the narrow width. -/
 def motion : MotionPanels :=
   let n := cfg.keyCount
-  { panels := #[{ motion :=
-      { keys := ((List.range n).map cfg.key).toArray,
-        steps := ((List.range (n - 1)).map fun j => ({ moves := cfg.moves j } : MotionStep)).toArray,
-        between := cfg.between, morphSamples := cfg.samples } }]
+  let main : Motion :=
+    { keys := ((List.range n).map cfg.key).toArray,
+      steps := ((List.range (n - 1)).map fun j =>
+        ({ moves := cfg.movesOf cfg.key j } : MotionStep)).toArray,
+      between := cfg.between, morphSamples := cfg.samples }
+  let zoomed : Motion :=
+    { keys := ((List.range n).map cfg.zoomKey).toArray,
+      steps := ((List.range (n - 1)).map fun j =>
+        ({ moves := cfg.movesOf cfg.zoomKey j } : MotionStep)).toArray,
+      between := cfg.zoomBetween, morphSamples := cfg.samples }
+  { panels := if cfg.zoom then
+      #[{ title := "The lens", motion := main }, { title := "Near the tip", motion := zoomed }]
+    else #[{ motion := main }]
     captions := ((List.range n).map cfg.caption).toArray
     pacing := { motionPacing with hold := cfg.hold, lastHold := 3 }
     timing := ((List.range (n - 1)).map fun j =>
@@ -174,7 +259,10 @@ def motion : MotionPanels :=
                 Re v = κ." }
     checks := .fail
     poster := n - 1
-    width := figureWidth }
+    scale := .independent
+    width := figureWidth
+    narrowWidth := if cfg.zoom then some narrowWidth else none
+    shares := if cfg.zoom then #[figureWidth - 24 - zoomWidth, zoomWidth] else #[] }
 
 end LensLoopConfig
 
@@ -182,6 +270,9 @@ end LensLoopConfig
 
 /-- Morphed through the radii of the slider it would replace. -/
 def lensMorph : LensLoopConfig := {}
+
+/-- Morphed through the radii of the slider, beside the neighbourhood of the tip enlarged. -/
+def lensZoom : LensLoopConfig := { zoom := true }
 
 /-- Crossfaded through more radii. -/
 def lensFade : LensLoopConfig :=

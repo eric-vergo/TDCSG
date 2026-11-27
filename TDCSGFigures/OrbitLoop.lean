@@ -203,7 +203,7 @@ def caption (os : Array Orbit) (k : Nat) : String :=
     if k == 0 then
       s!"The orbit of 0 under the two moves at r = {t}, computed exactly: {n} points. As r \
         grows the closed disks grow and the orbit can only grow: the points it gains fade in. \
-        The orbit is drawn only at the radii of the steps."
+        The orbit is drawn only at the radii shown."
     else if n == prev then
       s!"r = {t}: the disks are larger, and the orbit is the same {n} points."
     else s!"r = {t}: {n} points; the {n - prev} new ones have faded in, and the {prev} points \
@@ -259,7 +259,8 @@ def between (j : Nat) (q : Rat) : Option Plane.Figure :=
   let a := (cfg.radius j).sqValue
   let b := (cfg.radius (j + 1)).sqValue
   some { width := figureWidth, padding := 16, style := orbitStyle, checks := .fail,
-         items := diskActors (⟨a * TDCSGFigures.rat (1 - q) + b * TDCSGFigures.rat q⟩ : SqrtOf QSqrt5) }
+         items := diskActors
+           (⟨a * TDCSGFigures.rat (1 - q) + b * TDCSGFigures.rat q⟩ : SqrtOf QSqrt5) }
 
 /-- The step from key `j` to key `j + 1`: the exact moves, and the circles and the lens morphed. -/
 def step (os : Array Orbit) (j : Nat) : MotionStep :=
@@ -412,6 +413,7 @@ def caption (os : Array Orbit) (n : Nat) : String :=
     s!"The orbit of 0 found move by move, at r = {t} (above) and at the critical radius R \
       (below): key n shows the points that at most n moves carry 0 to, each move a fifth of a \
       turn about −1 or +1 of a point in that closed disk. n = 0: the point 0."
+  else if n == 1 then s!"At most one move: {a} points at r = {t}, {b} at R."
   else if n < d then s!"At most {n} moves: {a} points at r = {t}, {b} at R."
   else if n == d then s!"At most {n} moves: {a} points at r = {t}, its whole orbit: no further \
     move reaches a new point. {b} points at R."

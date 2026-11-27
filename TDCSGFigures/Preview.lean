@@ -29,9 +29,9 @@ marked by rings (`pivotMark`) or the riding disks faint (`faintDisks`), as
 `DIR/framePair-WORD[-rP_Q][-pivot][-faint]…`, and prints
 whether every declared move arrives exactly (`FramePairConfig.allArrive`).
 
-`tdcsg-figure-preview --variants DIR [NAME …]` writes the variants (all, or those named) of the loops that would replace the
-sliders (`TDCSGFigures.LoopVariants.variants`) in the same way, prints their errors and whether
-their exact checks hold, and exits with status 1 if one fails.
+`tdcsg-figure-preview --variants DIR [NAME …]` writes the variants (all, or those named) of the
+loops that would replace the sliders (`TDCSGFigures.LoopVariants.variants`) in the same way,
+prints their errors and whether their exact checks hold, and exits with status 1 if one fails.
 -/
 
 namespace TDCSGFigures.Preview
