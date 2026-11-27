@@ -13,6 +13,7 @@ public import TDCSG.CriticalRadius.Five.Confinement
 public import TDCSG.CriticalRadius.Five.Cyclotomic
 public import TDCSG.CriticalRadius.Five.Labels
 public import TDCSG.CriticalRadius.Five.Lens
+public import TDCSG.CriticalRadius.Five.LensTip
 public import TDCSG.CriticalRadius.Five.Levels
 public import TDCSG.CriticalRadius.QuadraticSigns
 public import TDCSG.CriticalRadius.Renormalization

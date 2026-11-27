@@ -75,9 +75,9 @@ The orbit of $`0` under the two moves as the radius $`r` grows, computed exactly
 $`\mathbb{Z}[\zeta]` at $`r=1.5`, $`1.9`, $`1.95`, $`2.05`, $`2.1` and at $`R`. Below the
 critical radius it is finite: 9 points at $`r=1.5` and $`r=1.9`, then 71, 151 and 801 points.
 Enlarging the radius can only enlarge an orbit (`TDCSG.orbit_mono`), so each orbit keeps the
-points of the one before, which stay in place while the new ones fade in; between two radii only
-the circles grow, and the orbit is drawn only at the radii listed. At $`r=R` the orbit is infinite
-(`TDCSG.CriticalRadius.infinite_orbit_zero_five`); the last key frame shows only the first 1000
+points of the one before, which stay in place: from one radius to the next the circles grow and
+the new points fade in, and the picture is the exact orbit only at the radii listed. At $`r=R`
+the orbit is infinite (`TDCSG.CriticalRadius.infinite_orbit_zero_five`); the last key frame shows only the first 1000
 of its points, in the order a breadth-first search from $`0` finds them, and these include the
 801 points of the orbit at $`r=2.1`.
 :::

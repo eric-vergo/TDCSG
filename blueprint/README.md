@@ -220,7 +220,8 @@ theorem on the page of the figures' theorems that the figure is made of its keys
 (`by unfold name; with_reducible rfl`, which fails at once when they differ), what each key draws,
 the anchors, the declared moves, that they arrive exactly (`allArrive … = true`) and each caption as
 a function of its key's data; add it to `previews` and to `siteMotions` in
-`TDCSGTests/Motions.lean`, whose `#guard` requires that PILean's engine finds no error in it, and
+`TDCSGTests/Motions.lean`, whose `engineErrors`, run compiled by `lake test`, requires that
+PILean's engine finds no error in it, and
 show it with `:::figure TDCSGFigures.name (label := "…") (alt := "…")`. An animation that replaces
 a figure with a linked theorem keeps its name and label, ends on that figure, at its size (and
 shows it as its poster), and keeps its theorem linked, as above.

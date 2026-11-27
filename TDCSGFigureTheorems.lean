@@ -45,14 +45,15 @@ though they are not linked). Each actor an animation moves is
 drawn at the exact anchors its arrival check reads. The captions are written out, or, where they
 are built from the data (the orbit on the chord, the walk), stated as functions of the data; the
 kernel does not reduce the string functions they are built with, so their words are pinned by
-`#guard` lines in `TDCSGTests.Motions`, which also require that PILean's engine finds no error in
-any animation. Where an animation replaced a
+`#guard` lines in `TDCSGTests.Motions`; the test driver requires that PILean's engine finds no
+error in any animation. Where an animation replaced a
 figure with a linked theorem, its last key frame is that figure, and the theorem stays linked to
 the animation: it states that the last key frame is the figure and what the figure draws
 (`TDCSGFigures.generatorStep_spec`, `TDCSGFigures.extensionJump_spec`,
 `TDCSGFigures.disjointDisks_spec`, `TDCSGFigures.exchangedIntervals_spec`,
-`TDCSGFigures.chordOrbit_spec`); the lens of chapter 5 replaced a slider with a linked theorem,
-and its theorem `TDCSGFigures.Lens.lensRadius_spec` stays linked to it. The other animations (the
+`TDCSGFigures.chordOrbit_spec`); the lens of chapter 5 is linked to its theorem
+`TDCSGFigures.Lens.lensRadius_spec`, which states its key frames and the pictures between them.
+The other animations (the
 orbit of zero on the front page, the word followed letter by letter and the three words of
 chapters 2 and 3, the frame pair of chapter 4 and the walk of chapter 7) are illustrations: no
 theorem is linked to them. The orbits of zero are computed by the exact orbit engine, which the
@@ -167,15 +168,16 @@ open PILean PILean.Plane PILean.Exact TDCSGFigures.OrbitLoop
 illustration, to which this theorem is not linked. It is the loop of `figureConfig`: one panel
 whose keys are `key os k`, `k = 0, …, 5`, for the radii `r = 1.5, 1.9, 1.95, 2.05, 2.1` and the
 critical radius `R` (`radius`), and whose steps are made from the declared moves `moves`, the
-circles and the lens morphed (`step`) through the exact pictures `between` at 11 radii between two
-keys (`samples = 12`), with `r²` evenly spaced; its poster is the last key, at `R`. The orbits `os`
+circles and the lens morphed (`step`) through the exact pictures `between` at 5 radii between two
+keys (`samples = 6`), with `r²` evenly spaced; its poster is the last key, at `R`. The orbits `os`
 are those of the orbit engine (`orbits`, `orbitAt`, `TDCSGFigures.orbit`): complete at the rational
 radii, and at `R` the first `cap = 1000` points of its breadth-first search from `0`. Key `k` draws
 the circles of radius `r` about `-1` and `1` and their lens (`diskActors`), the points of its orbit
 in the groups `pointGroup os j k` of the points first drawn at key `j ≤ k` (`newPoints`, the
 points of the orbit of key `j` that are not in the orbit of key `j - 1`), each recording where it
 stands relative to the disks and the lens as the engine decides it (`dot`), the centres
-(`centres`) and the line under the disks (`valueLabel`, `valueText`). Step `j` declares no move of
+(`centres`) and the line under the disks (`valueLabel`, `valueText`), in row `k % 2`, so that two
+lines never overlap. Step `j` declares no move of
 any point: the line under the disks changes and the group of key `j + 1`, if any, appears
 (`moves`). The facts about the orbits themselves come from the engine, which the kernel does not
 run here; they are `#guard` lines of `TDCSGTests.Motions`: the orbits have 9, 9, 71, 151, 801 and
@@ -190,7 +192,7 @@ theorem orbitRadius_keys :
     orbitRadius = figureConfig.motion ∧
     figureConfig.radii =
       #[("1.5", 3 / 2), ("1.9", 19 / 10), ("1.95", 39 / 20), ("2.05", 41 / 20), ("2.1", 21 / 10)] ∧
-    figureConfig.cap = 1000 ∧ figureConfig.samples = 12 ∧ figureConfig.keyCount = 6 ∧
+    figureConfig.cap = 1000 ∧ figureConfig.samples = 6 ∧ figureConfig.keyCount = 6 ∧
     (∀ cfg : GrowthConfig, cfg.motion.panels = #[{ motion :=
       { keys := ((List.range cfg.keyCount).map (cfg.key cfg.orbits)).toArray,
         steps := ((List.range (cfg.keyCount - 1)).map (GrowthConfig.step cfg.orbits)).toArray,
@@ -198,6 +200,7 @@ theorem orbitRadius_keys :
     (∀ cfg : GrowthConfig, cfg.motion.captions =
       ((List.range cfg.keyCount).map (cfg.caption cfg.orbits)).toArray) ∧
     (∀ cfg : GrowthConfig, cfg.motion.poster = cfg.keyCount - 1) ∧
+    (∀ cfg : GrowthConfig, cfg.motion.checks = .fail) ∧
     (∀ (cfg : GrowthConfig) (k : Nat), cfg.radius k = (
   match cfg.radii[k]? with
   | some (t, r) => .rat t r
@@ -257,7 +260,8 @@ theorem orbitRadius_keys :
   | .critical => s!"r = R: infinite, the first {n} shown"
     : String)) ∧
     (∀ (cfg : GrowthConfig) (os : Array Orbit) (k : Nat), cfg.valueLabel os k = (
-  Plane.Exact.label (cfg.valueText os k) ((0 : Rat), valueY) |>.actor s!"value-{k}"
+  Plane.Exact.label (cfg.valueText os k) ((0 : Rat), valueY - (k % 2 : Nat) * 3 / 10)
+    |>.actor s!"value-{k}"
     : Item)) ∧ valueY = -27 / 10 ∧
     (∀ (cfg : GrowthConfig) (os : Array Orbit) (k : Nat), cfg.key os k = (
   let ρ := cfg.radius k
@@ -298,9 +302,9 @@ theorem orbitRadius_keys :
   | .rat t _ =>
     if k == 0 then
       s!"The orbit of 0 under the two moves at r = {t}, computed exactly: {n} points. As r \
-        grows the closed disks grow and the orbit can only grow: at each radius shown the points \
-        it has gained fade in. Between two radii only the circles grow; the orbit is drawn only \
-        at the radii shown."
+        grows the closed disks grow and the orbit can only grow: from one radius shown to the next \
+        the circles grow and the points the orbit gains fade in. The orbit is exact only at the \
+        radii shown."
     else if n == prev then
       s!"r = {t}: the disks are larger, and the orbit is the same {n} points."
     else s!"r = {t}: {n} points; the {n - prev} new ones have faded in, and the {prev} points \
@@ -2316,9 +2320,8 @@ figure_links lensEstimate lensEstimate_spec
 end TDCSGFigures.Lens
 ```
 
-{figref "lens-radius"}[]: the animation `TDCSGFigures.Lens.lensRadius`, which replaced the slider
-of earlier versions of the site and ends on its last picture, at `R`, with its theorem
-`TDCSGFigures.Lens.lensRadius_spec`.
+{figref "lens-radius"}[]: the animation `TDCSGFigures.Lens.lensRadius`, whose last key frame is the
+lens picture at `R`, with its theorem `TDCSGFigures.Lens.lensRadius_spec`.
 
 ```Verso.Genre.Manual.InlineLean.lean
 namespace TDCSGFigures.Lens
@@ -2331,7 +2334,7 @@ own scale, drawn from the same setting `setting k` by `zoomItems`), for `k = 0, 
 `r = 1.8, 2, 2.08, 2.12`, then `R` with the dashed edge `Re v = κ - η` on `Re v = κ`, then the last
 key at `R` (`criticalSetting`), the two half-planes one, which is the poster. The steps are made
 from `movesOf`: when the radius changes, every actor of both keys morphs through the exact pictures
-`between j q` and `zoomBetween j q` at the fractions `q = i/12`, `0 < i < 12`, of the step, which
+`between j q` and `zoomBetween j q` at the fractions `q = i/6`, `0 < i < 6`, of the step, which
 are the lens pictures at the squared radius `(1 - q) r_j² + q r_{j+1}²` (`r2Between`); between two
 consecutive samples the browser interpolates the path data linearly, and that is not stated. What
 one key draws and the next does not appears or vanishes. The items of every key are `lensItems` and
@@ -2339,10 +2342,13 @@ one key draws and the next does not appears or vanishes. The items of every key 
 `tipOf (h²) = (c₁/2 + √(h² s²), √(s²/4) - √(h² c₁²))` with `h² = r²/4 - 1/4` (`hSqOf`), recording
 that it lies on both circles and on the lens and, below `R`, outside both half-planes, at `R` on
 both edges; `v*` and the margin `η` at the first key; in the enlarged panel, the margin `η` as a bar
-above the box below `R`, and `η = 0` at `R`. The facts hold exactly in `ℚ(√5)`: at every key below
-`R` and at every sample (all of whose radii are below `R`) the tip lies on both circles, so on the
-perpendicular bisector of `0` and `u` (`LensLoopConfig.tipOnBoth`), and at every key below `R` its
-real part is at most `κ - 2η` (`tipReLe`) and it lies left of `κ - η` (`tipFacts`); at `R` the
+above the box below `R`, and `η = 0` at `R`. The facts hold exactly in `ℚ(√5)`, read off the
+coordinates of the tip drawn (`tipOnCircles`, `reAtMost`, written out): at every key and at every
+sample (all of whose radii are below `R`) the tip lies on both circles, so on the perpendicular
+bisector of `0` and `u`, and its real part is at most `κ - 2η` (`LensLoopConfig.tipOnBoth`); at
+every key below `R` it lies left of `κ - η` (`tipFacts`). For every radius, every point of the lens
+has real part at most `κ - 2η` (`TDCSG.Five.re_le_of_mem_lens`), which is what the captions say of
+the tip below `R`. At `R` the
 margin is `0` (`margin` is `η` of `TDCSG.Five.IsGoodLevel`), `h² = s²` and `c₁/2 + s² = κ`, so the
 tip is `v*`, which lies on both circles of radius `R/2` with real part `κ`; the disk `|v| ≤ r/2`
 lies left of `κ - η` at `1.8`, `2` and `2.08` and crosses it at `2.12` (`diskLeftOfCut`). The
@@ -2352,7 +2358,7 @@ panel, the timing and the frames the browser draws between the samples. -/
 theorem lensRadius_spec :
     lensRadius = lensConfig.motion ∧
     lensConfig.radii = #[(9 / 5, "1.8"), (2, "2"), (52 / 25, "2.08"), (53 / 25, "2.12")] ∧
-    lensConfig.samples = 12 ∧ lensConfig.keyCount = 6 ∧
+    lensConfig.samples = 6 ∧ lensConfig.keyCount = 6 ∧
     (∀ cfg : LensLoopConfig, cfg.motion.panels = #[
       { title := "The lens", motion :=
         { keys := ((List.range cfg.keyCount).map cfg.key).toArray,
@@ -2368,6 +2374,7 @@ theorem lensRadius_spec :
       ((List.range cfg.keyCount).map cfg.caption).toArray) ∧
     (∀ cfg : LensLoopConfig, cfg.motion.poster = cfg.keyCount - 1) ∧
     (∀ cfg : LensLoopConfig, cfg.motion.scale = .independent) ∧
+    (∀ cfg : LensLoopConfig, cfg.motion.checks = .fail) ∧
     (∀ (r2 : QSqrt5), hSqOf r2 = (
 r2 * rat (1 / 4) - rat (1 / 4)
     : QSqrt5)) ∧
@@ -2384,12 +2391,12 @@ r2 * rat (1 / 4) - rat (1 / 4)
   | some i => it |>.incident i "the half-plane Re v ≥ κ − η" |>.incident i "the half-plane Re v ≥ κ"
   | none => it
     : Item)) ∧
-    (∀ (r2 : QSqrt5) (rText : String) (first : Bool) (cuts : Plane.Incidence),
-      loopSetting r2 rText first cuts = (
+    (∀ (r2 : QSqrt5) (rText : String) (first : Bool) (cuts : Plane.Incidence)
+      (radiusRow : Nat), loopSetting r2 rText first cuts radiusRow = (
   { half := ⟨r2 * rat (1 / 4)⟩, r2, rText,
     tipPt := tipItemWith (tipOf (hSqOf r2)) (some cuts) |>.named tipTitle,
     tipXY := PlanePoint.toPoint (tipOf (hSqOf r2)), other := otherSide (r2 * rat (1 / 4)),
-    critical := false, showVStar := first, showMargin := first, motion := true }
+    critical := false, showVStar := first, showMargin := first, motion := true, radiusRow }
     : Setting (SqrtOf QSqrt5))) ∧
     (criticalSetting = (
   { loopSetting criticalSq "R = √(3 + φ)" false .on with
@@ -2479,7 +2486,8 @@ r2 * rat (1 / 4) - rat (1 / 4)
     Plane.Exact.label "Re v ≥ κ − η →" ((kc, cutLabelY) : QSqrt5 × QSqrt5) .left
       |> st.act "cut-label"]) ++
   (if st.motion then #[
-    Plane.Exact.label s!"r = {st.rText}" ((rat (-11 / 10), rat (9 / 4)) : QSqrt5 × QSqrt5)
+    Plane.Exact.label s!"r = {st.rText}"
+      ((rat (-11 / 10), rat (9 / 4) - rat (st.radiusRow / 5)) : QSqrt5 × QSqrt5)
       .right |>.bold |> st.act s!"r-{st.rText}"] else #[])
     : Array Item)) ∧
     (∀ (st : Setting (SqrtOf QSqrt5)), zoomTip st = (
@@ -2494,7 +2502,7 @@ r2 * rat (1 / 4) - rat (1 / 4)
     (∀ (st : Setting (SqrtOf QSqrt5)), zoomMargin st = (
   let kc := cut st.r2
   if st.r2 == criticalSq then #[
-    Plane.Exact.label "η = 0" ((kappa, zoomBarY) : QSqrt5 × QSqrt5) .above
+    Plane.Exact.label "η = 0" ((kappa, zoomBarY) : QSqrt5 × QSqrt5) .above (some 26)
       |>.actor "zoom-eta-zero"]
   else #[
     Plane.Exact.segment (kc, zoomBarY) (kappa, zoomBarY) |>.width 1
@@ -2520,7 +2528,7 @@ r2 * rat (1 / 4) - rat (1 / 4)
     zoomTip st,
     Plane.Exact.label "κ" ((kappa, zoomBottom) : QSqrt5 × QSqrt5) .belowRight
       |>.actor "kappa-label"] ++
-  (if st.critical then #[] else #[
+  (if st.r2 == criticalSq then #[] else #[
     Plane.Exact.label "κ − η" ((kc, zoomBottom) : QSqrt5 × QSqrt5) .belowLeft
       |>.actor "cut-label"]) ++
   zoomMargin st
@@ -2535,10 +2543,10 @@ r2 * rat (1 / 4) - rat (1 / 4)
     : QSqrt5)) ∧
     (∀ (cfg : LensLoopConfig) (k : Nat), cfg.setting k = (
   match cfg.radii[k]? with
-  | some (_, t) => loopSetting (cfg.r2At k) t (k == 0)
+  | some (_, t) => loopSetting (cfg.r2At k) t (k == 0) .outside (k % 2)
   | none =>
-    if k == cfg.radii.size then loopSetting criticalSq "R = √(3 + φ)" false .on
-    else criticalSetting
+    if k == cfg.radii.size then loopSetting criticalSq "R = √(3 + φ)" false .on (k % 2)
+    else { criticalSetting with radiusRow := (k - 1) % 2 }
     : Setting (SqrtOf QSqrt5))) ∧
     (∀ (cfg : LensLoopConfig) (k : Nat), cfg.key k = (
   { lensFigure (cfg.setting k) false with view := none, width := mainWidth }
@@ -2588,6 +2596,29 @@ cfg.r2At j * rat (1 - q) + cfg.r2At (j + 1) * rat q
       "At R the two half-planes are one, Re v ≥ κ, and the tip of the lens is v∗, on its \
         edge. Below R it stays at least η left of the dashed edge."
     : String)) ∧
+    (∀ (p : SurdPoint) (ρ2 : QSqrt5), tipOnCircles p ρ2 = (
+  match p.re, p.im with
+  | ⟨b, [(sa, A)]⟩, ⟨y0, [(sb, B), (sc, C)]⟩ =>
+    sa == 1 && sb == 1 && sc == -1 && y0 == ⟨0, 0⟩ && b == cosine * rat (1 / 2) &&
+      B == sineSq * rat (1 / 4) && QSqrt.lt ⟨0, 0⟩ cosine && QSqrt.le ⟨0, 0⟩ A &&
+      QSqrt.le ⟨0, 0⟩ C && cosine * cosine * A == sineSq * C &&
+      cosine * cosine * rat (1 / 4) + A + B + C == ρ2
+  | _, _ => false
+    : Bool)) ∧
+    (∀ (p : SurdPoint) (K : QSqrt5) (strict : Bool), reAtMost p K strict = (
+  match p.re with
+  | ⟨b, [(1, A)]⟩ => sqrtLt A (K - b) || (!strict && sqrtEq A (K - b))
+  | _ => false
+    : Bool)) ∧
+    (∀ (r2 : QSqrt5), LensLoopConfig.tipOnBoth r2 = (
+  tipOnCircles (tipOf (hSqOf r2)) (r2 * rat (1 / 4)) &&
+    reAtMost (tipOf (hSqOf r2)) (kappa - margin r2 * rat 2)
+    : Bool)) ∧
+    (∀ (cfg : LensLoopConfig), cfg.samplesBelowR = (
+  (List.range cfg.radii.size).all fun j => (List.range (cfg.samples - 1)).all fun i =>
+    let r2 := cfg.r2Between j ((i + 1 : Nat) / (cfg.samples : Rat))
+    QSqrt.lt r2 criticalSq && tipOnBoth r2
+    : Bool)) ∧
     (∀ {β : Type} [RealValue β] (st : Setting β) (narrow : Bool), lensFigure st narrow = (
   { width := figureWidth
     narrowWidth := if narrow then some narrowWidth else none
@@ -2602,6 +2633,7 @@ cfg.r2At j * rat (1 - q) + cfg.r2At (j + 1) * rat q
     zoomRight = rat (109 / 100) ∧ zoomBottom = rat (2 / 25) ∧ zoomTop = rat (8 / 25) ∧
     zoomBarY = rat (17 / 50) ∧
     lensConfig.samplesBelowR = true ∧
+    ((List.range 4).all fun k => QSqrt.lt (lensConfig.r2At k) criticalSq) = true ∧
     (lensConfig.radii.all fun (r, _) =>
       tipFacts (r / 2) && tipReLe (r / 2) && LensLoopConfig.tipOnBoth (rat (r * r))) = true ∧
     LensLoopConfig.tipOnBoth criticalSq = true ∧

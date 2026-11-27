@@ -94,16 +94,31 @@ def cutLabelY : QSqrt5 := rat (9 / 4)
 `h (-3/5, -4/5)`. -/
 def radiusEnd (h : Float) : Point := ⟨-0.6 * h, -0.8 * h⟩
 
-/-- The decided relations of the tip at the half radius `ρ = r/2`: it lies on both circles
-(`|tip|² = |tip - u|² = ρ²`, from the radicands: `c₁² (h² s²) = 4 (s²/4)(h² c₁²)` makes the cross
-terms cancel, and `c₁²/4 + h² s² + s²/4 + h² c₁² = ρ²`), and its real part is less than `κ - η`. -/
+/-- Whether the point `p` lies on both circles of squared radius `ρ2` about `0` and `u = ζ`, read
+off its own coordinates: `p` must be `(b + √A, √B - √C)` with `b = c₁/2`, `B = s²/4`, `A, C ≥ 0`
+and `c₁ > 0`. Then `|p|² = c₁²/4 + A + B + C + c₁√A - √(s² C)` and
+`|p - u|² = c₁²/4 + A + B + C - c₁√A + √(s² C)` (as `u = (c₁, √(s²))`), so `c₁² A = s² C` makes
+both `c₁²/4 + A + B + C`, which must be `ρ2`. A point of another form is refused. -/
+def tipOnCircles (p : SurdPoint) (ρ2 : QSqrt5) : Bool :=
+  match p.re, p.im with
+  | ⟨b, [(sa, A)]⟩, ⟨y0, [(sb, B), (sc, C)]⟩ =>
+    sa == 1 && sb == 1 && sc == -1 && y0 == ⟨0, 0⟩ && b == cosine * rat (1 / 2) &&
+      B == sineSq * rat (1 / 4) && QSqrt.lt ⟨0, 0⟩ cosine && QSqrt.le ⟨0, 0⟩ A &&
+      QSqrt.le ⟨0, 0⟩ C && cosine * cosine * A == sineSq * C &&
+      cosine * cosine * rat (1 / 4) + A + B + C == ρ2
+  | _, _ => false
+
+/-- Whether the real part of the point `p`, of the form `b + √A`, is at most `K` (`strict`: less
+than `K`), read off its own coordinates. A point of another form is refused. -/
+def reAtMost (p : SurdPoint) (K : QSqrt5) (strict : Bool := false) : Bool :=
+  match p.re with
+  | ⟨b, [(1, A)]⟩ => sqrtLt A (K - b) || (!strict && sqrtEq A (K - b))
+  | _ => false
+
+/-- The decided relations of the tip `tip ρ` at the half radius `ρ = r/2`: it lies on both
+circles (`tipOnCircles`), and its real part is less than `κ - η`. -/
 def tipFacts (ρ : Rat) : Bool :=
-  let A := hSq ρ * sineSq
-  let B := sineSq * rat (1 / 4)
-  let C := hSq ρ * (cosine * cosine)
-  QSqrt.lt ⟨0, 0⟩ cosine && cosine * cosine * A == rat 4 * B * C &&
-    cosine * cosine * rat (1 / 4) + A + B + C == rat (ρ * ρ) &&
-    sqrtLt A (cut (rat (4 * ρ * ρ)) - cosine * rat (1 / 2))
+  tipOnCircles (tip ρ) (rat (ρ * ρ)) && reAtMost (tip ρ) (cut (rat (4 * ρ * ρ))) true
 
 /-! ### The picture -/
 
@@ -136,6 +151,10 @@ structure Setting (β : Type) where
   (so that the circles can be drawn alike at every radius but for their path data); the real axis
   is a segment across the box; and the radius is written at the top left. -/
   motion : Bool := false
+  /-- The row of the radius written at the top left, in a key of a loop: `0`, or `1` a line below,
+  so that consecutive keys write their radii in different rows and the two never overlap while
+  one fades out and the next fades in. -/
+  radiusRow : Nat := 0
 
 /-- The item `it` as the actor `id` in a key of a loop; unchanged otherwise. -/
 def Setting.act {β : Type} (st : Setting β) (id : String) (it : Item) : Item :=
@@ -228,7 +247,8 @@ def lensItems {β : Type} [RealValue β] (st : Setting β) : Array Item :=
     Plane.Exact.label "Re v ≥ κ − η →" ((kc, cutLabelY) : QSqrt5 × QSqrt5) .left
       |> st.act "cut-label"]) ++
   (if st.motion then #[
-    Plane.Exact.label s!"r = {st.rText}" ((rat (-11 / 10), rat (9 / 4)) : QSqrt5 × QSqrt5)
+    Plane.Exact.label s!"r = {st.rText}"
+      ((rat (-11 / 10), rat (9 / 4) - rat (st.radiusRow / 5)) : QSqrt5 × QSqrt5)
       .right |>.bold |> st.act s!"r-{st.rText}"] else #[])
 
 /-- Where `|u|² = 1` stands against `(r/2)²`. -/
@@ -290,12 +310,11 @@ def lensEstimate : Plane.Figure := frameAt (9 / 10) "1.8" true true
   vStar.realPart == kappa &&
   (ZetaFrac.mk (zeta 1 + zeta 2 - Zeta5.ofInt 1) 2).normSq == criticalSq * rat (1 / 4)
 
-/-- The chapter's sharpness claim, exactly: the tip's real part `c₁/2 + √(h² s²)` is at most
-`κ - 2η`, so strictly below `κ - η` when `η > 0`. -/
+/-- The chapter's sharpness claim at the half radius `ρ`, exactly: the real part of `tip ρ` is at
+most `κ - 2η`, so strictly below `κ - η` when `η > 0` (for every radius, every point of the lens:
+`TDCSG.Five.re_le_of_mem_lens`). -/
 def tipReLe (ρ : Rat) : Bool :=
-  let A := hSq ρ * sineSq
-  let K := kappa - margin (rat (4 * ρ * ρ)) * rat 2 - cosine * rat (1 / 2)
-  sqrtLt A K || sqrtEq A K
+  reAtMost (tip ρ) (kappa - margin (rat (4 * ρ * ρ)) * rat 2)
 
 -- At `R` the bound is an equality: `h² = s²` there, and `c₁/2 + s² = κ`.
 #guard hSq 0 + criticalSq * rat (1 / 4) == sineSq && cosine * rat (1 / 2) + sineSq == kappa
@@ -309,8 +328,9 @@ def tipReLe (ρ : Rat) : Bool :=
 radii, ending at the critical radius `R = √(3 + φ)`, beside the neighbourhood of the tip enlarged
 (`zoomItems`), the two panels on one clock. Its keys are the exact pictures at the radii of
 `LensLoopConfig.radii`, then two at `R`: the first with the dashed edge `Re v = κ - η` where it
-has arrived, on `Re v = κ` (`η = 0`), and the tip there; the last as the slider of earlier versions
-of the site showed `R`, the two half-planes one, the tip `v*`.
+has arrived, on `Re v = κ` (`η = 0`), and the tip there; the last with the two half-planes one and
+the tip `v*`, the data of the lens picture at `R` drawn in the loop's layout (narrower, beside the
+enlarged panel, the real axis a segment across the box, the radius written at the top left).
 
 The lens is a function of the radius, and so are the circles, the dashed edge, the drawn radius,
 the tip and its label: between two keys of different radii they are morphed through the exact
@@ -337,11 +357,11 @@ def tipTitle : String := "the tip of the lens: its corner of largest real part"
 both circles and on the lens, and `cuts` relative to both half-planes (`.outside` below `R`, `.on`
 at `R`); `v*` and the margin `η` drawn apart when `first`. -/
 def loopSetting (r2 : QSqrt5) (rText : String) (first : Bool)
-    (cuts : Plane.Incidence := .outside) : Setting (SqrtOf QSqrt5) :=
+    (cuts : Plane.Incidence := .outside) (radiusRow : Nat := 0) : Setting (SqrtOf QSqrt5) :=
   { half := ⟨r2 * rat (1 / 4)⟩, r2, rText,
     tipPt := tipItemWith (tipOf (hSqOf r2)) (some cuts) |>.named tipTitle,
     tipXY := PlanePoint.toPoint (tipOf (hSqOf r2)), other := otherSide (r2 * rat (1 / 4)),
-    critical := false, showVStar := first, showMargin := first, motion := true }
+    critical := false, showVStar := first, showMargin := first, motion := true, radiusRow }
 
 /-- The setting of the last key: at `R`, the two half-planes one, the tip `tipOf (hSqOf R²)`, which
 is `v*`, on the edge of `Re v ≥ κ`. -/
@@ -392,11 +412,12 @@ def zoomTip (st : Setting (SqrtOf QSqrt5)) : Item :=
   it.named tipTitle |>.actor "tip"
 
 /-- The margin in the enlarged panel at the setting `st`, above the box: below `R` the bar from
-`κ - η` to `κ` with its ticks and its name `η`; at `R` the words `η = 0` at `κ`. -/
+`κ - η` to `κ` with its ticks and its name `η`; at `R` the words `η = 0` above `κ`, higher than the
+name `η`, so that the two never overlap while one fades out and the other fades in. -/
 def zoomMargin (st : Setting (SqrtOf QSqrt5)) : Array Item :=
   let kc := cut st.r2
   if st.r2 == criticalSq then #[
-    Plane.Exact.label "η = 0" ((kappa, zoomBarY) : QSqrt5 × QSqrt5) .above
+    Plane.Exact.label "η = 0" ((kappa, zoomBarY) : QSqrt5 × QSqrt5) .above (some 26)
       |>.actor "zoom-eta-zero"]
   else #[
     Plane.Exact.segment (kc, zoomBarY) (kappa, zoomBarY) |>.width 1
@@ -411,8 +432,9 @@ the whole picture: the half-plane `Re v ≥ κ` and, unless at the last key, `Re
 edge), within the box; the arcs of the circles `|v| = r/2` and `|v − u| = r/2` through the tip
 (exact centres and radius; the angles only choose the piece drawn); the tip (`zoomTip`),
 unlabelled (the panel's title names it, and a label beside it would run into an arc or a
-half-plane at some radius); the labels of the edges at the bottom of the box; and the margin
-above it (`zoomMargin`). Its actors have the ids of the whole picture's, and morph as they do. -/
+half-plane at some radius); the labels of the edges at the bottom of the box (below `R` only for
+`κ - η`, which at `R` would run into `κ`); and the margin above it (`zoomMargin`). Its actors
+have the ids of the whole picture's, and morph as they do. -/
 def zoomItems (st : Setting (SqrtOf QSqrt5)) : Array Item :=
   let kc := cut st.r2
   let a0 := angleFrom ⟨0, 0⟩ st.tipXY
@@ -429,7 +451,7 @@ def zoomItems (st : Setting (SqrtOf QSqrt5)) : Array Item :=
     zoomTip st,
     Plane.Exact.label "κ" ((kappa, zoomBottom) : QSqrt5 × QSqrt5) .belowRight
       |>.actor "kappa-label"] ++
-  (if st.critical then #[] else #[
+  (if st.r2 == criticalSq then #[] else #[
     Plane.Exact.label "κ − η" ((kc, zoomBottom) : QSqrt5 × QSqrt5) .belowLeft
       |>.actor "cut-label"]) ++
   zoomMargin st
@@ -442,7 +464,7 @@ structure LensLoopConfig where
   /-- The radii below `R`, increasing, with their values as text. -/
   radii : Array (Rat × String) := #[(9 / 5, "1.8"), (2, "2"), (52 / 25, "2.08"), (53 / 25, "2.12")]
   /-- The number of intervals of a morph, each ended by an exact picture. -/
-  samples : Nat := 12
+  samples : Nat := 6
   /-- The duration of a step that changes the radius, in seconds. -/
   stepTime : Rat := 6 / 5
   /-- The rest at every key but the first and the last, in seconds. -/
@@ -462,13 +484,14 @@ def r2At (k : Nat) : QSqrt5 :=
   | none => criticalSq
 
 /-- The setting of key `k`: the radius of `radii`, `v*` and the margin drawn at key `0`; then `R`
-with the cut on `Re v = κ`; then the last key (`criticalSetting`). -/
+with the cut on `Re v = κ`; then the last key (`criticalSetting`). The radius is written in row
+`k % 2`, the two keys at `R` in the same row. -/
 def setting (k : Nat) : Setting (SqrtOf QSqrt5) :=
   match cfg.radii[k]? with
-  | some (_, t) => loopSetting (cfg.r2At k) t (k == 0)
+  | some (_, t) => loopSetting (cfg.r2At k) t (k == 0) .outside (k % 2)
   | none =>
-    if k == cfg.radii.size then loopSetting criticalSq "R = √(3 + φ)" false .on
-    else criticalSetting
+    if k == cfg.radii.size then loopSetting criticalSq "R = √(3 + φ)" false .on (k % 2)
+    else { criticalSetting with radiusRow := (k - 1) % 2 }
 
 /-- The width of the whole picture's panel: the figure's width but for the gap and the enlarged
 panel. -/
@@ -487,9 +510,6 @@ def actorIds (f : Plane.Figure) : Array String := f.items.filterMap (·.actorId?
 
 /-- Whether step `j` changes the radius. -/
 def grows (j : Nat) : Bool := j < cfg.radii.size
-
-/-- The tip at key `k`. -/
-def tipAt (k : Nat) : SurdPoint := tipOf (hSqOf (cfg.r2At k))
 
 /-- The moves of step `j` in the panel whose keys are `keyAt`: when the radius changes, the actors
 of both keys morph through the exact pictures between (`between`), the tip and its label included
@@ -517,20 +537,16 @@ def zoomBetween (j : Nat) (q : Rat) : Option Plane.Figure :=
     some { cfg.zoomKey j with items := zoomItems (loopSetting (cfg.r2Between j q) "" false) }
   else none
 
-/-- Whether the tip `tipOf (hSqOf r2)` lies on both circles of radius `r/2` about `0` and `u`, and
-so on the perpendicular bisector of `0` and `u`: `h² ≥ 0`, and with `A = h² s²`, `B = s²/4` and
-`C = h² c₁²` the cross terms of `|tip|²` and `|tip - u|²` cancel (`c₁² A = 4 B C`) and the rest is
-`r²/4` (`c₁²/4 + A + B + C = r²/4`), as in `tipFacts`. -/
+/-- Whether the tip drawn at the squared radius `r2`, `tipOf (hSqOf r2)`, lies on both circles of
+radius `r/2` about `0` and `u` (`tipOnCircles`), and so on the perpendicular bisector of `0` and
+`u`, with real part at most `κ - 2η` (`reAtMost`). -/
 def tipOnBoth (r2 : QSqrt5) : Bool :=
-  let h2 := hSqOf r2
-  let A := h2 * sineSq
-  let B := sineSq * rat (1 / 4)
-  let C := h2 * (cosine * cosine)
-  QSqrt.lt ⟨0, 0⟩ cosine && QSqrt.le ⟨0, 0⟩ h2 && cosine * cosine * A == rat 4 * B * C &&
-    cosine * cosine * rat (1 / 4) + A + B + C == r2 * rat (1 / 4)
+  tipOnCircles (tipOf (hSqOf r2)) (r2 * rat (1 / 4)) &&
+    reAtMost (tipOf (hSqOf r2)) (kappa - margin r2 * rat 2)
 
 /-- Whether every picture between two keys of different radii is at a radius below `R`
-(`r2Between j (i / samples)`, `0 < i < samples`, below `R²`), with its tip on both circles. -/
+(`r2Between j (i / samples)`, `0 < i < samples`, below `R²`), with its tip on both circles and
+at most `κ - 2η` (`tipOnBoth`). -/
 def samplesBelowR : Bool :=
   (List.range cfg.radii.size).all fun j => (List.range (cfg.samples - 1)).all fun i =>
     let r2 := cfg.r2Between j ((i + 1 : Nat) / (cfg.samples : Rat))

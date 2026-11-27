@@ -14,10 +14,11 @@ a turn, a vector of a slide or the place of an actor, and proves, by `decide +ke
 check then fails. The figures' own statements are on the page of the figures' theorems
 (`TDCSGFigures.generatorStep_keys` and the other `_keys` theorems).
 
-A `#guard` line requires that PILean's engine reports no error for any animation of the site, wide
-or narrow, so that a drawn move that misses its key stops the build, and another that every caption
-and title has all its characters in PILean's lettering, which draws them on the contact sheets and
-in print. The other `#guard` lines pin the captions of the animations whose captions are built from
+`engineErrors` lists the errors PILean's engine reports for the animations of the site, wide and
+narrow; the test driver (`TDCSGTests.Main`, run by `lake test`) runs it compiled and fails when the
+list is not empty, so that a drawn move that misses its key stops the gate. A `#guard` line requires
+that every caption and title has all its characters in PILean's lettering, which draws them on the
+contact sheets and in print. The other `#guard` lines pin the captions of the animations whose captions are built from
 their data, word for word, by evaluation: the kernel does not reduce the string functions these
 captions are built with, so the theorems state the caption functions and these lines their texts. -/
 
@@ -131,11 +132,15 @@ def siteMotions : Array (String × PILean.Plane.MotionPanels) := #[
   ("TDCSGFigures.orbitRadius", orbitRadius),
   ("lensRadius", Lens.lensRadius)]
 
--- Every animation of the site, and its narrow rendition, has no error in PILean's engine: every
--- move it draws lands on its next key, every rest shows its still, the writer agrees with the
--- baker. A drawn move that differs from the exact one it is made from stops the build here.
-#guard siteMotions.all fun (_, P) =>
-  P.report.errors.isEmpty && (P.narrow.map (·.report.errors.isEmpty)).getD true
+/-- The errors PILean's engine reports for the animations of the site and their narrow renditions,
+each with the animation's name: every move drawn must land on its next key, every rest show its
+still, the writer agree with the baker. The test driver runs this compiled and fails when it is not
+empty. -/
+def engineErrors : List String :=
+  siteMotions.toList.flatMap fun (name, P) =>
+    let all := [("", P)] ++ (P.narrow.map fun n => [("-narrow", n)]).getD []
+    all.flatMap fun (suffix, Q) =>
+      Q.report.errors.toList.map fun e => s!"{name}{suffix}: {e}"
 
 -- Every caption, title and panel title of the animations of the site has all its characters in
 -- PILean's lettering, which draws them on the contact sheets and in print.
@@ -152,34 +157,26 @@ section OrbitRadius
 
 open TDCSGFigures.OrbitLoop
 
--- The orbits have 9, 9, 71, 151, 801 and 1000 points; the first five, at r = 1.5, 1.9, 1.95,
--- 2.05 and 2.1, are complete; at R the search was stopped at 1000 points (the orbit there is
--- infinite, `TDCSG.CriticalRadius.infinite_orbit_zero_five`).
-#guard
-  let os := figureConfig.orbits
-  os.map (·.points.size) == #[9, 9, 71, 151, 801, 1000] &&
-    os.map (·.complete) == #[true, true, true, true, true, false]
-
--- Each drawn orbit contains the one before it, and the engine decides on which side of each disk
--- every point drawn lies; the groups that appear up to each key are the points of its orbit, each
--- once; every declared appearance and disappearance is the change from one key to the next, and
--- no group of points moves (`allArrive`).
-#guard figureConfig.nested && figureConfig.partitions && figureConfig.arrives
-
--- The 801 points of the orbit at r = 2.1 are among the first 997 points of the search at R, and
--- not all among the first 996.
+-- The orbits are computed once. They have 9, 9, 71, 151, 801 and 1000 points; the first five, at
+-- r = 1.5, 1.9, 1.95, 2.05 and 2.1, are complete; at R the search was stopped at 1000 points (the
+-- orbit there is infinite, `TDCSG.CriticalRadius.infinite_orbit_zero_five`). Each drawn orbit
+-- contains the one before it, and the engine decides on which side of each disk every point drawn
+-- lies; the groups that appear up to each key are the points of its orbit, each once; every
+-- declared appearance and disappearance is the change from one key to the next, and no group of
+-- points moves (`allArrive`). The 801 points of the orbit at r = 2.1 are among the first 997
+-- points of the search at R, and not all among the first 996. The lines under the disks are
+-- written out.
 #guard
   let os := figureConfig.orbits
   let within := fun (n : Nat) => (os.getD 4 default).points.all fun p =>
     ((os.getD 5 default).points.extract 0 n).any (·.z == p.z)
-  within 997 && !within 996
-
--- The lines under the disks.
-#guard
-  let os := figureConfig.orbits
-  (List.range 6).map (figureConfig.valueText os) == ["r = 1.5: 9 points", "r = 1.9: 9 points",
-    "r = 1.95: 71 points", "r = 2.05: 151 points", "r = 2.1: 801 points",
-    "r = R: infinite, the first 1000 shown"]
+  os.map (·.points.size) == #[9, 9, 71, 151, 801, 1000] &&
+    os.map (·.complete) == #[true, true, true, true, true, false] &&
+    figureConfig.nested os && figureConfig.partitions os && figureConfig.arrives os &&
+    within 997 && !within 996 &&
+    (List.range 6).map (figureConfig.valueText os) == ["r = 1.5: 9 points", "r = 1.9: 9 points",
+      "r = 1.95: 71 points", "r = 2.05: 151 points", "r = 2.1: 801 points",
+      "r = R: infinite, the first 1000 shown"]
 
 end OrbitRadius
 
@@ -187,9 +184,8 @@ end OrbitRadius
 
 #guard orbitRadius.captions == #[
   "The orbit of 0 under the two moves at r = 1.5, computed exactly: 9 points. As r grows the \
-    closed disks grow and the orbit can only grow: at each radius shown the points it has \
-    gained fade in. Between two radii only the circles grow; the orbit is drawn only at the \
-    radii shown.",
+    closed disks grow and the orbit can only grow: from one radius shown to the next the circles \
+    grow and the points the orbit gains fade in. The orbit is exact only at the radii shown.",
   "r = 1.9: the disks are larger, and the orbit is the same 9 points.",
   "r = 1.95: 71 points; the 62 new ones have faded in, and the 9 points of the orbit at r = 1.9 \
     are among them.",

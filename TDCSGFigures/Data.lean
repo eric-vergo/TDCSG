@@ -225,8 +225,7 @@ def Side.lens : Side → Side → Side
   | .outside, _ | _, .outside => .outside
   | _, _ => .on
 
-/-- An orbit point with where it stands relative to the left and the right disk, and how many
-moves the breadth-first search needed to reach it. -/
+/-- An orbit point with where it stands relative to the left and the right disk. -/
 structure OrbitPoint where
   /-- The point. -/
   z : Zeta5
@@ -234,9 +233,6 @@ structure OrbitPoint where
   left : Side
   /-- Relative to the right disk. -/
   right : Side
-  /-- The fewest moves (each a turn by a fifth about `-1` or `1`, either way, of a point in that
-  closed disk) that carry the starting point to `z`: its depth in the search. -/
-  depth : Nat := 0
 
 /-- An orbit, breadth first from its starting point, and whether it was exhausted (otherwise the
 search stopped at its cap). -/
@@ -265,8 +261,7 @@ def sides (r2 : RadiusSq) (z : Zeta5) : Except String (Side × Side) := do
 
 open TDCSGCompute in
 /-- The orbit of `start` under the two generators at squared radius `r2`, breadth first, by the
-engine's exact disk decisions, stopped after `cap` points; each point carries its depth in the
-search. -/
+engine's exact disk decisions, stopped after `cap` points. -/
 def orbit (r2 : RadiusSq) (start : Zeta5 := origin) (cap : Nat := 4000) : Except String Orbit := do
   let F := field
   let T := DiskTest.make F ⟨r2.num, r2.den⟩
@@ -276,20 +271,17 @@ def orbit (r2 : RadiusSq) (start : Zeta5 := origin) (cap : Nat := 4000) : Except
   | .added s => set := s
   | _ => throw "the starting point does not fit the store"
   let mut out : Array OrbitPoint := #[]
-  let mut depths : Array Nat := #[0]
   let mut head := 0
   while head < set.size && head < cap do
     let z := set.get head
     let l ← sideOf T z 1
     let r ← sideOf T z (-1)
-    let d := depths.getD head 0
-    out := out.push ⟨⟨z⟩, l, r, d⟩
+    out := out.push ⟨⟨z⟩, l, r⟩
     let imgs := (if l != .outside then #[F.rotCW z 1, F.rotCCW z 1] else #[]) ++
       (if r != .outside then #[F.rotCW z (-1), F.rotCCW z (-1)] else #[])
     for w in imgs do
       match set.insert w with
-      | .added s => set := s; depths := depths.push (d + 1)
-      | .present s => set := s
+      | .added s | .present s => set := s
       | .overflow _ => throw s!"coefficient overflow at {w}"
     head := head + 1
   return { points := out, complete := head == set.size }

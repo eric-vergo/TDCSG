@@ -18,8 +18,9 @@ contains the one before it (`GrowthConfig.nested`, decided on the drawn points; 
 `TDCSG.orbit_mono`), so from one key to the next the points already drawn stay and the new ones
 fade in, while the two circles and their lens grow: a morph through the exact circles and lens at
 `samples - 1` radii between two keys, `r²` evenly spaced (`GrowthConfig.between`), between which
-the browser interpolates the path data linearly. The orbit itself is drawn only at the keys. The
-radius and the number of points are written under the disks.
+the browser interpolates the path data linearly. The picture is the exact orbit only at the keys;
+during a step the new points fade in while the circles grow. The radius and the number of points
+are written under the disks, in two rows taken in turn.
 
 No point moves. The points a key draws first are one actor, a group (`GrowthConfig.pointGroup`),
 which keeps the animated SVG small, and which comes in by an appearance; the groups up to a key are
@@ -123,7 +124,7 @@ structure GrowthConfig where
   /-- How many points of the infinite orbit at `R` are drawn: the first ones the search finds. -/
   cap : Nat := 1000
   /-- The number of intervals of a step in which the circles and the lens are drawn exactly. -/
-  samples : Nat := 12
+  samples : Nat := 6
   /-- The duration of a step, in seconds. -/
   stepTime : Rat := 6 / 5
   /-- The rest at every key but the first and the last, in seconds. -/
@@ -176,9 +177,12 @@ def valueText (os : Array Orbit) (k : Nat) : String :=
   | .rat t _ => s!"r = {t}: {n} points"
   | .critical => s!"r = R: infinite, the first {n} shown"
 
-/-- The line under the disks at key `k` (actor `"value-<k>"`). -/
+/-- The line under the disks at key `k` (actor `"value-<k>"`), in row `k % 2` (`valueY`, or
+`3/10` below it), so that the lines of consecutive keys never overlap while one fades out and the
+next fades in. -/
 def valueLabel (os : Array Orbit) (k : Nat) : Item :=
-  Plane.Exact.label (cfg.valueText os k) ((0 : Rat), valueY) |>.actor s!"value-{k}"
+  Plane.Exact.label (cfg.valueText os k) ((0 : Rat), valueY - (k % 2 : Nat) * 3 / 10)
+    |>.actor s!"value-{k}"
 
 /-- The caption of key `k`. -/
 def caption (os : Array Orbit) (k : Nat) : String :=
@@ -188,9 +192,9 @@ def caption (os : Array Orbit) (k : Nat) : String :=
   | .rat t _ =>
     if k == 0 then
       s!"The orbit of 0 under the two moves at r = {t}, computed exactly: {n} points. As r \
-        grows the closed disks grow and the orbit can only grow: at each radius shown the points \
-        it has gained fade in. Between two radii only the circles grow; the orbit is drawn only \
-        at the radii shown."
+        grows the closed disks grow and the orbit can only grow: from one radius shown to the next \
+        the circles grow and the points the orbit gains fade in. The orbit is exact only at the \
+        radii shown."
     else if n == prev then
       s!"r = {t}: the disks are larger, and the orbit is the same {n} points."
     else s!"r = {t}: {n} points; the {n - prev} new ones have faded in, and the {prev} points \
@@ -226,14 +230,12 @@ def actors (os : Array Orbit) (k : Nat) : List (ExactActor ZetaFrac) :=
 
 /-- Whether every declared appearance and disappearance is the change from one key to the next,
 and every group of points stays where it is (`allArrive`). -/
-def arrives : Bool :=
-  let os := cfg.orbits
+def arrives (os : Array Orbit) : Bool :=
   allArrive (cfg.keyCount - 1) (moves os) (actors os)
 
 /-- Whether each drawn orbit contains the one before it, the orbits at the rational radii are
 complete, and the engine decides the side of every point drawn. -/
-def nested : Bool :=
-  let os := cfg.orbits
+def nested (os : Array Orbit) : Bool :=
   ((List.range (cfg.keyCount - 1)).all fun k =>
     subset (os.getD k default).points (os.getD (k + 1) default).points) &&
   ((List.range cfg.radii.size).all fun k => (os.getD k default).complete) &&
@@ -242,8 +244,7 @@ def nested : Bool :=
 
 /-- Whether the groups of points up to each key are the points of its orbit, each once: the sizes
 of the groups add up to the size of the orbit, and every point of the orbit is in a group. -/
-def partitions : Bool :=
-  let os := cfg.orbits
+def partitions (os : Array Orbit) : Bool :=
   (List.range cfg.keyCount).all fun k =>
     let groups := (groupsUpTo os k).map (newPoints os)
     let pts := (os.getD k default).points
