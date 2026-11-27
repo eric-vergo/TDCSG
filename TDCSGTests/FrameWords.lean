@@ -11,8 +11,8 @@ Pins, by `decide +kernel`, of words, most with letters that do not act, at `r = 
 (`TDCSGFigures.Lift.radiusSq`): for each word one summary (`TDCSGFigures.Lift.wordSummary`) of its
 idle positions, the geometry of every step (`State.stepHolds`), whether the orbit closes and its
 squared extents `|(y + 1)/2|²` and `|P - x|²` in the two frames. These are other words for the
-frame pair, found by `scripts/FrameWords.lean`; the figure's own word, `a a b a b a a b b a b b`,
-is pinned in `TDCSGFigures.Lift.wordSummary_word`. This module is built by the test driver, not by
+frame pair, found by `scripts/FrameWords.lean`; the figure's own word, at `r = 2.12`, is pinned in
+`TDCSGFigures.Lift.wordSummary_word`. This module is built by the test driver, not by
 the figures or the blueprint.
 -/
 

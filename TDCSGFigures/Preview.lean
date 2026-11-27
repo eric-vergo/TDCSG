@@ -24,8 +24,9 @@ its notes are printed but do not count.
 
 `tdcsg-figure-preview --frame-pair WORD [--radius P/Q] [--pivot] [--faint] [--out DIR]` writes the
 frame pair of chapter 4 for another word (letters `a`, `b`, `A = a⁻¹`, `B = b⁻¹`;
-`TDCSGFigures.Lift.FramePairConfig`), radius, with the turn centres marked (`pivotMark`) or the
-riding disks faint (`faintDisks`), as `DIR/framePair-WORD[-rP_Q][-pivot][-faint]…`, and prints
+`TDCSGFigures.Lift.FramePairConfig`, with the figure's arrows), radius, with the turn centres
+marked by rings (`pivotMark`) or the riding disks faint (`faintDisks`), as
+`DIR/framePair-WORD[-rP_Q][-pivot][-faint]…`, and prints
 whether every declared move arrives exactly (`FramePairConfig.allArrive`).
 -/
 
@@ -167,7 +168,7 @@ def main (args : List String) : IO UInt32 := do
     IO.FS.createDirAll dir
     let w ← IO.ofExcept (TDCSGFigures.Lift.parseWord word)
     let c : TDCSGFigures.Lift.FramePairConfig :=
-      { word := w, radius := opts.1.getD TDCSGFigures.Lift.radius, pivotMark := opts.2.1,
+      { word := w, radius := opts.1.getD TDCSGFigures.Lift.pairRadius, pivotMark := opts.2.1,
         faintDisks := opts.2.2 }
     let stem := s!"framePair-{word}" ++ (opts.1.map fun q => s!"-r{q.num}_{q.den}").getD "" ++
       (if opts.2.1 then "-pivot" else "") ++ (if opts.2.2 then "-faint" else "")

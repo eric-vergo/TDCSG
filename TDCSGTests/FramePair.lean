@@ -8,11 +8,14 @@ import TDCSGFigures.Chord
 /-!
 # The declared moves of the frame pair arrive exactly
 
-For words of the frame pair at `r = 1.95` from `z = 0`, checked by `decide +kernel`: every
+For words of the frame pair from `z = 0`, at `r = 1.95` and at the figure's `r = 2.12`, checked
+by `decide +kernel`: every
 declared turn of every step (`TDCSGFigures.Lift.FramePairConfig.frameSteps`), applied exactly in
 `ℤ[ζ₅]` to the anchors of the actors that the key figures draw (`FramePairConfig.actorsAt`) in key
 `k`, gives their anchors in key `k + 1` (`FramePairConfig.allArrive`), in each panel's own
-coordinates. A misplaced actor makes the check fail. Every drawn actor gives back its base title
+coordinates. A misplaced actor, a ring about the wrong centre, a turn-centre ring about the wrong
+centre, and an arrow about the wrong centre or turned the wrong way each make the check fail.
+Every drawn actor gives back its base title
 (`FramePairConfig.baseTitlesRecoverable`, checked by evaluation, since the drawing goes through
 floating point). The letters that act are the ones pinned in `TDCSGTests.FrameWords` and
 `TDCSGFigures.Lift.wordSummary_word`. This is the exact counterpart of the floating-point arrival
@@ -33,28 +36,35 @@ theorem turnFactor_fifths :
       (turnFactor (1 / 5) == some (zeta 1)) = true := by
   decide +kernel
 
+/-- `a b a b` at `r = 1.95`, without arrows. -/
+def abab : FramePairConfig := { word := [.a, .b, .a, .b], radius := radius, arrowMark := false }
+
 /-- `a b a b`: every step arrives; every letter acts. -/
 theorem frameSteps_abab :
-    ({ word := [.a, .b, .a, .b] } : FramePairConfig).allArrive = true ∧
-      (({ word := [.a, .b, .a, .b] } : FramePairConfig).frameSteps.map (·.acts)) =
+    abab.allArrive = true ∧ (abab.frameSteps.map (·.acts)) =
         [true, true, true, true] := by
   decide +kernel
 
 /-- `a b a b b a b`: every step arrives; the letter `6` does not act (two steps). -/
 theorem frameSteps_ababbab :
-    ({ word := [.a, .b, .a, .b, .b, .a, .b] } : FramePairConfig).allArrive = true ∧
-    (({ word := [.a, .b, .a, .b, .b, .a, .b] } : FramePairConfig).frameSteps.map (·.acts)) =
+    ({ word := [.a, .b, .a, .b, .b, .a, .b], radius := radius, arrowMark := false } :
+      FramePairConfig).allArrive = true ∧
+    (({ word := [.a, .b, .a, .b, .b, .a, .b], radius := radius, arrowMark := false } :
+      FramePairConfig).frameSteps.map (·.acts)) =
       [true, true, true, true, true, false, false, true] := by
   decide +kernel
 
+/-- `a a b a a a b b b b b` at `r = 1.95`, without arrows. -/
+def aabaaabbbbb : FramePairConfig :=
+  { word := [.a, .a, .b, .a, .a, .a, .b, .b, .b, .b, .b], radius := radius, arrowMark := false }
+
 /-- `a a b a a a b b b b b`: every step arrives; the letter `3` does not act (two steps). -/
 theorem frameSteps_aabaaabbbbb :
-    ({ word := [.a, .a, .b, .a, .a, .a, .b, .b, .b, .b, .b] } : FramePairConfig).allArrive = true ∧
-    (({ word := [.a, .a, .b, .a, .a, .a, .b, .b, .b, .b, .b] } : FramePairConfig).frameSteps.map
-      (·.acts)) = [true, true, false, false, true, true, true, true, true, true, true, true] := by
+    aabaaabbbbb.allArrive = true ∧ (aabaaabbbbb.frameSteps.map (·.acts)) =
+      [true, true, false, false, true, true, true, true, true, true, true, true] := by
   decide +kernel
 
-/-- The inverse letters: the figure's word followed by its inverse arrives at every step. -/
+/-- The figure's word followed by its inverse arrives at every step, with its arrows. -/
 theorem frameSteps_inverse :
     ({ word := word ++ inverseWord word } : FramePairConfig).allArrive = true := by
   decide +kernel
@@ -86,11 +96,10 @@ theorem ringElsewhere_fails :
     ({} : FramePairConfig).ringsPlacedWith ringElsewhere = false := by
   decide +kernel
 
-/-- A word whose turns alternate between the two centres except around its idle letters, at
-`r = 2.12`: `a b⁻¹ a b a⁻¹ b⁻¹ a b a⁻¹ b`, with the turn centres marked (`pivotMark`). -/
+/-- The figure's word with the turn centres marked by rings (`pivotMark`) instead of arrows. -/
 def pivotWord : FramePairConfig :=
   { word := [.a, .bInv, .a, .b, .aInv, .bInv, .a, .b, .aInv, .b], radius := 53 / 25,
-    pivotMark := true }
+    pivotMark := true, arrowMark := false }
 
 /-- With the turn centres marked, every step arrives and every turn centre is marked where its
 turn turns (`pivotsPlaced`): the letters `3` and `8` do not act, and each of the eight turns gets
@@ -118,24 +127,61 @@ theorem pivotElsewhere_fails : pivotWord.pivotsPlacedWith pivotElsewhere = false
 theorem no_pivots : ({} : FramePairConfig).pivotsPlaced = true := by
   decide +kernel
 
--- The animations with the turn centres marked, and with the riding disks faint as well, pass every
--- check of PILean's engine; checked by evaluation (the drawing is in floating point).
+-- The animations with the turn centres marked, with the riding disks faint as well, and with both
+-- rings and arrows, pass every check of PILean's engine; checked by evaluation (the drawing is in
+-- floating point).
 #guard pivotWord.motion.problems.isEmpty
 #guard ({ pivotWord with faintDisks := true }).motion.problems.isEmpty
 #guard ({ pivotMark := true } : FramePairConfig).motion.problems.isEmpty
 
+/-- The actors of the figure with the arrow of the turn of letter `i` (from `0`) changed by `f`
+in the moving frame. -/
+def arrowChanged (i : Nat) (f : Actor → Actor) (p : Panel) (k : Nat) : List Actor :=
+  (({} : FramePairConfig).actorsAt p k).map fun a =>
+    if p == .right && a.id == s!"arrow-{i}" then f a else a
+
+/-- An arrow turned the wrong way fails the check of the arrows: the arrow of letter `5`, `a⁻¹`,
+drawn counterclockwise in the moving frame, where the pair turns clockwise. -/
+theorem arrowFlipped_fails :
+    ({} : FramePairConfig).arrowsPlacedWith (arrowChanged 4 fun a =>
+      match a.kind with
+      | .turnArrow ρ q r w => { a with kind := .turnArrow ρ (-q) r w }
+      | _ => a) = false := by
+  decide +kernel
+
+/-- An arrow about the other centre of the pair fails the check of the arrows: the arrow of
+letter `2`, `b⁻¹`, drawn about the left centre. -/
+theorem arrowElsewhere_fails :
+    ({} : FramePairConfig).arrowsPlacedWith (arrowChanged 1 fun a =>
+      { a with anchors := (({} : FramePairConfig).centresAt 1).1 :: a.anchors.drop 1 }) =
+        false := by
+  decide +kernel
+
+/-- Without the option, no key shows an arrow. -/
+theorem no_arrows :
+    ({ arrowMark := false } : FramePairConfig).arrowsPlaced = true ∧
+      ({ arrowMark := false } : FramePairConfig).keyCount = 13 := by
+  decide +kernel
+
+/-- The word strip, an option off on the site, with the earlier word `a a b a b a a b b a b b` at
+`r = 1.95` and without arrows: the strip has room for letters without exponents only (the figure's
+word, with `a⁻¹` and `b⁻¹`, overlaps in it). -/
+def stripCfg : FramePairConfig :=
+  { word := [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b], radius := radius, arrowMark := false,
+    strip := true }
+
 /-- The word strip, an option off on the site, marks the letter of every key, for the frame pair
 and for the three words. -/
 theorem strip_marks :
-    ({ strip := true } : FramePairConfig).stripMarkIds 4 = ["strip-2"] ∧
+    stripCfg.stripMarkIds 4 = ["strip-2"] ∧
       ({} : FramePairConfig).stripMarkIds 4 = [] := by
   decide +kernel
 
 -- The marks the strip draws are those `stripMarkIds` names, and the animations with the strip pass
 -- every check of PILean's engine; checked by evaluation (the drawing is in floating point).
-#guard ({ strip := true } : FramePairConfig).stripMarks
+#guard stripCfg.stripMarks
 #guard wordStripMarks 1 && wordStripMarks 2 && wordStripMarks 3
-#guard ({ strip := true } : FramePairConfig).motion.problems.isEmpty
+#guard stripCfg.motion.problems.isEmpty
 #guard [1, 2, 3].all fun i => (wordLoopWith i true).problems.isEmpty
 
 -- Every drawn actor of the figure's word gives back its base title. The drawing goes through

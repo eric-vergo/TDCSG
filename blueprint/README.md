@@ -136,7 +136,9 @@ named items by a fifth of a full turn about an exact centre, or an item that app
 PILean checks, at the strict level, that each declared turn carries one key onto the next, that
 every rest shows its key's still and that the written SVG draws what its plan says; the site
 build refuses an animation not checked strictly. The animations share one timing,
-`TDCSGFigures.motionPacing` in `TDCSGFigures/Style.lean`. They are illustrations: no theorem is
+`TDCSGFigures.motionPacing` in `TDCSGFigures/Style.lean`; the frame pair shows each turn with an
+arrow about its centre, whose fades are steps of their own between short rests, so that the pause
+between two turns keeps the shared length. They are illustrations: no theorem is
 linked to them, and the data of their key frames are stated on the page of the figures' theorems
 (`wordLoop_keys`, `framePair_keys`). The site ships no script of its own for them: the moving
 pictures are SMIL in the page, and what hides them is the stylesheet of PILean's adapter and the
