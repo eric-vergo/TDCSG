@@ -141,15 +141,16 @@ python3 scripts/check-engines.py _out/site/html-multi /tmp/motion-out [--workers
 
 ### Animations
 
-Thirteen figures are animations drawn by PILean from exact key frames: the turn of one disk and
+Fourteen figures are animations drawn by PILean from exact key frames: the turn of one disk and
 two disjoint disks of chapter 1 (`TDCSGFigures.extensionJump`, `disjointDisks` in
 `TDCSGFigures/Compound.lean`), one step of the left generator and a word letter by letter of
 chapter 2 (`generatorStep`, `wordSteps` in `TDCSGFigures/TwoDisks.lean`), the three words, the
 interval exchange and the orbit on the chord of chapter 3 (`wordLoop1`, `wordLoop2`, `wordLoop3`,
 `chordOrbit` in `TDCSGFigures/Chord.lean`, `exchangedIntervals` in
 `TDCSGFigures/ProofDiagrams.lean`), the frame pair of chapter 4 (`TDCSGFigures.Lift.framePair` in
-`TDCSGFigures/FramePairMotion.lean`) and the walk of chapter 7
-(`TDCSGFigures.Confinement.walkToLeaf`). Each key is a `Plane.Figure` of exact data, and each step
+`TDCSGFigures/FramePairMotion.lean`), the crossing at a good level of chapter 6
+(`TDCSGFigures.Levels.terminalCrossing`, with the end of its edge enlarged in a second panel) and the
+walk of chapter 7 (`TDCSGFigures.Confinement.walkToLeaf`). Each key is a `Plane.Figure` of exact data, and each step
 between two keys declares its moves: a turn of named items by a fifth of a full turn about an
 exact centre, a slide along an exact vector, or an item that appears or vanishes. The moves are
 declared once, exactly (`TDCSGFigures.ExactMove` in `TDCSGFigures/Data/Moves.lean`, or the frame
@@ -164,7 +165,7 @@ frame pair shows each turn with an arrow about its centre, whose fades are steps
 between short rests, so that the pause between two turns keeps the shared length.
 
 Where an animation replaced a figure with a linked theorem (`generatorStep`, `extensionJump`,
-`disjointDisks`, `exchangedIntervals`, `chordOrbit`), it keeps the figure's name, label and
+`disjointDisks`, `exchangedIntervals`, `chordOrbit`, `terminalCrossing`), it keeps the figure's name, label and
 number, its last key frame is that figure (`<name>Final`) and its poster, the still the figure page,
 the reduced-motion view and print show first, and the theorem `<name>_spec` stays linked: it states
 that the last key frame is the figure and what the figure draws. The other key frames, the moves

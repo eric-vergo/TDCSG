@@ -5,6 +5,7 @@ Authors: Eric Vergo, Claude Fable 5.2
 import PILean.Trust.Attr
 import TDCSGFigures.Data.PartTwo
 import TDCSGFigures.Style
+import TDCSGFigures.Data.Moves
 
 /-!
 # The figures of chapter 6, good levels
@@ -14,13 +15,19 @@ import TDCSGFigures.Style
   bands `|phase| > L/2 - η`, the good levels `-10`, `-2`, `3` decided exactly
   (`TDCSGFigures.isGoodLevel`), the walls `lo = -10` and `hi = 3` the confinement proof can use
   and the gap `|m| ≤ 2` between its two search ranges.
-* `terminalCrossing`: the crossing at `r = 2.12`, `x = 0.472`, `n = (4, -3, 1, 1, -3)`: the window,
-  the edge from `n` to the leaf `n + e₀` across the good level `n₀ = 4`, the other neighbours
-  `n + eₖ` of `n` in the window, the candidates `n + e₀ - eₖ` outside it, and the half-plane
-  `Re w ≥ Re x + κ - η` beyond the cut, which holds the leaf.
+* `terminalCrossingFinal`: the crossing at `r = 2.12`, `x = 0.472`, `n = (4, -3, 1, 1, -3)`: the
+  window, the edge from `n` to the leaf `n + e₀` across the good level `n₀ = 4`, the other
+  neighbours `n + eₖ` of `n` in the window, the candidates `n + e₀ - eₖ` outside it, and the
+  half-plane `Re w ≥ Re x + κ - η` beyond the cut, which holds the leaf.
+* `terminalCrossing`: an animation of two panels on one clock, the crossing above and the
+  neighbourhood of the leaf enlarged below. A circle walks from `n` along the thick edge to a point
+  of it just inside the enlarged box, then on to the leaf, across the cut in the enlarged panel;
+  the leaf's candidates appear outside the window; the circle walks back to `n` and goes. Its last
+  keys are `terminalCrossingFinal` and `terminalZoom` (with ids, `zoomIds`); every slide of the
+  circle is checked exactly (`crossArrives`, `zoomArrives`).
 * `terminalZoom`: the same near the leaf, enlarged with a scale bar of length `0.005`: the leaf
   lies `0.0046` beyond the cut and `0.0041` inside the window's edge, both below a pixel in
-  `terminalCrossing`.
+  `terminalCrossingFinal`.
 -/
 
 namespace TDCSGFigures.Levels
@@ -145,7 +152,7 @@ def labelText (n : Label) : String :=
 /-- The subscript digit `k`. -/
 def sub (k : Nat) : String := #["₀", "₁", "₂", "₃", "₄"].getD k ""
 
-/-- The world box of `terminalCrossing`. -/
+/-- The world box of `terminalCrossingFinal`. -/
 def crossView : Box := ⟨-0.66, -1.35, 2.7, 1.35⟩
 
 /-- The half-plane `Re w ≥ Re x + κ - η` as far as `crossView` shows it. -/
@@ -171,39 +178,46 @@ def zoomBox : List (QSqrt5 × QSqrt5) :=
 /-- The edge from `n` to its neighbour `n + eₖ`. -/
 def neighbourEdge (k : Nat) : Item :=
   Plane.Exact.segment (proj crossN) (proj (shift crossN k 1)) |>.role rightRole |>.width 1.5
-    |>.named s!"the edge from n to n + e{sub k}"
+    |>.named s!"the edge from n to n + e{sub k}" |>.withId s!"nedge-{k}"
 
 /-- The rejected step from the leaf `n + e₀` to its candidate `n + e₀ - eₖ`. -/
 def rejectedStep (k : Nat) : Item :=
   Plane.Exact.segment (proj leaf) (proj (shift leaf k (-1))) |>.faint |>.width 1.5 |>.dashed
-    |>.named s!"the rejected step from n + e₀ to n + e₀ − e{sub k}"
+    |>.named s!"the rejected step from n + e₀ to n + e₀ − e{sub k}" |>.withId s!"reject-{k}"
 
 /-- The neighbour `n + eₖ` of `n`, a square (weight one), recording where it stands relative to
 the window. -/
 def neighbourPoint (k : Nat) : Item :=
   Plane.Exact.point (proj (shift crossN k 1)) |>.role rightRole |>.marker .square
     |>.named s!"n + e{sub k} = {labelText (shift crossN k 1)}, weight 1, a neighbour of n"
-    |>.incident (windowSide (shift crossN k 1)).incidence "the window"
+    |>.incident (windowSide (shift crossN k 1)).incidence "the window" |>.withId s!"neighbour-{k}"
+
+/-- Where the label of the neighbour `n + eₖ` stands: left of `n + e₁` and `n + e₄`, right of
+`n + e₂`, above `n + e₃`, clear of the edges at each. -/
+def neighbourPlace (k : Nat) : Placement × Float :=
+  #[(.left, 10), (.right, 17), (.above, 15), (.left, 10)].getD (k - 1) (.above, 10)
 
 /-- The label of the neighbour `n + eₖ`. -/
 def neighbourLabel (k : Nat) : Item :=
-  Plane.Exact.label s!"n + e{sub k}" (proj (shift crossN k 1)) .auto |>.role rightRole
+  Plane.Exact.label s!"n + e{sub k}" (proj (shift crossN k 1)) (neighbourPlace k).1
+    (some (neighbourPlace k).2) |>.role rightRole |>.withId s!"neighbour-label-{k}"
 
 /-- The candidate `n + e₀ - eₖ` of the leaf, recording where it stands relative to the window. -/
 def candidatePoint (k : Nat) : Item :=
   Plane.Exact.point (proj (shift leaf k (-1))) |>.faint |>.marker .ring
     |>.named s!"n + e₀ − e{sub k} = {labelText (shift leaf k (-1))}, weight 0, outside the window"
-    |>.incident (windowSide (shift leaf k (-1))).incidence "the window"
+    |>.incident (windowSide (shift leaf k (-1))).incidence "the window" |>.withId s!"candidate-{k}"
 
 /-- The label of the candidate `n + e₀ - eₖ`, placed `place`. -/
 def candidateLabel (k : Nat) (place : Placement) : Item :=
   Plane.Exact.label s!"n + e₀ − e{sub k}" (proj (shift leaf k (-1))) place
+    |>.withId s!"candidate-label-{k}"
 
-/-- The window, the half-plane beyond the cut, the edge from `n` to the leaf `n + e₀` across the
-good level `n₀ = 4`, the four other neighbours `n + eₖ` of `n` (inside the window) with their
-edges, and the four candidates `n + e₀ - eₖ` of the leaf (outside it). -/
-@[figure]
-def terminalCrossing : Plane.Figure where
+/-- The figure of the crossing, the last key of `terminalCrossing`: the window, the half-plane
+beyond the cut, the edge from `n` to the leaf `n + e₀` across the good level `n₀ = 4`, the four
+other neighbours `n + eₖ` of `n` (inside the window) with their edges, and the four candidates
+`n + e₀ - eₖ` of the leaf (outside it). Each item has an id, which the animation reads. -/
+def terminalCrossingFinal : Plane.Figure where
   width := figureWidth
   narrowWidth := some narrowWidth
   view := some crossView
@@ -214,37 +228,39 @@ def terminalCrossing : Plane.Figure where
     Plane.Exact.polygon crossHalfPlane |>.faint |>.filled |>.noOutline |>.fillOpacity 0.16
       |>.named "the half-plane Re w ≥ Re x + κ − η"
       |>.describedBy "beyond the cut of the lens estimate, turned to the direction j = 0"
-      |>.declRef `TDCSG.Five.div_two_lt_norm_sub_of_le_re,
+      |>.declRef `TDCSG.Five.div_two_lt_norm_sub_of_le_re |>.withId "half-plane",
     Plane.Exact.disk crossXPoint (53 / 50 : Rat) |>.role windowRole |>.fillOpacity 0.07
       |>.named "the window" |>.describedBy "the closed disk |w − x| ≤ r/2, r = 2.12, x = 0.472"
-      |>.declRef `TDCSG.Five.InWindow,
+      |>.declRef `TDCSG.Five.InWindow |>.withId "window",
     Plane.Exact.segment crossXPoint crossRim |>.role windowRole |>.width 1.5 |>.dashed
-      |>.named "a radius r/2 = 1.06 of the window",
-    Plane.Exact.labelBeside "r/2" crossXPoint crossRim |>.role windowRole,
+      |>.named "a radius r/2 = 1.06 of the window" |>.withId "radius",
+    Plane.Exact.labelBeside "r/2" crossXPoint crossRim |>.role windowRole |>.withId "radius-label",
     neighbourEdge 1, neighbourEdge 2, neighbourEdge 3, neighbourEdge 4,
     rejectedStep 1, rejectedStep 2, rejectedStep 3, rejectedStep 4,
     Plane.Exact.segment (proj crossN) (proj leaf) |>.width 3.5
       |>.named "the edge from n to n + e₀: it raises n₀ from the good level 4 to 5"
-      |>.declRef `TDCSG.Five.IsGoodLevel.leaf,
-    Plane.Exact.polygon zoomBox |>.width 1 |>.named "the square enlarged in the next figure",
+      |>.declRef `TDCSG.Five.IsGoodLevel.leaf |>.withId "edge",
+    Plane.Exact.polygon zoomBox |>.width 1 |>.named "the square enlarged in the next figure"
+      |>.withId "zoom-box",
     neighbourPoint 1, neighbourLabel 1, neighbourPoint 2, neighbourLabel 2,
     neighbourPoint 3, neighbourLabel 3, neighbourPoint 4, neighbourLabel 4,
     candidatePoint 1, candidateLabel 1 .belowLeft, candidatePoint 2, candidateLabel 2 .below,
     candidatePoint 3, candidateLabel 3 .above, candidatePoint 4, candidateLabel 4 .aboveLeft,
     Plane.Exact.point (proj crossN) |>.role leftRole |>.size 5
       |>.named s!"n = {labelText crossN}, weight 0, P(n) = 7 − 4φ, at the good level n₀ = 4"
-      |>.incident (windowSide crossN).incidence "the window",
+      |>.incident (windowSide crossN).incidence "the window" |>.withId "n",
     Plane.Exact.point (proj leaf) |>.role rightRole |>.marker .square |>.size 5
       |>.named s!"the leaf n + e₀ = {labelText leaf}, weight 1, P = 8 − 4φ"
       |>.incident (windowSide leaf).incidence "the window"
-      |>.incident .inside "the half-plane Re w ≥ Re x + κ − η",
+      |>.incident .inside "the half-plane Re w ≥ Re x + κ − η" |>.withId "leaf",
     Plane.Exact.label "n" (proj crossN) (.toward (Plane.deg 100)) (some 10) |>.role leftRole
-      |>.italic,
-    Plane.Exact.label "n₀ = 4 → 5" ((rat (21 / 20), rat (2 / 25)) : QSqrt5 × QSqrt5),
+      |>.italic |>.withId "name-n",
+    Plane.Exact.label "n₀ = 4 → 5" ((rat (21 / 20), rat (2 / 25)) : QSqrt5 × QSqrt5)
+      |>.withId "level-label",
     Plane.Exact.label "window" ((rat 0, rat (6 / 5)) : QSqrt5 × QSqrt5)
-      |>.role windowRole,
+      |>.role windowRole |>.withId "window-label",
     Plane.Exact.label "Re w ≥ Re x + κ − η" ((crossCut, rat (5 / 4)) : QSqrt5 × QSqrt5) .right
-      |>.size 12]
+      |>.size 12 |>.withId "cut-label"]
   info := { title := "A crossing at the good level n₀ = 4 ends in the leaf n + e₀" }
 
 /-! ### The enlargement near the leaf -/
@@ -294,6 +310,209 @@ def terminalZoom : Plane.Figure where
     Plane.Exact.label "window edge" ((rat (15322 / 10000), rat (-1 / 200)) :
       QSqrt5 × QSqrt5) .right |>.role windowRole]
   info := { title := "Near the leaf, enlarged: the cut, the leaf and the window's edge" }
+
+/-! ### The crossing walked -/
+
+/-- `p - q` for numbers of `ℚ(ζ₅)` given over denominators, exact. -/
+def zetaFracSub (p q : ZetaFrac) : ZetaFrac := ZetaFrac.add p ⟨-q.num, q.den⟩
+
+/-- `P(n)`. -/
+def nZ : ZetaFrac := ZetaFrac.ofZeta (proj crossN)
+
+/-- `P(n + e₀)`, the leaf. -/
+def leafZ : ZetaFrac := ZetaFrac.ofZeta (proj leaf)
+
+/-- The point `(1.512, 0)` of the edge from `n` to the leaf, just inside the enlarged box. -/
+def boxEntry : ZetaFrac := ⟨Zeta5.ofInt 1512, 1000⟩
+
+/-- `boxEntry` in the coordinates of the enlarged panel: its real part, on the real axis. -/
+def boxEntryQ : QSqrt5 × QSqrt5 := (boxEntry.realPart, rat 0)
+
+/-- Where the walk is at key `k` of `terminalCrossing`, in the crossing: `n`, the point
+`boxEntry`, the leaf (keys `2` and `3`), `n` again; after key `4` the circle is gone. -/
+def walkAt (k : Nat) : List ZetaFrac :=
+  match k with
+  | 0 => [nZ] | 1 => [boxEntry] | 2 | 3 => [leafZ] | 4 => [nZ] | _ => []
+
+/-- Where the walk is at key `k` in the enlarged panel: not yet at key `0`, `boxEntryQ` at key
+`1`, the leaf at keys `2` and `3`, then gone. -/
+def zoomWalkAt (k : Nat) : List (QSqrt5 × QSqrt5) :=
+  match k with
+  | 1 => [boxEntryQ] | 2 | 3 => [leafQ] | _ => []
+
+/-- The radius of the circle that marks the walk in the crossing. -/
+def walkerRadius : Rat := 1 / 16
+
+/-- The radius of the circle that marks the walk in the enlarged panel. -/
+def zoomWalkerRadius : Rat := 1 / 1800
+
+/-- The circle about each point of `ps` that marks where the walk is (actor `walker`), of radius
+`ρ`: one circle, or none when `ps` is empty. -/
+def walkerItems {α : Type} [PlanePoint α] (ρ : Rat) (ps : List α) : Array Item :=
+  (ps.map fun c => Plane.Exact.circle c ρ |>.width 2 |>.role leftRole
+    |>.named "a circle about the point the walk has reached" |>.withId "walker").toArray
+
+/-- The name `n` while the circle of the walk is about `n`: left of it and a little up, between the
+edge to `n + e₂` and the drawn radius, clear of the circle and of the walk along the thick edge. -/
+def earlyName : Item :=
+  Plane.Exact.label "n" (proj crossN) (.toward (Plane.deg 168)) (some 16) |>.role leftRole
+    |>.italic |>.withId "name-n-early"
+
+/-- Whether key `k < 5` of the crossing draws the item `id` of `terminalCrossingFinal`: the
+rejected steps, the candidates and their names from key `3`; not the words `n₀ = 4 → 5`, which the
+circle would pass under on its way back and which appear at the last step; everything else at
+every key. -/
+def crossShows (k : Nat) (id : String) : Bool :=
+  if id.startsWith "reject-" || id.startsWith "candidate-" then 3 ≤ k
+  else id != "level-label"
+
+/-- The items of key `k < 5` of the crossing: those of `terminalCrossingFinal` it shows
+(`crossShows`), the name `n` as `earlyName`, and the circle about `walkAt k`. -/
+def crossKeyItems (k : Nat) : Array Item :=
+  (terminalCrossingFinal.items.filter fun it => crossShows k (it.actorId?.getD "")).map (fun it =>
+    if it.actorId? == some "name-n" then earlyName else it) ++
+  walkerItems walkerRadius (walkAt k)
+
+/-- The ids of the items of `terminalZoom`, in its drawing order. -/
+def zoomIds : Array String :=
+  #["half-plane", "window-arc", "edge", "scale", "leaf", "leaf-label", "scale-label",
+    "edge-label", "cut-name", "cut-label", "window-edge-label"]
+
+/-- `terminalZoom` with each item given its id from `zoomIds`, the last key of the enlarged
+panel. -/
+def zoomFinal : Plane.Figure :=
+  { terminalZoom with
+    items := terminalZoom.items.mapIdx fun i it => it.withId (zoomIds.getD i "") }
+
+/-- The name of the leaf in the enlarged panel while the circle of the walk may be about it: below
+it and smaller, clear of the circle and of the window's edge. -/
+def zoomEarlyName : Item :=
+  Plane.Exact.label "n + e₀ (leaf)" leafQ .below (some 14) |>.size 12 |>.role rightRole
+    |>.withId "leaf-label-early"
+
+/-- The items of key `k < 5` of the enlarged panel: those of `zoomFinal`, the leaf's name as
+`zoomEarlyName`, and the circle about `zoomWalkAt k`. -/
+def zoomKeyItems (k : Nat) : Array Item :=
+  zoomFinal.items.map (fun it =>
+    if it.actorId? == some "leaf-label" then zoomEarlyName else it) ++
+  walkerItems zoomWalkerRadius (zoomWalkAt k)
+
+/-- Key `k` of the crossing: `crossKeyItems k` in the frame of `terminalCrossingFinal`, which is
+key `5`. -/
+def crossKey (k : Nat) : Plane.Figure :=
+  if k < 5 then { terminalCrossingFinal with items := crossKeyItems k } else terminalCrossingFinal
+
+/-- Key `k` of the enlarged panel: `zoomKeyItems k` in the frame of `zoomFinal`, which is key
+`5`. -/
+def zoomKey (k : Nat) : Plane.Figure :=
+  if k < 5 then { zoomFinal with items := zoomKeyItems k } else zoomFinal
+
+/-- The declared moves of the steps of the crossing: the circle slides from `n` to `boxEntry`, on
+to the leaf, the candidates with their spokes and names appear, the circle slides back to `n`; at
+the last step it goes, the name `n` takes its place in the figure and the words `n₀ = 4 → 5`
+appear. -/
+def crossMoves : Nat → List (String × ExactMove ZetaFrac)
+  | 0 => [("walker", .slide (zetaFracSub boxEntry nZ))]
+  | 1 => [("walker", .slide (zetaFracSub leafZ boxEntry))]
+  | 2 => ([1, 2, 3, 4].map (s!"reject-{·}", .appear)) ++
+      ([1, 2, 3, 4].flatMap fun k => [(s!"candidate-{k}", .appear),
+        (s!"candidate-label-{k}", .appear)])
+  | 3 => [("walker", .slide (zetaFracSub nZ leafZ))]
+  | _ => [("walker", .vanish), ("name-n-early", .vanish), ("name-n", .appear),
+      ("level-label", .appear)]
+
+/-- The declared moves of the steps of the enlarged panel: the circle appears at `boxEntryQ`,
+slides to the leaf, waits, goes; at the last step the leaf's name takes its place in the figure. -/
+def zoomMoves : Nat → List (String × ExactMove (QSqrt5 × QSqrt5))
+  | 0 => [("walker", .appear)]
+  | 1 => [("walker", .slide (leafQ.1 - boxEntryQ.1, leafQ.2 - boxEntryQ.2))]
+  | 2 => []
+  | 3 => [("walker", .vanish)]
+  | _ => [("leaf-label-early", .vanish), ("leaf-label", .appear)]
+
+/-- The ids of the actors of key `k` of the crossing that come and go, without anchors. -/
+def crossFadeIds (k : Nat) : List String :=
+  (if 3 ≤ k then [1, 2, 3, 4].flatMap fun j =>
+    [s!"reject-{j}", s!"candidate-{j}", s!"candidate-label-{j}"] else []) ++
+  (if k < 5 then ["name-n-early"] else ["name-n", "level-label"])
+
+/-- The exact actors of key `k` of the crossing: the circle at `walkAt k`, drawn there
+(`crossKeyItems`), and the actors that come and go. -/
+def crossActors (k : Nat) : List (ExactActor ZetaFrac) :=
+  (if (walkAt k).isEmpty then [] else [⟨"walker", walkAt k⟩]) ++
+    (crossFadeIds k).map fun id => ⟨id, []⟩
+
+/-- The exact actors of key `k` of the enlarged panel: the circle at `zoomWalkAt k` and the
+leaf's name. -/
+def zoomActors (k : Nat) : List (ExactActor (QSqrt5 × QSqrt5)) :=
+  (if (zoomWalkAt k).isEmpty then [] else [⟨"walker", zoomWalkAt k⟩]) ++
+    [⟨if k < 5 then "leaf-label-early" else "leaf-label", []⟩]
+
+/-- Whether every declared move of the crossing carries the actors of one key onto those of the
+next, exactly in `ℚ(ζ₅)`. -/
+def crossArrives : Bool := allArrive 5 crossMoves crossActors
+
+/-- Whether every declared move of the enlarged panel carries the actors of one key onto those of
+the next, exactly in `ℚ(√5)²`. -/
+def zoomArrives : Bool := allArrive 5 zoomMoves zoomActors
+
+/-- The captions of the keys of `terminalCrossing`. -/
+def crossCaptions : Array String := #[
+  "A crossing at a good level, at r = 2.12, x = 0.472: the label n = (4, −3, 1, 1, −3) has weight \
+    zero and its coordinate n₀ = 4 is a good level. The circle starts at n; the thick edge leads \
+    to n + e₀ and raises n₀ to 5.",
+  "The walk follows the thick edge to the small square, which the lower panel shows enlarged.",
+  "It reaches the leaf n + e₀: enlarged, the step ends between 0.0045 and 0.0046 beyond the cut \
+    Re w = Re x + κ − η and between 0.0041 and 0.0042 inside the window's edge, both less than a \
+    pixel in the upper panel.",
+  "By the lens estimate the four other candidates n + e₀ − eₖ of the leaf lie outside the window \
+    (open rings at the ends of dashed spokes): n + e₀ has no neighbor but n.",
+  "So the only step from the leaf leads back along the same edge to n, at level 4.",
+  "The crossing: n with its four neighbors n + eₖ inside the window, the thick edge to the leaf \
+    n + e₀ in the shaded half-plane, and the leaf's four candidates outside the window. Below, the \
+    neighborhood of the leaf enlarged, with a scale bar of length 0.005."]
+
+/-- The crossing as a motion: the keys `crossKey k`, the steps made from `crossMoves`. -/
+def crossMotion : Motion where
+  keys := ((List.range 6).map crossKey).toArray
+  steps := ((List.range 5).map (exactStep ∘ crossMoves)).toArray
+
+/-- The enlarged panel as a motion: the keys `zoomKey k`, the steps made from `zoomMoves`. -/
+def zoomMotion : Motion where
+  keys := ((List.range 6).map zoomKey).toArray
+  steps := ((List.range 5).map (exactStep ∘ zoomMoves)).toArray
+
+/-- The timing of step `k`: a slide where either panel slides, a fade otherwise. -/
+def crossTiming (k : Nat) : PanelTiming :=
+  if k == 2 || k == 4 then { duration := some motionPacing.fade, easing := some .linear }
+  else { duration := some motionPacing.slide, easing := some motionPacing.easing }
+
+/-- A crossing at the good level n₀ = 4 at r = 2.12, x = 0.472, walked: a circle follows the thick
+edge from n to the leaf n + e₀, which the lower panel shows enlarged, just beyond the cut and
+inside the window's edge; the leaf's four other candidates appear outside the window and the walk
+returns to n. The last key frames are the figure of the crossing, `terminalCrossingFinal`, and
+`terminalZoom`. -/
+@[figure]
+def terminalCrossing : MotionPanels where
+  panels := #[{ title := "The crossing", motion := crossMotion },
+    { title := "Near the leaf, enlarged", motion := zoomMotion }]
+  captions := crossCaptions
+  pacing := { motionPacing with hold := 7 / 5 }
+  timing := ((List.range 5).map crossTiming).toArray
+  info := { title := "A crossing at the good level n₀ = 4 ends in the leaf n + e₀"
+            description := "Two panels on one clock: the crossing at r = 2.12, x = 0.472, and \
+              below it the neighborhood of the leaf n + e₀ enlarged. A circle walks from n along \
+              the thick edge across the good level n₀ = 4 to the leaf, which the enlargement shows \
+              just beyond the cut and inside the window's edge; the leaf's four other candidates \
+              appear outside the window, and the walk returns to n. The key frames are exact; \
+              between them the browser slides the circle along the edge and fades what comes and \
+              goes." }
+  checks := .fail
+  poster := 5
+  scale := .independent
+  arrangement := .stacked
+  width := figureWidth
+  narrowWidth := some narrowWidth
 
 /-! ### The facts the figures show -/
 

@@ -7,7 +7,7 @@ import TDCSGFigures
 /-!
 # The exact arrival checks of the animations refuse wrong moves
 
-The animations of chapters 1, 2, 3 and 7 check every declared turn and slide exactly
+The animations of chapters 1, 2, 3, 6 and 7 check every declared turn and slide exactly
 (`TDCSGFigures.allArrive`): the move, applied in `ℚ(ζ₅)` or `ℚ(√5)²` to the anchors of the actors of
 one key, must give those of the next. Each theorem here changes one thing, a centre, a fraction of
 a turn, a vector of a slide or the place of an actor, and proves, by `decide +kernel`, that the
@@ -112,6 +112,14 @@ theorem walk_wrongVector :
       else Confinement.walkMoves k) Confinement.walkActors = false := by
   decide +kernel
 
+/-- The crossing's walk slid from `n` straight to the leaf, where the key has it at `(1.512, 0)`,
+misses its key. -/
+theorem crossing_wrongSlide :
+    allArrive 5 (fun k => if k == 0 then
+      [("walker", .slide (Levels.zetaFracSub Levels.leafZ Levels.nZ))]
+      else Levels.crossMoves k) Levels.crossActors = false := by
+  decide +kernel
+
 /-! ### The engine finds no error in any animation of the site -/
 
 /-- The animations of the site, with the names of their files in the site: the declaration's name,
@@ -130,7 +138,8 @@ def siteMotions : Array (String × PILean.Plane.MotionPanels) := #[
   ("TDCSGFigures.chordOrbit", chordOrbit),
   ("walkToLeaf", Confinement.walkToLeaf),
   ("TDCSGFigures.orbitRadius", orbitRadius),
-  ("lensRadius", Lens.lensRadius)]
+  ("lensRadius", Lens.lensRadius),
+  ("terminalCrossing", Levels.terminalCrossing)]
 
 /-- The errors PILean's engine reports for the animations of the site and their narrow renditions,
 each with the animation's name: every move drawn must land on its next key, every rest show its

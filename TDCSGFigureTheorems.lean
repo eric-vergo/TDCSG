@@ -51,7 +51,7 @@ figure with a linked theorem, its last key frame is that figure, and the theorem
 the animation: it states that the last key frame is the figure and what the figure draws
 (`TDCSGFigures.generatorStep_spec`, `TDCSGFigures.extensionJump_spec`,
 `TDCSGFigures.disjointDisks_spec`, `TDCSGFigures.exchangedIntervals_spec`,
-`TDCSGFigures.chordOrbit_spec`); the lens of chapter 5 is linked to its theorem
+`TDCSGFigures.chordOrbit_spec`, `TDCSGFigures.Levels.terminalCrossing_spec`); the lens of chapter 5 is linked to its theorem
 `TDCSGFigures.Lens.lensRadius_spec`, which states its key frames and the pictures between them.
 The other animations (the
 orbit of zero on the front page, the word followed letter by letter and the three words of
@@ -2685,80 +2685,99 @@ tag := "theorems-levels"
 file := "Theorems-levels"
 %%%
 
-{figref "terminal-crossing"}[]: the figure `TDCSGFigures.Levels.terminalCrossing`
-and its theorem `TDCSGFigures.Levels.terminalCrossing_spec`.
+{figref "terminal-crossing"}[]: the animation `TDCSGFigures.Levels.terminalCrossing`, whose last
+key frame is the figure of the crossing, with its theorem
+`TDCSGFigures.Levels.terminalCrossing_spec`; the other key frames, the walk and the moves are stated
+in `TDCSGFigures.Levels.terminalCrossing_keys`.
 
 ```Verso.Genre.Manual.InlineLean.lean
 namespace TDCSGFigures.Levels
 
 open PILean PILean.Plane PILean.Exact TDCSGFigures
 
-/-- What `terminalCrossing` draws, item for item, and why its records are right. The data are
-`r = 53/25`, `x = 59/125`, `n = (4, -3, 1, 1, -3)` and the leaf `n + e₀`; the items are written
-out in drawing order, those of the four neighbours `n + eₖ` and the four candidates `n + e₀ - eₖ`
-(`k = 1, …, 4`) by the builders `neighbourEdge`, `rejectedStep`, `neighbourPoint`,
-`neighbourLabel`, `candidatePoint` and `candidateLabel`, whose definitions are stated. The
-records hold exactly: `n` has weight zero and its level `n₀ = 4` is good at `r = 2.12`,
-`x = 0.472`; `n`, the leaf and every `n + eₖ` lie inside the window and every `n + e₀ - eₖ`
-outside it (`windowSide`, from `|q P(m) - p|² ≤ q² r²/4` for `x = p/q`), so the leaf has no
-neighbour but `n`; the leaf's real part `8 - 4φ` exceeds the cut `Re x + κ - η`, and
-`P(n) = 7 - 4φ` is real. Not stated: how the builders and modifiers draw, the layout, the
-lettering, the style's colour values and the pixels. -/
+/-- The animation `terminalCrossing` and the figure of the crossing, the last key frame of its
+upper panel. The animation has two panels on one clock, `crossMotion` (the crossing) above
+`zoomMotion` (the leaf enlarged); its poster, the still shown under reduced motion and in print, is
+the last key, and its checks are strict. Key `5` of the crossing is `terminalCrossingFinal`, the
+figure of the crossing, whose items are written out in drawing order, each with its id: the data
+are `r = 53/25`, `x = 59/125`, `n = (4, -3, 1, 1, -3)` and the leaf `n + e₀`; those of the four
+neighbours `n + eₖ` and the four candidates `n + e₀ - eₖ` (`k = 1, …, 4`) are made by the builders
+`neighbourEdge`, `rejectedStep`, `neighbourPoint`, `neighbourLabel` (placed by `neighbourPlace`),
+`candidatePoint` and `candidateLabel`, whose definitions are stated. The records hold exactly: `n`
+has weight zero and its level `n₀ = 4` is good at `r = 2.12`, `x = 0.472`; `n`, the leaf and every
+`n + eₖ` lie inside the window and every `n + e₀ - eₖ` outside it (`windowSide`, from
+`|q P(m) - p|² ≤ q² r²/4` for `x = p/q`), so the leaf has no neighbour but `n`; the leaf's real part
+`8 - 4φ` exceeds the cut `Re x + κ - η`, and `P(n) = 7 - 4φ` is real. Not stated: how the builders
+and modifiers draw, the layout, the lettering, the style's colour values and the pixels. -/
 theorem terminalCrossing_spec :
+    terminalCrossing.panels = #[{ title := "The crossing", motion := crossMotion },
+      { title := "Near the leaf, enlarged", motion := zoomMotion }] ∧
+    terminalCrossing.poster = 5 ∧ terminalCrossing.checks = .fail ∧
+    crossMotion.keys = ((List.range 6).map crossKey).toArray ∧
+    crossKey 5 = terminalCrossingFinal ∧
     crossN = #[4, -3, 1, 1, -3] ∧ leaf = shift crossN 0 1 ∧ crossX = 59 / 125 ∧
     crossRadius = 53 / 25 ∧ crossCut = rat crossX + kappa - margin crossRadiusSq ∧
     (∀ k, neighbourEdge k = (Plane.Exact.segment (proj crossN) (proj (shift crossN k 1))
-      |>.role "right" |>.width 1.5 |>.named s!"the edge from n to n + e{sub k}")) ∧
+      |>.role "right" |>.width 1.5 |>.named s!"the edge from n to n + e{sub k}"
+      |>.withId s!"nedge-{k}")) ∧
     (∀ k, rejectedStep k = (Plane.Exact.segment (proj leaf) (proj (shift leaf k (-1)))
       |>.faint |>.width 1.5 |>.dashed
-      |>.named s!"the rejected step from n + e₀ to n + e₀ − e{sub k}")) ∧
+      |>.named s!"the rejected step from n + e₀ to n + e₀ − e{sub k}" |>.withId s!"reject-{k}")) ∧
     (∀ k, neighbourPoint k = (Plane.Exact.point (proj (shift crossN k 1)) |>.role "right"
       |>.marker .square
       |>.named s!"n + e{sub k} = {labelText (shift crossN k 1)}, weight 1, a neighbour of n"
-      |>.incident (windowSide (shift crossN k 1)).incidence "the window")) ∧
+      |>.incident (windowSide (shift crossN k 1)).incidence "the window"
+      |>.withId s!"neighbour-{k}")) ∧
+    (∀ k, neighbourPlace k =
+      #[(.left, 10), (.right, 17), (.above, 15), (.left, 10)].getD (k - 1) (.above, 10)) ∧
     (∀ k, neighbourLabel k =
-      (Plane.Exact.label s!"n + e{sub k}" (proj (shift crossN k 1)) .auto |>.role "right")) ∧
+      (Plane.Exact.label s!"n + e{sub k}" (proj (shift crossN k 1)) (neighbourPlace k).1
+        (some (neighbourPlace k).2) |>.role "right" |>.withId s!"neighbour-label-{k}")) ∧
     (∀ k, candidatePoint k = (Plane.Exact.point (proj (shift leaf k (-1))) |>.faint
       |>.marker .ring
       |>.named s!"n + e₀ − e{sub k} = {labelText (shift leaf k (-1))}, weight 0, outside the window"
-      |>.incident (windowSide (shift leaf k (-1))).incidence "the window")) ∧
+      |>.incident (windowSide (shift leaf k (-1))).incidence "the window"
+      |>.withId s!"candidate-{k}")) ∧
     (∀ k p, candidateLabel k p =
-      Plane.Exact.label s!"n + e₀ − e{sub k}" (proj (shift leaf k (-1))) p) ∧
-    terminalCrossing.items = #[
+      (Plane.Exact.label s!"n + e₀ − e{sub k}" (proj (shift leaf k (-1))) p
+        |>.withId s!"candidate-label-{k}")) ∧
+    terminalCrossingFinal.items = #[
       Plane.Exact.polygon crossHalfPlane |>.faint |>.filled |>.noOutline |>.fillOpacity 0.16
         |>.named "the half-plane Re w ≥ Re x + κ − η"
         |>.describedBy "beyond the cut of the lens estimate, turned to the direction j = 0"
-        |>.declRef `TDCSG.Five.div_two_lt_norm_sub_of_le_re,
+        |>.declRef `TDCSG.Five.div_two_lt_norm_sub_of_le_re |>.withId "half-plane",
       Plane.Exact.disk crossXPoint (53 / 50 : Rat) |>.role "window" |>.fillOpacity 0.07
         |>.named "the window" |>.describedBy "the closed disk |w − x| ≤ r/2, r = 2.12, x = 0.472"
-        |>.declRef `TDCSG.Five.InWindow,
+        |>.declRef `TDCSG.Five.InWindow |>.withId "window",
       Plane.Exact.segment crossXPoint crossRim |>.role "window" |>.width 1.5 |>.dashed
-        |>.named "a radius r/2 = 1.06 of the window",
-      Plane.Exact.labelBeside "r/2" crossXPoint crossRim |>.role "window",
+        |>.named "a radius r/2 = 1.06 of the window" |>.withId "radius",
+      Plane.Exact.labelBeside "r/2" crossXPoint crossRim |>.role "window" |>.withId "radius-label",
       neighbourEdge 1, neighbourEdge 2, neighbourEdge 3, neighbourEdge 4,
       rejectedStep 1, rejectedStep 2, rejectedStep 3, rejectedStep 4,
       Plane.Exact.segment (proj crossN) (proj leaf) |>.width 3.5
         |>.named "the edge from n to n + e₀: it raises n₀ from the good level 4 to 5"
-        |>.declRef `TDCSG.Five.IsGoodLevel.leaf,
-      Plane.Exact.polygon zoomBox |>.width 1 |>.named "the square enlarged in the next figure",
+        |>.declRef `TDCSG.Five.IsGoodLevel.leaf |>.withId "edge",
+      Plane.Exact.polygon zoomBox |>.width 1 |>.named "the square enlarged in the next figure"
+        |>.withId "zoom-box",
       neighbourPoint 1, neighbourLabel 1, neighbourPoint 2, neighbourLabel 2,
       neighbourPoint 3, neighbourLabel 3, neighbourPoint 4, neighbourLabel 4,
       candidatePoint 1, candidateLabel 1 .belowLeft, candidatePoint 2, candidateLabel 2 .below,
       candidatePoint 3, candidateLabel 3 .above, candidatePoint 4, candidateLabel 4 .aboveLeft,
       Plane.Exact.point (proj crossN) |>.role "left" |>.size 5
         |>.named s!"n = {labelText crossN}, weight 0, P(n) = 7 − 4φ, at the good level n₀ = 4"
-        |>.incident (windowSide crossN).incidence "the window",
+        |>.incident (windowSide crossN).incidence "the window" |>.withId "n",
       Plane.Exact.point (proj leaf) |>.role "right" |>.marker .square |>.size 5
         |>.named s!"the leaf n + e₀ = {labelText leaf}, weight 1, P = 8 − 4φ"
         |>.incident (windowSide leaf).incidence "the window"
-        |>.incident .inside "the half-plane Re w ≥ Re x + κ − η",
+        |>.incident .inside "the half-plane Re w ≥ Re x + κ − η" |>.withId "leaf",
       Plane.Exact.label "n" (proj crossN) (.toward (Plane.deg 100)) (some 10) |>.role "left"
-        |>.italic,
-      Plane.Exact.label "n₀ = 4 → 5" ((rat (21 / 20), rat (2 / 25)) : QSqrt5 × QSqrt5),
+        |>.italic |>.withId "name-n",
+      Plane.Exact.label "n₀ = 4 → 5" ((rat (21 / 20), rat (2 / 25)) : QSqrt5 × QSqrt5)
+        |>.withId "level-label",
       Plane.Exact.label "window" ((rat 0, rat (6 / 5)) : QSqrt5 × QSqrt5)
-        |>.role "window",
+        |>.role "window" |>.withId "window-label",
       Plane.Exact.label "Re w ≥ Re x + κ − η" ((crossCut, rat (5 / 4)) : QSqrt5 × QSqrt5) .right
-        |>.size 12] ∧
+        |>.size 12 |>.withId "cut-label"] ∧
     weight crossN = 0 ∧ isGoodLevel crossRadiusSq crossX 0 4 = some true ∧
     (windowSide crossN == .inside && windowSide leaf == .inside) = true ∧
     [1, 2, 3, 4].all (fun k => windowSide (shift crossN k 1) == .inside) = true ∧
@@ -2766,12 +2785,140 @@ theorem terminalCrossing_spec :
     QSqrt.lt crossCut (proj leaf).realPart = true ∧
     ((proj crossN).realPart == ⟨5, -2⟩ && (proj crossN).conj == proj crossN &&
       (proj leaf).realPart == ⟨6, -2⟩) = true := by
-  refine ⟨rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl,
-    fun _ => rfl, fun _ _ => rfl, rfl, ?_⟩
   repeat' apply And.intro
-  all_goals decide +kernel
+  all_goals first
+    | (intros; unfold terminalCrossing; with_reducible rfl)
+    | (intros; unfold crossMotion; with_reducible rfl)
+    | (intros; unfold crossKey; rfl)
+    | (intros; unfold terminalCrossingFinal; with_reducible rfl)
+    | (intros; unfold neighbourEdge; rfl)
+    | (intros; unfold rejectedStep; rfl)
+    | (intros; unfold neighbourPoint; rfl)
+    | (intros; unfold neighbourPlace; rfl)
+    | (intros; unfold neighbourLabel; rfl)
+    | (intros; unfold candidatePoint; rfl)
+    | (intros; unfold candidateLabel; rfl)
+    | rfl
+    | decide +kernel
 
 figure_links terminalCrossing terminalCrossing_spec
+
+/-- The key frames of `terminalCrossing` before the last, its walk and its moves, written out. Key
+`k < 5` of the crossing draws the items of `terminalCrossingFinal` that `crossShows k` keeps (the
+rejected steps, the candidates and their names from key `3`, never the words `n₀ = 4 → 5`, which
+appear at the last step), with the name `n` as `earlyName`, clear of the circle, and a
+circle about each point of `walkAt k`: `P(n)`, the point `(1.512, 0)` of the edge (`boxEntry`), the
+leaf, the leaf, `P(n)`. Key `k < 5` of the enlarged panel draws the items of `terminalZoom` with
+the ids `zoomIds`, the leaf's name as `zoomEarlyName`, and a circle about each point of
+`zoomWalkAt k`: none, `(1.512, 0)`, the leaf, the leaf, none; key `5` is `zoomFinal`. The circle is
+drawn at the points the exact arrival check reads (`walkerItems`, `crossActors`, `zoomActors`).
+The declared moves are written out; each slide, applied exactly to the circle's centre in one key,
+gives its centre in the next, in `ℚ(ζ₅)` for the crossing and in `ℚ(√5)²` for the enlarged panel
+(`crossArrives`, `zoomArrives`), and the other actors come and go only by a declared appearance or
+disappearance. The point `boxEntry` drawn and slid to is real and lies on the edge, between
+`P(n) = 7 - 4φ` and the leaf `8 - 4φ`, both real, and inside the enlarged box, whose left edge is
+`1.51`; the enlarged panel draws it and the leaf at the same real parts. The captions are written
+out. Not stated: how the builders draw, the layout, the timing and the frames the browser draws
+between the key frames. -/
+theorem terminalCrossing_keys :
+    crossCaptions = #[
+      "A crossing at a good level, at r = 2.12, x = 0.472: the label n = (4, −3, 1, 1, −3) has \
+        weight zero and its coordinate n₀ = 4 is a good level. The circle starts at n; the thick \
+        edge leads to n + e₀ and raises n₀ to 5.",
+      "The walk follows the thick edge to the small square, which the lower panel shows enlarged.",
+      "It reaches the leaf n + e₀: enlarged, the step ends between 0.0045 and 0.0046 beyond the \
+        cut Re w = Re x + κ − η and between 0.0041 and 0.0042 inside the window's edge, both less \
+        than a pixel in the upper panel.",
+      "By the lens estimate the four other candidates n + e₀ − eₖ of the leaf lie outside the \
+        window (open rings at the ends of dashed spokes): n + e₀ has no neighbor but n.",
+      "So the only step from the leaf leads back along the same edge to n, at level 4.",
+      "The crossing: n with its four neighbors n + eₖ inside the window, the thick edge to the \
+        leaf n + e₀ in the shaded half-plane, and the leaf's four candidates outside the window. \
+        Below, the neighborhood of the leaf enlarged, with a scale bar of length 0.005."] ∧
+    terminalCrossing.captions = crossCaptions ∧
+    crossMotion.steps = ((List.range 5).map (exactStep ∘ crossMoves)).toArray ∧
+    zoomMotion.keys = ((List.range 6).map zoomKey).toArray ∧
+    zoomMotion.steps = ((List.range 5).map (exactStep ∘ zoomMoves)).toArray ∧
+    (∀ k, crossKey k = if k < 5 then { terminalCrossingFinal with items := crossKeyItems k }
+      else terminalCrossingFinal) ∧
+    (∀ k, crossKeyItems k =
+      (terminalCrossingFinal.items.filter fun it => crossShows k (it.actorId?.getD "")).map
+        (fun it => if it.actorId? == some "name-n" then earlyName else it) ++
+      walkerItems walkerRadius (walkAt k)) ∧
+    (∀ k id, crossShows k id = (if id.startsWith "reject-" || id.startsWith "candidate-" then
+      decide (3 ≤ k) else id != "level-label")) ∧
+    earlyName = (Plane.Exact.label "n" (proj crossN) (.toward (Plane.deg 168)) (some 16)
+      |>.role "left" |>.italic |>.withId "name-n-early") ∧
+    (∀ {α : Type} [PlanePoint α] (ρ : Rat) (ps : List α), walkerItems ρ ps =
+      (ps.map fun c => Plane.Exact.circle c ρ |>.width 2 |>.role "left"
+        |>.named "a circle about the point the walk has reached" |>.withId "walker").toArray) ∧
+    walkerRadius = 1 / 16 ∧ zoomWalkerRadius = 1 / 1800 ∧
+    nZ = ZetaFrac.ofZeta (proj crossN) ∧ leafZ = ZetaFrac.ofZeta (proj leaf) ∧
+    boxEntry = ⟨Zeta5.ofInt 1512, 1000⟩ ∧ boxEntryQ = (boxEntry.realPart, rat 0) ∧
+    leafQ = ((proj leaf).realPart, rat 0) ∧
+    (List.range 6).map walkAt = [[nZ], [boxEntry], [leafZ], [leafZ], [nZ], []] ∧
+    (List.range 6).map zoomWalkAt = [[], [boxEntryQ], [leafQ], [leafQ], [], []] ∧
+    zoomIds = #["half-plane", "window-arc", "edge", "scale", "leaf", "leaf-label", "scale-label",
+      "edge-label", "cut-name", "cut-label", "window-edge-label"] ∧
+    zoomFinal = { terminalZoom with
+      items := terminalZoom.items.mapIdx fun i it => it.withId (zoomIds.getD i "") } ∧
+    zoomEarlyName = (Plane.Exact.label "n + e₀ (leaf)" leafQ .below (some 14) |>.size 12
+      |>.role "right" |>.withId "leaf-label-early") ∧
+    (∀ k, zoomKey k = if k < 5 then { zoomFinal with items := zoomKeyItems k } else zoomFinal) ∧
+    (∀ k, zoomKeyItems k = zoomFinal.items.map (fun it =>
+        if it.actorId? == some "leaf-label" then zoomEarlyName else it) ++
+      walkerItems zoomWalkerRadius (zoomWalkAt k)) ∧
+    (∀ p q, zetaFracSub p q = ZetaFrac.add p ⟨-q.num, q.den⟩) ∧
+    crossMoves 0 = [("walker", .slide (zetaFracSub boxEntry nZ))] ∧
+    crossMoves 1 = [("walker", .slide (zetaFracSub leafZ boxEntry))] ∧
+    moveKinds (crossMoves 2) = [("reject-1", "appear"), ("reject-2", "appear"),
+      ("reject-3", "appear"), ("reject-4", "appear"), ("candidate-1", "appear"),
+      ("candidate-label-1", "appear"), ("candidate-2", "appear"), ("candidate-label-2", "appear"),
+      ("candidate-3", "appear"), ("candidate-label-3", "appear"), ("candidate-4", "appear"),
+      ("candidate-label-4", "appear")] ∧
+    crossMoves 3 = [("walker", .slide (zetaFracSub nZ leafZ))] ∧
+    moveKinds (crossMoves 4) = [("walker", "vanish"), ("name-n-early", "vanish"),
+      ("name-n", "appear"), ("level-label", "appear")] ∧
+    moveKinds (zoomMoves 0) = [("walker", "appear")] ∧
+    zoomMoves 1 = [("walker", .slide (leafQ.1 - boxEntryQ.1, leafQ.2 - boxEntryQ.2))] ∧
+    zoomMoves 2 = [] ∧ moveKinds (zoomMoves 3) = [("walker", "vanish")] ∧
+    moveKinds (zoomMoves 4) = [("leaf-label-early", "vanish"), ("leaf-label", "appear")] ∧
+    (∀ k, crossFadeIds k = (if 3 ≤ k then [1, 2, 3, 4].flatMap fun j =>
+        [s!"reject-{j}", s!"candidate-{j}", s!"candidate-label-{j}"] else []) ++
+      (if k < 5 then ["name-n-early"] else ["name-n", "level-label"])) ∧
+    (∀ k, crossActors k = (if (walkAt k).isEmpty then [] else [⟨"walker", walkAt k⟩]) ++
+      (crossFadeIds k).map fun id => ⟨id, []⟩) ∧
+    (∀ k, zoomActors k = (if (zoomWalkAt k).isEmpty then [] else [⟨"walker", zoomWalkAt k⟩]) ++
+      [⟨if k < 5 then "leaf-label-early" else "leaf-label", []⟩]) ∧
+    crossArrives = true ∧ zoomArrives = true ∧
+    (QSqrt.lt (proj crossN).realPart boxEntry.realPart &&
+      QSqrt.lt boxEntry.realPart (proj leaf).realPart && boxEntry.num.conj == boxEntry.num &&
+      (proj leaf).conj == proj leaf && (proj crossN).conj == proj crossN &&
+      QSqrt.lt (rat (151 / 100)) boxEntry.realPart &&
+      leafQ.1 == leafZ.realPart) = true := by
+  repeat' apply And.intro
+  all_goals first
+    | (intros; unfold crossCaptions; with_reducible rfl)
+    | (intros; unfold terminalCrossing; with_reducible rfl)
+    | (intros; unfold crossMotion; with_reducible rfl)
+    | (intros; unfold zoomMotion; with_reducible rfl)
+    | (intros; unfold crossKey; with_reducible rfl)
+    | (intros; unfold crossKeyItems; with_reducible rfl)
+    | (intros; unfold crossShows; with_reducible rfl)
+    | (intros; unfold earlyName; rfl)
+    | (intros; unfold walkerItems; rfl)
+    | (intros; unfold zoomFinal; with_reducible rfl)
+    | (intros; unfold zoomEarlyName; rfl)
+    | (intros; unfold zoomKey; with_reducible rfl)
+    | (intros; unfold zoomKeyItems; with_reducible rfl)
+    | (intros; unfold zetaFracSub; with_reducible rfl)
+    | (intros; unfold crossFadeIds; with_reducible rfl)
+    | (intros; unfold crossActors; with_reducible rfl)
+    | (intros; unfold zoomActors; with_reducible rfl)
+    | rfl
+    | (simp only [crossMoves]; done)
+    | (simp only [zoomMoves]; done)
+    | decide +kernel
 
 end TDCSGFigures.Levels
 ```
