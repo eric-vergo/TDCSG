@@ -88,42 +88,62 @@ $`y` gives the formula.
 The proof's invariant has a picture. The rigid motion $`T(w)=P(n)+\zeta^jw` sends the halved
 starting frame onto the moving frame: the halved centers $`0` and $`1` go to $`P(n)` and
 $`P(n+e_j)`, and the halved point $`(y+1)/2` goes to $`x`. A letter that acts turns the point in
-one frame and the pair of centers in the other.
+one frame and the pair of centers in the other. An inverse letter $`a^{-1}` or $`b^{-1}` turns
+the other way, by $`\zeta` instead of $`\zeta^4`, and lowers $`j` by one.
 
-:::lemma_ "frame_pair" (lean := "TDCSG.Five.framePicture_genA_genB, TDCSG.Five.halved_genA, TDCSG.Five.halved_genB, TDCSG.Five.frameMap_succ_zeta_pow_four_mul, TDCSG.Five.frameMap_add_basis_sub_basis_succ, TDCSG.Five.proj_add_basis_succ_sub, TDCSG.Five.proj_add_basis_sub_basis_succ_sub") (uses := "disk_rotation, center_projection, unit_step")
+:::lemma_ "frame_pair" (lean := "TDCSG.Five.framePicture_genA_genB, TDCSG.Five.halved_genA, TDCSG.Five.halved_genB, TDCSG.Five.frameMap_succ_zeta_pow_four_mul, TDCSG.Five.frameMap_add_basis_sub_basis_succ, TDCSG.Five.proj_add_basis_succ_sub, TDCSG.Five.proj_add_basis_sub_basis_succ_sub, TDCSG.Five.framePicture_symm, TDCSG.Five.halved_permA_symm, TDCSG.Five.halved_permB_symm") (uses := "disk_rotation, center_projection, unit_step")
 Let $`y` be framed by $`(n,j)`, that is $`2(x-P(n))=\zeta^j(y+1)`, and let $`T_{n,j}(w)=P(n)+\zeta^jw`.
 Then $`T_{n,j}` sends $`0`, $`1` and $`(y+1)/2` to $`P(n)`, $`P(n+e_j)` and $`x`. If $`a` acts at
 $`y`, the halved point turns about $`0` by $`\zeta^4`, a fifth of a turn clockwise, and
 $`T_{n,j+1}` sends the new picture onto $`P(n)`, $`P(n+e_{j+1})` and $`x` again: in the moving
 frame the left center stays and the right center turns about it by a fifth of a turn
 counterclockwise. If $`b` acts, the same holds about $`1` and the right center, with the frame
-$`(n+e_j-e_{j+1},j+1)`. A letter that does not act fixes $`y` and the frame.
+$`(n+e_j-e_{j+1},j+1)`. The inverses turn the other way: if $`a^{-1}` acts, the halved point
+turns about $`0` by $`\zeta`, a fifth of a turn counterclockwise, the frame becomes $`(n,j-1)`,
+and in the moving frame the right center turns about the left one by a fifth of a turn
+clockwise; if $`b^{-1}` acts, the same holds about $`1` and the right center, with the frame
+$`(n+e_j-e_{j-1},j-1)`. A letter that does not act fixes $`y` and the frame.
 :::
 
 :::proof "frame_pair"
 The images of $`0` and $`1` are $`P(n)` and $`P(n)+\zeta^j=P(n+e_j)`, and $`T_{n,j}((y+1)/2)=x` is
 the framing equation divided by two. A turn of the halved point by $`\zeta^4` about $`0` composed
 with $`T_{n,j+1}` is $`T_{n,j}`, since $`\zeta^{j+1}\zeta^4=\zeta^j`; about $`1` the same holds
-with the label $`n+e_j-e_{j+1}`. So the updated motion sends the turned picture to the same three
-points of the moving frame, with the turned center in place of the old one.
+with the label $`n+e_j-e_{j+1}`. For the inverses, a turn by $`\zeta` composed with $`T_{n,j-1}`
+is $`T_{n,j}`, since $`\zeta^{j-1}\zeta=\zeta^j`, and about $`1` the label is $`n+e_j-e_{j-1}`.
+So the updated motion sends the turned picture to the same three points of the moving frame,
+with the turned center in place of the old one.
 :::
 
-:::figure TDCSGFigures.Lift.framePair (label := "change-of-frame") (alt := "Two panels on one clock. Left: two disks about 0 and 1, fixed, and a point that turns by fifths about the center of one of them. Right: a fixed window about x = 1/2 with a point at x, and a pair of centers with disks riding on them that turns by fifths about one of the centers. Some letters do not act; then a ring marks a center and nothing moves.")
-The word $`aababaabbabb` applied to $`z=0` at $`r=1.95`, in both frames on one clock. Left, the
-traditional view, halved by $`w\mapsto(w+1)/2`: the disks about $`0` and $`1` stay, and the point
-$`(y+1)/2` turns a fifth of a turn clockwise about the center of the disk of each letter that
-acts. Right, the moving frame of the proof: the window about $`x=1/2` and the point at $`x` stay,
-and the pair of centers $`P(n)` and $`P(n+e_j)`, with the halved disks riding on them, turns a
-fifth of a turn counterclockwise about the active center, so the other center takes a unit step.
-The letters 3, 5 and 10 do not act: a ring marks the center of their disk while nothing moves. In
-the moving frame that center lies outside the window, exactly when the point lies outside the
-disk, as the framing equation requires.
+:::figure TDCSGFigures.Lift.framePair (label := "change-of-frame") (alt := "Two panels on one clock. Left: two disks about 0 and 1, fixed, and a point that turns by fifths about the center of one of them. Right: a fixed window about x = 1/2 with a point at x, and a pair of centers with disks riding on them that turns by fifths about one of the centers. Before and during each turn a curved arrow about the turning center shows its direction in each panel; the turns alternate between the two centers. Two letters do not act; then a dashed ring marks a center and nothing moves.")
+The word $`ab^{-1}aba^{-1}b^{-1}aba^{-1}b` applied to $`z=0` at $`r=2.12`, in both frames on one
+clock. Left, the traditional view, halved by $`w\mapsto(w+1)/2`: the disks about $`0` and $`1`
+stay, and the point $`(y+1)/2` turns a fifth of a turn about the center of the disk of each letter
+that acts, clockwise for $`a` and $`b` and counterclockwise for $`a^{-1}` and $`b^{-1}`. Right, the
+moving frame of the proof: the window about $`x=1/2` and the point at $`x` stay, and the pair of
+centers $`P(n)` and $`P(n+e_j)`, with the halved disks riding on them, turns a fifth of a turn the
+other way about the active center, so the other center takes a unit step. An arrow about the
+active center in each panel shows each turn, its direction in that panel, before and while it
+turns. The letters 3 and 8 do not act: a dashed ring marks the center of their disk while nothing
+moves. In the moving frame that center lies outside the window, exactly when the point lies
+outside the disk, as the framing equation requires.
 :::
 
 The key frames of {figref "change-of-frame"}[] are exact: each is drawn from the states of the word
 computed in $`\mathbb Z[\zeta]`, and each turn of a fifth carries one key frame onto the next,
 as {bpref "frame_pair"}[] says. Between two key frames the browser turns the drawn items about the
 stated center.
+
+The word was chosen so that the turns alternate between the two centers. They do at every step
+except across the letters 3 and 8, where the same center turns twice; this cannot be avoided. A
+letter that acts leaves the point in its own disk, since a rotation maps its disk onto itself, so
+the same letter or its inverse, a power of it, would act again. So a letter that does not act is
+of the other kind than the last letter that acted, and the next letter that acts turns about the
+same center as that one. The radius $`r=2.12`, still below $`\sqrt{3+\varphi}\approx2.149`,
+makes every act or idle decision of this word visible in the picture: each center tested lies
+at least $`0.08` inside or outside the window, in the units of the moving frame, where the window
+has radius $`r/2`. At $`r=1.95` the second letter of any word whose first two letters turn about
+different centers is decided by less than $`0.005` in the same units.
 
 For the window of {figref "unit-steps"}[], $`x=1/2` and $`r=1.95`, three of the five neighbors of
 zero are inside.

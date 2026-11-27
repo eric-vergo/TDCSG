@@ -13,9 +13,10 @@ import TDCSGFigures.Style
   current left centre `0` to the projections `ζʲ = P(eⱼ)` of the labels `eⱼ`, and which of them end
   in the window (`1`, `ζ`, `ζ⁴`), decided exactly in `ℚ(√5)` (`unitSteps_spec`).
 * The frame pair (`TDCSGFigures.Lift.framePair`, in `TDCSGFigures.FramePairMotion`) follows the
-  word `word`, `a a b a b a a b b a b b`, applied to the point `0` at `r = 1.95`, in two frames at
-  once; this module holds its data: the word, the states `statesFor radiusSq word` and the pin
-  `wordSummary_word` (the letters `3`, `5` and `10` do not act).
+  word `word`, `a b⁻¹ a b a⁻¹ b⁻¹ a b a⁻¹ b`, applied to the point `0` at `r = pairRadius = 2.12`,
+  in two frames at once; this module holds its data: the word, its radius, the states
+  `statesFor pairRadiusSq word` and the pin `wordSummary_word` (the letters `3` and `8` do not
+  act, and the orbit returns to its start).
 -/
 
 namespace TDCSGFigures.Lift
@@ -24,7 +25,7 @@ open PILean PILean.Plane PILean.Exact TDCSGFigures
 
 /-! ### The data -/
 
-/-- The radius `r = 39/20 = 1.95` of both figures. -/
+/-- The radius `r = 39/20 = 1.95` of the window figure `unitSteps`. -/
 def radius : Rat := 39 / 20
 
 /-- `r²`, in `ℚ(√5)`. -/
@@ -122,23 +123,31 @@ def unitSteps : Plane.Figure where
 
 /-! ### The word of the frame pair -/
 
-/-- The letters applied to `z = 0`, in order: `a a b a b a a b b a b b`. -/
-def word : List Early.Letter := [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b]
+/-- The radius `r = 53/25 = 2.12` of the frame pair, below the critical radius `√(3 + φ) ≈ 2.149`.
+At this radius every letter of `word` is decided by a visible margin: each centre that is tested
+lies at least `0.08` inside or outside the window (`FramePairConfig.marginsVisible`). -/
+def pairRadius : Rat := 53 / 25
 
-/-- The states after `0, 1, …, 12` letters, starting from `y = 0`, `n = 0`, `j = 0`
+/-- `r²` of the frame pair, in `ℚ(√5)`. -/
+def pairRadiusSq : QSqrt5 := rat (pairRadius * pairRadius)
+
+/-- The letters applied to `z = 0`, in order: `a b⁻¹ a b a⁻¹ b⁻¹ a b a⁻¹ b`. -/
+def word : List Early.Letter := [.a, .bInv, .a, .b, .aInv, .bInv, .a, .b, .aInv, .b]
+
+/-- The states after `0, 1, …, 10` letters at `r = 2.12`, starting from `y = 0`, `n = 0`, `j = 0`
 (`TDCSG.Five.framed_self`). -/
-def states : List State := statesFor radiusSq word
+def states : List State := statesFor pairRadiusSq word
 
 /-- The framing equation `2 (x - P(n)) = ζʲ (y + 1)` at `x = 1/2`, that is
 `1 - 2 P(n) = ζʲ (y + 1)`, checked exactly in `ℤ[ζ₅]` (`State.framedFrom`). -/
 def State.framed (s : State) : Bool := s.framedFrom origin
 
-/-- The word of the frame pair at `r = 1.95` from `z = 0`: the letters `3`, `5` and `10` do not
-act, every step has the geometry of `State.stepHolds`, the orbit does not close, and it reaches
-`|(y + 1)/2|² = |P - x|² = 3/2 + √5/4` (about `1.43²`), the squared distance of each idle letter's
+/-- The word of the frame pair at `r = 2.12` from `z = 0`: the letters `3` and `8` do not act,
+every step has the geometry of `State.stepHolds`, the orbit returns to its start, and it reaches
+`|(y + 1)/2|² = |P - x|² = 4 - 3√5/4` (about `1.52²`), the squared distance of each idle letter's
 centre from `x`. -/
 theorem wordSummary_word :
-    wordSummary radiusSq word = ⟨[3, 5, 10], true, false, ⟨3 / 2, 1 / 4⟩, ⟨3 / 2, 1 / 4⟩⟩ := by
+    wordSummary pairRadiusSq word = ⟨[3, 8], true, true, ⟨4, -3 / 4⟩, ⟨4, -3 / 4⟩⟩ := by
   decide +kernel
 
 /-- The halved image `(y + 1)/2` of a point. -/
