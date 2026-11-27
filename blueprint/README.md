@@ -123,10 +123,20 @@ figure. It needs Playwright for Python with its Chromium:
 ```sh
 lake exe tdcsg-motion-out /tmp/motion-out
 python3 scripts/check-pages.py _out/site/html-multi
-python3 scripts/check-motion.py _out/site/html-multi /tmp/motion-out [SHOTS]
+python3 scripts/check-motion.py _out/site/html-multi /tmp/motion-out [SHOTS] [--workers N]
 ```
 
-The release workflow runs both after the build.
+The release workflow runs both after the build, the browser checks with four workers (`--workers`,
+pages checked at a time, each in its own Chromium).
+
+`scripts/check-engines.py`, run by hand on a Mac, adds the same checks in Firefox (on the site and
+on the standalone files) and in WebKit, the engine of Safari (on the standalone files, through
+PILean's `tools/webkit/webkit_check.py`, which needs a logged-in session with a screen and shows
+nothing). It runs each pass only where it can and says what it skipped; it installs nothing:
+
+```sh
+python3 scripts/check-engines.py _out/site/html-multi /tmp/motion-out [--workers N]
+```
 
 ### Animations
 

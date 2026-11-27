@@ -117,7 +117,7 @@ jobs:
           "$RUNNER_TEMP/browser/bin/pip" install --quiet playwright==1.65.0
           "$RUNNER_TEMP/browser/bin/python" -m playwright install --with-deps chromium
           "$RUNNER_TEMP/browser/bin/python" scripts/check-motion.py _out/site/html-multi \
-            "$RUNNER_TEMP/motion-out"
+            "$RUNNER_TEMP/motion-out" --workers 4
 
       - name: Upload the verified site
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
