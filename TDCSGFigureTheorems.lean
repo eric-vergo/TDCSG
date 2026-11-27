@@ -41,9 +41,13 @@ stated here as a plain
 theorem (`TDCSGFigures.wordLoop_keys`, `TDCSGFigures.Lift.framePair_keys`,
 `TDCSGFigures.generatorStep_keys` and the other `_keys` theorems, and for two illustrations
 `TDCSGFigures.wordSteps_spec` and `TDCSGFigures.Confinement.walkToLeaf_spec`, named `_spec`,
-though they are not linked). Each actor an animation moves is
+though they are not linked).
+The phases winding round of chapter 6 are an exception to the exactness of the drawing: on its
+circle the points are drawn at rounded phases and each turn is a rational within `2⁻⁶²` of
+`φ - 1`, which `TDCSGFigures.Levels.levelWinding_keys` states. Each actor an animation moves is
 drawn at the exact anchors its arrival check reads. The captions are written out, or, where they
-are built from the data (the orbit on the chord, the walk, the component of zero), stated as functions of the data; the
+are built from the data (the orbit on the chord, the walk, the component of zero, the phases
+winding round), stated as functions of the data; the
 kernel does not reduce the string functions they are built with, so their words are pinned by
 `#guard` lines in `TDCSGTests.Motions`; the test driver requires that PILean's engine finds no
 error in any animation. Where an animation replaced a
@@ -56,7 +60,8 @@ the animation: it states that the last key frame is the figure and what the figu
 `TDCSGFigures.Lens.lensRadius_spec`, which states its key frames and the pictures between them.
 The other animations (the
 orbit of zero on the front page, the word followed letter by letter and the three words of
-chapters 2 and 3, the frame pair of chapter 4 and the walk of chapter 7) are illustrations: no
+chapters 2 and 3, the frame pair of chapter 4, the phases winding round of chapter 6 and the walk
+of chapter 7) are illustrations: no
 theorem is linked to them. The orbits of zero are computed by the exact orbit engine, which the
 kernel does not run here; their sizes and how they contain one another are pinned by `#guard`
 lines in `TDCSGTests.Motions` (`TDCSGFigures.orbitRadius_keys`).
@@ -3009,6 +3014,108 @@ theorem levelPhases_spec :
   all_goals decide +kernel
 
 figure_links levelPhases levelPhases_spec
+
+end TDCSGFigures.Levels
+```
+
+{figref "level-winding"}[]: the animation `TDCSGFigures.Levels.levelWinding`, an illustration,
+and the data of its key frames, `TDCSGFigures.Levels.levelWinding_keys`.
+
+```Verso.Genre.Manual.InlineLean.lean
+namespace TDCSGFigures.Levels
+
+open PILean PILean.Plane PILean.Exact TDCSGFigures
+
+/-- The animation `levelWinding` and the data its key frames are drawn from, written out; an
+illustration, to which this theorem is not linked. It has two panels on one clock, `circleMotion`
+and `stripMotion`, of 23 keys each, one per level `levelAt k = -13 + k`; its poster is the last key
+and its checks are strict. Key `k` of the circle draws the shaded arc of the good phases, the
+circle, the points of the levels up to `levelAt k` with their names, and the hand at `levelAt k`;
+level `m`'s point and the hand are drawn at `circleTurns m` of a full turn, the reduced phase
+rounded to a rational (`phaseAt`), and step `k` turns the hand by `turnOf k`, the difference of the
+drawn turns of the two levels taken modulo one. Key `k` along the levels draws the points of the
+levels up to `levelAt k` at `stripAt m = (m, 8 t)`, `t` the exact reduced phase in `ℚ(√5)`, and a
+ring about the last (`tracerAt k`); step `k` slides the ring by the exact vector from one point to
+the next.
+Decided exactly: each reduced phase is the one before plus `φ - 1` or minus `2 - φ`
+(`phaseStepsArePhi`: the phase grows by `φ L`); every point drawn on the circle is within `2⁻⁶²` of
+a turn of its exact reduced phase (`circleNearPhase`); every declared turn is within `2⁻⁶²` of
+`φ - 1` (`turnsNearPhi`); every slide of the ring carries it exactly onto the next point, and the
+points come only by declared appearances (`stripArrives`); the good levels are `-10`, `-2` and
+`3`. The captions are stated as a function of the level; their words are pinned by evaluation in
+`TDCSGTests.Motions`. Not stated: the floating-point angles of the circle, how the builders draw,
+the layout, the timing and the frames the browser draws between the key frames. -/
+theorem levelWinding_keys :
+    levelWinding.panels = #[{ title := "On a circle", motion := circleMotion },
+      { title := "Along the levels", motion := stripMotion }] ∧
+    levelWinding.poster = 22 ∧ levelWinding.checks = .fail ∧
+    levelWinding.captions = ((List.range levelCount).map windingCaption).toArray ∧
+    circleMotion.keys = ((List.range levelCount).map circleKey).toArray ∧
+    circleMotion.steps = ((List.range (levelCount - 1)).map fun k =>
+      ({ moves := circleMoves k } : MotionStep)).toArray ∧
+    (∀ k, circleMoves k = (let m' := levelAt (k + 1)
+      #[("hand", .turn ⟨0, 0⟩ (turnOf k)), ("hand-sense", .turn ⟨0, 0⟩ (turnOf k)),
+        (s!"level-{m'}", .appear), (s!"name-{m'}", .appear)])) ∧
+    (∀ m, circleTurns m = phaseAt m) ∧
+    (∀ m, levelAngle m = angleOf (Exact.toFloat (circleTurns m))) ∧
+    (∀ k, turnOf k = (let d := circleTurns (levelAt (k + 1)) - circleTurns (levelAt k)
+      if d < 0 then d + 1 else d)) ∧
+    (∀ m, hand m = (Plane.arrow ⟨0, 0⟩ (onCircle (levelAngle m) handLength) |>.width 2
+      |>.role "left" |>.named "the hand, at the phase of the level last reached"
+      |>.withId "hand")) ∧
+    (∀ m, circlePoint m = (levelMark m (Plane.point (onCircle (levelAngle m) 1))
+      |>.named s!"level {intText m}" |>.incident .on circleTitle
+      |>.incident (if good m then .on else .outside) arcTitle |>.withId s!"level-{m}")) ∧
+    (∀ m it, levelMark m it = if good m then it.role "good" |>.size 6 else it.faint |>.size 3.5) ∧
+    stripMotion.keys = ((List.range levelCount).map stripKey).toArray ∧
+    stripMotion.steps = ((List.range (levelCount - 1)).map fun k =>
+      exactStep (stripMoves k)).toArray ∧
+    (∀ m, stripAt m = (rat m, unitHeight * phaseQ m)) ∧ unitHeight = rat 8 ∧
+    (∀ m, phaseQ m = (reducedPhase m).getD (rat 0)) ∧
+    (∀ k, tracerAt k = [stripAt (levelAt k)]) ∧
+    (∀ ps, tracerItems ps = (ps.map fun c => Plane.Exact.circle c tracerRadius |>.width 2
+      |>.role "left" |>.named "a ring about the level last reached" |>.withId "tracer").toArray) ∧
+    (∀ k, (stripKey k).items = stripBase ++ ((levels.take (k + 1)).map stripPoint).toArray ++
+      tracerItems (tracerAt k)) ∧
+    (∀ m, stripPoint m = (
+      let y := (stripAt m).2
+      let it := levelMark m (Plane.Exact.point (stripAt m)) |>.named s!"level {intText m}"
+        |>.incident (above bandTop y) "the upper good band"
+        |>.incident (above y (rat 0 - bandTop)) "the lower good band"
+        |>.incident (if QSqrt.lt stripBottom y && QSqrt.lt y stripTop then .inside else .outside)
+          "the phases from −L/2 to L/2"
+      let it := if m == -10 then it.incident .on "the wall lo = −10"
+        else if m == 3 then it.incident .on "the wall hi = 3" else it
+      it.withId s!"level-{m}")) ∧
+    (∀ k, stripMoves k = (let p := stripAt (levelAt k)
+      let q := stripAt (levelAt (k + 1))
+      [("tracer", .slide (q.1 - p.1, q.2 - p.2)), (s!"level-{levelAt (k + 1)}", .appear)])) ∧
+    (∀ k, stripActors k = [⟨"tracer", tracerAt k⟩] ++
+      (levels.take (k + 1)).map fun m => ⟨s!"level-{m}", [stripAt m]⟩) ∧
+    (levelCount == 23 && phaseStepsArePhi && circleNearPhase && turnsNearPhi && stripArrives &&
+      levels.filter good == [-10, -2, 3]) = true := by
+  repeat' apply And.intro
+  all_goals first
+    | (intros; unfold levelWinding; with_reducible rfl)
+    | (intros; unfold circleMotion; with_reducible rfl)
+    | (intros; unfold circleMoves; with_reducible rfl)
+    | (intros; unfold circleTurns; with_reducible rfl)
+    | (intros; unfold levelAngle; with_reducible rfl)
+    | (intros; unfold turnOf; with_reducible rfl)
+    | (intros; unfold hand; rfl)
+    | (intros; unfold circlePoint; with_reducible rfl)
+    | (intros; unfold levelMark; rfl)
+    | (intros; unfold stripMotion; with_reducible rfl)
+    | (intros; unfold stripAt; with_reducible rfl)
+    | (intros; unfold phaseQ; with_reducible rfl)
+    | (intros; unfold tracerAt; with_reducible rfl)
+    | (intros; unfold tracerItems; rfl)
+    | (intros; unfold stripKey; with_reducible rfl)
+    | (intros; unfold stripPoint; rfl)
+    | (intros; unfold stripMoves; with_reducible rfl)
+    | (intros; unfold stripActors; with_reducible rfl)
+    | decide +kernel
+    | rfl
 
 end TDCSGFigures.Levels
 ```
