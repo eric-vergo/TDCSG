@@ -256,10 +256,11 @@ theorem extensionJump_keys :
   "A closed disk B of radius 10 about c = 0, to be turned through 72° clockwise and extended by \
     the identity. A bar from 8 to 12 crosses the boundary circle at 10: p = 9 lies inside B, \
     q = 11 outside, 2 apart.",
-  "The extension ĥ turns the part of the bar in B, its point 10 on the circle included, about c \
-    and fixes the part outside: the bar is torn at the circle. p went to ĥ(p) = 9ζ⁴, q stayed.",
-  "p and q were 2 apart; ĥ(p) and ĥ(q) = q are about 11.9 apart. However close to the circle p \
-    and q are taken, the jump stays, so ĥ is not continuous and is no isometry of the plane."]
+  "The extension turns the part of the bar in B, its point 10 on the circle included, about c and \
+    fixes the part outside: the bar is torn at the circle. p went to its image 9ζ⁴, q stayed.",
+  "p and q were 2 apart; their images, 9ζ⁴ and q itself, are about 11.9 apart. However close to \
+    the circle p and q are taken, the jump stays, so the extension is not continuous and is no \
+    isometry of the plane."]
     : Array String)) ∧
     (∀ (k : Nat), jumpKey k = (
   { extensionJumpFinal with items := jumpKeyItems k, info := { title := jumpCaptions.getD k "" } }

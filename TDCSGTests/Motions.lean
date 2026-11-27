@@ -15,11 +15,11 @@ check then fails. The figures' own statements are on the page of the figures' th
 (`TDCSGFigures.generatorStep_keys` and the other `_keys` theorems).
 
 A `#guard` line requires that PILean's engine reports no error for any animation of the site, wide
-or narrow, so that a drawn move that misses its key stops the build. The other `#guard` lines pin
-the captions of the animations whose captions are built from their data,
-word for word, by evaluation: the kernel does not reduce the string functions these captions are
-built with, so the theorems state the caption functions and these lines their texts.
--/
+or narrow, so that a drawn move that misses its key stops the build, and another that every caption
+and title has all its characters in PILean's lettering, which draws them on the contact sheets and
+in print. The other `#guard` lines pin the captions of the animations whose captions are built from
+their data, word for word, by evaluation: the kernel does not reduce the string functions these
+captions are built with, so the theorems state the caption functions and these lines their texts. -/
 
 namespace TDCSGTests.Motions
 
@@ -124,6 +124,12 @@ def siteMotions : Array (String × PILean.Plane.MotionPanels) := #[
 -- baker. A drawn move that differs from the exact one it is made from stops the build here.
 #guard siteMotions.all fun (_, P) =>
   P.report.errors.isEmpty && (P.narrow.map (·.report.errors.isEmpty)).getD true
+
+-- Every caption, title and panel title of the animations of the site has all its characters in
+-- PILean's lettering, which draws them on the contact sheets and in print.
+#guard siteMotions.all fun (_, P) =>
+  ((P.captions.toList ++ [P.info.title] ++ P.panels.toList.map (·.title)).all
+    fun c => (PILean.Lettering.missing c).isEmpty)
 
 /-! ### The captions built from data, word for word -/
 
