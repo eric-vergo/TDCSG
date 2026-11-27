@@ -1002,7 +1002,7 @@ theorem framePair_keys :
     ({} : FramePairConfig).strip = false ∧ ({} : FramePairConfig).arrowMark = true ∧
     ({} : FramePairConfig).pivotMark = false ∧ ({} : FramePairConfig).faintDisks = false ∧
     word = [.a, .bInv, .a, .b, .aInv, .bInv, .a, .b, .aInv, .b] ∧ pairRadius = 53 / 25 ∧
-    framePair.panels =
+    ({} : FramePairConfig).motion.panels =
       #[{ title := "Traditional view",
           motion := { keys := ({} : FramePairConfig).leftKeys,
                       steps := ({} : FramePairConfig).leftSteps } },
@@ -1025,7 +1025,7 @@ theorem framePair_keys :
       let moves := turns ++ appear.toArray.map (·, Move.appear) ++
         vanish.toArray.map (·, Move.vanish)
       if moves.isEmpty then MotionStep.idle else { moves }) ∧
-    framePair.captions =
+    ({} : FramePairConfig).motion.captions =
       ((List.range ({} : FramePairConfig).keyCount).map ({} : FramePairConfig).keyCaption).toArray ∧
     (states.map (·.n) == [
       #[0, 0, 0, 0, 0], #[0, 0, 0, 0, 0], #[-1, 1, 0, 0, 0], #[-1, 1, 0, 0, 0], #[0, 0, 0, 0, 0],
