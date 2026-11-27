@@ -8,9 +8,9 @@ import TDCSGFigures
 # Previews of the figures
 
 `tdcsg-figure-preview [--out DIR] [NAME …]` renders the figures named (all of `previews` when none
-is named) to `DIR` (`out` by default) for an author to look at: for each figure, or each frame of
-an explorer, an SVG and a PNG in the light style, in its dark twin, and at the narrow width in
-both, named `NAME[-frame-K][-narrow][-dark].{svg,png}` (a plot, which has no narrow rendition, in
+is named) to `DIR` (`out` by default) for an author to look at: for each figure an SVG and a PNG
+in the light style, in its dark twin, and at the narrow width in both, named
+`NAME[-narrow][-dark].{svg,png}` (a plot, which has no narrow rendition, in
 the light style and its dark twin). It prints every layout problem the figure's checks report
 (`PILean.Plane.Check`, `PILean.Plot.Check` for a plot) at both widths, whatever the figure's
 checks level, and exits with status 1 if there is one. The site build renders the same figures
@@ -28,23 +28,16 @@ frame pair of chapter 4 for another word (letters `a`, `b`, `A = a⁻¹`, `B = b
 marked by rings (`pivotMark`) or the riding disks faint (`faintDisks`), as
 `DIR/framePair-WORD[-rP_Q][-pivot][-faint]…`, and prints
 whether every declared move arrives exactly (`FramePairConfig.allArrive`).
-
-`tdcsg-figure-preview --variants DIR [NAME …]` writes the variants (all, or those named) of the
-loops that would replace the sliders (`TDCSGFigures.LoopVariants.variants`) in the same way,
-prints their errors and whether their exact checks hold, and exits with status 1 if one fails.
 -/
 
 namespace TDCSGFigures.Preview
 
 open PILean
 
-/-- What a preview shows: a plane figure, the frames of an explorer of plane figures as its
-slider or stepper shows them (one view for all, `Plane.commonView`), a plot, or an animation. -/
+/-- What a preview shows: a plane figure, a plot, or an animation. -/
 inductive Entry where
   /-- A plane figure. -/
   | plane (fig : Plane.Figure)
-  /-- The frames of an explorer, with their value or step labels. -/
-  | frames (figs : Array (String × Plane.Figure))
   /-- A plot. -/
   | plot (fig : Plot.Figure)
   /-- An animation of plane figures as panels on one clock. -/
@@ -53,7 +46,7 @@ inductive Entry where
 /-- The figures with their names. A new figure is added here to be previewed. -/
 def previews : Array (String × Entry) := #[
   ("criticalChord", .plane criticalChord),
-  ("orbitRadius", .frames sliderFrames),
+  ("orbitRadius", .motion orbitRadius),
   ("extensionJump", .motion extensionJump),
   ("disjointDisks", .motion disjointDisks),
   ("generatorStep", .motion generatorStep),
@@ -74,7 +67,7 @@ def previews : Array (String × Entry) := #[
   ("unitSteps", .plane Lift.unitSteps),
   ("framePair", .motion Lift.framePair),
   ("lensEstimate", .plane Lens.lensEstimate),
-  ("lensRadius", .frames Lens.sliderFrames),
+  ("lensRadius", .motion Lens.lensRadius),
   ("levelPhases", .plot Levels.levelPhases),
   ("terminalCrossing", .plane Levels.terminalCrossing),
   ("terminalZoom", .plane Levels.terminalZoom),
@@ -167,17 +160,6 @@ where
 open PILean TDCSGFigures.Preview in
 /-- Renders the previews (see the module docstring). -/
 def main (args : List String) : IO UInt32 := do
-  if let "--variants" :: dir :: names := args then
-    IO.FS.createDirAll dir
-    let mut failed := false
-    for (name, P, exact) in TDCSGFigures.LoopVariants.variants do
-      if !names.isEmpty && !names.contains name then continue
-      let errors ← renderMotion dir name P
-      for e in errors do IO.println s!"  {e}"
-      IO.println s!"{name}: {P.keyCount} keys, {errors.size} errors, exact checks {exact}"
-      failed := failed || !errors.isEmpty || !exact
-    IO.println s!"wrote {dir}"
-    return if failed then 1 else 0
   if let "--frame-pair" :: word :: rest := args then
     let (opts, dir) ← IO.ofExcept (framePairOptions rest)
     IO.FS.createDirAll dir
@@ -217,9 +199,6 @@ def main (args : List String) : IO UInt32 := do
     let figs : Array (String × Plane.Figure) := match entry with
       | .plot _ | .motion _ => #[]
       | .plane f => #[(name, f)]
-      | .frames fs =>
-        let views := PILean.Plane.commonView (fs.map (·.2))
-        views.mapIdx fun k f => (s!"{name}-frame-{k}", f)
     for (stem, f) in figs do
       let ps ← render dir stem f
       IO.println s!"{stem}: {f.items.size} items, {ps.size} layout problems"

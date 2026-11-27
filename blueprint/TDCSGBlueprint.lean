@@ -70,12 +70,16 @@ Lean declarations that prove it.
   depend on the starting point, every orbit has a bounded number of points, and the group is
   finite.
 
-:::figure_explorer TDCSGFigures.orbitRadius (label := "orbit-radius") (alt := "Two closed disks about minus one and one whose radius grows from 1.2 to the critical radius, with the orbit of zero drawn as dots: a few points for small radii, more and more near the critical radius.")
+:::figure TDCSGFigures.orbitRadius (label := "orbit-radius") (alt := "Two closed disks about minus one and one whose radius grows from 1.5 to the critical radius, with the orbit of zero drawn as dots: 9 points at radii 1.5 and 1.9, then 71, 151 and 801 points, and at the critical radius its first 1000 points; each orbit keeps the points of the one before and gains new ones.")
 The orbit of $`0` under the two moves as the radius $`r` grows, computed exactly in
-$`\mathbb{Z}[\zeta]` at each radius. Below the critical radius it is finite: 9 points at $`r=1.2`
-and $`r=1.9`, then 71 and 151 points at $`r=1.95` and $`2.05` (and 801 at $`r=2.1`, not drawn).
-At $`r=R` it is infinite; the last frame shows only its first 500 points, in the order a
-breadth-first search finds them.
+$`\mathbb{Z}[\zeta]` at $`r=1.5`, $`1.9`, $`1.95`, $`2.05`, $`2.1` and at $`R`. Below the
+critical radius it is finite: 9 points at $`r=1.5` and $`r=1.9`, then 71, 151 and 801 points.
+Enlarging the radius can only enlarge an orbit (`TDCSG.orbit_mono`), so each orbit keeps the
+points of the one before, which stay in place while the new ones fade in; between two radii only
+the circles grow, and the orbit is drawn only at the radii listed. At $`r=R` the orbit is infinite
+(`TDCSG.CriticalRadius.infinite_orbit_zero_five`); the last key frame shows only the first 1000
+of its points, in the order a breadth-first search from $`0` finds them, and these include the
+801 points of the orbit at $`r=2.1`.
 :::
 
 *How to read it.* Chapters 1 and 2 set up the objects and state the theorem; they also introduce

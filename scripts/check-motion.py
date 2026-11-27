@@ -22,8 +22,9 @@ The checks are PILean's, called on this site:
   error and no content-policy report.
 
 Its own checks, of this site: the positions again in the dark theme, each figure no wider than the
-text column, and no script of the site's own for a figure (the site's scripts are Verso's, Verso
-Blueprint's and PILean's explorer script for the sliders that remain).
+text column, no script of the site's own for a figure (the site's scripts are Verso's, Verso
+Blueprint's and PILean's explorer script, which PILean's adapter adds to every page with a figure),
+and no explorer on any page, so that the explorer script has nothing to run on.
 """
 import json
 import os
@@ -65,6 +66,9 @@ def no_site_scripts(c, site):
                      if re.search(r"pilean|word-?motion|playWords|wordTrace", b, re.I)
                      and not b.startswith("window.xref")]
     c.check("no inline script handles a figure", not figure_inline, str(figure_inline[:2]))
+    explorers = sorted(str(page.relative_to(site)) for page in site.rglob("index.html")
+                       if "pilean-explorer-frame" in page.read_text(encoding="utf-8"))
+    c.check("no page shows an explorer", not explorers, str(explorers[:3]))
 
 
 def page_checks(c, browser, base, url, expect, helpers):

@@ -127,7 +127,9 @@ def siteMotions : Array (String × PILean.Plane.MotionPanels) := #[
   ("TDCSGFigures.wordSteps", wordSteps),
   ("TDCSGFigures.exchangedIntervals", exchangedIntervals),
   ("TDCSGFigures.chordOrbit", chordOrbit),
-  ("walkToLeaf", Confinement.walkToLeaf)]
+  ("walkToLeaf", Confinement.walkToLeaf),
+  ("TDCSGFigures.orbitRadius", orbitRadius),
+  ("lensRadius", Lens.lensRadius)]
 
 -- Every animation of the site, and its narrow rendition, has no error in PILean's engine: every
 -- move it draws lands on its next key, every rest shows its still, the writer agrees with the
@@ -141,7 +143,82 @@ def siteMotions : Array (String × PILean.Plane.MotionPanels) := #[
   ((P.captions.toList ++ [P.info.title] ++ P.panels.toList.map (·.title)).all
     fun c => (PILean.Lettering.missing c).isEmpty)
 
+/-! ### The orbits of zero as the radius grows
+
+The orbits of `TDCSGFigures.orbitRadius` come from the exact orbit engine, which the kernel does
+not run, so their facts are checked here by evaluation. -/
+
+section OrbitRadius
+
+open TDCSGFigures.OrbitLoop
+
+-- The orbits have 9, 9, 71, 151, 801 and 1000 points; the first five, at r = 1.5, 1.9, 1.95,
+-- 2.05 and 2.1, are complete; at R the search was stopped at 1000 points (the orbit there is
+-- infinite, `TDCSG.CriticalRadius.infinite_orbit_zero_five`).
+#guard
+  let os := figureConfig.orbits
+  os.map (·.points.size) == #[9, 9, 71, 151, 801, 1000] &&
+    os.map (·.complete) == #[true, true, true, true, true, false]
+
+-- Each drawn orbit contains the one before it, and the engine decides on which side of each disk
+-- every point drawn lies; the groups that appear up to each key are the points of its orbit, each
+-- once; every declared appearance and disappearance is the change from one key to the next, and
+-- no group of points moves (`allArrive`).
+#guard figureConfig.nested && figureConfig.partitions && figureConfig.arrives
+
+-- The 801 points of the orbit at r = 2.1 are among the first 997 points of the search at R, and
+-- not all among the first 996.
+#guard
+  let os := figureConfig.orbits
+  let within := fun (n : Nat) => (os.getD 4 default).points.all fun p =>
+    ((os.getD 5 default).points.extract 0 n).any (·.z == p.z)
+  within 997 && !within 996
+
+-- The lines under the disks.
+#guard
+  let os := figureConfig.orbits
+  (List.range 6).map (figureConfig.valueText os) == ["r = 1.5: 9 points", "r = 1.9: 9 points",
+    "r = 1.95: 71 points", "r = 2.05: 151 points", "r = 2.1: 801 points",
+    "r = R: infinite, the first 1000 shown"]
+
+end OrbitRadius
+
 /-! ### The captions built from data, word for word -/
+
+#guard orbitRadius.captions == #[
+  "The orbit of 0 under the two moves at r = 1.5, computed exactly: 9 points. As r grows the \
+    closed disks grow and the orbit can only grow: at each radius shown the points it has \
+    gained fade in. Between two radii only the circles grow; the orbit is drawn only at the \
+    radii shown.",
+  "r = 1.9: the disks are larger, and the orbit is the same 9 points.",
+  "r = 1.95: 71 points; the 62 new ones have faded in, and the 9 points of the orbit at r = 1.9 \
+    are among them.",
+  "r = 2.05: 151 points; the 80 new ones have faded in, and the 71 points of the orbit at \
+    r = 1.95 are among them.",
+  "r = 2.1: 801 points; the 650 new ones have faded in, and the 151 points of the orbit at \
+    r = 2.05 are among them.",
+  "r = R = √(3 + φ): the orbit is infinite, and only the first 1000 of its points that a \
+    breadth-first search from 0 finds are drawn; the 801 points of the orbit at r = 2.1 are \
+    among them."]
+
+#guard Lens.lensRadius.captions == #[
+  "The lens of the closed disks |v| ≤ r/2 and |v − u| ≤ r/2 at r = 1.8, with the half-planes \
+    Re v ≥ κ − η (dashed edge) and Re v ≥ κ, η = (3 + φ − r²)/16, and v∗ on Re v = κ. The \
+    second panel shows the tip enlarged, and above it the margin η between the edges as a bar. \
+    The tip lies left of the dashed edge, at least η from it. The circle |v| = r/2 lies left of \
+    the dashed edge: no v meets the hypothesis of the lemma.",
+  "r = 2: the margin η is smaller, and the tip has moved right; it stays at least η left of the \
+    dashed edge. The circle |v| = r/2 lies left of the dashed edge: no v meets the hypothesis \
+    of the lemma.",
+  "r = 2.08: the margin η is smaller, and the tip has moved right; it stays at least η left of \
+    the dashed edge. The circle |v| = r/2 lies left of the dashed edge: no v meets the \
+    hypothesis of the lemma.",
+  "r = 2.12: the margin η is smaller, and the tip has moved right; it stays at least η left of \
+    the dashed edge. The circle |v| = r/2 crosses the dashed edge, and the lens does not.",
+  "r = R = √(3 + φ): η = 0, so the dashed edge has reached Re v = κ, and so has the tip: the \
+    tip is v∗.",
+  "At R the two half-planes are one, Re v ≥ κ, and the tip of the lens is v∗, on its edge. \
+    Below R it stays at least η left of the dashed edge."]
 
 #guard chordOrbit.captions == #[
   "The orbit of 0 along the chord at the critical radius: the parameter t of the point tE, \
@@ -180,6 +257,7 @@ def siteMotions : Array (String × PILean.Plane.MotionPanels) := #[
   "n is a leaf: its other candidates n + eₖ, k ≠ 2, lie outside the window (open rings at the \
     ends of dashed spokes).",
   "From the leaf n the only step leads back to n + e₂, as the one-step lemma requires. The \
-    labels of the path are numbered in the order of the walk."]
+    labels of the path are numbered 1 to 12 in the order of the walk; labels 13 and 14 are n + e₂ \
+    and n."]
 
 end TDCSGTests.Motions

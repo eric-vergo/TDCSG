@@ -18,8 +18,9 @@ radius its coordinates are `c₁/2 + √(h² s²)` and `√(s²/4) - √(h² c�
 from `u` and has real part `κ`.
 
 * `lensEstimate`: the picture at `r = 1.8`, every element labelled.
-* `lensRadius`: a slider through `r = 1.8, 2, 2.08, 2.12` and `R = √(3 + φ)`; the tip moves
-  towards the cuts and meets both at `R`, where `η = 0` and the tip is `v*`.
+* `lensRadius`: a loop through `r = 1.8, 2, 2.08, 2.12` and
+  `R = √(3 + φ)`, drawn from these pictures (`Setting.motion`); the tip moves towards the cuts and
+  meets both at `R`, where `η = 0` and the tip is `v*`.
 
 The chapter's claim that the estimate is sharp exactly at `R` is checked exactly at the radii
 drawn: the tip's real part is at most `κ - 2η` (`tipReLe`), so it lies left of `κ - η` below `R`,
@@ -129,19 +130,16 @@ structure Setting (β : Type) where
   /-- Whether the margin `η` is wide enough to be drawn as a dimension line. -/
   showMargin : Bool
   /-- Whether the picture is a key of a loop (`TDCSGFigures.Lens.LensLoopConfig`): the items that
-  change with the radius are actors (`Setting.act`), and the labels of `0`, `u` and `c₁`, which
-  are placed anew at each radius, are an actor of each radius and crossfade; the titles of the
-  circles and of the cut do not name the radius (so that the circles can be drawn alike at every
-  radius but for their path data), the real axis is a segment across the box, and the radius is
-  written at the top left. -/
+  change with the radius are actors (`Setting.act`); the labels of `0`, `u` and `c₁` are placed
+  explicitly (below, above right, below), clear of every circle at every radius of the loop, so
+  that they keep their places; the titles of the circles and of the cut do not name the radius
+  (so that the circles can be drawn alike at every radius but for their path data); the real axis
+  is a segment across the box; and the radius is written at the top left. -/
   motion : Bool := false
-  /-- What the ids of the actors end with, in a loop. -/
-  idSuffix : String := ""
 
-/-- The item `it` as the actor `id` (followed by the setting's `idSuffix`) in a key of a loop;
-unchanged otherwise. -/
+/-- The item `it` as the actor `id` in a key of a loop; unchanged otherwise. -/
 def Setting.act {β : Type} (st : Setting β) (id : String) (it : Item) : Item :=
-  if st.motion then it.actor (id ++ st.idSuffix) else it
+  if st.motion then it.actor id else it
 
 /-- The radius as the title of a circle or of the cut names it: `r = <value>`, or nothing in a key
 of a loop. -/
@@ -211,9 +209,12 @@ def lensItems {β : Type} [RealValue β] (st : Setting β) : Array Item :=
       |>.incident .outside "the lens" |>.incident .on "the half-plane Re v ≥ κ"
       |>.incident .inside "the half-plane Re v ≥ κ − η" |> st.act "vstar",
     Plane.Exact.label "v∗" vStar .auto |> st.act "vstar-label"] else #[]) ++ #[
-    Plane.Exact.label "0" origin .auto |>.role windowRole |> st.act s!"label-0-r{st.rText}",
-    Plane.Exact.label "u = ζ" (zeta 1) .auto |>.role windowRole |> st.act s!"label-u-r{st.rText}",
-    Plane.Exact.label "c₁" foot .auto |> st.act s!"label-c1-r{st.rText}",
+    (if st.motion then Plane.Exact.label "0" origin .below (some 12)
+      else Plane.Exact.label "0" origin .auto) |>.role windowRole |> st.act "label-0",
+    (if st.motion then Plane.Exact.label "u = ζ" (zeta 1) .aboveRight (some 8)
+      else Plane.Exact.label "u = ζ" (zeta 1) .auto) |>.role windowRole |> st.act "label-u",
+    (if st.motion then Plane.Exact.label "c₁" foot .below (some 16)
+      else Plane.Exact.label "c₁" foot .auto) |> st.act "label-c1",
     Plane.label (if st.critical then "tip = v∗" else "tip") st.tipXY .auto
       |> st.act (if st.critical then "tip-label-critical" else "tip-label"),
     Plane.Exact.label "lens" ((rat (1 / 10), rat (11 / 20)) : QSqrt5 × QSqrt5) |>.role lensRole,
@@ -252,14 +253,6 @@ def tipItemWith (p : SurdPoint) (cuts : Option Plane.Incidence) : Item :=
 half-planes (`tipFacts`). -/
 def tipItem (ρ : Rat) : Item := tipItemWith (tip ρ) (some .outside)
 
-/-- The tip at `R`, the point `v*`: on both circles, on the lens and on the boundary of the
-half-plane `Re v ≥ κ`, where the cut `κ - η` is `κ`. -/
-def tipCritical : Item :=
-  Plane.Exact.point vStar |>.size 5
-    |>.named "the tip of the lens at R: v∗ = 1 + t u, t = 1/2 − c₁"
-    |>.incident .on "the circle |v| = r/2" |>.incident .on "the circle |v − u| = r/2"
-    |>.incident .on "the lens" |>.incident .on "the half-plane Re v ≥ κ"
-
 /-- The setting at the rational radius `r = 2ρ`, with `v*` drawn apart from the tip and the
 margin `η` drawn as a dimension line when `showVStar` (at `r = 1.8`; from `r = 2` on `v*` is too
 near the tip to be seen apart, and `η` is a few pixels wide). -/
@@ -267,13 +260,6 @@ def settingAt (ρ : Rat) (rText : String) (showVStar : Bool) : Setting Rat :=
   { half := ρ, r2 := rat (4 * ρ * ρ), rText, tipPt := tipItem ρ,
     tipXY := PlanePoint.toPoint (tip ρ), other := otherSide (rat (ρ * ρ)), critical := false,
     showVStar, showMargin := showVStar }
-
-/-- The setting at `R`. -/
-def settingCritical : Setting (SqrtOf QSqrt5) :=
-  { half := SqrtOf.mk (criticalSq * rat (1 / 4)), r2 := criticalSq, rText := "R = √(3 + φ)",
-    tipPt := tipCritical, tipXY := PlanePoint.toPoint vStar,
-    other := otherSide (criticalSq * rat (1 / 4)), critical := true, showVStar := false,
-    showMargin := false }
 
 /-- A lens picture. -/
 def lensFigure {β : Type} [RealValue β] (st : Setting β) (narrow : Bool) : Plane.Figure where
@@ -290,31 +276,12 @@ def lensFigure {β : Type} [RealValue β] (st : Setting β) (narrow : Bool) : Pl
 def frameAt (ρ : Rat) (rText : String) (showVStar narrow : Bool) : Plane.Figure :=
   lensFigure (settingAt ρ rText showVStar) narrow
 
-/-- The lens picture at `R`. -/
-def frameCritical : Plane.Figure := lensFigure settingCritical false
-
 /-- Two closed disks of radius r/2 = 0.9 about 0 and u = ζ, their lens, and the half-planes
 Re v ≥ κ − η and Re v ≥ κ: the tip of the lens lies left of both. -/
 @[figure]
 def lensEstimate : Plane.Figure := frameAt (9 / 10) "1.8" true true
 
-/-- The half radii of the slider below `R`, with their radii as text. -/
-def sliderRadii : Array (Rat × String) :=
-  #[(9 / 10, "1.8"), (1, "2"), (26 / 25, "2.08"), (53 / 50, "2.12")]
-
-/-- The frames of `lensRadius`. -/
-def sliderFrames : Array (String × Plane.Figure) :=
-  (sliderRadii.map fun (ρ, t) => (t, frameAt ρ t (ρ == 9 / 10) false)).push ("R", frameCritical)
-
-/-- The lens and the cuts as the radius grows from 1.8 to R: the tip reaches the line Re v = κ
-exactly at R, where η = 0. -/
-@[figure]
-def lensRadius : Explorer := Plane.slider "r" sliderFrames
-
 /-! ### The facts the figures show -/
-
--- The tip lies on both circles and left of `κ - η` at every radius of the slider below `R`.
-#guard sliderRadii.all fun (ρ, _) => tipFacts ρ
 
 -- `v*` lies on both circles of radius `R/2` and has real part `κ`; the other corner
 -- `(ζ + ζ² - 1)/2 = ζ² conj v*` of the lens at `R` lies on both circles too.
@@ -323,9 +290,6 @@ def lensRadius : Explorer := Plane.slider "r" sliderFrames
   vStar.realPart == kappa &&
   (ZetaFrac.mk (zeta 1 + zeta 2 - Zeta5.ofInt 1) 2).normSq == criticalSq * rat (1 / 4)
 
--- Below `R`, `v*` lies outside both disks of radius `r/2`: `|v*|² = R²/4 > r²/4`.
-#guard sliderRadii.all fun (ρ, _) => QSqrt.lt (rat (ρ * ρ)) (criticalSq * rat (1 / 4))
-
 /-- The chapter's sharpness claim, exactly: the tip's real part `c₁/2 + √(h² s²)` is at most
 `κ - 2η`, so strictly below `κ - η` when `η > 0`. -/
 def tipReLe (ρ : Rat) : Bool :=
@@ -333,16 +297,319 @@ def tipReLe (ρ : Rat) : Bool :=
   let K := kappa - margin (rat (4 * ρ * ρ)) * rat 2 - cosine * rat (1 / 2)
   sqrtLt A K || sqrtEq A K
 
-#guard sliderRadii.all fun (ρ, _) => tipReLe ρ
-
 -- At `R` the bound is an equality: `h² = s²` there, and `c₁/2 + s² = κ`.
 #guard hSq 0 + criticalSq * rat (1 / 4) == sineSq && cosine * rat (1 / 2) + sineSq == kappa
 
--- The disk `|v| ≤ r/2` stays left of `κ - η` at `r = 1.8, 2, 2.08` and crosses it at `2.12`.
-#guard (sliderRadii.map fun (ρ, _) => QSqrt.lt (rat ρ) (cut (rat (4 * ρ * ρ)))) ==
-  #[true, true, true, false]
-
 -- `16κ - R² = 7φ + 1`, the constant of the threshold `r² - 8r + 7φ + 1 = 0`.
 #guard kappa * rat 16 - criticalSq == phi * rat 7 + rat 1
+
+/-! ### The lens as the radius grows to `R`
+
+`lensRadius`, a looping animation of the lens pictures of chapter 5 (`lensItems`) at increasing
+radii, ending at the critical radius `R = √(3 + φ)`, beside the neighbourhood of the tip enlarged
+(`zoomItems`), the two panels on one clock. Its keys are the exact pictures at the radii of
+`LensLoopConfig.radii`, then two at `R`: the first with the dashed edge `Re v = κ - η` where it
+has arrived, on `Re v = κ` (`η = 0`), and the tip there; the last as the slider of earlier versions
+of the site showed `R`, the two half-planes one, the tip `v*`.
+
+The lens is a function of the radius, and so are the circles, the dashed edge, the drawn radius,
+the tip and its label: between two keys of different radii they are morphed through the exact
+pictures at `samples - 1` radii between them (`r²` evenly spaced, all of them below `R`;
+`LensLoopConfig.between`, `LensLoopConfig.zoomBetween`), and the browser interpolates the path
+data linearly only between two consecutive samples. So at every sample the tip is the exact tip of
+the sampled radius, on the perpendicular bisector of `0` and `u`. What one key shows and the next
+does not (the margin `η` and `v*` of the first key, the bar of the margin in the enlarged panel at
+`R`, the labels that change their words at `R`) fades.
+
+The tip's title is set after its records, so that it does not list them (`tipTitle`): the records
+change at `R`, where the tip lies on the edges, and an actor that morphs is drawn alike at every
+radius but for its path data. The layout checks of every key still read the records.
+-/
+
+/-- `h² = r²/4 - 1/4` at the squared radius `r2`. -/
+def hSqOf (r2 : QSqrt5) : QSqrt5 := r2 * rat (1 / 4) - rat (1 / 4)
+
+/-- The title of the tip in the loop (see the module docstring). -/
+def tipTitle : String := "the tip of the lens: its corner of largest real part"
+
+/-- The setting of a key of the loop at the squared radius `r2` (`r` written `rText`), with the cut
+`κ - η` drawn: the half radius `√(r²/4)`, the tip `tipOf (hSqOf r2)` recording that it lies on
+both circles and on the lens, and `cuts` relative to both half-planes (`.outside` below `R`, `.on`
+at `R`); `v*` and the margin `η` drawn apart when `first`. -/
+def loopSetting (r2 : QSqrt5) (rText : String) (first : Bool)
+    (cuts : Plane.Incidence := .outside) : Setting (SqrtOf QSqrt5) :=
+  { half := ⟨r2 * rat (1 / 4)⟩, r2, rText,
+    tipPt := tipItemWith (tipOf (hSqOf r2)) (some cuts) |>.named tipTitle,
+    tipXY := PlanePoint.toPoint (tipOf (hSqOf r2)), other := otherSide (r2 * rat (1 / 4)),
+    critical := false, showVStar := first, showMargin := first, motion := true }
+
+/-- The setting of the last key: at `R`, the two half-planes one, the tip `tipOf (hSqOf R²)`, which
+is `v*`, on the edge of `Re v ≥ κ`. -/
+def criticalSetting : Setting (SqrtOf QSqrt5) :=
+  { loopSetting criticalSq "R = √(3 + φ)" false .on with
+    critical := true,
+    tipPt := tipItemWith (tipOf (hSqOf criticalSq)) none
+      |>.incident .on "the half-plane Re v ≥ κ" |>.named tipTitle }
+
+/-! ### The neighbourhood of the tip, enlarged -/
+
+/-- The right edge of the half-planes in the enlarged panel, whose box (about
+`[0.84, 1.09] × [0.08, 0.34]`) the arcs through the tip fix on the left. -/
+def zoomRight : QSqrt5 := rat (109 / 100)
+
+/-- The bottom of the enlarged box. -/
+def zoomBottom : QSqrt5 := rat (2 / 25)
+
+/-- The top of the enlarged box. -/
+def zoomTop : QSqrt5 := rat (8 / 25)
+
+/-- The height of the bar that spans the margin `η` in the enlarged panel, above the box. -/
+def zoomBarY : QSqrt5 := rat (17 / 50)
+
+/-- The half-plane `Re v ≥ a` as far as the enlarged box shows it. -/
+def zoomHalfPlane (a : QSqrt5) : List (QSqrt5 × QSqrt5) :=
+  [(a, zoomBottom), (zoomRight, zoomBottom), (zoomRight, zoomTop), (a, zoomTop)]
+
+/-- The width of the enlarged panel, in pixels. -/
+def zoomWidth : Float := 216
+
+/-- Half the angle of the arcs of the two circles drawn about the tip, in radians. -/
+def zoomArc : Float := 0.08
+
+/-- The angle of the point `p` seen from `c`, in radians. -/
+def angleFrom (c p : Point) : Float := Float.atan2 (p.y - c.y) (p.x - c.x)
+
+/-- The tip in the enlarged panel at the setting `st`: `tipOf (hSqOf st.r2)`, recording that it
+lies on both circles and where it stands relative to the half-planes (`.outside` both below `R`,
+`.on` both at `R`; on `Re v ≥ κ` at the last key). -/
+def zoomTip (st : Setting (SqrtOf QSqrt5)) : Item :=
+  let it := Plane.Exact.point (tipOf (hSqOf st.r2)) |>.size 5
+    |>.incident .on "the circle |v| = r/2" |>.incident .on "the circle |v − u| = r/2"
+  let it := if st.critical then it.incident .on "the half-plane Re v ≥ κ"
+    else
+      let i := if st.r2 == criticalSq then Plane.Incidence.on else .outside
+      it.incident i "the half-plane Re v ≥ κ − η" |>.incident i "the half-plane Re v ≥ κ"
+  it.named tipTitle |>.actor "tip"
+
+/-- The margin in the enlarged panel at the setting `st`, above the box: below `R` the bar from
+`κ - η` to `κ` with its ticks and its name `η`; at `R` the words `η = 0` at `κ`. -/
+def zoomMargin (st : Setting (SqrtOf QSqrt5)) : Array Item :=
+  let kc := cut st.r2
+  if st.r2 == criticalSq then #[
+    Plane.Exact.label "η = 0" ((kappa, zoomBarY) : QSqrt5 × QSqrt5) .above
+      |>.actor "zoom-eta-zero"]
+  else #[
+    Plane.Exact.segment (kc, zoomBarY) (kappa, zoomBarY) |>.width 1
+      |>.named "the margin η between the edges" |>.actor "zoom-margin",
+    Plane.Exact.tickAt (kc, zoomBarY) (kc, zoomBarY) (kappa, zoomBarY) |>.actor "zoom-tick-cut",
+    Plane.Exact.tickAt (kappa, zoomBarY) (kc, zoomBarY) (kappa, zoomBarY)
+      |>.actor "zoom-tick-kappa",
+    Plane.Exact.labelBeside "η" (kc, zoomBarY) (kappa, zoomBarY) |>.actor "zoom-eta"]
+
+/-- The items of the enlarged panel at the setting `st` (`r²` is `st.r2`), from the same data as
+the whole picture: the half-plane `Re v ≥ κ` and, unless at the last key, `Re v ≥ κ - η` (dashed
+edge), within the box; the arcs of the circles `|v| = r/2` and `|v − u| = r/2` through the tip
+(exact centres and radius; the angles only choose the piece drawn); the tip (`zoomTip`),
+unlabelled (the panel's title names it, and a label beside it would run into an arc or a
+half-plane at some radius); the labels of the edges at the bottom of the box; and the margin
+above it (`zoomMargin`). Its actors have the ids of the whole picture's, and morph as they do. -/
+def zoomItems (st : Setting (SqrtOf QSqrt5)) : Array Item :=
+  let kc := cut st.r2
+  let a0 := angleFrom ⟨0, 0⟩ st.tipXY
+  let au := angleFrom (PlanePoint.toPoint (zeta 1)) st.tipXY
+  #[Plane.Exact.polygon (zoomHalfPlane kappa) |>.faint |>.filled |>.width 1 |>.fillOpacity 0.18
+      |>.named "the half-plane Re v ≥ κ"] ++
+  (if st.critical then #[] else #[
+    Plane.Exact.polygon (zoomHalfPlane kc) |>.faint |>.filled |>.width 1 |>.dashed
+      |>.fillOpacity 0.16 |>.named "the half-plane Re v ≥ κ − η" |>.actor "cut"]) ++ #[
+    Plane.Exact.arc origin st.half (a0 - zoomArc) (a0 + zoomArc) |>.role windowRole
+      |>.named "the circle |v| = r/2" |>.actor "disk-0",
+    Plane.Exact.arc (zeta 1) st.half (au - zoomArc) (au + zoomArc) |>.role windowRole |>.dashed
+      |>.named "the circle |v − u| = r/2" |>.actor "disk-u",
+    zoomTip st,
+    Plane.Exact.label "κ" ((kappa, zoomBottom) : QSqrt5 × QSqrt5) .belowRight
+      |>.actor "kappa-label"] ++
+  (if st.critical then #[] else #[
+    Plane.Exact.label "κ − η" ((kc, zoomBottom) : QSqrt5 × QSqrt5) .belowLeft
+      |>.actor "cut-label"]) ++
+  zoomMargin st
+
+/-! ### The loop -/
+
+/-- The loop through the lens pictures as the radius grows to `R` (see the module docstring); the
+defaults are the figure `lensRadius`. -/
+structure LensLoopConfig where
+  /-- The radii below `R`, increasing, with their values as text. -/
+  radii : Array (Rat × String) := #[(9 / 5, "1.8"), (2, "2"), (52 / 25, "2.08"), (53 / 25, "2.12")]
+  /-- The number of intervals of a morph, each ended by an exact picture. -/
+  samples : Nat := 12
+  /-- The duration of a step that changes the radius, in seconds. -/
+  stepTime : Rat := 6 / 5
+  /-- The rest at every key but the first and the last, in seconds. -/
+  hold : Rat := 3 / 2
+
+namespace LensLoopConfig
+
+variable (cfg : LensLoopConfig)
+
+/-- The number of keys: one per radius below `R`, and two at `R`. -/
+def keyCount : Nat := cfg.radii.size + 2
+
+/-- `r²` at key `k` (`3 + φ` for the two keys at `R`). -/
+def r2At (k : Nat) : QSqrt5 :=
+  match cfg.radii[k]? with
+  | some (r, _) => rat (r * r)
+  | none => criticalSq
+
+/-- The setting of key `k`: the radius of `radii`, `v*` and the margin drawn at key `0`; then `R`
+with the cut on `Re v = κ`; then the last key (`criticalSetting`). -/
+def setting (k : Nat) : Setting (SqrtOf QSqrt5) :=
+  match cfg.radii[k]? with
+  | some (_, t) => loopSetting (cfg.r2At k) t (k == 0)
+  | none =>
+    if k == cfg.radii.size then loopSetting criticalSq "R = √(3 + φ)" false .on
+    else criticalSetting
+
+/-- The width of the whole picture's panel: the figure's width but for the gap and the enlarged
+panel. -/
+def mainWidth : Float := figureWidth - 24 - zoomWidth
+
+/-- Key `k` of the whole picture: the lens picture of its setting, without a view of its own. -/
+def key (k : Nat) : Plane.Figure :=
+  { lensFigure (cfg.setting k) false with view := none, width := mainWidth }
+
+/-- Key `k` of the enlarged panel: `zoomItems` of the same setting. -/
+def zoomKey (k : Nat) : Plane.Figure :=
+  { cfg.key k with items := zoomItems (cfg.setting k), width := zoomWidth }
+
+/-- The ids of the actors of the figure `f`. -/
+def actorIds (f : Plane.Figure) : Array String := f.items.filterMap (·.actorId?)
+
+/-- Whether step `j` changes the radius. -/
+def grows (j : Nat) : Bool := j < cfg.radii.size
+
+/-- The tip at key `k`. -/
+def tipAt (k : Nat) : SurdPoint := tipOf (hSqOf (cfg.r2At k))
+
+/-- The moves of step `j` in the panel whose keys are `keyAt`: when the radius changes, the actors
+of both keys morph through the exact pictures between (`between`), the tip and its label included
+(they stay otherwise); those of key `j` alone vanish, those of key `j + 1` alone appear. -/
+def movesOf (keyAt : Nat → Plane.Figure) (j : Nat) : Array (String × Move) :=
+  let a := actorIds (keyAt j)
+  let b := actorIds (keyAt (j + 1))
+  (if cfg.grows j then (a.filter b.contains).map (·, Move.morph) else #[]) ++
+    (a.filter (!b.contains ·)).map (·, Move.vanish) ++
+    (b.filter (!a.contains ·)).map (·, Move.appear)
+
+/-- The squared radius at the fraction `q` of step `j`: `(1 - q) r_j² + q r_{j+1}²`. -/
+def r2Between (j : Nat) (q : Rat) : QSqrt5 := cfg.r2At j * rat (1 - q) + cfg.r2At (j + 1) * rat q
+
+/-- The whole picture at the fraction `q` of step `j`: the lens picture at the squared radius
+`r2Between j q`. -/
+def between (j : Nat) (q : Rat) : Option Plane.Figure :=
+  if cfg.grows j then
+    some { cfg.key j with items := lensItems (loopSetting (cfg.r2Between j q) "" false) }
+  else none
+
+/-- The enlarged panel at the fraction `q` of step `j`. -/
+def zoomBetween (j : Nat) (q : Rat) : Option Plane.Figure :=
+  if cfg.grows j then
+    some { cfg.zoomKey j with items := zoomItems (loopSetting (cfg.r2Between j q) "" false) }
+  else none
+
+/-- Whether the tip `tipOf (hSqOf r2)` lies on both circles of radius `r/2` about `0` and `u`, and
+so on the perpendicular bisector of `0` and `u`: `h² ≥ 0`, and with `A = h² s²`, `B = s²/4` and
+`C = h² c₁²` the cross terms of `|tip|²` and `|tip - u|²` cancel (`c₁² A = 4 B C`) and the rest is
+`r²/4` (`c₁²/4 + A + B + C = r²/4`), as in `tipFacts`. -/
+def tipOnBoth (r2 : QSqrt5) : Bool :=
+  let h2 := hSqOf r2
+  let A := h2 * sineSq
+  let B := sineSq * rat (1 / 4)
+  let C := h2 * (cosine * cosine)
+  QSqrt.lt ⟨0, 0⟩ cosine && QSqrt.le ⟨0, 0⟩ h2 && cosine * cosine * A == rat 4 * B * C &&
+    cosine * cosine * rat (1 / 4) + A + B + C == r2 * rat (1 / 4)
+
+/-- Whether every picture between two keys of different radii is at a radius below `R`
+(`r2Between j (i / samples)`, `0 < i < samples`, below `R²`), with its tip on both circles. -/
+def samplesBelowR : Bool :=
+  (List.range cfg.radii.size).all fun j => (List.range (cfg.samples - 1)).all fun i =>
+    let r2 := cfg.r2Between j ((i + 1 : Nat) / (cfg.samples : Rat))
+    QSqrt.lt r2 criticalSq && tipOnBoth r2
+
+/-- Whether the disk `|v| ≤ r/2` lies left of the dashed edge at the radius `r`. -/
+def diskLeftOfCut (r : Rat) : Bool := QSqrt.lt (rat (r / 2)) (cut (rat (r * r)))
+
+/-- The caption of key `k`. -/
+def caption (k : Nat) : String :=
+  match cfg.radii[k]? with
+  | some (r, t) =>
+    let disk := if diskLeftOfCut r then " The circle |v| = r/2 lies left of the dashed edge: no \
+        v meets the hypothesis of the lemma."
+      else " The circle |v| = r/2 crosses the dashed edge, and the lens does not."
+    if k == 0 then
+      s!"The lens of the closed disks |v| ≤ r/2 and |v − u| ≤ r/2 at r = {t}, with the \
+        half-planes Re v ≥ κ − η (dashed edge) and Re v ≥ κ, η = (3 + φ − r²)/16, and v∗ on \
+        Re v = κ. The second panel shows the tip enlarged, and above it the margin η between \
+        the edges as a bar. The tip lies left of the dashed edge, at least η from it." ++ disk
+    else
+      s!"r = {t}: the margin η is smaller, and the tip has moved right; it stays at least η \
+        left of the dashed edge." ++ disk
+  | none =>
+    if k == cfg.radii.size then
+      "r = R = √(3 + φ): η = 0, so the dashed edge has reached Re v = κ, and so has the tip: \
+        the tip is v∗."
+    else
+      "At R the two half-planes are one, Re v ≥ κ, and the tip of the lens is v∗, on its \
+        edge. Below R it stays at least η left of the dashed edge."
+
+/-- The loop: the lens beside the neighbourhood of its tip, enlarged, on one clock, each panel at
+its own scale, stacked at the narrow width; its poster is the last key. -/
+def motion : MotionPanels :=
+  let n := cfg.keyCount
+  let main : Motion :=
+    { keys := ((List.range n).map cfg.key).toArray,
+      steps := ((List.range (n - 1)).map fun j =>
+        ({ moves := cfg.movesOf cfg.key j } : MotionStep)).toArray,
+      between := cfg.between, morphSamples := cfg.samples }
+  let zoomed : Motion :=
+    { keys := ((List.range n).map cfg.zoomKey).toArray,
+      steps := ((List.range (n - 1)).map fun j =>
+        ({ moves := cfg.movesOf cfg.zoomKey j } : MotionStep)).toArray,
+      between := cfg.zoomBetween, morphSamples := cfg.samples }
+  { panels := #[{ title := "The lens", motion := main },
+      { title := "Near the tip", motion := zoomed }]
+    captions := ((List.range n).map cfg.caption).toArray
+    pacing := { motionPacing with hold := cfg.hold, lastHold := 3 }
+    timing := ((List.range (n - 1)).map fun j =>
+      (if cfg.grows j then { duration := some cfg.stepTime, easing := some .linear }
+        else { duration := some motionPacing.fade, easing := some .linear } : PanelTiming)).toArray
+    info := { title := "The lens and its tip as r grows to R"
+              description := s!"The lens of the closed disks |v| ≤ r/2 about 0 and \
+                |v − u| ≤ r/2 about u = ζ, with the half-planes Re v ≥ κ − η (dashed edge) and \
+                Re v ≥ κ, and in a second panel the neighbourhood of its tip enlarged, with the \
+                margin η between the edges; at \
+                r = {", ".intercalate (cfg.radii.map (·.2)).toList} and R = √(3 + φ). Between two \
+                radii the picture passes through the exact pictures at radii between, and the \
+                browser interpolates between those. As r grows the \
+                margin narrows and the tip moves right, staying left of the dashed edge; at R, \
+                where η = 0, the tip is v∗ on Re v = κ." }
+    checks := .fail
+    poster := n - 1
+    scale := .independent
+    width := figureWidth
+    narrowWidth := some narrowWidth
+    shares := #[mainWidth, zoomWidth] }
+
+end LensLoopConfig
+
+/-- The configuration of the figure: the defaults. -/
+def lensConfig : LensLoopConfig := {}
+
+/-- The lens of the disks of radius r/2 about 0 and u = ζ and the half-planes Re v ≥ κ − η and
+Re v ≥ κ as r grows through 1.8, 2, 2.08 and 2.12 to R, beside the neighbourhood of the tip
+enlarged: the tip moves right and stays left of Re v = κ − η, and reaches the line Re v = κ
+exactly at R, where η = 0 and the tip is v∗. -/
+@[figure]
+def lensRadius : MotionPanels := lensConfig.motion
 
 end TDCSGFigures.Lens

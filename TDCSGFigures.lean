@@ -18,7 +18,7 @@ import TDCSGFigures.Lens
 import TDCSGFigures.Levels
 import TDCSGFigures.Confinement
 import TDCSGFigures.ProofDiagrams
-import TDCSGFigures.LoopVariants
+import TDCSGFigures.OrbitLoop
 
 /-!
 # The figures of the blueprint

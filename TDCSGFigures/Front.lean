@@ -109,16 +109,7 @@ def criticalChord : Plane.Figure where
   items := Front.items
   info := { title := "The critical chord between two closed disks" }
 
-/-! ### The orbit of zero as the radius grows -/
-
-/-- The radii of the slider below the critical radius, with their labels. -/
-def sliderRadii : Array (String × Rat) :=
-  #[("1.2", 6 / 5), ("1.9", 19 / 10), ("1.95", 39 / 20), ("2.05", 41 / 20)]
-
-/-- The most points of the orbit of zero drawn at the critical radius, where the orbit is
-infinite: the first ones the breadth-first search finds. The cap keeps the page that shows every
-frame inline small. -/
-def criticalCap : Nat := 500
+/-! ### What the orbits of zero share (`orbitRadius`, in `TDCSGFigures.OrbitLoop`) -/
 
 /-- The house style for orbits: markers without the ring of background colour, since the many
 orbit points are drawn without halos. -/
@@ -128,54 +119,5 @@ def orbitStyle : Style := { houseStyle with plane := { houseStyle.plane with mar
 def withSides (it : Item) (l r : Side) : Item :=
   it |>.incident l.incidence "the left circle" |>.incident r.incidence "the right circle"
     |>.incident (l.lens r).incidence "the lens"
-
-/-- The picture of the orbit `o` of zero at radius `r` (`r2` its square, `rText` its value as
-text): the two disks outlined, their lens, the centres and every point of `o`, each point and
-centre recording where it stands relative to each disk and to the lens as the engine decided
-it. -/
-def orbitFrame {β : Type} [RealValue β] (r : β) (r2 : RadiusSq) (rText : String) (o : Orbit) :
-    Except String Plane.Figure := do
-  let (ll, lr) ← sides r2 leftCentre
-  let (rl, rr) ← sides r2 rightCentre
-  return {
-    width := figureWidth
-    padding := 16
-    style := orbitStyle
-    checks := .fail
-    items := #[
-      Plane.Exact.disk leftCentre r |>.noFill |>.role leftRole |>.named "the left circle"
-        |>.describedBy s!"the closed disk of radius {rText} about −1",
-      Plane.Exact.disk rightCentre r |>.noFill |>.role rightRole |>.named "the right circle"
-        |>.describedBy s!"the closed disk of radius {rText} about 1",
-      Plane.Exact.lens leftCentre rightCentre r r |>.role lensRole |>.noOutline
-        |>.fillOpacity 0.12 |>.named "the lens"] ++
-      o.points.map (fun p => withSides (Plane.Exact.point p.z |>.size 1.5 |>.halo false)
-        p.left p.right) ++
-      #[withSides (Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1") ll lr,
-        withSides (Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1") rl rr,
-        Plane.Exact.label "−1" leftCentre .auto |>.role leftRole,
-        Plane.Exact.label "+1" rightCentre .auto |>.role rightRole]
-    info := { title := s!"The orbit of 0 at radius {rText}: " ++
-      if o.complete then s!"{o.points.size} points" else s!"its first {o.points.size} points" } }
-
-/-- A frame that says why it could not be drawn. -/
-def failedFrame (e : String) : Plane.Figure :=
-  { items := #[Plane.label s!"not drawn: {e}" ⟨0, 0⟩], checks := .fail }
-
-/-- The frames of the slider: one for each radius of `sliderRadii`, then the critical radius,
-where only the first `criticalCap` points are drawn. -/
-def sliderFrames : Array (String × Plane.Figure) :=
-  let frame := fun {β : Type} [RealValue β] (r : β) (r2 : RadiusSq) (t : String) (cap : Nat) =>
-    match orbit r2 origin cap >>= orbitFrame r r2 t with
-    | .ok f => f
-    | .error e => failedFrame e
-  (sliderRadii.map fun (t, r) => (t, frame r (RadiusSq.ofRat r) t 100000)).push
-    ("R", frame critical RadiusSq.critical "R = √(3 + φ)" criticalCap)
-
-/-- The orbit of 0 under the two generators for radii from 1.2 to the critical radius R: finite
-below R, with 9, 9, 71 and 151 points at r = 1.2, 1.9, 1.95 and 2.05, and infinite at R, where
-its first 500 points are drawn. -/
-@[figure]
-def orbitRadius : Explorer := Plane.slider "r" sliderFrames
 
 end TDCSGFigures
