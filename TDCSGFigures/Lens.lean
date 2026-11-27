@@ -44,10 +44,14 @@ def sineSq : QSqrt5 := rat 1 - cosine * cosine
 /-- `h² = (r/2)² - 1/4` at the half radius `ρ = r/2`. -/
 def hSq (ρ : Rat) : QSqrt5 := rat (ρ * ρ - 1 / 4)
 
+/-- The tip of the lens of the disks of radius `ρ` about `0` and `u`, given `h² = ρ² - 1/4`:
+`(c₁/2 + √(h² s²), √(s²/4) - √(h² c₁²))`. -/
+def tipOf (h2 : QSqrt5) : SurdPoint :=
+  ⟨{ base := cosine * rat (1 / 2), roots := [(1, h2 * sineSq)] },
+    { roots := [(1, sineSq * rat (1 / 4)), (-1, h2 * (cosine * cosine))] }⟩
+
 /-- The tip of the lens at the half radius `ρ`: `(c₁/2 + √(h² s²), √(s²/4) - √(h² c₁²))`. -/
-def tip (ρ : Rat) : SurdPoint :=
-  ⟨{ base := cosine * rat (1 / 2), roots := [(1, hSq ρ * sineSq)] },
-    { roots := [(1, sineSq * rat (1 / 4)), (-1, hSq ρ * (cosine * cosine))] }⟩
+def tip (ρ : Rat) : SurdPoint := tipOf (hSq ρ)
 
 /-- `u = ζ` with the coordinates `(c₁, √(s²))`. -/
 def uSurd : SurdPoint := ⟨Surd.ofQ cosine, { roots := [(1, sineSq)] }⟩
@@ -124,44 +128,70 @@ structure Setting (β : Type) where
   showVStar : Bool
   /-- Whether the margin `η` is wide enough to be drawn as a dimension line. -/
   showMargin : Bool
+  /-- Whether the picture is a key of a loop (`TDCSGFigures.Lens.LensLoopConfig`): the items that
+  change with the radius are actors (`Setting.act`), the titles of the circles and of the cut do
+  not name the radius (so that the circles can be drawn alike at every radius but for their path
+  data), the real axis is a segment across the box, and the radius is written at the top left. -/
+  motion : Bool := false
+  /-- What the ids of the actors end with, in a loop. -/
+  idSuffix : String := ""
+
+/-- The item `it` as the actor `id` (followed by the setting's `idSuffix`) in a key of a loop;
+unchanged otherwise. -/
+def Setting.act {β : Type} (st : Setting β) (id : String) (it : Item) : Item :=
+  if st.motion then it.actor (id ++ st.idSuffix) else it
+
+/-- The radius as the title of a circle or of the cut names it: `r = <value>`, or nothing in a key
+of a loop. -/
+def Setting.atR {β : Type} (st : Setting β) : String :=
+  if st.motion then "" else s!", r = {st.rText}"
 
 /-- The items of a lens picture: the half-planes `Re v ≥ κ - η` (below `R`) and `Re v ≥ κ`,
 outlined (`κ - η` dashed), the real axis, the two disks and their lens, the foot of `u` on the
 real axis, the margin `η` between the cuts as a dimension line (when `showMargin`), a radius `r/2`
 of `|v| ≤ r/2`, the points `0`, `u`, `c₁`, the tip and `v*`, and their labels, each beside what it
-names. -/
+names; in a key of a loop (`Setting.motion`), the radius at the top left. -/
 def lensItems {β : Type} [RealValue β] (st : Setting β) : Array Item :=
   let kc := cut st.r2
   let foot : QSqrt5 × QSqrt5 := (cosine, ⟨0, 0⟩)
   (if st.critical then #[] else #[
     Plane.Exact.polygon (halfPlane kc) |>.faint |>.filled |>.width 1 |>.dashed
       |>.fillOpacity 0.16 |>.named "the half-plane Re v ≥ κ − η"
-      |>.describedBy s!"where the lens estimate puts no point of the lens, at r = {st.rText}"
-      |>.declRef `TDCSG.Five.div_two_lt_norm_sub_of_le_re]) ++ #[
+      |>.describedBy (if st.motion then "where the lens estimate puts no point of the lens"
+        else s!"where the lens estimate puts no point of the lens, at r = {st.rText}")
+      |>.declRef `TDCSG.Five.div_two_lt_norm_sub_of_le_re |> st.act "cut"]) ++ #[
     Plane.Exact.polygon (halfPlane kappa) |>.faint |>.filled |>.width 1 |>.fillOpacity 0.18
       |>.named "the half-plane Re v ≥ κ"
       |>.describedBy "κ = (2φ + 1)/4 = (1 + L)/2, L = φ − 1/2",
-    Plane.Exact.line origin rightCentre |>.faint |>.width 1 |>.named "the real axis",
+    (if st.motion then
+      Plane.Exact.segment ((rat (-23 / 20), rat 0) : QSqrt5 × QSqrt5) (xRight, rat 0) |>.faint
+        |>.width 1 |>.named "the real axis"
+    else Plane.Exact.line origin rightCentre |>.faint |>.width 1 |>.named "the real axis"),
     Plane.Exact.disk origin st.half |>.noFill |>.role windowRole
-      |>.named "the circle |v| = r/2" |>.describedBy s!"the closed disk |v| ≤ r/2, r = {st.rText}",
+      |>.named "the circle |v| = r/2" |>.describedBy s!"the closed disk |v| ≤ r/2{st.atR}"
+      |> st.act "disk-0",
     Plane.Exact.disk (zeta 1) st.half |>.noFill |>.role windowRole |>.dashed
       |>.named "the circle |v − u| = r/2"
-      |>.describedBy s!"the closed disk |v − u| ≤ r/2 about u = ζ, r = {st.rText}",
+      |>.describedBy s!"the closed disk |v − u| ≤ r/2 about u = ζ{st.atR}" |> st.act "disk-u",
     Plane.Exact.lens origin (zeta 1) st.half st.half |>.role lensRole |>.noOutline
-      |>.fillOpacity 0.12 |>.named "the lens",
+      |>.fillOpacity 0.12 |>.named "the lens" |> st.act "lens",
     Plane.Exact.segment uSurd ⟨Surd.ofQ cosine, Surd.ofQ ⟨0, 0⟩⟩ |>.faint |>.width 1
       |>.dashed #[2, 3] |>.named "the foot of u on the real axis"] ++
   (if st.showMargin then #[
     Plane.Exact.segment (kc, marginY) (kappa, marginY) |>.width 1
       |>.named "the margin η = (3 + φ − r²)/16 between the cuts κ − η and κ"
-      |>.declRef `TDCSG.Five.IsGoodLevel,
-    Plane.Exact.tickAt (kc, marginY) (kc, marginY) (kappa, marginY),
-    Plane.Exact.tickAt (kappa, marginY) (kc, marginY) (kappa, marginY),
-    Plane.Exact.labelBeside "η" (kc, marginY) (kappa, marginY)] else #[]) ++ #[
+      |>.declRef `TDCSG.Five.IsGoodLevel |> st.act "margin",
+    Plane.Exact.tickAt (kc, marginY) (kc, marginY) (kappa, marginY) |> st.act "margin-tick-cut",
+    Plane.Exact.tickAt (kappa, marginY) (kc, marginY) (kappa, marginY)
+      |> st.act "margin-tick-kappa",
+    Plane.Exact.labelBeside "η" (kc, marginY) (kappa, marginY) |> st.act "margin-label"]
+    else #[]) ++ #[
     Plane.segment ⟨0, 0⟩ (radiusEnd (RealValue.toFloat st.half)) |>.role windowRole |>.width 1.5
-      |>.dashed |>.named "a radius r/2 of the disk |v| ≤ r/2",
-    Plane.labelBeside "r/2" ⟨0, 0⟩ (radiusEnd (RealValue.toFloat st.half)) |>.role windowRole,
+      |>.dashed |>.named "a radius r/2 of the disk |v| ≤ r/2" |> st.act "radius",
+    Plane.labelBeside "r/2" ⟨0, 0⟩ (radiusEnd (RealValue.toFloat st.half)) |>.role windowRole
+      |> st.act "radius-label",
     Plane.Exact.point origin |>.role windowRole |>.named "0, the center of |v| ≤ r/2"
+      |> (if st.motion then (·.incident .on "the real axis") else id)
       |>.incident .inside "the circle |v| = r/2"
       |>.incident st.other.incidence "the circle |v − u| = r/2"
       |>.incident (Side.lens .inside st.other).incidence "the lens",
@@ -171,26 +201,32 @@ def lensItems {β : Type} [RealValue β] (st : Setting β) : Array Item :=
       |>.incident (Side.lens .inside st.other).incidence "the lens",
     Plane.Exact.point foot |>.faint |>.size 3
       |>.named "c₁ = Re u = (φ − 1)/2 on the real axis" |>.incident .on "the real axis",
-    st.tipPt] ++
+    st.act "tip" st.tipPt] ++
   (if st.showVStar then #[
     Plane.Exact.point vStar |>.named "v∗ = 1 + t u, t = 1/2 − c₁, at distance R/2 from 0 and u"
       |>.incident .outside "the circle |v| = r/2" |>.incident .outside "the circle |v − u| = r/2"
       |>.incident .outside "the lens" |>.incident .on "the half-plane Re v ≥ κ"
-      |>.incident .inside "the half-plane Re v ≥ κ − η",
-    Plane.Exact.label "v∗" vStar .auto] else #[]) ++ #[
+      |>.incident .inside "the half-plane Re v ≥ κ − η" |> st.act "vstar",
+    Plane.Exact.label "v∗" vStar .auto |> st.act "vstar-label"] else #[]) ++ #[
     Plane.Exact.label "0" origin .auto |>.role windowRole,
     Plane.Exact.label "u = ζ" (zeta 1) .auto |>.role windowRole,
     Plane.Exact.label "c₁" foot .auto,
-    Plane.label (if st.critical then "tip = v∗" else "tip") st.tipXY .auto,
+    Plane.label (if st.critical then "tip = v∗" else "tip") st.tipXY .auto
+      |> st.act (if st.critical then "tip-label-critical" else "tip-label"),
     Plane.Exact.label "lens" ((rat (1 / 10), rat (11 / 20)) : QSqrt5 × QSqrt5) |>.role lensRole,
     Plane.Exact.label "|v| ≤ r/2" ((rat (3 / 10), rat (-11 / 20)) : QSqrt5 × QSqrt5)
       |>.role windowRole,
     Plane.Exact.label "|v − u| ≤ r/2" ((rat (9 / 20), rat (3 / 2)) : QSqrt5 × QSqrt5)
       |>.role windowRole,
     Plane.Exact.label (if st.critical then "Re v ≥ κ, η = 0" else "Re v ≥ κ")
-      ((kappa, cutLabelY) : QSqrt5 × QSqrt5) .right] ++
+      ((kappa, cutLabelY) : QSqrt5 × QSqrt5) .right
+      |> st.act (if st.critical then "kappa-label-critical" else "kappa-label")] ++
   (if st.critical then #[] else #[
-    Plane.Exact.label "Re v ≥ κ − η →" ((kc, cutLabelY) : QSqrt5 × QSqrt5) .left])
+    Plane.Exact.label "Re v ≥ κ − η →" ((kc, cutLabelY) : QSqrt5 × QSqrt5) .left
+      |> st.act "cut-label"]) ++
+  (if st.motion then #[
+    Plane.Exact.label s!"r = {st.rText}" ((rat (-11 / 10), rat (9 / 4)) : QSqrt5 × QSqrt5)
+      .right |>.bold |> st.act s!"r-{st.rText}"] else #[])
 
 /-- Where `|u|² = 1` stands against `(r/2)²`. -/
 def otherSide (ρ2 : QSqrt5) : Side :=
@@ -199,14 +235,20 @@ where
   /-- `1`. -/
   rat1 : QSqrt5 := rat 1
 
-/-- The tip at the half radius `ρ`, recording that it lies on both circles and outside both
-half-planes (`tipFacts`). -/
-def tipItem (ρ : Rat) : Item :=
-  Plane.Exact.point (tip ρ) |>.size 5
+/-- The tip `p` of the lens, recording that it lies on both circles and on the lens, and, given
+`cuts`, where it stands relative to both half-planes. -/
+def tipItemWith (p : SurdPoint) (cuts : Option Plane.Incidence) : Item :=
+  let it := Plane.Exact.point p |>.size 5
     |>.named "the tip of the lens: its corner of largest real part"
     |>.incident .on "the circle |v| = r/2" |>.incident .on "the circle |v − u| = r/2"
-    |>.incident .on "the lens" |>.incident .outside "the half-plane Re v ≥ κ − η"
-    |>.incident .outside "the half-plane Re v ≥ κ"
+    |>.incident .on "the lens"
+  match cuts with
+  | some i => it |>.incident i "the half-plane Re v ≥ κ − η" |>.incident i "the half-plane Re v ≥ κ"
+  | none => it
+
+/-- The tip at the half radius `ρ`, recording that it lies on both circles and outside both
+half-planes (`tipFacts`). -/
+def tipItem (ρ : Rat) : Item := tipItemWith (tip ρ) (some .outside)
 
 /-- The tip at `R`, the point `v*`: on both circles, on the lens and on the boundary of the
 half-plane `Re v ≥ κ`, where the cut `κ - η` is `κ`. -/

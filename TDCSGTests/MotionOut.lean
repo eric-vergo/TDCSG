@@ -19,6 +19,9 @@ eased fraction done at a quarter, a half and three quarters of it, each panel's 
 actor's position at every rest and at three points of every move, so that a check can tell that the
 panels are in phase.
 
+`tdcsg-motion-out --variants DIR` writes the same files for the variants of the loops that would
+replace the sliders (`TDCSGFigures.LoopVariants.variants`), which are not figures of the site.
+
 `scripts/check-motion.py` reads the folder: PILean's `tools/motion-browser-check.py` checks the
 standalone files, and PILean's `motion_browser.py` checks the moving pictures of the built site
 against the same expectations.
@@ -49,12 +52,16 @@ def writePanels (dir : System.FilePath) (name : String) (P : MotionPanels) :
 
 /-- Writes the files of every animation into the folder given (see the module docstring). -/
 def main (args : List String) : IO UInt32 := do
-  let [dir] := args | do
-    IO.eprintln "usage: tdcsg-motion-out DIR"
-    return 2
+  let (dir, motions) ← match args with
+    | [dir] => pure (dir, TDCSGTests.Motions.siteMotions)
+    | ["--variants", dir] =>
+      pure (dir, TDCSGFigures.LoopVariants.variants.map fun (n, P, _) => (n, P))
+    | _ => do
+      IO.eprintln "usage: tdcsg-motion-out [--variants] DIR"
+      return 2
   IO.FS.createDirAll dir
   let mut failed := false
-  for (name, P) in TDCSGTests.Motions.siteMotions do
+  for (name, P) in motions do
     let errors ← writePanels dir name P
     for e in errors do IO.eprintln e
     failed := failed || !errors.isEmpty

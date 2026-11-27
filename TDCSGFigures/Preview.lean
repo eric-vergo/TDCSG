@@ -28,6 +28,10 @@ frame pair of chapter 4 for another word (letters `a`, `b`, `A = a⁻¹`, `B = b
 marked by rings (`pivotMark`) or the riding disks faint (`faintDisks`), as
 `DIR/framePair-WORD[-rP_Q][-pivot][-faint]…`, and prints
 whether every declared move arrives exactly (`FramePairConfig.allArrive`).
+
+`tdcsg-figure-preview --variants DIR [NAME …]` writes the variants (all, or those named) of the loops that would replace the
+sliders (`TDCSGFigures.LoopVariants.variants`) in the same way, prints their errors and whether
+their exact checks hold, and exits with status 1 if one fails.
 -/
 
 namespace TDCSGFigures.Preview
@@ -163,6 +167,17 @@ where
 open PILean TDCSGFigures.Preview in
 /-- Renders the previews (see the module docstring). -/
 def main (args : List String) : IO UInt32 := do
+  if let "--variants" :: dir :: names := args then
+    IO.FS.createDirAll dir
+    let mut failed := false
+    for (name, P, exact) in TDCSGFigures.LoopVariants.variants do
+      if !names.isEmpty && !names.contains name then continue
+      let errors ← renderMotion dir name P
+      for e in errors do IO.println s!"  {e}"
+      IO.println s!"{name}: {P.keyCount} keys, {errors.size} errors, exact checks {exact}"
+      failed := failed || !errors.isEmpty || !exact
+    IO.println s!"wrote {dir}"
+    return if failed then 1 else 0
   if let "--frame-pair" :: word :: rest := args then
     let (opts, dir) ← IO.ofExcept (framePairOptions rest)
     IO.FS.createDirAll dir
