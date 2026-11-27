@@ -67,7 +67,8 @@ def no_site_scripts(c, site):
                      and not b.startswith("window.xref")]
     c.check("no inline script handles a figure", not figure_inline, str(figure_inline[:2]))
     explorers = sorted(str(page.relative_to(site)) for page in site.rglob("index.html")
-                       if "pilean-explorer-frame" in page.read_text(encoding="utf-8"))
+                       if re.search(r'class="[^"]*\bpilean-explorer\b',
+                                    page.read_text(encoding="utf-8")))
     c.check("no page shows an explorer", not explorers, str(explorers[:3]))
 
 
@@ -83,9 +84,15 @@ def page_checks(c, browser, base, url, expect, helpers):
         motion_browser.position_checks(c, page, sid, spec, f"{url} {name} (dark, 1440 px)")
     sizes = page.evaluate("""() => [...document.querySelectorAll('figure.pilean-figure')]
       .filter(f => f.querySelector('.pilean-motion')).map(f => {
-        const col = f.closest('main').querySelector('p');
-        return [f.getBoundingClientRect().width,
-                col ? col.getBoundingClientRect().width : 0]; })""")
+        // the text column: the most common width of the page's paragraphs (the front page's
+        // first paragraph is narrower than the column, and a few panels are wider)
+        const counts = new Map();
+        for (const p of f.closest('main').querySelectorAll('p')) {
+          const w = Math.round(p.getBoundingClientRect().width);
+          if (w > 0) counts.set(w, (counts.get(w) || 0) + 1);
+        }
+        const col = [...counts].reduce((a, b) => (b[1] > a[1] ? b : a), [0, 0])[0];
+        return [f.getBoundingClientRect().width, col]; })""")
     for fig, col in sizes:
         print(f"{url}: figure {fig:.0f} px in a text column of {col:.0f} px")
         c.check(f"{url}: the figure fits the text column", fig <= col + 0.5, f"{fig} {col}")
