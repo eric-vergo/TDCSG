@@ -1,11 +1,12 @@
 """Check the animations of the rendered blueprint in a headless Chromium.
 
-    python3 scripts/check-motion.py SITE EXPECT [SHOTS]
+    python3 scripts/check-motion.py SITE EXPECT [SHOTS] [--workers N]
 
-SITE is the generator's `html-multi` folder; EXPECT the folder that `lake exe tdcsg-motion-out
-EXPECT` writes from Lean: for each animation of the site, and for its narrow rendition, its
-animated SVG, the still of each key, the poster key's PNG and the exact expectations (PILean's own
-writer). SHOTS, if given, is a folder for screenshots.
+SITE is the generator's `html-multi` folder; EXPECT the folder that
+`lake exe tdcsg-motion-out EXPECT` writes from Lean: for each animation of the site, and for its
+narrow rendition, its animated SVG, the still of each key, the poster key's PNG and the exact
+expectations (PILean's own writer). SHOTS, if given, is a folder for screenshots. `--workers N`
+checks N pages at a time, each in its own Chromium (PILean's `motion_browser.py --workers`).
 
 The checks are PILean's, called on this site:
 
@@ -79,7 +80,8 @@ def page_checks(c, browser, base, url, expect, helpers):
     sizes = page.evaluate("""() => [...document.querySelectorAll('figure.pilean-figure')]
       .filter(f => f.querySelector('.pilean-motion')).map(f => {
         const col = f.closest('main').querySelector('p');
-        return [f.getBoundingClientRect().width, col ? col.getBoundingClientRect().width : 0]; })""")
+        return [f.getBoundingClientRect().width,
+                col ? col.getBoundingClientRect().width : 0]; })""")
     for fig, col in sizes:
         print(f"{url}: figure {fig:.0f} px in a text column of {col:.0f} px")
         c.check(f"{url}: the figure fits the text column", fig <= col + 0.5, f"{fig} {col}")
@@ -87,7 +89,16 @@ def page_checks(c, browser, base, url, expect, helpers):
 
 
 def main(argv):
-    if len(argv) not in (3, 4):
+    argv = list(argv)
+    workers = "1"
+    if "--workers" in argv:
+        i = argv.index("--workers")
+        if i + 1 >= len(argv):
+            print(__doc__)
+            return 2
+        workers = argv[i + 1]
+        del argv[i:i + 2]
+    if len(argv) not in (3, 4) or not workers.isdigit():
         print(__doc__)
         return 2
     site, expect = Path(argv[1]).resolve(), Path(argv[2]).resolve()
@@ -97,7 +108,7 @@ def main(argv):
         [sys.executable, "-I", str(pilean / "tools/motion-browser-check.py"), str(expect)])
     run(c, "PILean's check of the animations in the site's pages",
         [sys.executable, "-I", str(tools / "motion_browser.py"), str(site), "--expect",
-         str(expect)] + (["--shots", shots] if shots else []))
+         str(expect), "--workers", workers] + (["--shots", shots] if shots else []))
     no_site_scripts(c, site)
     helpers = {"new_page": site_browser.new_page, "goto": site_browser.goto}
     server, base = site_browser.serve(str(site))

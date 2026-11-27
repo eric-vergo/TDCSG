@@ -5,6 +5,7 @@ Authors: Eric Vergo, Claude Fable 5.2
 import PILean.Trust.Attr
 import TDCSGFigures.Data.PartTwo
 import TDCSGFigures.Style
+import TDCSGFigures.Data.Moves
 
 /-!
 # The figures of chapter 7, confinement
@@ -14,10 +15,13 @@ import TDCSGFigures.Style
   with the edges of the graph and the window. For each coordinate `j` the good levels nearest the
   gap `|m| ≤ 2`, the candidates for the walls `lo` and `hi` of the confinement proof, are computed
   (`nearestWalls`) and stated with the figure, for its caption.
-* `walkToLeaf`: a stepper along a path of the center graph at `r = 2.13`, `x = 1/5`, found by a
-  breadth-first search from `0`: it lowers the coordinate `n₂` from `0` to `-4`, crosses the good
-  level `-5` into the label `n = (0, 3, -5, 4, -2)`, whose other candidates `n + eₖ` all lie
-  outside the window, and can only step back.
+* `walkToLeaf`: an animation of a walk along a path of the center graph at `r = 2.13`, `x = 1/5`,
+  found by a breadth-first search from `0` (an illustration): a circle slides from label to label,
+  one step `±eⱼ` at a time (a slide by `±ζʲ`), and the edges and labels appear as it reaches them;
+  it lowers the coordinate `n₂` from `0` to `-4`, crosses the good level `-5` into the label
+  `n = (0, 3, -5, 4, -2)`, whose other candidates `n + eₖ` all lie outside the window, and steps
+  back; at the last key the labels are numbered in the order of the walk. Every slide is checked
+  exactly (`walkArrives`).
 -/
 
 namespace TDCSGFigures.Confinement
@@ -43,11 +47,11 @@ def edgesAmong (labels : List Label) : List (Label × Label) :=
         if labels.contains m then some (n, m) else none
     else []
 
-/-- A label drawn at its projection: a dot in the colour of left centres for weight zero, a square
-in the colour of right centres for weight one, titled with its integer vector, recording that it
-lies in the window `title`. -/
-def labelPoint (n : Label) (rel : Incidence) (window : String) : Item :=
-  let it := Plane.Exact.point (proj n) |>.size 4.5
+/-- A label drawn at its projection, a marker of radius `size`: a dot in the colour of left centres
+for weight zero, a square in the colour of right centres for weight one, titled with its integer
+vector, recording that it lies in the window `title`. -/
+def labelPoint (n : Label) (rel : Incidence) (window : String) (size : Float := 4.5) : Item :=
+  let it := Plane.Exact.point (proj n) |>.size size
     |>.named s!"the label {labelText n}, weight {weight n}"
     |>.incident rel window
   if weight n == 0 then it.role leftRole else it.role rightRole |>.marker .square
@@ -148,12 +152,53 @@ def walkSide (n : Label) : Incidence :=
 /-- The world box of the walk's frames. -/
 def walkView : Box := ⟨-1.0, -1.95, 2.3, 1.3⟩
 
-/-- The frame of `walkToLeaf` that draws the first `k` labels of the path, numbered in the order
-of the walk, with the candidates `n + eₖ` of the leaf when `candidates`, and the step back when
-`back`. -/
-def walkFrame (k : Nat) (candidates back : Bool) (title : String) : Plane.Figure :=
-  let ps := path.take k
+/-- The radius of the circle that marks where the walk is. -/
+def walkerRadius : Rat := 1 / 20
+
+/-- The radius of the markers of the labels of the walk, in pixels, small enough that the markers
+of `n + e₂` and of the window centre stay apart at the narrow width. -/
+def walkMarkerSize : Float := 3.5
+
+/-- The label where the walk is at key `k` of `walkToLeaf`: `path[k]` up to the leaf (`k ≤ 14`),
+the leaf at key `15`, and `n + e₂` at key `16`, after the step back. -/
+def walkAt (k : Nat) : Label :=
+  if k ≤ path.length - 1 then path.getD k zeroLabel
+  else if k == path.length then leafN
+  else beforeLeaf
+
+/-- The number of labels of the path drawn at key `k`: `k + 1` up to the leaf, all after. -/
+def walkShown (k : Nat) : Nat := min (k + 1) path.length
+
+/-- The unit vector of the step from `a` to `b` and its sign, `(j, s)` with `b = a + s eⱼ`. -/
+def stepDir (a b : Label) : Nat × Int :=
+  ((List.range 5).find? (fun j => b == shift a j 1 || b == shift a j (-1))).elim (0, 0) fun j =>
+    (j, if b == shift a j 1 then 1 else -1)
+
+/-- The anchor of the circle that marks where the walk is at key `k`: `P(walkAt k)`. The drawing
+(`walker`) and the exact arrival check read this same point. -/
+def walkerAnchors (k : Nat) : List ZetaFrac := [ZetaFrac.ofZeta (proj (walkAt k))]
+
+/-- The circle that marks where the walk is (actor `"walker"`), about `walkerAnchors k`. -/
+def walker (k : Nat) : Item :=
+  Plane.Exact.circle ((walkerAnchors k).headD (ZetaFrac.ofZeta origin)) walkerRadius |>.width 2
+    |>.named "a circle about the label where the walk is" |>.withId "walker"
+
+/-- The labels of the path numbered at the last key of `walkToLeaf`, in the order of the walk: all
+but `0`, `n + e₂` and `n`, which have their names. -/
+def walkNumbered : List Nat := (List.range (path.length - 3)).map (· + 1)
+
+/-- The items of key `k` of `walkToLeaf` (`k ≤ 16`): the window, the edges and labels of the path up
+to `path[k]` (all of it from key `14` on); from key `15` on the
+candidates `n + eₖ` of the leaf, `k ≠ 2`, outside the window; at key `16` the step back and the
+labels of the path numbered in the order of the walk (`walkNumbered`); the
+circle about the label where the walk is. Each part of the path, each candidate and the step back
+is an actor that appears with the key that first shows it. -/
+def walkKey (k : Nat) : Plane.Figure :=
+  let shown := walkShown k
+  let ps := path.take shown
   let steps := ps.zip ps.tail
+  let candidates := decide (path.length ≤ k)
+  let back := decide (path.length + 1 ≤ k)
   let window := "the window"
   { width := figureWidth
     view := some walkView
@@ -167,28 +212,33 @@ def walkFrame (k : Nat) (candidates back : Bool) (title : String) : Plane.Figure
         |>.declRef `TDCSG.Five.InWindow,
       Plane.Exact.point ((walkX, 0) : Rat × Rat) |>.role windowRole |>.marker .cross
         |>.named "the window center x = 1/5" |>.incident .inside window] ++
-      (steps.toArray.map fun (a, b) =>
+      (steps.toArray.mapIdx fun i (a, b) =>
         let last := b == leafN
         Plane.Exact.segment (proj a) (proj b) |>.width (if last then 3.5 else 1.5)
           |>.named (if last then
               "the step from n + e₂ to n: it lowers n₂ from −4 to the good level −5"
             else s!"the step from {labelText a} to {labelText b}")
-          |>.declRef (if last then `TDCSG.Five.leaf_of_crossing else `TDCSG.Five.centerGraph)) ++
+          |>.declRef (if last then `TDCSG.Five.leaf_of_crossing else `TDCSG.Five.centerGraph)
+          |>.withId s!"edge-{i}") ++
       (if candidates then (List.range 5).toArray.filterMap fun j =>
         if j == 2 then none else
           some (Plane.Exact.segment (proj leafN) (proj (shift leafN j 1)) |>.faint |>.dashed
-            |>.named s!"the rejected step from n to n + e{sub j}") else #[]) ++
-      (ps.toArray.map fun n => labelPoint n (walkSide n) window) ++
+            |>.named s!"the rejected step from n to n + e{sub j}" |>.withId s!"reject-{j}")
+        else #[]) ++
+      (ps.toArray.mapIdx fun i n =>
+        labelPoint n (walkSide n) window walkMarkerSize |>.withId s!"label-{i}") ++
       (if candidates then (List.range 5).toArray.filterMap fun j =>
         if j == 2 then none else
           let m := shift leafN j 1
-          some (Plane.Exact.point (proj m) |>.faint |>.marker .ring |>.size 4.5
+          some (Plane.Exact.point (proj m) |>.faint |>.marker .ring |>.size walkMarkerSize
             |>.named s!"n + e{sub j} = {labelText m}, outside the window"
-            |>.incident (walkSide m) window) else #[]) ++
+            |>.incident (walkSide m) window |>.withId s!"candidate-{j}") else #[]) ++
       (if back then #[Plane.Exact.arrow (proj leafN) (proj beforeLeaf) |>.width 2
           |>.named "the only step from n: back to n + e₂"
-          |>.declRef `SimpleGraph.Reachable.mem_or_exists_adj_of_leaf] else #[]) ++ #[
-      Plane.Exact.label "0" origin (.toward (Plane.deg 200)) |>.role leftRole,
+          |>.declRef `SimpleGraph.Reachable.mem_or_exists_adj_of_leaf |>.withId "back"]
+        else #[]) ++
+      #[walker k] ++ #[
+      Plane.Exact.label "0" origin (.toward (Plane.deg 200)) (some 14) |>.role leftRole,
       Plane.Exact.label "window" ((rat (1 / 5), rat (23 / 20)) : QSqrt5 × QSqrt5)
         |>.role windowRole,
       Plane.Exact.label "dots: weight 0 (left centers)"
@@ -197,34 +247,122 @@ def walkFrame (k : Nat) (candidates back : Bool) (title : String) : Plane.Figure
         ((rat (2 / 5), rat (-8 / 5)) : QSqrt5 × QSqrt5) |>.role rightRole,
       Plane.Exact.label "×: the window center x = 1/5"
         ((rat (2 / 5), rat (-7 / 4)) : QSqrt5 × QSqrt5) |>.role windowRole] ++
-      (ps.toArray.mapIdx fun i n => if i == 0 || n == leafN || n == beforeLeaf then #[] else
-        #[Plane.Exact.label s!"{i}" (proj n) .auto |>.size 11]).flatten ++
-      (if k ≥ path.length - 1 then #[Plane.Exact.label "n + e₂" (proj beforeLeaf) .auto
-        |>.role rightRole] else #[]) ++
-      (if k ≥ path.length then #[Plane.Exact.label "n" (proj leafN) .auto |>.role leftRole,
+      (if shown ≥ path.length - 1 then #[Plane.Exact.label "n + e₂" (proj beforeLeaf) .auto
+        |>.role rightRole |>.withId "name-before"] else #[]) ++
+      (if shown ≥ path.length then #[Plane.Exact.label "n" (proj leafN)
+          (.toward (Plane.deg (-36))) (some 14) |>.role leftRole
+          |>.withId "name-leaf",
         Plane.Exact.label "n₂ = −5 at n: a good level"
-          ((rat (2 / 5), rat (-19 / 10)) : QSqrt5 × QSqrt5) |>.role goodRole] else #[]) ++
+          ((rat (2 / 5), rat (-19 / 10)) : QSqrt5 × QSqrt5) |>.role goodRole
+          |>.withId "good-level"] else #[]) ++
       (if candidates then (List.range 5).toArray.filterMap fun j =>
         if j == 2 then none else
-          some (Plane.Exact.label s!"n + e{sub j}" (proj (shift leafN j 1)) .auto |>.faint)
-        else #[])
-    info := { title } }
+          some (Plane.Exact.label s!"n + e{sub j}" (proj (shift leafN j 1)) .auto |>.faint
+            |>.withId s!"candidate-label-{j}")
+        else #[]) ++
+      (if back then (walkNumbered.toArray.map fun i =>
+          Plane.Exact.label s!"{i}" (proj (path.getD i zeroLabel)) .auto |>.size 11
+            |>.withId s!"number-{i}") else #[])
+    info := { title := s!"The walk at key {k}" } }
 
-/-- The steps of `walkToLeaf`, with their captions. -/
-def walkFrames : Array (String × Plane.Figure) := #[
-  ("the walk from 0 lowers n₂ from 0 to −4", walkFrame (path.length - 1) false false
-    "A path of the center graph from 0 to n + e₂ = (0, 3, −4, 4, −2)"),
-  ("it crosses the good level n₂ = −5 into n", walkFrame path.length false false
-    "The step into n = (0, 3, −5, 4, −2) crosses the good level −5 of n₂"),
-  ("n is a leaf: its other candidates lie outside the window", walkFrame path.length true false
-    "The other candidates n + eₖ of n lie outside the window"),
-  ("the walk can only step back", walkFrame path.length true true
-    "From the leaf n the only step leads back to n + e₂")]
+/-- The step `k` of the walk as text: its unit vector with its sign. -/
+def stepText (k : Nat) : String :=
+  let (j, sgn) := stepDir (path.getD k zeroLabel) (path.getD (k + 1) zeroLabel)
+  s!"{if sgn == 1 then "+" else "−"} e{sub j}"
 
-/-- A path of the center graph at r = 2.13, x = 1/5 from 0 lowers n₂ to −4, crosses the good level
-−5 into a leaf and is forced back. -/
-@[figure]
-def walkToLeaf : Explorer := Plane.stepper walkFrames
+/-- The caption of key `k` of `walkToLeaf`. -/
+def walkCaption (k : Nat) : String :=
+  let n := path.getD k zeroLabel
+  if k == 0 then
+    "A walk in the center graph at r = 2.13, x = 1/5, from the label 0, along a path that a \
+      breadth-first search found; the circle marks where the walk is. Each step adds or removes \
+      one unit vector eⱼ, and every label lies in the window."
+  else if k + 2 < path.length then
+    s!"Move {k}: {stepText (k - 1)}, to {labelText n}; n₂ = {intText (n.getD 2 0)}."
+  else if k + 2 == path.length then
+    s!"Move {k}: {stepText (k - 1)}, to n + e₂ = {labelText n}: n₂ has fallen from 0 to −4."
+  else if k + 1 == path.length then
+    s!"Move {k}: {stepText (k - 1)}, into n = {labelText n}: the step crosses the good level −5 \
+      of n₂."
+  else if k == path.length then
+    "n is a leaf: its other candidates n + eₖ, k ≠ 2, lie outside the window (open rings at the \
+      ends of dashed spokes)."
+  else
+    "From the leaf n the only step leads back to n + e₂, as the one-step lemma requires. The \
+      labels of the path are numbered in the order of the walk."
+
+/-- The ids of the labels of text that key `k` of `walkToLeaf` shows and that appear during the
+walk: the names `n + e₂` (from key `13` on), `n` and its good level (from key `14` on), the
+names of the candidates (from key `15` on) and the numbers of the labels (at key `16`). -/
+def walkNameIds (k : Nat) : List String :=
+  (if path.length - 2 ≤ k then ["name-before"] else []) ++
+    (if path.length - 1 ≤ k then ["name-leaf", "good-level"] else []) ++
+    (if path.length ≤ k then [0, 1, 3, 4].map (s!"candidate-label-{·}") else []) ++
+    (if path.length + 1 ≤ k then walkNumbered.map (s!"number-{·}") else [])
+
+/-- The declared moves from key `k` to key `k + 1` of `walkToLeaf`: along the path, the circle
+slides from `P(path[k])` to `P(path[k + 1])`, by `±ζʲ` for a step `±eⱼ`, while the edge and the
+label it reaches appear, with the names that key `k + 1` shows first; at the leaf, the candidates,
+their spokes and their names appear; then the circle slides back to `P(n + e₂)` while the step
+back appears. -/
+def walkMoves (k : Nat) : List (String × ExactMove ZetaFrac) :=
+  let slide :=
+    ("walker", ExactMove.slide (ZetaFrac.ofZeta (proj (walkAt (k + 1)) - proj (walkAt k))))
+  let names := ((walkNameIds (k + 1)).filter (!(walkNameIds k).contains ·)).map (·, .appear)
+  if k + 1 < path.length then
+    [slide, (s!"edge-{k}", .appear), (s!"label-{k + 1}", .appear)] ++ names
+  else if k + 1 == path.length then
+    ([0, 1, 3, 4].map (s!"reject-{·}", .appear)) ++
+      ([0, 1, 3, 4].map (s!"candidate-{·}", .appear)) ++ names
+  else [slide, ("back", .appear)] ++ names
+
+/-- The exact anchors of the actors of key `k` of `walkToLeaf` that move or carry a meaning by
+their place: the circle about `P(walkAt k)`, the labels of the path shown (`P(path[i])`), the
+ends of the edges, the candidates and their spokes, and the ends of the step back; the labels of
+text are listed without anchors. -/
+def walkActors (k : Nat) : List (ExactActor ZetaFrac) :=
+  let z := ZetaFrac.ofZeta
+  let ps := path.take (walkShown k)
+  let cands := if path.length ≤ k then [0, 1, 3, 4] else []
+  [⟨"walker", walkerAnchors k⟩] ++
+    ((ps.zip ps.tail).zipIdx.map fun ((a, b), i) => ⟨s!"edge-{i}", [z (proj a), z (proj b)]⟩) ++
+    (ps.zipIdx.map fun (n, i) => ⟨s!"label-{i}", [z (proj n)]⟩) ++
+    (cands.map fun j => ⟨s!"reject-{j}", [z (proj leafN), z (proj (shift leafN j 1))]⟩) ++
+    (cands.map fun j => ⟨s!"candidate-{j}", [z (proj (shift leafN j 1))]⟩) ++
+    (if path.length + 1 ≤ k then [⟨"back", [z (proj leafN), z (proj beforeLeaf)]⟩] else []) ++
+    (walkNameIds k).map fun id => ⟨id, []⟩
+
+/-- Whether every declared move of `walkToLeaf` carries the actors of one key onto those of the
+next, exactly in `ℚ(ζ₅)`. -/
+def walkArrives : Bool := allArrive (path.length + 1) walkMoves walkActors
+
+/-- The number of keys of `walkToLeaf`: one per label of the path, the candidates, the step
+back. -/
+def walkKeyCount : Nat := path.length + 2
+
+/-- A path of the center graph at r = 2.13, x = 1/5 from 0, walked step by step: it lowers n₂ to
+−4, crosses the good level −5 into a leaf, finds the other candidates outside the window and is
+forced back. It has no narrow rendition: at the narrow width the marker of n + e₂ would touch the
+window center and the legend would cover the candidate n + e₄, so on a small screen the picture
+is scaled down as a whole. -/
+@[figure illustration]
+def walkToLeaf : MotionPanels where
+  panels := #[{ motion := { keys := ((List.range walkKeyCount).map walkKey).toArray,
+                            steps := ((List.range (walkKeyCount - 1)).map fun k =>
+                              exactStep (walkMoves k)).toArray } }]
+  captions := ((List.range walkKeyCount).map walkCaption).toArray
+  pacing := motionPacing
+  timing := ((List.range (walkKeyCount - 1)).map fun k => moveTiming (walkMoves k)).toArray
+  info := { title := "A walk meets a wall"
+            description := "A path of the center graph at r = 2.13, x = 1/5, inside the \
+              circular window, walked from the label 0 one step at a time, a circle marking \
+              where the walk is and each label drawn as it is reached (dots for weight zero, \
+              squares for weight one). It lowers n₂ from 0 to −4 and crosses the good level −5 \
+              into the label n at the window's edge; the other candidates of n appear outside \
+              the window, and the walk steps back to n + e₂." }
+  checks := .fail
+  poster := walkKeyCount - 1
+  width := figureWidth
 
 /-! ### The facts the figures show -/
 

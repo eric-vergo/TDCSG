@@ -1,22 +1,29 @@
 /-
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Eric Vergo, Claude Fable 5.2
+Authors: Eric Vergo, Claude Fable 5.2, Claude Opus 5.5
 -/
 import PILean.Trust.Attr
 import TDCSGFigures.Data.Early
+import TDCSGFigures.Data.Moves
 import TDCSGFigures.Style
 
 /-!
 # The figures of chapter 2, two disks and the critical radius
 
-* `generatorStep`: the closed disks of radius `3/2` about `-1` and `1`, their lens, and one step
-  of the left generator: `a` turns `0` clockwise through `72°` about `-1`, to `a(0) = -1 + ζ⁴`.
-* `wordSteps`: a stepper that follows `0` through the word `a b b a` at radius `2.1`, letter by
-  letter; a letter turns the point when the point lies in the letter's closed disk and leaves it
-  where it is otherwise.
+* `generatorStep`: an animation of one step of the left generator at radius `3/2`. The left disk
+  turns a fifth of a turn clockwise about `-1`, carrying the points inside it (`turnedSamples`,
+  the origin among them) and leaving the points outside it where they are (`fixedSamples`);
+  then the turn is drawn as an arc from `0` to `a(0) = -1 + ζ⁴`. Its last key frame is the figure
+  of one step of the generator (`generatorStepFinal`), which keeps its linked theorem.
+* `wordSteps`: an animation that follows `0` through the word `a b b a` at radius `2.1`, letter by
+  letter (an illustration): a letter turns the point a fifth of a turn about its centre when the
+  point lies in the letter's closed disk, and the last letter, whose disk does not hold the point,
+  leaves it where it is.
 
 Every point is exact in `ℤ[ζ₅]`, every radius rational, and every incidence the figures record is
-decided exactly in `ℚ(√5)` (`generatorStep_spec`, `wordSteps_spec`).
+decided exactly in `ℚ(√5)`; every declared move is checked exactly (`generatorArrives`,
+`stepsArrive`). The statements are `generatorStep_spec`, `generatorStep_keys` and
+`wordSteps_spec`.
 -/
 
 namespace TDCSGFigures
@@ -28,8 +35,9 @@ open PILean PILean.Plane PILean.Exact TDCSGFigures.Early
 /-- The end `(19/10, -6/5)` of the drawn radius of the right disk: `|(9/10, -6/5)| = 3/2`. -/
 def rightSpokeEnd : Rat × Rat := (19 / 10, -6 / 5)
 
-/-- The items of `generatorStep`, in drawing order. -/
-def generatorStepItems : Array Item := #[
+/-- The items of `generatorStepFinal` before the marks of the turn: the disks, the lens, the
+drawn radius of the right disk and the segment from `-1` to `0`. -/
+def generatorBase : Array Item := #[
   Plane.Exact.disk leftCentre (3 / 2 : Rat) |>.noFill |>.role leftRole |>.named "the left circle"
     |>.describedBy "the closed disk of radius 3/2 about −1, turned by a" |>.declRef `TDCSG.genA,
   Plane.Exact.disk rightCentre (3 / 2 : Rat) |>.noFill |>.role rightRole
@@ -41,42 +49,197 @@ def generatorStepItems : Array Item := #[
     |>.dashed |>.named "a radius of the right disk, length 3/2",
   Plane.Exact.labelBeside "r = 1.5" ((1 : Rat), (0 : Rat)) rightSpokeEnd |>.role rightRole,
   Plane.Exact.segment leftCentre origin |>.role leftRole |>.width 1.5
-    |>.named "from −1 to 0",
+    |>.named "from −1 to 0"]
+
+/-- The marks of the turn, which the animation fades in after the turn (actors `"image-spoke"`,
+`"angle"`, `"angle-label"`, `"arc"`): the segment from `-1` to `a(0)`, the angle of `72°` and the
+arc from `0` to `a(0)`. -/
+def generatorMarks : Array Item := #[
   Plane.Exact.segment leftCentre aZero |>.role leftRole |>.width 1.5
-    |>.named "from −1 to a(0)",
+    |>.named "from −1 to a(0)" |>.withId "image-spoke",
   Plane.Exact.angleMark leftCentre 0 (-deg 72) (some 22) |>.role leftRole
-    |>.named "72° clockwise",
-  Plane.Exact.label "72°" leftCentre (.toward (-deg 112)) (some 26) |>.role leftRole |>.size 12,
+    |>.named "72° clockwise" |>.withId "angle",
+  Plane.Exact.label "72°" leftCentre (.toward (-deg 112)) (some 26) |>.role leftRole |>.size 12
+    |>.withId "angle-label",
   Plane.Exact.arc leftCentre (1 : Rat) (deg 0) (-deg 72) |>.withArrow |>.role leftRole
     |>.width 2 |>.dashed |>.named "a turns 0 through 72° clockwise about −1"
-    |>.declRef `TDCSG.diskRotation,
+    |>.declRef `TDCSG.diskRotation |>.withId "arc"]
+
+/-- The centres. -/
+def generatorCentres : Array Item := #[
   Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1",
-  Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1",
+  Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1"]
+
+/-- The origin, where it was before the turn (actor `"origin"`). -/
+def generatorOrigin : Item :=
   Plane.Exact.point origin |>.named "0" |>.incident .inside "the left circle"
-    |>.incident .inside "the right circle" |>.incident .inside "the lens",
+    |>.incident .inside "the right circle" |>.incident .inside "the lens" |>.withId "origin"
+
+/-- The point `a(0)` (actor `"image"`). -/
+def generatorImage : Item :=
   Plane.Exact.point aZero |>.role leftRole |>.named "a(0) = −1 + ζ⁴"
     |>.incident .inside "the left circle" |>.incident .outside "the right circle"
-    |>.incident .outside "the lens" |>.declRef `TDCSG.genA,
+    |>.incident .outside "the lens" |>.declRef `TDCSG.genA |>.withId "image"
+
+/-- The labels of the centres and of the origin. -/
+def generatorLabels : Array Item := #[
   Plane.Exact.label "−1" leftCentre .above |>.role leftRole,
   Plane.Exact.label "+1" rightCentre .above |>.role rightRole,
-  Plane.Exact.label "0" origin .aboveRight,
-  Plane.Exact.label "a(0)" aZero .below |>.role leftRole,
+  Plane.Exact.label "0" origin .aboveRight]
+
+/-- The label of `a(0)` (actor `"image-label"`). -/
+def generatorImageLabel : Item :=
+  Plane.Exact.label "a(0)" aZero .below |>.role leftRole |>.withId "image-label"
+
+/-- The names of the disks and of the lens. -/
+def generatorNames : Array Item := #[
   Plane.Exact.label "left disk" ((-8 / 5 : Rat), (3 / 4 : Rat)) |>.role leftRole,
   Plane.Exact.label "right disk" ((8 / 5 : Rat), (3 / 4 : Rat)) |>.role rightRole,
   Plane.Exact.label "lens" ((0 : Rat), (5 / 8 : Rat)) |>.role lensRole |>.size 13]
 
-/-- The closed disks of radius 1.5 about −1 and 1 and their lens; the left generator a turns the
-origin clockwise through 72° about −1, to a(0) = −1 + ζ⁴. The origin lies in both disks, a(0) in
-the left disk only. -/
-@[figure]
-def generatorStep : Plane.Figure where
+/-- The figure of one step of the left generator, the last key frame of `generatorStep`: the
+closed disks of radius 1.5 about −1 and 1 and their lens; the left generator a turns the origin
+clockwise through 72° about −1, to a(0) = −1 + ζ⁴. The origin lies in both disks, a(0) in the
+left disk only. -/
+def generatorStepFinal : Plane.Figure where
   width := figureWidth
-  narrowWidth := some narrowWidth
   padding := 16
   style := houseStyle
   checks := .fail
-  items := generatorStepItems
+  items := generatorBase ++ generatorMarks ++ generatorCentres ++
+    #[generatorOrigin, generatorImage] ++ generatorLabels ++ #[generatorImageLabel] ++
+    generatorNames
   info := { title := "One step of the left generator" }
+
+/-- The points of the left disk that the animation turns with it: `0` (on the circle of radius
+`1` about `-1`), `-1 + φ⁻¹ ζ³`, `ζ⁴ - 2 = -1 + (ζ⁴ - 1)` and `-1 + ζ² - ζ³`
+(`φ⁻¹ = ζ + ζ⁴`). -/
+def turnedSamples : List Zeta5 :=
+  [origin, leftCentre + phiInv * zeta 3, zeta 4 - Zeta5.ofInt 2, leftCentre + zeta 2 - zeta 3]
+
+/-- Points just outside the left disk, which the animation leaves where they are: `φ⁻¹`, in the
+right disk, and `-1 + φ ζ²`, `-1 + φ ζ³` (`φ = 1 + φ⁻¹`), at distance `φ > 3/2` from `-1`. -/
+def fixedSamples : List Zeta5 :=
+  [phiInv, leftCentre + (Zeta5.ofInt 1 + phiInv) * zeta 2,
+    leftCentre + (Zeta5.ofInt 1 + phiInv) * zeta 3]
+
+/-- The points of `turnedSamples` after the turn by `a`, `-1 + ζ⁴ (z + 1)`. -/
+def turnedImages : List Zeta5 := turnedSamples.map Letter.a.rotate
+
+/-- The anchors of the content of the left disk that turns, with the samples at `zs`: the first
+sample and `-1` (the ends of its segment), then every sample (the first one's point and the
+dots). The drawing (`turningContentAt`) and the exact arrival check read these same points. -/
+def turningAnchors (zs : List Zeta5) : List ZetaFrac :=
+  let z := ZetaFrac.ofZeta (zs.headD origin)
+  [z, ZetaFrac.ofZeta leftCentre] ++ zs.map ZetaFrac.ofZeta
+
+/-- The content of the left disk that turns (actor `"disk"`), drawn at the anchors `as`
+(`turningAnchors`): the segment between the first two, the third as a point and the others as
+small dots, each recording that it lies inside the left disk. -/
+def turningContentAt (as : List ZetaFrac) : Item :=
+  let o := ZetaFrac.ofZeta origin
+  (group (#[Plane.Exact.segment (as.getD 0 o) (as.getD 1 o) |>.role leftRole |>.width 1.5,
+      Plane.Exact.point (as.getD 2 o) |>.role leftRole] ++
+    (as.drop 3).toArray.map fun w =>
+      Plane.Exact.point w |>.role leftRole |>.size 3 |>.incident .inside "the left circle"))
+    |>.named "points of the left disk, which a turns" |>.withId "disk"
+
+/-- The content of the left disk with the samples at `zs`. -/
+def turningContent (zs : List Zeta5) : Item := turningContentAt (turningAnchors zs)
+
+/-- The anchors of the points outside the left disk. -/
+def fixedAnchors : List ZetaFrac := fixedSamples.map ZetaFrac.ofZeta
+
+/-- The points outside the left disk (actor `"outside"`), drawn at `fixedAnchors`, each recording
+that it lies outside. -/
+def fixedContent : Item :=
+  group (fixedAnchors.toArray.map fun w =>
+      Plane.Exact.point w |>.size 3 |>.incident .outside "the left circle")
+    |>.named "points outside the left disk, which a fixes" |>.withId "outside"
+
+/-- The samples of the left disk at key `k`: `turnedSamples` before the turn, `turnedImages` after
+it. -/
+def generatorSamples (k : Nat) : List Zeta5 := if k == 0 then turnedSamples else turnedImages
+
+/-- The items of key `k` of `generatorStep`, `k ≤ 1`: the content of the left disk, the origin and
+the samples inside it, before (`k = 0`) or after the turn, and the points outside it, between the
+base and the centres of `generatorStepFinal`, in place of its marks of the turn, the origin,
+`a(0)` and its label. -/
+def generatorKeyItems (k : Nat) : Array Item :=
+  generatorBase ++
+    #[turningContent (generatorSamples k), fixedContent] ++
+    generatorCentres ++ generatorLabels ++ generatorNames
+
+/-- The captions of the keys of `generatorStep`. -/
+def generatorCaptions : Array String := #[
+  "The left generator a acts on its closed disk of radius 1.5 about −1. The points inside the \
+    disk, the origin among them (drawn in the color of the left disk), turn with it; the points \
+    outside it stay where they are.",
+  "a turns the disk a fifth of a turn clockwise about −1: the origin goes to a(0) = −1 + ζ⁴, \
+    and the points outside the left disk have not moved.",
+  "One step of the left generator: a turns the origin through 72° clockwise about −1, along the \
+    dashed arc, to a(0). The origin lies in both disks, a(0) in the left disk only."]
+
+/-- Key `k` of `generatorStep`, `k ≤ 1`: the items `generatorKeyItems k` in the frame of
+`generatorStepFinal`. -/
+def generatorKey (k : Nat) : Plane.Figure :=
+  { generatorStepFinal with items := generatorKeyItems k,
+                            info := { title := generatorCaptions.getD k "" } }
+
+/-- The keys of `generatorStep`: two keys, then the figure `generatorStepFinal`. -/
+def generatorKeys : Array Plane.Figure := #[generatorKey 0, generatorKey 1, generatorStepFinal]
+
+/-- The turn of the left disk: about `-1`, by the fraction of `a`, `-1/5` of a full turn
+(clockwise). -/
+def generatorTurn : ExactTurn := ⟨ZetaFrac.ofZeta leftCentre, Letter.a.turns⟩
+
+/-- The declared moves of the steps of `generatorStep`: the content of the left disk turns; then
+it and the points outside vanish while the marks of the turn, the origin, `a(0)` and its label
+appear. -/
+def generatorMoves : Nat → List (String × ExactMove ZetaFrac)
+  | 0 => [("disk", .turn generatorTurn)]
+  | _ => [("disk", .vanish), ("outside", .vanish), ("image-spoke", .appear), ("angle", .appear),
+      ("angle-label", .appear), ("arc", .appear), ("origin", .appear), ("image", .appear),
+      ("image-label", .appear)]
+
+/-- The exact anchors of the actors of key `k` of `generatorStep`: at keys `0` and `1`, the
+content of the disk (`turningAnchors` of the samples of the key) and the points outside
+(`fixedAnchors`), the same points the key draws; at key `2`, the marks of the turn (the ends of
+the segment and of the arc, the centre of the angle and of its label), the origin, `a(0)` and its
+label, which only appear. -/
+def generatorActors (k : Nat) : List (ExactActor ZetaFrac) :=
+  let z := ZetaFrac.ofZeta
+  if k ≤ 1 then
+    [⟨"disk", turningAnchors (generatorSamples k)⟩, ⟨"outside", fixedAnchors⟩]
+  else
+    [⟨"image-spoke", [z leftCentre, z aZero]⟩, ⟨"angle", [z leftCentre]⟩,
+      ⟨"angle-label", [z leftCentre]⟩, ⟨"arc", [z origin, z aZero]⟩, ⟨"origin", [z origin]⟩,
+      ⟨"image", [z aZero]⟩, ⟨"image-label", [z aZero]⟩]
+
+/-- Whether every declared move of `generatorStep` carries the actors of one key onto those of the
+next, exactly in `ℚ(ζ₅)`. -/
+def generatorArrives : Bool := allArrive 2 generatorMoves generatorActors
+
+/-- One step of the left generator at radius 1.5: the left disk turns a fifth of a turn clockwise
+about −1, carrying the points inside it, the origin to a(0) = −1 + ζ⁴, and leaving the points
+outside it where they are; then the turn is drawn as an arc. The last key frame is the figure of
+the step, `generatorStepFinal`. -/
+@[figure]
+def generatorStep : MotionPanels where
+  panels := #[{ motion := { keys := generatorKeys,
+                            steps := ((List.range 2).map (exactStep ∘ generatorMoves)).toArray } }]
+  captions := generatorCaptions
+  pacing := motionPacing
+  timing := ((List.range 2).map fun k => moveTiming (generatorMoves k)).toArray
+  info := { title := "One step of the left generator"
+            description := "The closed disks of radius 1.5 about −1 and 1 and their lens. The \
+              left disk turns a fifth of a turn clockwise about −1 and carries the points inside \
+              it: the origin goes to a(0) = −1 + ζ⁴. The points outside the left disk stay \
+              where they are. Then the turn is drawn as a dashed arc from 0 to a(0)." }
+  checks := .fail
+  poster := 2
+  width := figureWidth
+  narrowWidth := some narrowWidth
 
 /-! ### A word, letter by letter -/
 
@@ -84,10 +247,10 @@ def generatorStep : Plane.Figure where
 decided exactly. -/
 def withSidesStep (z : Zeta5) (it : Item) : Item := recordSides r2Step z it
 
-/-- The labels `z₀, …, z₄` of the points of the stepper. -/
+/-- The labels `z₀, …, z₄` of the points of the word. -/
 def stepName (k : Nat) : String := s!"z{#["₀", "₁", "₂", "₃", "₄"].getD k ""}"
 
-/-- What every frame of the stepper draws: the two closed disks of radius 2.1, their lens, the
+/-- What every key of `wordSteps` draws: the two closed disks of radius 2.1, their lens, the
 centres and the names. -/
 def stepBase : Array Item := #[
   Plane.Exact.disk leftCentre (21 / 10 : Rat) |>.noFill |>.role leftRole |>.named "the left circle"
@@ -101,62 +264,158 @@ def stepBase : Array Item := #[
   withSidesStep leftCentre (Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1"),
   withSidesStep rightCentre
     (Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1"),
-  Plane.Exact.label "−1" leftCentre .auto |>.role leftRole,
-  Plane.Exact.label "+1" rightCentre .auto |>.role rightRole,
+  Plane.Exact.label "−1" leftCentre .left (some 24) |>.role leftRole,
+  Plane.Exact.label "+1" rightCentre .right (some 24) |>.role rightRole,
   Plane.Exact.label "left disk, radius 2.1" ((-1 : Rat), (-5 / 2 : Rat)) |>.role leftRole,
   Plane.Exact.label "right disk, radius 2.1" ((1 : Rat), (5 / 2 : Rat)) |>.role rightRole]
 
-/-- Frame `k` of the stepper: the base, the points `z₀, …, z_{k-1}` faint, the point `z_k`, and for
-`k ≥ 1` the turn of letter `k` as an arc from `z_{k-1}` to `z_k` about its centre, or, when the
-letter fixes the point, a note saying so beside the point. -/
-def stepFrame (k : Nat) : Plane.Figure :=
-  let pts := stepPoints
-  let z := pts.getD k origin
-  let past := (List.range k).filter (fun j => pts.getD j origin != z)
-  let move : Array Item := match k with
-    | 0 => #[]
-    | k + 1 =>
-      let l := stepWord.getD k .a
-      let z₀ := pts.getD k origin
-      let role := if l.centre == leftCentre then leftRole else rightRole
-      if z₀ == z then
-        #[Plane.Exact.label s!"{stepName (k + 1)} = {stepName k}: {l.text} fixes it" z .left
-            |>.role role]
-      else
-        let θ := angleFrom l.centre z₀
-        #[Plane.Exact.arc l.centre (SqrtOf.mk (z₀ - l.centre).normSq) θ (θ - deg 72)
-            |>.withArrow |>.role role |>.width 2 |>.dashed
-            |>.named s!"{l.text} turns {stepName k} through 72° clockwise"
-            |>.declRef (if l.centre == leftCentre then `TDCSG.genA else `TDCSG.genB)]
+/-- The point `z_k` of `0` under `a b b a` (`stepPoints`). -/
+def stepPoint (k : Nat) : Zeta5 := stepPoints.getD k origin
+
+/-- Whether letter `k + 1` of `a b b a` turns `z_k` (`Letter.covers`, decided exactly). -/
+def stepActs (k : Nat) : Bool := (stepWord.getD k .a).covers r2Step (stepPoint k)
+
+/-- The anchor of `z_k`: the point that the point following the word, its name at key `k` and the
+point left behind there are drawn at, and that the exact arrival check reads. -/
+def stepAnchors (k : Nat) : List ZetaFrac := [ZetaFrac.ofZeta (stepPoint k)]
+
+/-- The point that follows the word (actor `"point"`), at `stepAnchors k`. -/
+def stepMover (k : Nat) : Item :=
+  Plane.Exact.point ((stepAnchors k).headD (ZetaFrac.ofZeta origin)) |>.size 5
+    |>.named "the point followed through the word" |>.withId "point"
+
+/-- The name of the point at key `k`: `z_k`, and `z₄ = z₃` at the last key. -/
+def stepLabelText (k : Nat) : String := if k == 4 then "z₄ = z₃" else stepName k
+
+/-- The name of the point that follows the word at key `k` (actor `"name-<k>"`), at
+`stepAnchors k`. -/
+def stepLabel (k : Nat) : Item :=
+  Plane.Exact.label (stepLabelText k) ((stepAnchors k).headD (ZetaFrac.ofZeta origin)) .auto
+    |>.bold |>.withId s!"name-{k}"
+
+/-- The point `z_j` left behind (actor `"trail-<j>"`), at `stepAnchors j`: faint, with its label,
+recording where it stands relative to the disks. -/
+def stepTrail (j : Nat) : Item :=
+  let p := (stepAnchors j).headD (ZetaFrac.ofZeta origin)
+  (group #[withSidesStep (stepPoint j) (Plane.Exact.point p |>.faint),
+      Plane.Exact.label (stepName j) p .auto])
+    |>.named (stepName j) |>.withId s!"trail-{j}"
+
+/-- The points left behind at key `k`: `z_j` for `j < k` with `z_j ≠ z_k`. -/
+def stepTrailIndices (k : Nat) : List Nat :=
+  (List.range k).filter fun j => !(stepPoint j == stepPoint k)
+
+/-- The radius of the circle that marks the centre of the last turn. -/
+def stepPivotRadius : Rat := 1 / 5
+
+/-- The circle about the centre of the last turn at key `k`, for `1 ≤ k ≤ 3`, the keys after a
+letter that turns (actor `"pivot-left"` about `-1` or `"pivot-right"` about `1`). -/
+def stepPivot (k : Nat) : Array Item :=
+  if k == 0 || 3 < k then #[]
+  else
+    let c := (stepWord.getD (k - 1) .a).centre
+    let left := c == leftCentre
+    #[Plane.Exact.circle c stepPivotRadius |>.role (if left then leftRole else rightRole)
+      |>.width 2 |>.named s!"a circle about the center {if left then "−1" else "+1"} of the last \
+        turn" |>.withId (if left then "pivot-left" else "pivot-right")]
+
+/-- At key `4`, the segment from `-1` to `z₃` (actor `"reach"`), longer than the radius `2.1`:
+`z₃` lies outside the left disk, so the last `a` does not act. -/
+def stepReach (k : Nat) : Array Item :=
+  if k == 4 then
+    #[Plane.Exact.segment leftCentre (stepPoint 3) |>.role leftRole |>.width 1.5 |>.dashed
+      |>.named "from −1 to z₃, longer than 2.1" |>.withId "reach"]
+  else #[]
+
+/-- The items of key `k` of `wordSteps`. -/
+def stepKeyItems (k : Nat) : Array Item :=
+  stepBase ++ stepPivot k ++ stepReach k ++ (stepTrailIndices k).toArray.map stepTrail ++
+    #[stepMover k, stepLabel k]
+
+/-- The captions of the keys of `wordSteps`. -/
+def stepCaptions : Array String := #[
+  "z₀ = 0, in both disks. The word a b b a is applied to it at radius 2.1, letter by letter from \
+    left to right.",
+  "Letter 1, a: z₀ lies in the left disk, so a turns it a fifth of a turn clockwise about −1 \
+    (circled), to z₁.",
+  "Letter 2, b: z₁ lies in the right disk, so b turns it a fifth of a turn clockwise about +1 \
+    (circled), to z₂.",
+  "Letter 3, b: z₂ lies in the right disk, so b turns it again, to z₃.",
+  "Letter 4, a: z₃ lies outside the left disk, farther than 2.1 from −1 (dashed), so a leaves it \
+    where it is: z₄ = z₃."]
+
+/-- Key `k` of `wordSteps`. -/
+def stepKey (k : Nat) : Plane.Figure :=
   { width := figureWidth
     padding := 16
     style := houseStyle
     checks := .fail
-    items := stepBase ++ move ++
-      (past.toArray.map fun j =>
-        withSidesStep (pts.getD j origin)
-          (Plane.Exact.point (pts.getD j origin) |>.faint |>.named (stepName j))) ++
-      (past.toArray.map fun j =>
-        Plane.Exact.label (stepName j) (pts.getD j origin) .auto) ++
-      #[withSidesStep z (Plane.Exact.point z |>.named (stepName k)),
-        Plane.Exact.label (stepName k) z .auto |>.bold]
+    items := stepKeyItems k
     info := { title := s!"The point {stepName k} of 0 under a b b a at radius 2.1" } }
 
-/-- The captions of the stepper's frames. -/
-def stepCaptions : Array String := #[
-  "z₀ = 0, in both disks",
-  "a: z₀ is in the left disk; a turns it 72° clockwise about −1",
-  "b: z₁ is in the right disk; b turns it 72° clockwise about +1",
-  "b: z₂ is in the right disk; b turns it again",
-  "a: z₃ is outside the left disk; a leaves it where it is"]
+/-- The turn of letter `k + 1` of `a b b a`: about its centre by its own fraction, `-1/5` of a
+full turn. -/
+def stepTurn (k : Nat) : ExactTurn :=
+  let l := stepWord.getD k .a
+  ⟨ZetaFrac.ofZeta l.centre, l.turns⟩
 
-/-- The frames of the stepper with their captions. -/
-def stepFrames : Array (String × Plane.Figure) :=
-  stepCaptions.mapIdx fun k c => (c, stepFrame k)
+/-- The id of the circle about the centre of letter `k + 1` of `a b b a`. -/
+def stepPivotId (k : Nat) : String :=
+  if (stepWord.getD k .a).centre == leftCentre then "pivot-left" else "pivot-right"
 
-/-- The point 0 under the word a b b a at radius 2.1, letter by letter: a turns the point when it
-lies in the left closed disk and leaves it otherwise, b likewise with the right disk. -/
-@[figure]
-def wordSteps : Explorer := Plane.stepper stepFrames
+/-- The declared moves from key `k` to key `k + 1` of `wordSteps`: for the three letters that act,
+the point turns by `stepTurn k`, the circle about the letter's centre appears unless it is already
+there and the circle of the letter before vanishes, and the point left behind appears; for the
+last letter, which does not act, the segment from `-1` to `z₃` appears and the circle vanishes.
+At every step the name of the point fades out and the next one in. -/
+def stepMoves : Nat → List (String × ExactMove ZetaFrac)
+  | 0 => [("point", .turn (stepTurn 0)), (stepPivotId 0, .appear), ("trail-0", .appear),
+      ("name-0", .vanish), ("name-1", .appear)]
+  | 1 => [("point", .turn (stepTurn 1)), (stepPivotId 1, .appear), ("trail-1", .appear),
+      (stepPivotId 0, .vanish), ("name-1", .vanish), ("name-2", .appear)]
+  | 2 => [("point", .turn (stepTurn 2)), ("trail-2", .appear), ("name-2", .vanish),
+      ("name-3", .appear)]
+  | _ => [("reach", .appear), (stepPivotId 2, .vanish), ("name-3", .vanish), ("name-4", .appear)]
+
+/-- The exact anchors of the actors of key `k` of `wordSteps`: the circle about the centre of
+letter `k`, the segment from `-1` to `z₃` at key `4`, the points left behind, the point `z_k` and
+its name, the last three at the anchors they are drawn at (`stepAnchors`). -/
+def stepActors (k : Nat) : List (ExactActor ZetaFrac) :=
+  let z := ZetaFrac.ofZeta
+  let pivot : List (ExactActor ZetaFrac) :=
+    if k == 0 || 3 < k then []
+    else
+      let c := (stepWord.getD (k - 1) .a).centre
+      [⟨if c == leftCentre then "pivot-left" else "pivot-right", [z c]⟩]
+  let reach : List (ExactActor ZetaFrac) :=
+    if k == 4 then [⟨"reach", [z leftCentre, z (stepPoint 3)]⟩] else []
+  pivot ++ reach ++ (stepTrailIndices k).map (fun j => ⟨s!"trail-{j}", stepAnchors j⟩) ++
+    [⟨"point", stepAnchors k⟩, ⟨s!"name-{k}", stepAnchors k⟩]
+
+/-- Whether every declared move of `wordSteps` carries the actors of one key onto those of the
+next, exactly in `ℚ(ζ₅)`. -/
+def stepsArrive : Bool := allArrive 4 stepMoves stepActors
+
+/-- The point 0 under the word a b b a at radius 2.1, letter by letter: a turns the point a fifth
+of a turn clockwise about −1 when it lies in the left closed disk and leaves it otherwise, b
+likewise about +1 with the right disk; here the last a leaves the point where it is. -/
+@[figure illustration]
+def wordSteps : MotionPanels where
+  panels := #[{ motion := { keys := ((List.range 5).map stepKey).toArray,
+                            steps := ((List.range 4).map (exactStep ∘ stepMoves)).toArray } }]
+  captions := stepCaptions
+  pacing := motionPacing
+  timing := ((List.range 4).map fun k => moveTiming (stepMoves k)).toArray
+  info := { title := "The point 0 under the word a b b a"
+            description := "The closed disks of radius 2.1 about −1 and 1 and their lens. The \
+              origin is followed through the word a b b a, letters applied from left to right: \
+              a turns the point a fifth of a turn clockwise about −1 when it lies in the left \
+              disk, b likewise about +1 with the right disk. The first three letters turn it; \
+              the point the last a meets lies outside the left disk and stays. A small circle \
+              marks the center of the last turn, and the points left behind stay faint." }
+  checks := .fail
+  poster := 4
+  width := figureWidth
+  narrowWidth := some narrowWidth
 
 end TDCSGFigures

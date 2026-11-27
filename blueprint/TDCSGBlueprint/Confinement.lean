@@ -90,13 +90,15 @@ meet a wall at all. To watch a walk from $`0` meet a wall, {figref "walk-to-leaf
 window, $`r=2.13` and $`x=1/5`, where the component of $`0` has 131 labels and two of its edges cross
 a good level; it follows one of them.
 
-:::figure_explorer TDCSGFigures.Confinement.walkToLeaf (label := "walk-to-leaf") (links := TDCSGFigures.Confinement.walkToLeaf_spec) (alt := "A numbered path of labels inside a circular window. Its last step reaches the label n on the window's edge; the other candidates of n lie outside the window and the walk can only step back.")
+:::figure TDCSGFigures.Confinement.walkToLeaf (label := "walk-to-leaf") (alt := "A circle walks a path of labels inside a circular window, one step at a time, the edges and labels appearing as it reaches them. Its last step reaches the label n on the window's edge; the other candidates of n appear outside the window, and the circle steps back.")
 A path of the center graph at $`r=2.13`, $`x=1/5`, found by a breadth-first search from $`0`,
-drawn step by step (labels numbered along the path, dots for weight zero, squares for weight one).
-It lowers the coordinate $`n_2` from $`0` to $`-4`, then crosses the good level $`-5` into the label
-$`n=(0,3,-5,4,-2)` at the window's edge. The other candidates $`n+e_k`, $`k\ne2`, lie outside the
-window (open rings at the ends of dashed spokes), so $`n` is a leaf and the walk can only step back
-to $`n+e_2`, as the one-step lemma requires.
+walked one step at a time: a circle marks where the walk is, and each edge and label appears as it
+is reached (dots for weight zero, squares for weight one). It lowers the coordinate $`n_2` from
+$`0` to $`-4`, then crosses the good level $`-5` into the label $`n=(0,3,-5,4,-2)` at the window's
+edge. The other candidates $`n+e_k`, $`k\ne2`, lie outside the window (open rings at the ends of
+dashed spokes), so $`n` is a leaf and the walk can only step back to $`n+e_2`, as the one-step lemma
+requires. The key frames are exact (`TDCSGFigures.Confinement.walkToLeaf_spec`); between them the
+browser slides the circle along the edges.
 :::
 
 :::figure TDCSGFigures.coordinateBox (label := "coordinate-box") (inline := true) (links := TDCSGFigures.coordinateBox_spec) (alt := "Five horizontal rows, one per coordinate, with open rings for good levels and dots for the coordinate values reached by the component of zero.")

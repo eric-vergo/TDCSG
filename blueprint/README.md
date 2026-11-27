@@ -75,16 +75,16 @@ the pages use with `PILeanVerso.withFigures` into `-verso-data/pilean-figures` w
 fingerprints and the source record of each file, and fails the build when a figure with
 `checks := .fail` has a layout problem (at its full and its narrow width, in both themes).
 
-A chapter shows a figure with `:::figure` (inline, so that the picture follows the page's theme
-and its elements link to Lean) or `:::figure_explorer` (a slider or stepper), with a label, a text
+A chapter shows a figure with `:::figure` (inline, so that the picture follows the page's theme and
+its elements link to Lean) or `:::figure_explorer` (a slider or stepper), with a label, a text
 alternative, the theorem it proves and the caption as the body. An animation (a PILean
 `MotionPanels` marked `@[figure illustration]`) is shown with `:::figure` too, always inline: it
-loops on its own clock with no controls and no script, and shows its key frames as stills, each
-with its caption, while it is hovered or focused, when the reader turns animations off with the
-switch beside the theme control or the system asks for reduced motion, and in print. Figures are numbered as the
-Blueprint numbers its statements: "Figure 5.1" is the first figure of chapter 5, and the figures
-of the unnumbered pages (the front page and the two part pages) are numbered 1 to 4. Prose refers
-to a figure by its label, `{figref "lens-estimate"}[]`, which renders its current number.
+loops on its own clock with no controls and no script, and shows its key frames as stills, each with
+its caption, while it is hovered or focused, when the reader turns animations off with the switch
+beside the theme control or the system asks for reduced motion, and in print. Figures are numbered
+as the Blueprint numbers its statements: "Figure 5.1" is the first figure of chapter 5, and the
+figures of the unnumbered pages (the front page and the two part pages) are numbered 1 to 4. Prose
+refers to a figure by its label, `{figref "lens-estimate"}[]`, which renders its current number.
 
 Under each figure the page shows its number and caption, then a source line: the declaration,
 its file and line linked to the repository at the build's commit, the fingerprint, and the
@@ -105,7 +105,9 @@ replay; `lake build TDCSGBlueprint` checks them.
 `scripts/check-pages.py` reads the manifest, requires a visible numbered caption, an accessible
 name and gapless numbering, allows no other image in the pages, follows the Lean links and every
 link to a place in the same page, requires every animation to be recorded as checked strictly
-(`checks` `fail`, no error left), as an illustration and with its narrow rendition, and calls
+(`checks` `fail`, no error left), with its narrow rendition (except the walk of chapter 7, scaled
+down as a whole on a small screen), and as an illustration or, for an animation that replaced a
+figure with a linked theorem, with that theorem (`LINKED_MOTIONS` in the script), and calls
 PILean's site checks (`tools/site/` of the `pilean` package): `pilean-verify`, every inline
 picture, moving ones included, against its file (`inline_check.py`), nothing active in a figure
 or an animation (`markup_check.py`), each figure's page against the manifest, with an animation's
@@ -121,35 +123,67 @@ figure. It needs Playwright for Python with its Chromium:
 ```sh
 lake exe tdcsg-motion-out /tmp/motion-out
 python3 scripts/check-pages.py _out/site/html-multi
-python3 scripts/check-motion.py _out/site/html-multi /tmp/motion-out [SHOTS]
+python3 scripts/check-motion.py _out/site/html-multi /tmp/motion-out [SHOTS] [--workers N]
 ```
 
-The release workflow runs both after the build.
+The release workflow runs both after the build, the browser checks with four workers (`--workers`,
+pages checked at a time, each in its own Chromium).
+
+`scripts/check-engines.py`, run by hand on a Mac, adds the same checks in Firefox (on the site and
+on the standalone files) and in WebKit, the engine of Safari (on the standalone files, through
+PILean's `tools/webkit/webkit_check.py`, which needs a logged-in session with a screen and shows
+nothing). It runs each pass only where it can and says what it skipped; it installs nothing:
+
+```sh
+python3 scripts/check-engines.py _out/site/html-multi /tmp/motion-out [--workers N]
+```
 
 ### Animations
 
-The three words of chapter 3 (`TDCSGFigures.wordLoop1`, `wordLoop2`, `wordLoop3` in
-`TDCSGFigures/Chord.lean`) and the frame pair of chapter 4 (`TDCSGFigures.Lift.framePair` in
-`TDCSGFigures/FramePairMotion.lean`) are animations drawn by PILean from exact key frames: each key
-is a `Plane.Figure` of exact data, and each step between two keys declares its moves, a turn of
-named items by a fifth of a full turn about an exact centre, or an item that appears or vanishes.
-PILean checks, at the strict level, that each declared turn carries one key onto the next, that
-every rest shows its key's still and that the written SVG draws what its plan says; the site
-build refuses an animation not checked strictly. The animations share one timing,
-`TDCSGFigures.motionPacing` in `TDCSGFigures/Style.lean`; the frame pair shows each turn with an
-arrow about its centre, whose fades are steps of their own between short rests, so that the pause
-between two turns keeps the shared length. They are illustrations: no theorem is
-linked to them, and the data of their key frames are stated on the page of the figures' theorems
-(`wordLoop_keys`, `framePair_keys`). The site ships no script of its own for them: the moving
-pictures are SMIL in the page, and what hides them is the stylesheet of PILean's adapter and the
-motion switch of Verso Blueprint. The figures keep the anchors of the steppers they replaced
-(`#word-trace` for Figure 3.2, `#change-of-frame` for Figure 4.2), and the site build writes a
-page at each old figure page's address that sends the reader on (`movedFigures` in
-`BlueprintMain.lean`).
+Thirteen figures are animations drawn by PILean from exact key frames: the turn of one disk and
+two disjoint disks of chapter 1 (`TDCSGFigures.extensionJump`, `disjointDisks` in
+`TDCSGFigures/Compound.lean`), one step of the left generator and a word letter by letter of
+chapter 2 (`generatorStep`, `wordSteps` in `TDCSGFigures/TwoDisks.lean`), the three words, the
+interval exchange and the orbit on the chord of chapter 3 (`wordLoop1`, `wordLoop2`, `wordLoop3`,
+`chordOrbit` in `TDCSGFigures/Chord.lean`, `exchangedIntervals` in
+`TDCSGFigures/ProofDiagrams.lean`), the frame pair of chapter 4 (`TDCSGFigures.Lift.framePair` in
+`TDCSGFigures/FramePairMotion.lean`) and the walk of chapter 7
+(`TDCSGFigures.Confinement.walkToLeaf`). Each key is a `Plane.Figure` of exact data, and each step
+between two keys declares its moves: a turn of named items by a fifth of a full turn about an
+exact centre, a slide along an exact vector, or an item that appears or vanishes. The moves are
+declared once, exactly (`TDCSGFigures.ExactMove` in `TDCSGFigures/Data/Moves.lean`, or the frame
+pair's own steps), and read twice: by PILean's engine, which draws them, and by the exact arrival
+check (`TDCSGFigures.allArrive`), which applies each to the exact anchors of the actors of one key
+in `ℚ(ζ₅)` or `ℚ(√5)²` and requires those of the next. PILean checks, at the strict level, that each
+declared move carries one key onto the next on the page, that every rest shows its key's still and
+that the written SVG draws what its plan says; the site build refuses an animation not checked
+strictly. The animations share one timing, `TDCSGFigures.motionPacing` in
+`TDCSGFigures/Style.lean` (the pieces of the interval exchange slide as long as a turn takes); the
+frame pair shows each turn with an arrow about its centre, whose fades are steps of their own
+between short rests, so that the pause between two turns keeps the shared length.
 
-The three words have a word strip, off on the site: the word written under the picture with the
-letter of the current key marked (`wordLoopWith i true`, `TDCSGFigures/WordStrip.lean`), checked
-like the rest by PILean's engine and by `TDCSGTests.FramePair`.
+Where an animation replaced a figure with a linked theorem (`generatorStep`, `extensionJump`,
+`disjointDisks`, `exchangedIntervals`, `chordOrbit`), it keeps the figure's name, label and
+number, its last key frame is that figure (`<name>Final`) and its poster, the still the figure page,
+the reduced-motion view and print show first, and the theorem `<name>_spec` stays linked: it states
+that the last key frame is the figure and what the figure draws. The other key frames, the moves
+and the captions are stated in a plain theorem `<name>_keys`. The other animations are
+illustrations (`@[figure illustration]`): no theorem is linked to them, and the data of their key
+frames are stated in `wordLoop_keys`, `wordSteps_spec`, `framePair_keys` and `walkToLeaf_spec`.
+Each actor that moves is drawn at the exact anchors that its arrival check reads, and the theorems
+state those anchors.
+The exact arrival check works modulo a full turn, so the sense and the size of every declared turn
+are pinned separately: each turn by a letter uses the letter's own fraction `Letter.turns`, whose
+factor and size `turnsAreFifths` states (`TDCSGFigures/Data/Turns.lean`), and each statement writes
+out the fractions its animation declares (`declaredTurns`). `TDCSGTests.Motions` proves that the
+exact arrival checks refuse a wrong centre, fraction, vector or position.
+
+The site ships no script of its own for the animations: the moving pictures are SMIL in the page,
+and what hides them is the stylesheet of PILean's adapter and the motion switch of Verso Blueprint.
+Each animation keeps the label, and so the anchor, of the figure at its place (`#word-trace` for
+Figure 3.2, `#change-of-frame` for Figure 4.2, and so on), and the site build writes a page that
+sends the reader on at the address of each figure page whose declaration has a new name
+(`movedFigures` in `BlueprintMain.lean`).
 
 ### Adding a figure
 
@@ -177,12 +211,19 @@ like the rest by PILean's engine and by `TDCSGTests.FramePair`.
    body; the chapter imports `TDCSGFigureTheorems`.
 
 An animation is a `Plane.MotionPanels` (one panel, or several on one clock) whose keys are drawn
-as in step 2 and whose steps declare their moves, with `pacing := motionPacing`,
-`checks := .fail`, `width := figureWidth` and `narrowWidth := some narrowWidth`, marked
-`@[figure illustration]`; its captions, one per key, carry no counter ("Step k of N" is added by
-the page). State the data of its key frames in a plain theorem on the page of the figures'
-theorems, add it to `previews` and to `motions` in `TDCSGTests/MotionOut.lean`, and show it with
-`:::figure TDCSGFigures.name (label := "…") (alt := "…")`.
+as in step 2 and whose steps declare their moves, exactly (`exactStep`, with `moveTiming` for its
+timing), with `pacing := motionPacing`, `checks := .fail`, `width := figureWidth` and
+`narrowWidth := some narrowWidth`, marked `@[figure illustration]`; its captions, one per key,
+carry no counter ("Step k of N" is added by the page). Draw each actor that moves at the exact
+anchors its arrival check reads (one list for both, as `turningAnchors` does). State in a plain
+theorem on the page of the figures' theorems that the figure is made of its keys and steps
+(`by unfold name; with_reducible rfl`, which fails at once when they differ), what each key draws,
+the anchors, the declared moves, that they arrive exactly (`allArrive … = true`) and each caption as
+a function of its key's data; add it to `previews` and to `siteMotions` in
+`TDCSGTests/Motions.lean`, whose `#guard` requires that PILean's engine finds no error in it, and
+show it with `:::figure TDCSGFigures.name (label := "…") (alt := "…")`. An animation that replaces
+a figure with a linked theorem keeps its name and label, ends on that figure, at its size (and
+shows it as its poster), and keeps its theorem linked, as above.
 
 ### The frame pair for other words
 
@@ -260,4 +301,5 @@ one package at a time, and keep Mathlib's shared package revisions.
 
 GitHub Actions supplies `verification.json` after its Linux comparator run succeeds. A local
 render remains usable without that file. See the
-[standalone challenge](../Comparator/FiveDisk/Challenge.lean) and [solution](../Comparator/FiveDisk/Solution.lean).
+[standalone challenge](../Comparator/FiveDisk/Challenge.lean) and
+[solution](../Comparator/FiveDisk/Solution.lean).

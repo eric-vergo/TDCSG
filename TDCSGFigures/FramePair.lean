@@ -202,21 +202,6 @@ end FramePairConfig
 /-- `0` for `a` and `a⁻¹` (the left disk), `1` for `b` and `b⁻¹`. -/
 def sideIndex (l : Letter) : Nat := match l with | .a | .aInv => 0 | .b | .bInv => 1
 
-/-- The turn of the letter's point about its disk's centre, as a fraction of a full turn: `-1/5`
-(clockwise) for `a` and `b`, `1/5` for their inverses. -/
-def _root_.TDCSGFigures.Early.Letter.turns (l : Letter) : Rat :=
-  match l with
-  | .a | .b => -1 / 5
-  | .aInv | .bInv => 1 / 5
-
-/-- Whether the declared fractions are the letters' own turns: for each letter, `Letter.turns` is
-a fifth of a full turn, `1/5` or `-1/5`, and its factor (`turnFactor`) is the letter's turn
-`Letter.turn` (`ζ⁴`, clockwise, for `a` and `b`; `ζ` for their inverses), the turn of its exact
-rotation (`Letter.rotate`). -/
-def turnsAreFifths : Bool :=
-  [Letter.a, .aInv, .b, .bInv].all fun l =>
-    turnFactor l.turns == some l.turn && (l.turns == 1 / 5 || l.turns == -1 / 5)
-
 /-! ### Exact points -/
 
 /-- The window centre `x = 1/2` as a point of `ℚ(ζ₅)`. -/
