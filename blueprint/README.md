@@ -148,7 +148,9 @@ in `ℚ(ζ₅)` or `ℚ(√5)²` and requires those of the next. PILean checks, 
 declared move carries one key onto the next on the page, that every rest shows its key's still and
 that the written SVG draws what its plan says; the site build refuses an animation not checked
 strictly. The animations share one timing, `TDCSGFigures.motionPacing` in
-`TDCSGFigures/Style.lean` (the pieces of the interval exchange slide as long as a turn takes).
+`TDCSGFigures/Style.lean` (the pieces of the interval exchange slide as long as a turn takes); the
+frame pair shows each turn with an arrow about its centre, whose fades are steps of their own
+between short rests, so that the pause between two turns keeps the shared length.
 
 Where an animation replaced a figure with a linked theorem (`generatorStep`, `extensionJump`,
 `disjointDisks`, `exchangedIntervals`, `chordOrbit`), it keeps the figure's name, label and
@@ -165,14 +167,14 @@ or position.
 
 The site ships no script of its own for the animations: the moving pictures are SMIL in the page,
 and what hides them is the stylesheet of PILean's adapter and the motion switch of Verso Blueprint.
-Each animation keeps the label, and so the anchor, of the figure at its place, and the site build
+Each animation keeps the label, and so the anchor, of the figure at its place (`#word-trace` for
+Figure 3.2, `#change-of-frame` for Figure 4.2, and so on), and the site build
 writes a page that sends the reader on at the address of each figure page whose declaration has a
 new name (`movedFigures` in `BlueprintMain.lean`).
 
-Both kinds of animation have a word strip, off on the site: the word written under the picture
-with the letter of the current key marked (`FramePairConfig.strip`, `wordLoopWith i true`,
-`TDCSGFigures/WordStrip.lean`), checked like the rest by PILean's engine and by
-`TDCSGTests.FramePair`.
+The three words have a word strip, off on the site: the word written under the picture with the
+letter of the current key marked (`wordLoopWith i true`, `TDCSGFigures/WordStrip.lean`), checked
+like the rest by PILean's engine and by `TDCSGTests.FramePair`.
 
 ### Adding a figure
 
