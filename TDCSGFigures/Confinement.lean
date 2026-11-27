@@ -288,8 +288,9 @@ def walkCaption (k : Nat) : String :=
     "n is a leaf: its other candidates n + eₖ, k ≠ 2, lie outside the window (open rings at the \
       ends of dashed spokes)."
   else
-    "From the leaf n the only step leads back to n + e₂, as the one-step lemma requires. The \
-      labels of the path are numbered in the order of the walk."
+    s!"From the leaf n the only step leads back to n + e₂, as the one-step lemma requires. The \
+      labels of the path are numbered 1 to {path.length - 3} in the order of the walk; labels \
+      {path.length - 2} and {path.length - 1} are n + e₂ and n."
 
 /-- The ids of the labels of text that key `k` of `walkToLeaf` shows and that appear during the
 walk: the names `n + e₂` (from key `13` on), `n` and its good level (from key `14` on), the

@@ -31,9 +31,13 @@ no axiom beyond `propext`, `Classical.choice` and `Quot.sound`.
 
 Many figures are animations. Each is drawn from exact key frames, which its stills show; between
 two key frames the browser turns or slides the drawn items about the stated centres or along the
-stated vectors, and that motion is not part of any statement. What the key frames show, that the
-figure shown is made of exactly those key frames, declared moves and captions, and that each
-declared turn or slide carries one key frame onto the next exactly, is stated here as a plain
+stated vectors, and that motion is not part of any statement. In the two animations in which the
+radius grows (the orbit of zero and the lens), the circles, the lens and what depends on the
+radius pass instead through exact pictures at stated radii between the key frames, and the browser
+interpolates between consecutive ones; those pictures are stated, the interpolation is not. What
+the key frames show, that the figure shown is made of exactly those key frames, declared moves and
+captions, and that each declared turn or slide carries one key frame onto the next exactly, is
+stated here as a plain
 theorem (`TDCSGFigures.wordLoop_keys`, `TDCSGFigures.Lift.framePair_keys`,
 `TDCSGFigures.generatorStep_keys` and the other `_keys` theorems, and for two illustrations
 `TDCSGFigures.wordSteps_spec` and `TDCSGFigures.Confinement.walkToLeaf_spec`, named `_spec`,
@@ -41,15 +45,20 @@ though they are not linked). Each actor an animation moves is
 drawn at the exact anchors its arrival check reads. The captions are written out, or, where they
 are built from the data (the orbit on the chord, the walk), stated as functions of the data; the
 kernel does not reduce the string functions they are built with, so their words are pinned by
-`#guard` lines in `TDCSGTests.Motions`, which also require that PILean's engine finds no error in
-any animation. Where an animation replaced a
+`#guard` lines in `TDCSGTests.Motions`; the test driver requires that PILean's engine finds no
+error in any animation. Where an animation replaced a
 figure with a linked theorem, its last key frame is that figure, and the theorem stays linked to
 the animation: it states that the last key frame is the figure and what the figure draws
 (`TDCSGFigures.generatorStep_spec`, `TDCSGFigures.extensionJump_spec`,
 `TDCSGFigures.disjointDisks_spec`, `TDCSGFigures.exchangedIntervals_spec`,
-`TDCSGFigures.chordOrbit_spec`). The other animations (the word followed letter by letter and the
-three words of chapters 2 and 3, the frame pair of chapter 4 and the walk of chapter 7) are
-illustrations: no theorem is linked to them.
+`TDCSGFigures.chordOrbit_spec`); the lens of chapter 5 is linked to its theorem
+`TDCSGFigures.Lens.lensRadius_spec`, which states its key frames and the pictures between them.
+The other animations (the
+orbit of zero on the front page, the word followed letter by letter and the three words of
+chapters 2 and 3, the frame pair of chapter 4 and the walk of chapter 7) are illustrations: no
+theorem is linked to them. The orbits of zero are computed by the exact orbit engine, which the
+kernel does not run here; their sizes and how they contain one another are pinned by `#guard`
+lines in `TDCSGTests.Motions` (`TDCSGFigures.orbitRadius_keys`).
 
 The theorems are not statements of the proof, and they are not nodes of the dependency graph.
 
@@ -147,9 +156,201 @@ figure_links criticalChord criticalChord_spec
 end TDCSGFigures
 ```
 
-The slider of the orbit of zero, {figref "orbit-radius"}[], has no theorem of its own: its
-frames are computed by the exact orbit engine `TDCSGCompute`, and every point records the sides
-of the disks that the engine decided.
+{figref "orbit-radius"}[]: the animation `TDCSGFigures.orbitRadius`, an illustration, and the data
+of its key frames, `TDCSGFigures.orbitRadius_keys`.
+
+```Verso.Genre.Manual.InlineLean.lean
+namespace TDCSGFigures
+
+open PILean PILean.Plane PILean.Exact TDCSGFigures.OrbitLoop
+
+/-- The animation `orbitRadius` and the data its key frames are drawn from, written out; an
+illustration, to which this theorem is not linked. It is the loop of `figureConfig`: one panel
+whose keys are `key os k`, `k = 0, …, 5`, for the radii `r = 1.5, 1.9, 1.95, 2.05, 2.1` and the
+critical radius `R` (`radius`), and whose steps are made from the declared moves `moves`, the
+circles and the lens morphed (`step`) through the exact pictures `between` at 5 radii between two
+keys (`samples = 6`), with `r²` evenly spaced; its poster is the last key, at `R`. The orbits `os`
+are those of the orbit engine (`orbits`, `orbitAt`, `TDCSGFigures.orbit`): complete at the rational
+radii, and at `R` the first `cap = 1000` points of its breadth-first search from `0`. Key `k` draws
+the circles of radius `r` about `-1` and `1` and their lens (`diskActors`), the points of its orbit
+in the groups `pointGroup os j k` of the points first drawn at key `j ≤ k` (`newPoints`, the
+points of the orbit of key `j` that are not in the orbit of key `j - 1`), each recording where it
+stands relative to the disks and the lens as the engine decides it (`dot`), the centres
+(`centres`) and the line under the disks (`valueLabel`, `valueText`), in row `k % 2`, so that two
+lines never overlap. Step `j` declares no move of
+any point: the line under the disks changes and the group of key `j + 1`, if any, appears
+(`moves`). The facts about the orbits themselves come from the engine, which the kernel does not
+run here; they are `#guard` lines of `TDCSGTests.Motions`: the orbits have 9, 9, 71, 151, 801 and
+1000 points, the first five are complete, each contains the one before it (an instance of
+`TDCSG.orbit_mono`), the 801 points at `r = 2.1` are among the first 997 at `R`, the groups up to
+each key are the points of its orbit, each once, every declared move arrives exactly
+(`GrowthConfig.arrives`), the engine decides the side of every point drawn, and the captions and
+the lines under the disks are written out word for word. That the orbit at `R` is infinite is
+`TDCSG.CriticalRadius.infinite_orbit_zero_five`. Not stated: how the builders draw, the timing, and
+the frames the browser draws between the key frames and the samples. -/
+theorem orbitRadius_keys :
+    orbitRadius = figureConfig.motion ∧
+    figureConfig.radii =
+      #[("1.5", 3 / 2), ("1.9", 19 / 10), ("1.95", 39 / 20), ("2.05", 41 / 20), ("2.1", 21 / 10)] ∧
+    figureConfig.cap = 1000 ∧ figureConfig.samples = 6 ∧ figureConfig.keyCount = 6 ∧
+    (∀ cfg : GrowthConfig, cfg.motion.panels = #[{ motion :=
+      { keys := ((List.range cfg.keyCount).map (cfg.key cfg.orbits)).toArray,
+        steps := ((List.range (cfg.keyCount - 1)).map (GrowthConfig.step cfg.orbits)).toArray,
+        between := cfg.between, morphSamples := cfg.samples } }]) ∧
+    (∀ cfg : GrowthConfig, cfg.motion.captions =
+      ((List.range cfg.keyCount).map (cfg.caption cfg.orbits)).toArray) ∧
+    (∀ cfg : GrowthConfig, cfg.motion.poster = cfg.keyCount - 1) ∧
+    (∀ cfg : GrowthConfig, cfg.motion.checks = .fail) ∧
+    (∀ (cfg : GrowthConfig) (k : Nat), cfg.radius k = (
+  match cfg.radii[k]? with
+  | some (t, r) => .rat t r
+  | none => .critical
+    : Radius)) ∧
+    (∀ cfg : GrowthConfig, cfg.orbits = (
+  ((List.range cfg.keyCount).map fun k =>
+    let ρ := cfg.radius k
+    orbitAt ρ (match ρ with | .critical => cfg.cap | .rat .. => 100000)).toArray
+    : Array Orbit)) ∧
+    (∀ (ρ : Radius) (cap : Nat), orbitAt ρ cap = (
+  match orbit ρ.sq origin cap with
+  | .ok o => o
+  | .error _ => { points := #[], complete := false }
+    : Orbit)) ∧
+    (∀ (os : Array Orbit) (k : Nat), GrowthConfig.newPoints os k = (
+  let here := (os.getD k default).points
+  if k == 0 then here.map (·.z)
+  else
+    let before := (os.getD (k - 1) default).points
+    (here.filter fun p => !before.any (·.z == p.z)).map (·.z)
+    : Array Zeta5)) ∧
+    (∀ (cfg : GrowthConfig) (os : Array Orbit) (j k : Nat), cfg.pointGroup os j k = (
+  (group ((GrowthConfig.newPoints os j).map (dot (cfg.radius k).sq)))
+    |>.named s!"the points of the orbit first drawn at r = {(cfg.radius j).text}"
+    |>.actor s!"orbit-{j}"
+    : Item)) ∧
+    (∀ (os : Array Orbit) (k : Nat), GrowthConfig.groupsUpTo os k = (
+  (List.range (k + 1)).filter fun j => !(GrowthConfig.newPoints os j).isEmpty
+    : List Nat)) ∧
+    (∀ (r2 : RadiusSq) (z : Zeta5), dot r2 z = (
+  let it := Plane.Exact.point z |>.size 1.5 |>.halo false
+  match sides r2 z with
+  | .ok (l, r) => withSides it l r
+  | .error _ => it
+    : Item)) ∧
+    (∀ (r : SqrtOf QSqrt5), diskActors r = (
+#[
+  Plane.Exact.disk leftCentre r |>.noFill |>.role leftRole |>.named "the left circle"
+    |>.describedBy "the closed disk of radius r about −1" |>.actor "left-disk",
+  Plane.Exact.disk rightCentre r |>.noFill |>.role rightRole |>.named "the right circle"
+    |>.describedBy "the closed disk of radius r about 1" |>.actor "right-disk",
+  Plane.Exact.lens leftCentre rightCentre r r |>.role lensRole |>.noOutline
+    |>.fillOpacity 0.12 |>.named "the lens" |>.actor "lens"]
+    : Array Item)) ∧
+    (∀ (r2 : RadiusSq), centres r2 = (
+  let side := fun (c : Zeta5) (it : Item) => match sides r2 c with
+    | .ok (l, r) => withSides it l r
+    | .error _ => it
+  #[side leftCentre (Plane.Exact.point leftCentre |>.role leftRole |>.named "the center −1"),
+    side rightCentre (Plane.Exact.point rightCentre |>.role rightRole |>.named "the center 1")]
+    : Array Item)) ∧
+    (∀ (cfg : GrowthConfig) (os : Array Orbit) (k : Nat), cfg.valueText os k = (
+  let n := (os.getD k default).points.size
+  match cfg.radius k with
+  | .rat t _ => s!"r = {t}: {n} points"
+  | .critical => s!"r = R: infinite, the first {n} shown"
+    : String)) ∧
+    (∀ (cfg : GrowthConfig) (os : Array Orbit) (k : Nat), cfg.valueLabel os k = (
+  Plane.Exact.label (cfg.valueText os k) ((0 : Rat), valueY - (k % 2 : Nat) * 3 / 10)
+    |>.actor s!"value-{k}"
+    : Item)) ∧ valueY = -27 / 10 ∧
+    (∀ (cfg : GrowthConfig) (os : Array Orbit) (k : Nat), cfg.key os k = (
+  let ρ := cfg.radius k
+  { width := figureWidth
+    padding := 16
+    style := orbitStyle
+    checks := .fail
+    items := diskActors ρ.value ++
+      ((GrowthConfig.groupsUpTo os k).map (cfg.pointGroup os · k)).toArray ++
+      centres ρ.sq ++ #[cfg.valueLabel os k]
+    info := { title := s!"The orbit of 0 at r = {ρ.text}" } }
+    : Plane.Figure)) ∧
+    (∀ (os : Array Orbit) (j : Nat), GrowthConfig.moves os j = (
+  [(s!"value-{j}", .vanish), (s!"value-{j + 1}", .appear)] ++
+    (if (GrowthConfig.newPoints os (j + 1)).isEmpty then []
+      else [(s!"orbit-{j + 1}", .appear)])
+    : List (String × ExactMove ZetaFrac))) ∧
+    (∀ (os : Array Orbit) (j : Nat), GrowthConfig.step os j = (
+  let s := exactStep (GrowthConfig.moves os j)
+  { s with moves := #[("left-disk", .morph), ("right-disk", .morph), ("lens", .morph)] ++ s.moves }
+    : MotionStep)) ∧
+    (∀ (os : Array Orbit) (k : Nat), GrowthConfig.actors os k = (
+  ((GrowthConfig.groupsUpTo os k).map fun j =>
+    ⟨s!"orbit-{j}", (GrowthConfig.newPoints os j).toList.map ZetaFrac.ofZeta⟩) ++
+    [⟨s!"value-{k}", []⟩]
+    : List (ExactActor ZetaFrac))) ∧
+    (∀ (cfg : GrowthConfig) (j : Nat) (q : Rat), cfg.between j q = (
+  let a := (cfg.radius j).sqValue
+  let b := (cfg.radius (j + 1)).sqValue
+  some { width := figureWidth, padding := 16, style := orbitStyle, checks := .fail,
+         items := diskActors
+           (⟨a * TDCSGFigures.rat (1 - q) + b * TDCSGFigures.rat q⟩ : SqrtOf QSqrt5) }
+    : Option Plane.Figure)) ∧
+    (∀ (cfg : GrowthConfig) (os : Array Orbit) (k : Nat), cfg.caption os k = (
+  let n := (os.getD k default).points.size
+  let prev := (os.getD (k - 1) default).points.size
+  match cfg.radius k with
+  | .rat t _ =>
+    if k == 0 then
+      s!"The orbit of 0 under the two moves at r = {t}, computed exactly: {n} points. As r \
+        grows the closed disks grow and the orbit can only grow: from one radius shown to the next \
+        the circles grow and the points the orbit gains fade in. The orbit is exact only at the \
+        radii shown."
+    else if n == prev then
+      s!"r = {t}: the disks are larger, and the orbit is the same {n} points."
+    else s!"r = {t}: {n} points; the {n - prev} new ones have faded in, and the {prev} points \
+      of the orbit at r = {(cfg.radius (k - 1)).text} are among them."
+  | .critical =>
+    s!"r = R = √(3 + φ): the orbit is infinite, and only the first {n} of its points that a \
+      breadth-first search from 0 finds are drawn; the {prev} points of the orbit at \
+      r = {(cfg.radius (k - 1)).text} are among them."
+    : String)) ∧
+    (∀ ρ : Radius, ρ.sqValue = (
+  match ρ with
+  | .rat _ r => TDCSGFigures.rat (r * r)
+  | .critical => threePlusPhi
+    : QSqrt5)) ∧
+    (∀ ρ : Radius, ρ.sq = (
+  match ρ with
+  | .rat _ r => .ofRat r
+  | .critical => .critical
+    : RadiusSq)) ∧
+    RadiusSq.critical = ⟨#[3, 0, -1, -1], 1⟩ := by
+  repeat' apply And.intro
+  all_goals first
+    | rfl
+    | (intros; rfl)
+    | (intros; unfold GrowthConfig.motion; with_reducible rfl)
+    | (intros; unfold GrowthConfig.radius; with_reducible rfl)
+    | (intros; unfold GrowthConfig.orbits; with_reducible rfl)
+    | (intros; unfold orbitAt; with_reducible rfl)
+    | (intros; unfold GrowthConfig.newPoints; with_reducible rfl)
+    | (intros; unfold GrowthConfig.pointGroup; with_reducible rfl)
+    | (intros; unfold GrowthConfig.groupsUpTo; with_reducible rfl)
+    | (intros; unfold dot; with_reducible rfl)
+    | (intros; unfold diskActors; with_reducible rfl)
+    | (intros; unfold centres; with_reducible rfl)
+    | (intros; unfold GrowthConfig.valueText; with_reducible rfl)
+    | (intros; unfold GrowthConfig.valueLabel; with_reducible rfl)
+    | (intros; unfold GrowthConfig.key; with_reducible rfl)
+    | (intros; unfold GrowthConfig.moves; with_reducible rfl)
+    | (intros; unfold GrowthConfig.step; with_reducible rfl)
+    | (intros; unfold GrowthConfig.actors; with_reducible rfl)
+    | (intros; unfold GrowthConfig.between; with_reducible rfl)
+    | (intros; unfold GrowthConfig.caption; with_reducible rfl)
+    | (intro ρ; cases ρ <;> rfl)
+
+end TDCSGFigures
+```
 
 # The figures of chapter 1
 
@@ -2119,36 +2320,358 @@ figure_links lensEstimate lensEstimate_spec
 end TDCSGFigures.Lens
 ```
 
-{figref "lens-radius"}[]: the figure `TDCSGFigures.Lens.lensRadius`
-and its theorem `TDCSGFigures.Lens.lensRadius_spec`.
+{figref "lens-radius"}[]: the animation `TDCSGFigures.Lens.lensRadius`, whose last key frame is the
+lens picture at `R`, with its theorem `TDCSGFigures.Lens.lensRadius_spec`.
 
 ```Verso.Genre.Manual.InlineLean.lean
 namespace TDCSGFigures.Lens
 
-open PILean PILean.Plane PILean.Exact TDCSGFigures
+open PILean PILean.Plane PILean.Exact TDCSGFigures LensLoopConfig
 
-/-- What `lensRadius` shows. It is the slider of `sliderFrames`: the lens picture `frameAt ρ` at
-the half radii `ρ = 9/10, 1, 26/25, 53/50` (`r = 1.8, 2, 2.08, 2.12`), then `frameCritical` at
-`R`. At every radius below `R` the tip lies on both circles and left of `κ - η` (`tipFacts`), its
-real part is at most `κ - 2η` (`tipReLe`), and `v*` lies outside both disks; at `R` the tip is
-`v*`, on both circles of radius `R/2` with real part `κ`, where `η = 0`. The disk `|v| ≤ r/2`
-stays left of `κ - η` at the first three radii and crosses it at `2.12`. Not stated: the items of
-each frame (built by `lensItems` from these data), the layout and the pixels. -/
+/-- What `lensRadius` shows, and why. It is the loop of `lensConfig`: two panels on one clock, the
+lens pictures `key k` (left) and the neighbourhood of the tip enlarged, `zoomKey k` (right, at its
+own scale, drawn from the same setting `setting k` by `zoomItems`), for `k = 0, …, 5`: the radii
+`r = 1.8, 2, 2.08, 2.12`, then `R` with the dashed edge `Re v = κ - η` on `Re v = κ`, then the last
+key at `R` (`criticalSetting`), the two half-planes one, which is the poster. The steps are made
+from `movesOf`: when the radius changes, every actor of both keys morphs through the exact pictures
+`between j q` and `zoomBetween j q` at the fractions `q = i/6`, `0 < i < 6`, of the step, which
+are the lens pictures at the squared radius `(1 - q) r_j² + q r_{j+1}²` (`r2Between`); between two
+consecutive samples the browser interpolates the path data linearly, and that is not stated. What
+one key draws and the next does not appears or vanishes. The items of every key are `lensItems` and
+`zoomItems` of its setting, written out: the half radius `√(r²/4)`, the tip
+`tipOf (h²) = (c₁/2 + √(h² s²), √(s²/4) - √(h² c₁²))` with `h² = r²/4 - 1/4` (`hSqOf`), recording
+that it lies on both circles and on the lens and, below `R`, outside both half-planes, at `R` on
+both edges; `v*` and the margin `η` at the first key; in the enlarged panel, the margin `η` as a bar
+above the box below `R`, and `η = 0` at `R`. The facts hold exactly in `ℚ(√5)`, read off the
+coordinates of the tip drawn (`tipOnCircles`, `reAtMost`, written out): at every key and at every
+sample (all of whose radii are below `R`) the tip lies on both circles, so on the perpendicular
+bisector of `0` and `u`, and its real part is at most `κ - 2η` (`LensLoopConfig.tipOnBoth`); at
+every key below `R` it lies left of `κ - η` (`tipFacts`). For every radius, every point of the lens
+has real part at most `κ - 2η` (`TDCSG.Five.re_le_of_mem_lens`), which is what the captions say of
+the tip below `R`. At `R` the
+margin is `0` (`margin` is `η` of `TDCSG.Five.IsGoodLevel`), `h² = s²` and `c₁/2 + s² = κ`, so the
+tip is `v*`, which lies on both circles of radius `R/2` with real part `κ`; the disk `|v| ≤ r/2`
+lies left of `κ - η` at `1.8`, `2` and `2.08` and crosses it at `2.12` (`diskLeftOfCut`). The
+captions are stated as a function of the data (`LensLoopConfig.caption`), their words pinned by
+`#guard` in `TDCSGTests.Motions`. Not stated: how the builders draw, the layout, the scale of each
+panel, the timing and the frames the browser draws between the samples. -/
 theorem lensRadius_spec :
-    lensRadius = Plane.slider "r" sliderFrames ∧
-    sliderFrames = (sliderRadii.map fun (ρ, t) => (t, frameAt ρ t (ρ == 9 / 10) false)).push
-      ("R", frameCritical) ∧
-    sliderRadii = #[(9 / 10, "1.8"), (1, "2"), (26 / 25, "2.08"), (53 / 50, "2.12")] ∧
-    sliderRadii.all (fun (ρ, _) => tipFacts ρ && tipReLe ρ &&
-      QSqrt.lt (rat (ρ * ρ)) (criticalSq * rat (1 / 4))) = true ∧
+    lensRadius = lensConfig.motion ∧
+    lensConfig.radii = #[(9 / 5, "1.8"), (2, "2"), (52 / 25, "2.08"), (53 / 25, "2.12")] ∧
+    lensConfig.samples = 6 ∧ lensConfig.keyCount = 6 ∧
+    (∀ cfg : LensLoopConfig, cfg.motion.panels = #[
+      { title := "The lens", motion :=
+        { keys := ((List.range cfg.keyCount).map cfg.key).toArray,
+          steps := ((List.range (cfg.keyCount - 1)).map fun j =>
+            ({ moves := cfg.movesOf cfg.key j } : MotionStep)).toArray,
+          between := cfg.between, morphSamples := cfg.samples } },
+      { title := "Near the tip", motion :=
+        { keys := ((List.range cfg.keyCount).map cfg.zoomKey).toArray,
+          steps := ((List.range (cfg.keyCount - 1)).map fun j =>
+            ({ moves := cfg.movesOf cfg.zoomKey j } : MotionStep)).toArray,
+          between := cfg.zoomBetween, morphSamples := cfg.samples } }]) ∧
+    (∀ cfg : LensLoopConfig, cfg.motion.captions =
+      ((List.range cfg.keyCount).map cfg.caption).toArray) ∧
+    (∀ cfg : LensLoopConfig, cfg.motion.poster = cfg.keyCount - 1) ∧
+    (∀ cfg : LensLoopConfig, cfg.motion.scale = .independent) ∧
+    (∀ cfg : LensLoopConfig, cfg.motion.checks = .fail) ∧
+    (∀ (r2 : QSqrt5), hSqOf r2 = (
+r2 * rat (1 / 4) - rat (1 / 4)
+    : QSqrt5)) ∧
+    (∀ (h2 : QSqrt5), tipOf h2 = (
+  ⟨{ base := cosine * rat (1 / 2), roots := [(1, h2 * sineSq)] },
+    { roots := [(1, sineSq * rat (1 / 4)), (-1, h2 * (cosine * cosine))] }⟩
+    : SurdPoint)) ∧
+    (∀ (p : SurdPoint) (cuts : Option Plane.Incidence), tipItemWith p cuts = (
+  let it := Plane.Exact.point p |>.size 5
+    |>.named "the tip of the lens: its corner of largest real part"
+    |>.incident .on "the circle |v| = r/2" |>.incident .on "the circle |v − u| = r/2"
+    |>.incident .on "the lens"
+  match cuts with
+  | some i => it |>.incident i "the half-plane Re v ≥ κ − η" |>.incident i "the half-plane Re v ≥ κ"
+  | none => it
+    : Item)) ∧
+    (∀ (r2 : QSqrt5) (rText : String) (first : Bool) (cuts : Plane.Incidence)
+      (radiusRow : Nat), loopSetting r2 rText first cuts radiusRow = (
+  { half := ⟨r2 * rat (1 / 4)⟩, r2, rText,
+    tipPt := tipItemWith (tipOf (hSqOf r2)) (some cuts) |>.named tipTitle,
+    tipXY := PlanePoint.toPoint (tipOf (hSqOf r2)), other := otherSide (r2 * rat (1 / 4)),
+    critical := false, showVStar := first, showMargin := first, motion := true, radiusRow }
+    : Setting (SqrtOf QSqrt5))) ∧
+    (criticalSetting = (
+  { loopSetting criticalSq "R = √(3 + φ)" false .on with
+    critical := true,
+    tipPt := tipItemWith (tipOf (hSqOf criticalSq)) none
+      |>.incident .on "the half-plane Re v ≥ κ" |>.named tipTitle }
+    : Setting (SqrtOf QSqrt5))) ∧
+    (∀ {β : Type} (st : Setting β) (id : String) (it : Item), st.act id it = (
+  if st.motion then it.actor id else it
+    : Item)) ∧
+    (∀ {β : Type} (st : Setting β), st.atR = (
+  if st.motion then "" else s!", r = {st.rText}"
+    : String)) ∧
+    (∀ {β : Type} [RealValue β] (st : Setting β), lensItems st = (
+  let kc := cut st.r2
+  let foot : QSqrt5 × QSqrt5 := (cosine, ⟨0, 0⟩)
+  (if st.critical then #[] else #[
+    Plane.Exact.polygon (halfPlane kc) |>.faint |>.filled |>.width 1 |>.dashed
+      |>.fillOpacity 0.16 |>.named "the half-plane Re v ≥ κ − η"
+      |>.describedBy (if st.motion then "where the lens estimate puts no point of the lens"
+        else s!"where the lens estimate puts no point of the lens, at r = {st.rText}")
+      |>.declRef `TDCSG.Five.div_two_lt_norm_sub_of_le_re |> st.act "cut"]) ++ #[
+    Plane.Exact.polygon (halfPlane kappa) |>.faint |>.filled |>.width 1 |>.fillOpacity 0.18
+      |>.named "the half-plane Re v ≥ κ"
+      |>.describedBy "κ = (2φ + 1)/4 = (1 + L)/2, L = φ − 1/2",
+    (if st.motion then
+      Plane.Exact.segment ((rat (-23 / 20), rat 0) : QSqrt5 × QSqrt5) (xRight, rat 0) |>.faint
+        |>.width 1 |>.named "the real axis"
+    else Plane.Exact.line origin rightCentre |>.faint |>.width 1 |>.named "the real axis"),
+    Plane.Exact.disk origin st.half |>.noFill |>.role windowRole
+      |>.named "the circle |v| = r/2" |>.describedBy s!"the closed disk |v| ≤ r/2{st.atR}"
+      |> st.act "disk-0",
+    Plane.Exact.disk (zeta 1) st.half |>.noFill |>.role windowRole |>.dashed
+      |>.named "the circle |v − u| = r/2"
+      |>.describedBy s!"the closed disk |v − u| ≤ r/2 about u = ζ{st.atR}" |> st.act "disk-u",
+    Plane.Exact.lens origin (zeta 1) st.half st.half |>.role lensRole |>.noOutline
+      |>.fillOpacity 0.12 |>.named "the lens" |> st.act "lens",
+    Plane.Exact.segment uSurd ⟨Surd.ofQ cosine, Surd.ofQ ⟨0, 0⟩⟩ |>.faint |>.width 1
+      |>.dashed #[2, 3] |>.named "the foot of u on the real axis"] ++
+  (if st.showMargin then #[
+    Plane.Exact.segment (kc, marginY) (kappa, marginY) |>.width 1
+      |>.named "the margin η = (3 + φ − r²)/16 between the cuts κ − η and κ"
+      |>.declRef `TDCSG.Five.IsGoodLevel |> st.act "margin",
+    Plane.Exact.tickAt (kc, marginY) (kc, marginY) (kappa, marginY) |> st.act "margin-tick-cut",
+    Plane.Exact.tickAt (kappa, marginY) (kc, marginY) (kappa, marginY)
+      |> st.act "margin-tick-kappa"] ++
+    (if st.motion then #[] else #[Plane.Exact.labelBeside "η" (kc, marginY) (kappa, marginY)])
+    else #[]) ++ #[
+    Plane.segment ⟨0, 0⟩ (radiusEnd (RealValue.toFloat st.half)) |>.role windowRole |>.width 1.5
+      |>.dashed |>.named "a radius r/2 of the disk |v| ≤ r/2" |> st.act "radius",
+    Plane.labelBeside "r/2" ⟨0, 0⟩ (radiusEnd (RealValue.toFloat st.half)) |>.role windowRole
+      |> st.act "radius-label",
+    Plane.Exact.point origin |>.role windowRole |>.named "0, the center of |v| ≤ r/2"
+      |> (if st.motion then (·.incident .on "the real axis") else id)
+      |>.incident .inside "the circle |v| = r/2"
+      |>.incident st.other.incidence "the circle |v − u| = r/2"
+      |>.incident (Side.lens .inside st.other).incidence "the lens",
+    Plane.Exact.point (zeta 1) |>.role windowRole |>.named "u = ζ, the center of |v − u| ≤ r/2"
+      |>.incident .inside "the circle |v − u| = r/2"
+      |>.incident st.other.incidence "the circle |v| = r/2"
+      |>.incident (Side.lens .inside st.other).incidence "the lens",
+    Plane.Exact.point foot |>.faint |>.size 3
+      |>.named "c₁ = Re u = (φ − 1)/2 on the real axis" |>.incident .on "the real axis",
+    st.act "tip" st.tipPt] ++
+  (if st.showVStar then #[
+    Plane.Exact.point vStar |>.named "v∗ = 1 + t u, t = 1/2 − c₁, at distance R/2 from 0 and u"
+      |>.incident .outside "the circle |v| = r/2" |>.incident .outside "the circle |v − u| = r/2"
+      |>.incident .outside "the lens" |>.incident .on "the half-plane Re v ≥ κ"
+      |>.incident .inside "the half-plane Re v ≥ κ − η" |> st.act "vstar",
+    Plane.Exact.label "v∗" vStar .auto |> st.act "vstar-label"] else #[]) ++ #[
+    (if st.motion then Plane.Exact.label "0" origin .below (some 12)
+      else Plane.Exact.label "0" origin .auto) |>.role windowRole |> st.act "label-0",
+    (if st.motion then Plane.Exact.label "u = ζ" (zeta 1) .aboveRight (some 8)
+      else Plane.Exact.label "u = ζ" (zeta 1) .auto) |>.role windowRole |> st.act "label-u",
+    (if st.motion then Plane.Exact.label "c₁" foot .below (some 16)
+      else Plane.Exact.label "c₁" foot .auto) |> st.act "label-c1",
+    Plane.label (if st.critical then "tip = v∗" else "tip") st.tipXY .auto
+      |> st.act (if st.critical then "tip-label-critical" else "tip-label"),
+    Plane.Exact.label "lens" ((rat (1 / 10), rat (11 / 20)) : QSqrt5 × QSqrt5) |>.role lensRole,
+    Plane.Exact.label "|v| ≤ r/2" ((rat (3 / 10), rat (-11 / 20)) : QSqrt5 × QSqrt5)
+      |>.role windowRole,
+    Plane.Exact.label "|v − u| ≤ r/2" ((rat (9 / 20), rat (3 / 2)) : QSqrt5 × QSqrt5)
+      |>.role windowRole,
+    Plane.Exact.label (if st.critical && !st.motion then "Re v ≥ κ, η = 0" else "Re v ≥ κ")
+      ((kappa, cutLabelY) : QSqrt5 × QSqrt5) .right |> st.act "kappa-label"] ++
+  (if st.critical then #[] else #[
+    Plane.Exact.label "Re v ≥ κ − η →" ((kc, cutLabelY) : QSqrt5 × QSqrt5) .left
+      |> st.act "cut-label"]) ++
+  (if st.motion then #[
+    Plane.Exact.label s!"r = {st.rText}"
+      ((rat (-11 / 10), rat (9 / 4) - rat (st.radiusRow / 5)) : QSqrt5 × QSqrt5)
+      .right |>.bold |> st.act s!"r-{st.rText}"] else #[])
+    : Array Item)) ∧
+    (∀ (st : Setting (SqrtOf QSqrt5)), zoomTip st = (
+  let it := Plane.Exact.point (tipOf (hSqOf st.r2)) |>.size 5
+    |>.incident .on "the circle |v| = r/2" |>.incident .on "the circle |v − u| = r/2"
+  let it := if st.critical then it.incident .on "the half-plane Re v ≥ κ"
+    else
+      let i := if st.r2 == criticalSq then Plane.Incidence.on else .outside
+      it.incident i "the half-plane Re v ≥ κ − η" |>.incident i "the half-plane Re v ≥ κ"
+  it.named tipTitle |>.actor "tip"
+    : Item)) ∧
+    (∀ (st : Setting (SqrtOf QSqrt5)), zoomMargin st = (
+  let kc := cut st.r2
+  if st.r2 == criticalSq then #[
+    Plane.Exact.label "η = 0" ((kappa, zoomBarY) : QSqrt5 × QSqrt5) .above (some 26)
+      |>.actor "zoom-eta-zero"]
+  else #[
+    Plane.Exact.segment (kc, zoomBarY) (kappa, zoomBarY) |>.width 1
+      |>.named "the margin η between the edges" |>.actor "zoom-margin",
+    Plane.Exact.tickAt (kc, zoomBarY) (kc, zoomBarY) (kappa, zoomBarY) |>.actor "zoom-tick-cut",
+    Plane.Exact.tickAt (kappa, zoomBarY) (kc, zoomBarY) (kappa, zoomBarY)
+      |>.actor "zoom-tick-kappa",
+    Plane.Exact.labelBeside "η" (kc, zoomBarY) (kappa, zoomBarY) |>.actor "zoom-eta"]
+    : Array Item)) ∧
+    (∀ (st : Setting (SqrtOf QSqrt5)), zoomItems st = (
+  let kc := cut st.r2
+  let a0 := angleFrom ⟨0, 0⟩ st.tipXY
+  let au := angleFrom (PlanePoint.toPoint (zeta 1)) st.tipXY
+  #[Plane.Exact.polygon (zoomHalfPlane kappa) |>.faint |>.filled |>.width 1 |>.fillOpacity 0.18
+      |>.named "the half-plane Re v ≥ κ"] ++
+  (if st.critical then #[] else #[
+    Plane.Exact.polygon (zoomHalfPlane kc) |>.faint |>.filled |>.width 1 |>.dashed
+      |>.fillOpacity 0.16 |>.named "the half-plane Re v ≥ κ − η" |>.actor "cut"]) ++ #[
+    Plane.Exact.arc origin st.half (a0 - zoomArc) (a0 + zoomArc) |>.role windowRole
+      |>.named "the circle |v| = r/2" |>.actor "disk-0",
+    Plane.Exact.arc (zeta 1) st.half (au - zoomArc) (au + zoomArc) |>.role windowRole |>.dashed
+      |>.named "the circle |v − u| = r/2" |>.actor "disk-u",
+    zoomTip st,
+    Plane.Exact.label "κ" ((kappa, zoomBottom) : QSqrt5 × QSqrt5) .belowRight
+      |>.actor "kappa-label"] ++
+  (if st.r2 == criticalSq then #[] else #[
+    Plane.Exact.label "κ − η" ((kc, zoomBottom) : QSqrt5 × QSqrt5) .belowLeft
+      |>.actor "cut-label"]) ++
+  zoomMargin st
+    : Array Item)) ∧
+    (∀ (a : QSqrt5), zoomHalfPlane a = (
+  [(a, zoomBottom), (zoomRight, zoomBottom), (zoomRight, zoomTop), (a, zoomTop)]
+    : List (QSqrt5 × QSqrt5))) ∧
+    (∀ (cfg : LensLoopConfig) (k : Nat), cfg.r2At k = (
+  match cfg.radii[k]? with
+  | some (r, _) => rat (r * r)
+  | none => criticalSq
+    : QSqrt5)) ∧
+    (∀ (cfg : LensLoopConfig) (k : Nat), cfg.setting k = (
+  match cfg.radii[k]? with
+  | some (_, t) => loopSetting (cfg.r2At k) t (k == 0) .outside (k % 2)
+  | none =>
+    if k == cfg.radii.size then loopSetting criticalSq "R = √(3 + φ)" false .on (k % 2)
+    else { criticalSetting with radiusRow := (k - 1) % 2 }
+    : Setting (SqrtOf QSqrt5))) ∧
+    (∀ (cfg : LensLoopConfig) (k : Nat), cfg.key k = (
+  { lensFigure (cfg.setting k) false with view := none, width := mainWidth }
+    : Plane.Figure)) ∧
+    (∀ (cfg : LensLoopConfig) (k : Nat), cfg.zoomKey k = (
+  { cfg.key k with items := zoomItems (cfg.setting k), width := zoomWidth }
+    : Plane.Figure)) ∧
+    (∀ (cfg : LensLoopConfig) (keyAt : Nat → Plane.Figure) (j : Nat), cfg.movesOf keyAt j = (
+  let a := actorIds (keyAt j)
+  let b := actorIds (keyAt (j + 1))
+  (if cfg.grows j then (a.filter b.contains).map (·, Move.morph) else #[]) ++
+    (a.filter (!b.contains ·)).map (·, Move.vanish) ++
+    (b.filter (!a.contains ·)).map (·, Move.appear)
+    : Array (String × Move))) ∧
+    (∀ (cfg : LensLoopConfig) (j : Nat) (q : Rat), cfg.r2Between j q = (
+cfg.r2At j * rat (1 - q) + cfg.r2At (j + 1) * rat q
+    : QSqrt5)) ∧
+    (∀ (cfg : LensLoopConfig) (j : Nat) (q : Rat), cfg.between j q = (
+  if cfg.grows j then
+    some { cfg.key j with items := lensItems (loopSetting (cfg.r2Between j q) "" false) }
+  else none
+    : Option Plane.Figure)) ∧
+    (∀ (cfg : LensLoopConfig) (j : Nat) (q : Rat), cfg.zoomBetween j q = (
+  if cfg.grows j then
+    some { cfg.zoomKey j with items := zoomItems (loopSetting (cfg.r2Between j q) "" false) }
+  else none
+    : Option Plane.Figure)) ∧
+    (∀ (cfg : LensLoopConfig) (k : Nat), cfg.caption k = (
+  match cfg.radii[k]? with
+  | some (r, t) =>
+    let disk := if diskLeftOfCut r then " The circle |v| = r/2 lies left of the dashed edge: no \
+        v meets the hypothesis of the lemma."
+      else " The circle |v| = r/2 crosses the dashed edge, and the lens does not."
+    if k == 0 then
+      s!"The lens of the closed disks |v| ≤ r/2 and |v − u| ≤ r/2 at r = {t}, with the \
+        half-planes Re v ≥ κ − η (dashed edge) and Re v ≥ κ, η = (3 + φ − r²)/16, and v∗ on \
+        Re v = κ. The second panel shows the tip enlarged, and above it the margin η between \
+        the edges as a bar. The tip lies left of the dashed edge, at least η from it." ++ disk
+    else
+      s!"r = {t}: the margin η is smaller, and the tip has moved right; it stays at least η \
+        left of the dashed edge." ++ disk
+  | none =>
+    if k == cfg.radii.size then
+      "r = R = √(3 + φ): η = 0, so the dashed edge has reached Re v = κ, and so has the tip: \
+        the tip is v∗."
+    else
+      "At R the two half-planes are one, Re v ≥ κ, and the tip of the lens is v∗, on its \
+        edge. Below R it stays at least η left of the dashed edge."
+    : String)) ∧
+    (∀ (p : SurdPoint) (ρ2 : QSqrt5), tipOnCircles p ρ2 = (
+  match p.re, p.im with
+  | ⟨b, [(sa, A)]⟩, ⟨y0, [(sb, B), (sc, C)]⟩ =>
+    sa == 1 && sb == 1 && sc == -1 && y0 == ⟨0, 0⟩ && b == cosine * rat (1 / 2) &&
+      B == sineSq * rat (1 / 4) && QSqrt.lt ⟨0, 0⟩ cosine && QSqrt.le ⟨0, 0⟩ A &&
+      QSqrt.le ⟨0, 0⟩ C && cosine * cosine * A == sineSq * C &&
+      cosine * cosine * rat (1 / 4) + A + B + C == ρ2
+  | _, _ => false
+    : Bool)) ∧
+    (∀ (p : SurdPoint) (K : QSqrt5) (strict : Bool), reAtMost p K strict = (
+  match p.re with
+  | ⟨b, [(1, A)]⟩ => sqrtLt A (K - b) || (!strict && sqrtEq A (K - b))
+  | _ => false
+    : Bool)) ∧
+    (∀ (r2 : QSqrt5), LensLoopConfig.tipOnBoth r2 = (
+  tipOnCircles (tipOf (hSqOf r2)) (r2 * rat (1 / 4)) &&
+    reAtMost (tipOf (hSqOf r2)) (kappa - margin r2 * rat 2)
+    : Bool)) ∧
+    (∀ (cfg : LensLoopConfig), cfg.samplesBelowR = (
+  (List.range cfg.radii.size).all fun j => (List.range (cfg.samples - 1)).all fun i =>
+    let r2 := cfg.r2Between j ((i + 1 : Nat) / (cfg.samples : Rat))
+    QSqrt.lt r2 criticalSq && tipOnBoth r2
+    : Bool)) ∧
+    (∀ {β : Type} [RealValue β] (st : Setting β) (narrow : Bool), lensFigure st narrow = (
+  { width := figureWidth
+    narrowWidth := if narrow then some narrowWidth else none
+    view := some view
+    padding := 1
+    style := partTwoStyle
+    checks := .fail
+    items := lensItems st
+    info := { title :=
+      s!"The lens at r = {st.rText} and the half-planes Re v ≥ κ − η and Re v ≥ κ" } }
+    : Plane.Figure)) ∧
+    zoomRight = rat (109 / 100) ∧ zoomBottom = rat (2 / 25) ∧ zoomTop = rat (8 / 25) ∧
+    zoomBarY = rat (17 / 50) ∧
+    lensConfig.samplesBelowR = true ∧
+    ((List.range 4).all fun k => QSqrt.lt (lensConfig.r2At k) criticalSq) = true ∧
+    (lensConfig.radii.all fun (r, _) =>
+      tipFacts (r / 2) && tipReLe (r / 2) && LensLoopConfig.tipOnBoth (rat (r * r))) = true ∧
+    LensLoopConfig.tipOnBoth criticalSq = true ∧
+    (margin criticalSq == rat 0) = true ∧ (hSqOf criticalSq == sineSq) = true ∧
+    (cosine * rat (1 / 2) + sineSq == kappa) = true ∧
     (vStar.normSq == criticalSq * rat (1 / 4)) = true ∧
     ((vStar - ZetaFrac.ofZeta (zeta 1)).normSq == criticalSq * rat (1 / 4)) = true ∧
-    (vStar.realPart == kappa) = true ∧ (margin criticalSq == rat 0) = true ∧
-    (sliderRadii.map fun (ρ, _) => QSqrt.lt (rat ρ) (cut (rat (4 * ρ * ρ)))) =
+    (vStar.realPart == kappa) = true ∧
+    (lensConfig.radii.map fun (r, _) => LensLoopConfig.diskLeftOfCut r) =
       #[true, true, true, false] := by
-  refine ⟨rfl, rfl, rfl, ?_⟩
   repeat' apply And.intro
-  all_goals decide +kernel
+  all_goals first
+    | rfl
+    | (intros; rfl)
+    | (intros; unfold LensLoopConfig.motion; with_reducible rfl)
+    | (intros; unfold hSqOf; with_reducible rfl)
+    | (intros; unfold tipOf; with_reducible rfl)
+    | (intros; unfold tipItemWith; with_reducible rfl)
+    | (intros; unfold loopSetting; with_reducible rfl)
+    | (intros; unfold criticalSetting; with_reducible rfl)
+    | (intros; unfold Setting.act; with_reducible rfl)
+    | (intros; unfold Setting.atR; with_reducible rfl)
+    | (intros; unfold lensItems; with_reducible rfl)
+    | (intros; unfold zoomTip; with_reducible rfl)
+    | (intros; unfold zoomMargin; with_reducible rfl)
+    | (intros; unfold zoomItems; with_reducible rfl)
+    | (intros; unfold zoomHalfPlane; with_reducible rfl)
+    | (intros; unfold LensLoopConfig.r2At; with_reducible rfl)
+    | (intros; unfold LensLoopConfig.setting; with_reducible rfl)
+    | (intros; unfold LensLoopConfig.key; with_reducible rfl)
+    | (intros; unfold LensLoopConfig.zoomKey; with_reducible rfl)
+    | (intros; unfold LensLoopConfig.movesOf; with_reducible rfl)
+    | (intros; unfold LensLoopConfig.r2Between; with_reducible rfl)
+    | (intros; unfold LensLoopConfig.between; with_reducible rfl)
+    | (intros; unfold LensLoopConfig.zoomBetween; with_reducible rfl)
+    | (intros; unfold LensLoopConfig.caption; with_reducible rfl)
+    | (intros; unfold lensFigure; with_reducible rfl)
+    | decide +kernel
 
 figure_links lensRadius lensRadius_spec
 
@@ -2611,8 +3134,9 @@ min (k + 1) path.length
     "n is a leaf: its other candidates n + eₖ, k ≠ 2, lie outside the window (open rings at the \
       ends of dashed spokes)."
   else
-    "From the leaf n the only step leads back to n + e₂, as the one-step lemma requires. The \
-      labels of the path are numbered in the order of the walk."
+    s!"From the leaf n the only step leads back to n + e₂, as the one-step lemma requires. The \
+      labels of the path are numbered 1 to {path.length - 3} in the order of the walk; labels \
+      {path.length - 2} and {path.length - 1} are n + e₂ and n."
     : String)) ∧
     (List.range walkKeyCount).all (fun k => (walkerAnchors k).length == 1) = true ∧
     (List.range (path.length - 1)).all (fun k =>

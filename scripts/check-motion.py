@@ -22,8 +22,9 @@ The checks are PILean's, called on this site:
   error and no content-policy report.
 
 Its own checks, of this site: the positions again in the dark theme, each figure no wider than the
-text column, and no script of the site's own for a figure (the site's scripts are Verso's, Verso
-Blueprint's and PILean's explorer script for the sliders that remain).
+text column, no script of the site's own for a figure (the site's scripts are Verso's, Verso
+Blueprint's and PILean's explorer script, which PILean's adapter adds to every page with a figure),
+and no explorer on any page, so that the explorer script has nothing to run on.
 """
 import json
 import os
@@ -65,6 +66,10 @@ def no_site_scripts(c, site):
                      if re.search(r"pilean|word-?motion|playWords|wordTrace", b, re.I)
                      and not b.startswith("window.xref")]
     c.check("no inline script handles a figure", not figure_inline, str(figure_inline[:2]))
+    explorers = sorted(str(page.relative_to(site)) for page in site.rglob("index.html")
+                       if re.search(r'class="[^"]*\bpilean-explorer\b',
+                                    page.read_text(encoding="utf-8")))
+    c.check("no page shows an explorer", not explorers, str(explorers[:3]))
 
 
 def page_checks(c, browser, base, url, expect, helpers):
@@ -79,9 +84,11 @@ def page_checks(c, browser, base, url, expect, helpers):
         motion_browser.position_checks(c, page, sid, spec, f"{url} {name} (dark, 1440 px)")
     sizes = page.evaluate("""() => [...document.querySelectorAll('figure.pilean-figure')]
       .filter(f => f.querySelector('.pilean-motion')).map(f => {
-        const col = f.closest('main').querySelector('p');
-        return [f.getBoundingClientRect().width,
-                col ? col.getBoundingClientRect().width : 0]; })""")
+        // the text column: the page's first paragraph outside a figure (on the front page the
+        // first paragraph is a figure's caption)
+        const p = [...f.closest('main').querySelectorAll('p')].find(q => !q.closest('figure'));
+        const col = p ? p.getBoundingClientRect().width : 0;
+        return [f.getBoundingClientRect().width, col]; })""")
     for fig, col in sizes:
         print(f"{url}: figure {fig:.0f} px in a text column of {col:.0f} px")
         c.check(f"{url}: the figure fits the text column", fig <= col + 0.5, f"{fig} {col}")

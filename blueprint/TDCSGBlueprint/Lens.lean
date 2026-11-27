@@ -58,7 +58,7 @@ $`0\le r<R`.
 At equality, $`r=R`, the two circles meet at the point $`v_*=1+tu` of the proof, where
 $`t=1/2-c_1=(2-\varphi)/2`; its real part is $`\kappa`. Below $`R` the proof gives more than the
 lemma states: every point of the lens has real part at most $`\kappa-2\eta`, with
-$`\eta=(3+\varphi-r^2)/16`, so the tip of the lens stays at least $`\eta` left of the line
+$`\eta=(3+\varphi-r^2)/16` (`TDCSG.Five.re_le_of_mem_lens`, for every radius), so the tip of the lens stays at least $`\eta` left of the line
 $`\operatorname{Re}v=\kappa-\eta`. The estimate is sharp in the sense that this bound on the tip
 holds with equality only at $`r=R`, where $`\eta=0` and the tip is $`v_*` on the line
 $`\operatorname{Re}v=\kappa`. The margin $`\eta` supplies the room needed to choose the good
@@ -72,13 +72,18 @@ by no $`v` at all. The estimate has content only for $`4-\sqrt{15-7\varphi}\le r
 range just below $`R\approx2.149`. This is the same threshold as the one beyond which, by
 Chapter 6, an edge of the center graph can cross a good level at all.
 
-:::figure_explorer TDCSGFigures.Lens.lensRadius (label := "lens-radius") (links := TDCSGFigures.Lens.lensRadius_spec) (alt := "The lens picture at r = 1.8, 2, 2.08, 2.12 and R: as r grows the tip of the lens moves right towards the shaded half-planes and reaches the line Re v = kappa exactly at R.")
+:::figure TDCSGFigures.Lens.lensRadius (label := "lens-radius") (links := TDCSGFigures.Lens.lensRadius_spec) (alt := "Two panels. Left, the lens picture as r grows through 1.8, 2, 2.08 and 2.12 to R: the tip of the lens moves right towards the shaded half-planes and reaches the line Re v = kappa exactly at R. Right, the tip enlarged, with a bar above it spanning the margin eta between the two edges; the bar shrinks and at R the words eta = 0 replace it.")
 The lens of the disks $`|v|\le r/2` and $`|v-\zeta|\le r/2` with the half-planes
 $`\operatorname{Re}v\ge\kappa-\eta` (dashed edge) and $`\operatorname{Re}v\ge\kappa` for
-$`r=1.8, 2, 2.08, 2.12` and $`R=\sqrt{3+\varphi}`. As $`r` grows the strip between the two edges
-narrows and the tip moves right; below $`R` the tip stays left of the dashed edge, and at $`R`,
-where $`\eta=0`, the tip is $`v_*` on the line $`\operatorname{Re}v=\kappa`. Notice where the solid
-circle $`|v|\le r/2` lies: at $`r=1.8`, $`2` and $`2.08` it stays entirely left of the dashed edge,
-so no $`v` meets the hypothesis of the lemma; at $`r=2.12`, above $`4-\sqrt{15-7\varphi}`, it
-crosses the edge and the lens still does not.
+$`r=1.8, 2, 2.08, 2.12` and $`R=\sqrt{3+\varphi}`, and beside it the neighbourhood of the tip
+enlarged, where the bar above the edges is the margin $`\eta`. As $`r` grows the margin narrows
+and the tip moves right; below $`R` the tip stays at least $`\eta` left of the dashed edge, as every
+point of the lens does (`TDCSG.Five.re_le_of_mem_lens`), and at
+$`R`, where $`\eta=0`, the tip is $`v_*` on the line $`\operatorname{Re}v=\kappa`. Notice where
+the solid circle $`|v|\le r/2` lies: at $`r=1.8`, $`2` and $`2.08` it stays entirely left of the
+dashed edge, so no $`v` meets the hypothesis of the lemma; at $`r=2.12`, above
+$`4-\sqrt{15-7\varphi}`, it crosses the edge and the lens still does not. The key frames are the
+exact pictures at these radii; between two of them the picture passes through the exact pictures
+at five radii in between, the tip on the perpendicular bisector of $`0` and $`\zeta`, and the
+browser interpolates only between consecutive ones.
 :::

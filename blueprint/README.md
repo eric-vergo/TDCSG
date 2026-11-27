@@ -76,8 +76,9 @@ fingerprints and the source record of each file, and fails the build when a figu
 `checks := .fail` has a layout problem (at its full and its narrow width, in both themes).
 
 A chapter shows a figure with `:::figure` (inline, so that the picture follows the page's theme and
-its elements link to Lean) or `:::figure_explorer` (a slider or stepper), with a label, a text
-alternative, the theorem it proves and the caption as the body. An animation (a PILean
+its elements link to Lean), with a label, a text alternative, the theorem it proves and the caption
+as the body; the site shows no slider or stepper (`:::figure_explorer`), and
+`scripts/check-motion.py` checks that no page has one. An animation (a PILean
 `MotionPanels` marked `@[figure illustration]`) is shown with `:::figure` too, always inline: it
 loops on its own clock with no controls and no script, and shows its key frames as stills, each with
 its caption, while it is hovered or focused, when the reader turns animations off with the switch
@@ -192,8 +193,7 @@ sends the reader on at the address of each figure page whose declaration has a n
    `SqrtOf QSqrt5`, orbits through `TDCSGFigures.orbit`), with a `#guard` for every property its
    caption states.
 2. Draw it in the module of its chapter (`TDCSGFigures/<Chapter>.lean`, imported by
-   `TDCSGFigures.lean`) as a `Plane.Figure` (or an `Explorer` made with `Plane.slider` or
-   `Plane.stepper`) in `houseStyle` (`partTwoStyle`, `radiusStyle` for their roles), with
+   `TDCSGFigures.lean`) as a `Plane.Figure` in `houseStyle` (`partTwoStyle`, `radiusStyle` for their roles), with
    `checks := .fail`, `width := figureWidth` and `narrowWidth := some narrowWidth`. Disks are
    outlines (`noFill`), the lens a region of its own (`role lensRole`), the left disk and what
    belongs to it `role leftRole`, the right `role rightRole`, the window `role windowRole`, good
@@ -207,8 +207,8 @@ sends the reader on at the address of each figure page whose declaration has a n
    `TDCSGFigureTheorems.lean`, with the item list written out and the exact facts proved by `rfl`
    and `decide +kernel` (see `TDCSGFigures.criticalChord_spec`), followed by `figure_links`.
 5. Put it in its chapter with `:::figure TDCSGFigures.name (label := "…") (inline := true)
-   (links := TDCSGFigures.name_spec) (alt := "…")` or `:::figure_explorer`, the caption as the
-   body; the chapter imports `TDCSGFigureTheorems`.
+   (links := TDCSGFigures.name_spec) (alt := "…")`, the caption as the body; the chapter imports
+   `TDCSGFigureTheorems`.
 
 An animation is a `Plane.MotionPanels` (one panel, or several on one clock) whose keys are drawn
 as in step 2 and whose steps declare their moves, exactly (`exactStep`, with `moveTiming` for its
@@ -220,10 +220,20 @@ theorem on the page of the figures' theorems that the figure is made of its keys
 (`by unfold name; with_reducible rfl`, which fails at once when they differ), what each key draws,
 the anchors, the declared moves, that they arrive exactly (`allArrive … = true`) and each caption as
 a function of its key's data; add it to `previews` and to `siteMotions` in
-`TDCSGTests/Motions.lean`, whose `#guard` requires that PILean's engine finds no error in it, and
+`TDCSGTests/Motions.lean`, whose `engineErrors`, run compiled by `lake test`, requires that
+PILean's engine finds no error in it, and
 show it with `:::figure TDCSGFigures.name (label := "…") (alt := "…")`. An animation that replaces
 a figure with a linked theorem keeps its name and label, ends on that figure, at its size (and
 shows it as its poster), and keeps its theorem linked, as above.
+
+Where what a figure draws changes with a parameter (the radius of the orbit of zero,
+`TDCSGFigures.orbitRadius`, and of the lens, `TDCSGFigures.Lens.lensRadius`), the actors whose
+drawing changes are declared to morph, and the motion gives the exact pictures between two keys
+(`Motion.between`, sampled `morphSamples` times per step); the browser interpolates only between
+consecutive samples. Points that come with a key and stay are one group, an actor that appears
+once and never moves. Such an animation has no narrow rendition when the narrow width would bring
+its points closer than the layout checks allow (the orbit at the critical radius); a picture of
+panels side by side has one.
 
 ### The frame pair for other words
 
@@ -280,9 +290,8 @@ lake build                                       # TDCSGCompute and TDCSGFigures
 lake exe tdcsg-figure-preview --out out NAME     # every figure when no NAME is given
 ```
 
-The preview tool writes `out/NAME[-frame-K][-narrow][-dark].{svg,png}` (light, dark, narrow and
-narrow dark; each frame of an explorer as its slider shows it; for an animation its animated SVG
-and `NAME[-narrow]-key-K.{svg,png}`) and prints every layout problem of the figure at both
+The preview tool writes `out/NAME[-narrow][-dark].{svg,png}` (light, dark, narrow and narrow
+dark; for an animation its animated SVG and `NAME[-narrow]-key-K.{svg,png}`) and prints every layout problem of the figure at both
 widths, whatever its checks level; it exits with status 1 when there is one. The site build
 applies the same checks. `figures/lean-toolchain` must name the toolchain of
 the root `lean-toolchain`. The specification theorems are not part of this workspace: they live on

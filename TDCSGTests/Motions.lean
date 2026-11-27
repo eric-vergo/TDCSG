@@ -14,10 +14,11 @@ a turn, a vector of a slide or the place of an actor, and proves, by `decide +ke
 check then fails. The figures' own statements are on the page of the figures' theorems
 (`TDCSGFigures.generatorStep_keys` and the other `_keys` theorems).
 
-A `#guard` line requires that PILean's engine reports no error for any animation of the site, wide
-or narrow, so that a drawn move that misses its key stops the build, and another that every caption
-and title has all its characters in PILean's lettering, which draws them on the contact sheets and
-in print. The other `#guard` lines pin the captions of the animations whose captions are built from
+`engineErrors` lists the errors PILean's engine reports for the animations of the site, wide and
+narrow; the test driver (`TDCSGTests.Main`, run by `lake test`) runs it compiled and fails when the
+list is not empty, so that a drawn move that misses its key stops the gate. A `#guard` line requires
+that every caption and title has all its characters in PILean's lettering, which draws them on the
+contact sheets and in print. The other `#guard` lines pin the captions of the animations whose captions are built from
 their data, word for word, by evaluation: the kernel does not reduce the string functions these
 captions are built with, so the theorems state the caption functions and these lines their texts. -/
 
@@ -127,13 +128,19 @@ def siteMotions : Array (String × PILean.Plane.MotionPanels) := #[
   ("TDCSGFigures.wordSteps", wordSteps),
   ("TDCSGFigures.exchangedIntervals", exchangedIntervals),
   ("TDCSGFigures.chordOrbit", chordOrbit),
-  ("walkToLeaf", Confinement.walkToLeaf)]
+  ("walkToLeaf", Confinement.walkToLeaf),
+  ("TDCSGFigures.orbitRadius", orbitRadius),
+  ("lensRadius", Lens.lensRadius)]
 
--- Every animation of the site, and its narrow rendition, has no error in PILean's engine: every
--- move it draws lands on its next key, every rest shows its still, the writer agrees with the
--- baker. A drawn move that differs from the exact one it is made from stops the build here.
-#guard siteMotions.all fun (_, P) =>
-  P.report.errors.isEmpty && (P.narrow.map (·.report.errors.isEmpty)).getD true
+/-- The errors PILean's engine reports for the animations of the site and their narrow renditions,
+each with the animation's name: every move drawn must land on its next key, every rest show its
+still, the writer agree with the baker. The test driver runs this compiled and fails when it is not
+empty. -/
+def engineErrors : List String :=
+  siteMotions.toList.flatMap fun (name, P) =>
+    let all := [("", P)] ++ (P.narrow.map fun n => [("-narrow", n)]).getD []
+    all.flatMap fun (suffix, Q) =>
+      Q.report.errors.toList.map fun e => s!"{name}{suffix}: {e}"
 
 -- Every caption, title and panel title of the animations of the site has all its characters in
 -- PILean's lettering, which draws them on the contact sheets and in print.
@@ -141,7 +148,73 @@ def siteMotions : Array (String × PILean.Plane.MotionPanels) := #[
   ((P.captions.toList ++ [P.info.title] ++ P.panels.toList.map (·.title)).all
     fun c => (PILean.Lettering.missing c).isEmpty)
 
+/-! ### The orbits of zero as the radius grows
+
+The orbits of `TDCSGFigures.orbitRadius` come from the exact orbit engine, which the kernel does
+not run, so their facts are checked here by evaluation. -/
+
+section OrbitRadius
+
+open TDCSGFigures.OrbitLoop
+
+-- The orbits are computed once. They have 9, 9, 71, 151, 801 and 1000 points; the first five, at
+-- r = 1.5, 1.9, 1.95, 2.05 and 2.1, are complete; at R the search was stopped at 1000 points (the
+-- orbit there is infinite, `TDCSG.CriticalRadius.infinite_orbit_zero_five`). Each drawn orbit
+-- contains the one before it, and the engine decides on which side of each disk every point drawn
+-- lies; the groups that appear up to each key are the points of its orbit, each once; every
+-- declared appearance and disappearance is the change from one key to the next, and no group of
+-- points moves (`allArrive`). The 801 points of the orbit at r = 2.1 are among the first 997
+-- points of the search at R, and not all among the first 996. The lines under the disks are
+-- written out.
+#guard
+  let os := figureConfig.orbits
+  let within := fun (n : Nat) => (os.getD 4 default).points.all fun p =>
+    ((os.getD 5 default).points.extract 0 n).any (·.z == p.z)
+  os.map (·.points.size) == #[9, 9, 71, 151, 801, 1000] &&
+    os.map (·.complete) == #[true, true, true, true, true, false] &&
+    figureConfig.nested os && figureConfig.partitions os && figureConfig.arrives os &&
+    within 997 && !within 996 &&
+    (List.range 6).map (figureConfig.valueText os) == ["r = 1.5: 9 points", "r = 1.9: 9 points",
+      "r = 1.95: 71 points", "r = 2.05: 151 points", "r = 2.1: 801 points",
+      "r = R: infinite, the first 1000 shown"]
+
+end OrbitRadius
+
 /-! ### The captions built from data, word for word -/
+
+#guard orbitRadius.captions == #[
+  "The orbit of 0 under the two moves at r = 1.5, computed exactly: 9 points. As r grows the \
+    closed disks grow and the orbit can only grow: from one radius shown to the next the circles \
+    grow and the points the orbit gains fade in. The orbit is exact only at the radii shown.",
+  "r = 1.9: the disks are larger, and the orbit is the same 9 points.",
+  "r = 1.95: 71 points; the 62 new ones have faded in, and the 9 points of the orbit at r = 1.9 \
+    are among them.",
+  "r = 2.05: 151 points; the 80 new ones have faded in, and the 71 points of the orbit at \
+    r = 1.95 are among them.",
+  "r = 2.1: 801 points; the 650 new ones have faded in, and the 151 points of the orbit at \
+    r = 2.05 are among them.",
+  "r = R = √(3 + φ): the orbit is infinite, and only the first 1000 of its points that a \
+    breadth-first search from 0 finds are drawn; the 801 points of the orbit at r = 2.1 are \
+    among them."]
+
+#guard Lens.lensRadius.captions == #[
+  "The lens of the closed disks |v| ≤ r/2 and |v − u| ≤ r/2 at r = 1.8, with the half-planes \
+    Re v ≥ κ − η (dashed edge) and Re v ≥ κ, η = (3 + φ − r²)/16, and v∗ on Re v = κ. The \
+    second panel shows the tip enlarged, and above it the margin η between the edges as a bar. \
+    The tip lies left of the dashed edge, at least η from it. The circle |v| = r/2 lies left of \
+    the dashed edge: no v meets the hypothesis of the lemma.",
+  "r = 2: the margin η is smaller, and the tip has moved right; it stays at least η left of the \
+    dashed edge. The circle |v| = r/2 lies left of the dashed edge: no v meets the hypothesis \
+    of the lemma.",
+  "r = 2.08: the margin η is smaller, and the tip has moved right; it stays at least η left of \
+    the dashed edge. The circle |v| = r/2 lies left of the dashed edge: no v meets the \
+    hypothesis of the lemma.",
+  "r = 2.12: the margin η is smaller, and the tip has moved right; it stays at least η left of \
+    the dashed edge. The circle |v| = r/2 crosses the dashed edge, and the lens does not.",
+  "r = R = √(3 + φ): η = 0, so the dashed edge has reached Re v = κ, and so has the tip: the \
+    tip is v∗.",
+  "At R the two half-planes are one, Re v ≥ κ, and the tip of the lens is v∗, on its edge. \
+    Below R it stays at least η left of the dashed edge."]
 
 #guard chordOrbit.captions == #[
   "The orbit of 0 along the chord at the critical radius: the parameter t of the point tE, \
@@ -180,6 +253,7 @@ def siteMotions : Array (String × PILean.Plane.MotionPanels) := #[
   "n is a leaf: its other candidates n + eₖ, k ≠ 2, lie outside the window (open rings at the \
     ends of dashed spokes).",
   "From the leaf n the only step leads back to n + e₂, as the one-step lemma requires. The \
-    labels of the path are numbered in the order of the walk."]
+    labels of the path are numbered 1 to 12 in the order of the walk; labels 13 and 14 are n + e₂ \
+    and n."]
 
 end TDCSGTests.Motions

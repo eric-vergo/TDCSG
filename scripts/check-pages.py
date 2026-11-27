@@ -14,10 +14,10 @@ nothing at all in an animation), the figures' pages against the manifest (with a
 words, its table of steps, its stills and exactly the files of a motion), and a fresh render
 compared with the folder (`--check-figures`, through the site's generator). Every animation must
 be recorded as checked strictly (`checks` `fail`, `errorsLeft` 0) and with a narrow rendition
-(except those of `NO_NARROW`); an animation that replaced a figure with a linked theorem keeps it
-(`LINKED_MOTIONS`), every other one is an illustration. A link written as a fragment alone (`#…`)
-must name an element of the page it leads to under the page's `base`, except `#bp-motion`, the
-animations switch that Verso Blueprint's script puts in the menu.
+(except those of `NO_NARROW`); an animation linked to a theorem keeps it (`LINKED_MOTIONS`), every
+other one is an illustration. A link written as a
+fragment alone (`#…`) must name an element of the page it leads to under the page's `base`, except
+`#bp-motion`, the animations switch that Verso Blueprint's script puts in the menu.
 With `--release` it also checks the hosted verification record, the source links at the verified
 commit, and that the site's kernel replay accepted every node and calls each judged theorem proved.
 """
@@ -328,8 +328,8 @@ assert manifest_decls, "the PILean manifest lists no figure"
 
 
 # Every animation is checked strictly and has one caption per key (that its files are exactly
-# those of a motion is PILean's page check, below). An animation that replaced a figure with a
-# linked theorem keeps that theorem (`LINKED_MOTIONS`); every other animation is an illustration.
+# those of a motion is PILean's page check, below). An animation linked to a theorem keeps it
+# (`LINKED_MOTIONS`); every other animation is an illustration.
 # Every animation has its narrow rendition except those of `NO_NARROW`, whose picture is scaled
 # down as a whole on a small screen.
 LINKED_MOTIONS = {
@@ -338,8 +338,9 @@ LINKED_MOTIONS = {
     "TDCSGFigures.disjointDisks": "TDCSGFigures.disjointDisks_spec",
     "TDCSGFigures.exchangedIntervals": "TDCSGFigures.exchangedIntervals_spec",
     "TDCSGFigures.chordOrbit": "TDCSGFigures.chordOrbit_spec",
+    "TDCSGFigures.Lens.lensRadius": "TDCSGFigures.Lens.lensRadius_spec",
 }
-NO_NARROW = {"TDCSGFigures.Confinement.walkToLeaf"}
+NO_NARROW = {"TDCSGFigures.Confinement.walkToLeaf", "TDCSGFigures.orbitRadius"}
 motions = {}
 for entry in pilean_manifest["files"]:
     if entry.get("kind") == "motion":
