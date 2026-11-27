@@ -147,10 +147,9 @@ motion switch of Verso Blueprint. The figures keep the anchors of the steppers t
 page at each old figure page's address that sends the reader on (`movedFigures` in
 `BlueprintMain.lean`).
 
-Both kinds of animation have a word strip, off on the site: the word written under the picture
-with the letter of the current key marked (`FramePairConfig.strip`, `wordLoopWith i true`,
-`TDCSGFigures/WordStrip.lean`), checked like the rest by PILean's engine and by
-`TDCSGTests.FramePair`.
+The three words have a word strip, off on the site: the word written under the picture with the
+letter of the current key marked (`wordLoopWith i true`, `TDCSGFigures/WordStrip.lean`), checked
+like the rest by PILean's engine and by `TDCSGTests.FramePair`.
 
 ### Adding a figure
 

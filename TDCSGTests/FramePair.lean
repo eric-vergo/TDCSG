@@ -163,26 +163,30 @@ theorem no_arrows :
       ({ arrowMark := false } : FramePairConfig).keyCount = 13 := by
   decide +kernel
 
-/-- The word strip, an option off on the site, with the earlier word `a a b a b a a b b a b b` at
-`r = 1.95` and without arrows: the strip has room for letters without exponents only (the figure's
-word, with `a⁻¹` and `b⁻¹`, overlaps in it). -/
-def stripCfg : FramePairConfig :=
-  { word := [.a, .a, .b, .a, .b, .a, .a, .b, .b, .a, .b, .b], radius := radius, arrowMark := false,
-    strip := true }
+-- The three words' word strip, an option off on the site: its marks are those `wordStripMarks`
+-- names, and the animations with it pass every check of PILean's engine; checked by evaluation
+-- (the drawing is in floating point).
+#guard wordStripMarks 1 && wordStripMarks 2 && wordStripMarks 3
+#guard [1, 2, 3].all fun i => (wordLoopWith i true).problems.isEmpty
 
-/-- The word strip, an option off on the site, marks the letter of every key, for the frame pair
-and for the three words. -/
-theorem strip_marks :
-    stripCfg.stripMarkIds 4 = ["strip-2"] ∧
-      ({} : FramePairConfig).stripMarkIds 4 = [] := by
+/-- At `r = 1.95`, a word whose first two letters turn about different centres has its second
+letter decided by a margin under `0.005` (`marginsVisible`): for each of the eight such pairs,
+the margin `1/200` fails, while the figure's word at `r = 2.12` has every margin at least `0.08`.
+-/
+theorem margins_thin_at_195 :
+    ([[Letter.a, .b], [.a, .bInv], [.aInv, .b], [.aInv, .bInv], [.b, .a], [.b, .aInv], [.bInv, .a],
+        [.bInv, .aInv]].all fun w =>
+      !({ word := w, radius := radius } : FramePairConfig).marginsVisible (1 / 200)) = true ∧
+    ({} : FramePairConfig).marginsVisible (2 / 25) = true := by
   decide +kernel
 
--- The marks the strip draws are those `stripMarkIds` names, and the animations with the strip pass
--- every check of PILean's engine; checked by evaluation (the drawing is in floating point).
-#guard stripCfg.stripMarks
-#guard wordStripMarks 1 && wordStripMarks 2 && wordStripMarks 3
-#guard stripCfg.motion.problems.isEmpty
-#guard [1, 2, 3].all fun i => (wordLoopWith i true).problems.isEmpty
+/-- A declared fraction that is not the letter's own fifth fails the check of the turns:
+`turnsAreFifths` asks, for each letter, `turnFactor l.turns = some l.turn` and `|l.turns| = 1/5`,
+and `-4/5`, whose factor is also `ζ`, is refused. -/
+theorem turnsAreFifths_refuses_four_fifths :
+    turnsAreFifths = true ∧ (turnFactor (-4 / 5) == some (zeta 1)) = true ∧
+      ((-4 / 5 : Rat) == 1 / 5 || (-4 / 5 : Rat) == -1 / 5) = false := by
+  decide +kernel
 
 -- Every drawn actor of the figure's word gives back its base title. The drawing goes through
 -- floating point, which the kernel does not reduce, so this is checked by evaluation when the

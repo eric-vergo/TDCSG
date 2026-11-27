@@ -95,14 +95,10 @@ def leftKeys : Array Figure := cfg.keys.map fun p => { p.1 with view := none }
 /-- The keys of the right panel: the right key figures (`keys`), each without a view of its own. -/
 def rightKeys : Array Figure := cfg.keys.map fun p => { p.2 with view := none }
 
-/-- The steps of the left panel: the declared moves of `frameSteps`, and the marks of the word
-strip appearing and vanishing (`stripMarkIds`). -/
+/-- The steps of the left panel: the declared moves of `frameSteps`. -/
 def leftSteps : Array MotionStep :=
-  cfg.frameSteps.toArray.mapIdx fun j s =>
-    let now := cfg.stripMarkIds j
-    let next := cfg.stripMarkIds (j + 1)
-    panelStep s.leftTurn s.leftTurning (s.appearLeft ++ next.filter (!now.contains ·))
-      (s.vanishLeft ++ now.filter (!next.contains ·))
+  cfg.frameSteps.toArray.map fun s =>
+    panelStep s.leftTurn s.leftTurning s.appearLeft s.vanishLeft
 
 /-- The steps of the right panel: the declared moves of `frameSteps`. -/
 def rightSteps : Array MotionStep :=

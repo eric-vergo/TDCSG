@@ -138,11 +138,12 @@ The word was chosen so that the turns alternate between the two centers. They do
 except across the letters 3 and 8, where the same center turns twice; this cannot be avoided. A
 letter that acts leaves the point in its own disk, since a rotation maps its disk onto itself, so
 the same letter or its inverse, a power of it, would act again. So a letter that does not act is
-of the other kind than the letter before it, and the next letter that acts turns about the same
-center as the one before. The radius $`r=2.12`, still below $`\sqrt{3+\varphi}\approx2.149`,
+of the other kind than the last letter that acted, and the next letter that acts turns about the
+same center as that one. The radius $`r=2.12`, still below $`\sqrt{3+\varphi}\approx2.149`,
 makes every act or idle decision of this word visible in the picture: each center tested lies
-at least $`0.08` inside or outside the window. At $`r=1.95` the second letter of any word whose
-first two letters differ is decided by less than $`0.01`.
+at least $`0.08` inside or outside the window, in the units of the moving frame, where the window
+has radius $`r/2`. At $`r=1.95` the second letter of any word whose first two letters turn about
+different centers is decided by less than $`0.005` in the same units.
 
 For the window of {figref "unit-steps"}[], $`x=1/2` and $`r=1.95`, three of the five neighbors of
 zero are inside.

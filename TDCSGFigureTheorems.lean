@@ -971,8 +971,8 @@ open PILean PILean.Plane PILean.Exact TDCSGFigures
 set_option maxHeartbeats 4000000 in
 /-- The frame pair and the data its key frames are drawn from. The figure is the motion of the
 default configuration (`FramePairConfig.motion`): the word `a b⁻¹ a b a⁻¹ b⁻¹ a b a⁻¹ b` applied
-to `z = 0` at `r = 2.12`, with an arrow for each turn and without the word strip or the rings that
-mark turn centres; its two panels' keys are the key figures `FramePairConfig.keys`, its steps are
+to `z = 0` at `r = 2.12`, with an arrow for each turn and without the rings that mark turn
+centres; its two panels' keys are the key figures `FramePairConfig.keys`, its steps are
 made by `panelStep` from the declared moves `FramePairConfig.frameSteps`, and its captions are
 `FramePairConfig.keyCaption` of each key, written out in full.
 The states after `0, 1, …, 10` letters are computed exactly: the labels `n` of the current left
@@ -991,7 +991,9 @@ on the right, an arrow or a ring appearing or vanishing, or a pause, carries the
 onto those of the next exactly in `ℚ(ζ₅)`; each ring lies about the centre of its letter's disk in
 both panels, a centre outside the window (`ringsPlaced`); and each arrow is shown exactly in the
 two keys of its turn, about that turn's declared centre and in its sense, in both panels
-(`arrowsPlaced`) (all in `FramePairConfig.allArrive`; the general statements are
+(`arrowsPlaced`), and the declared fractions, written out for both panels, are the letters' own
+fifths, `turnFactor l.turns = some l.turn` with `|l.turns| = 1/5` (`turnsAreFifths`) (all in
+`FramePairConfig.allArrive`; the general statements are
 `TDCSG.Five.halved_genA`, `TDCSG.Five.halved_genB`, `TDCSG.Five.framePicture_genA_genB` and, for
 the inverse letters, `TDCSG.Five.halved_permA_symm`, `TDCSG.Five.halved_permB_symm` and
 `TDCSG.Five.framePicture_symm`). Not stated: how the builders draw, the layout, the timing and the
@@ -999,7 +1001,7 @@ frames the browser draws between the key frames. -/
 theorem framePair_keys :
     framePair = ({} : FramePairConfig).motion ∧
     ({} : FramePairConfig).word = word ∧ ({} : FramePairConfig).radius = pairRadius ∧
-    ({} : FramePairConfig).strip = false ∧ ({} : FramePairConfig).arrowMark = true ∧
+    ({} : FramePairConfig).arrowMark = true ∧
     ({} : FramePairConfig).pivotMark = false ∧ ({} : FramePairConfig).faintDisks = false ∧
     word = [.a, .bInv, .a, .b, .aInv, .bInv, .a, .b, .aInv, .b] ∧ pairRadius = 53 / 25 ∧
     ({} : FramePairConfig).motion.panels =
@@ -1011,11 +1013,8 @@ theorem framePair_keys :
                       steps := ({} : FramePairConfig).rightSteps } }] ∧
     (∀ cfg : FramePairConfig, cfg.leftKeys = cfg.keys.map fun p => { p.1 with view := none }) ∧
     (∀ cfg : FramePairConfig, cfg.rightKeys = cfg.keys.map fun p => { p.2 with view := none }) ∧
-    (∀ cfg : FramePairConfig, cfg.leftSteps = cfg.frameSteps.toArray.mapIdx fun j s =>
-      let now := cfg.stripMarkIds j
-      let next := cfg.stripMarkIds (j + 1)
-      panelStep s.leftTurn s.leftTurning (s.appearLeft ++ next.filter (!now.contains ·))
-        (s.vanishLeft ++ now.filter (!next.contains ·))) ∧
+    (∀ cfg : FramePairConfig, cfg.leftSteps = cfg.frameSteps.toArray.map fun s =>
+      panelStep s.leftTurn s.leftTurning s.appearLeft s.vanishLeft) ∧
     (∀ cfg : FramePairConfig, cfg.rightSteps = cfg.frameSteps.toArray.map fun s =>
       panelStep s.rightTurn s.rightTurning s.appearRight s.vanishRight) ∧
     (∀ t turning appear vanish, panelStep t turning appear vanish =
@@ -1063,19 +1062,23 @@ theorem framePair_keys :
       "Letter 1, a, acts: the point turns a fifth of a turn clockwise about the left center 0; " ++
         "in the moving frame the right center turns a fifth of a turn counterclockwise about " ++
         "the left center. (n = (0, 0, 0, 0, 0), j = 1)",
-      "Letter 1, a, has acted; its arrows fade. (n = (0, 0, 0, 0, 0), j = 1)",
+      "After letter 1, a: the point has turned a fifth of a turn clockwise about the left " ++
+        "center 0, and in the moving frame the right center a fifth of a turn counterclockwise " ++
+        "about the left center. (n = (0, 0, 0, 0, 0), j = 1)",
       "Letter 2, b⁻¹, is next: the point lies in the right disk, so it acts. Arrows show the " ++
         "turn: counterclockwise about the right center 1 on the left, clockwise about the " ++
         "right center in the moving frame. (n = (0, 0, 0, 0, 0), j = 1)",
       "Letter 2, b⁻¹, acts: the point turns a fifth of a turn counterclockwise about the right " ++
         "center 1; in the moving frame the left center turns a fifth of a turn clockwise about " ++
         "the right center. (n = (−1, 1, 0, 0, 0), j = 0)",
-      "Letter 2, b⁻¹, has acted; its arrows fade. (n = (−1, 1, 0, 0, 0), j = 0)",
+      "After letter 2, b⁻¹: the point has turned a fifth of a turn counterclockwise about the " ++
+        "right center 1, and in the moving frame the left center a fifth of a turn clockwise " ++
+        "about the right center. (n = (−1, 1, 0, 0, 0), j = 0)",
       "Letter 3, a, does not act: the point lies outside the left disk, and in the moving " ++
         "frame the left center lies outside the window; a ring marks that center in both " ++
         "panels, and nothing moves. (n = (−1, 1, 0, 0, 0), j = 0)",
-      "Letter 3, a, does not act: its ring is held while nothing moves. (n = (−1, 1, 0, 0, 0), " ++
-        "j = 0)",
+      "Letter 3, a, does not act (held): a ring marks the left center in both panels, and " ++
+        "nothing moves. (n = (−1, 1, 0, 0, 0), j = 0)",
       "Letter 3, a, did not act: the state is unchanged. (n = (−1, 1, 0, 0, 0), j = 0)",
       "Letter 4, b, is next: the point lies in the right disk, so it acts. Arrows show the " ++
         "turn: clockwise about the right center 1 on the left, counterclockwise about the " ++
@@ -1083,33 +1086,41 @@ theorem framePair_keys :
       "Letter 4, b, acts: the point turns a fifth of a turn clockwise about the right center " ++
         "1; in the moving frame the left center turns a fifth of a turn counterclockwise about " ++
         "the right center. (n = (0, 0, 0, 0, 0), j = 1)",
-      "Letter 4, b, has acted; its arrows fade. (n = (0, 0, 0, 0, 0), j = 1)",
+      "After letter 4, b: the point has turned a fifth of a turn clockwise about the right " ++
+        "center 1, and in the moving frame the left center a fifth of a turn counterclockwise " ++
+        "about the right center. (n = (0, 0, 0, 0, 0), j = 1)",
       "Letter 5, a⁻¹, is next: the point lies in the left disk, so it acts. Arrows show the " ++
         "turn: counterclockwise about the left center 0 on the left, clockwise about the left " ++
         "center in the moving frame. (n = (0, 0, 0, 0, 0), j = 1)",
       "Letter 5, a⁻¹, acts: the point turns a fifth of a turn counterclockwise about the left " ++
         "center 0; in the moving frame the right center turns a fifth of a turn clockwise " ++
         "about the left center. (n = (0, 0, 0, 0, 0), j = 0)",
-      "Letter 5, a⁻¹, has acted; its arrows fade. (n = (0, 0, 0, 0, 0), j = 0)",
+      "After letter 5, a⁻¹: the point has turned a fifth of a turn counterclockwise about the " ++
+        "left center 0, and in the moving frame the right center a fifth of a turn clockwise " ++
+        "about the left center. (n = (0, 0, 0, 0, 0), j = 0)",
       "Letter 6, b⁻¹, is next: the point lies in the right disk, so it acts. Arrows show the " ++
         "turn: counterclockwise about the right center 1 on the left, clockwise about the " ++
         "right center in the moving frame. (n = (0, 0, 0, 0, 0), j = 0)",
       "Letter 6, b⁻¹, acts: the point turns a fifth of a turn counterclockwise about the right " ++
         "center 1; in the moving frame the left center turns a fifth of a turn clockwise about " ++
         "the right center. (n = (1, 0, 0, 0, −1), j = 4)",
-      "Letter 6, b⁻¹, has acted; its arrows fade. (n = (1, 0, 0, 0, −1), j = 4)",
+      "After letter 6, b⁻¹: the point has turned a fifth of a turn counterclockwise about the " ++
+        "right center 1, and in the moving frame the left center a fifth of a turn clockwise " ++
+        "about the right center. (n = (1, 0, 0, 0, −1), j = 4)",
       "Letter 7, a, is next: the point lies in the left disk, so it acts. Arrows show the " ++
         "turn: clockwise about the left center 0 on the left, counterclockwise about the left " ++
         "center in the moving frame. (n = (1, 0, 0, 0, −1), j = 4)",
       "Letter 7, a, acts: the point turns a fifth of a turn clockwise about the left center 0; " ++
         "in the moving frame the right center turns a fifth of a turn counterclockwise about " ++
         "the left center. (n = (1, 0, 0, 0, −1), j = 0)",
-      "Letter 7, a, has acted; its arrows fade. (n = (1, 0, 0, 0, −1), j = 0)",
+      "After letter 7, a: the point has turned a fifth of a turn clockwise about the left " ++
+        "center 0, and in the moving frame the right center a fifth of a turn counterclockwise " ++
+        "about the left center. (n = (1, 0, 0, 0, −1), j = 0)",
       "Letter 8, b, does not act: the point lies outside the right disk, and in the moving " ++
         "frame the right center lies outside the window; a ring marks that center in both " ++
         "panels, and nothing moves. (n = (1, 0, 0, 0, −1), j = 0)",
-      "Letter 8, b, does not act: its ring is held while nothing moves. (n = (1, 0, 0, 0, −1), " ++
-        "j = 0)",
+      "Letter 8, b, does not act (held): a ring marks the right center in both panels, and " ++
+        "nothing moves. (n = (1, 0, 0, 0, −1), j = 0)",
       "Letter 8, b, did not act: the state is unchanged. (n = (1, 0, 0, 0, −1), j = 0)",
       "Letter 9, a⁻¹, is next: the point lies in the left disk, so it acts. Arrows show the " ++
         "turn: counterclockwise about the left center 0 on the left, clockwise about the left " ++
@@ -1117,17 +1128,26 @@ theorem framePair_keys :
       "Letter 9, a⁻¹, acts: the point turns a fifth of a turn counterclockwise about the left " ++
         "center 0; in the moving frame the right center turns a fifth of a turn clockwise " ++
         "about the left center. (n = (1, 0, 0, 0, −1), j = 4)",
-      "Letter 9, a⁻¹, has acted; its arrows fade. (n = (1, 0, 0, 0, −1), j = 4)",
+      "After letter 9, a⁻¹: the point has turned a fifth of a turn counterclockwise about the " ++
+        "left center 0, and in the moving frame the right center a fifth of a turn clockwise " ++
+        "about the left center. (n = (1, 0, 0, 0, −1), j = 4)",
       "Letter 10, b, is next: the point lies in the right disk, so it acts. Arrows show the " ++
         "turn: clockwise about the right center 1 on the left, counterclockwise about the " ++
         "right center in the moving frame. (n = (1, 0, 0, 0, −1), j = 4)",
       "Letter 10, b, acts: the point turns a fifth of a turn clockwise about the right center " ++
         "1; in the moving frame the left center turns a fifth of a turn counterclockwise about " ++
         "the right center. (n = (0, 0, 0, 0, 0), j = 0)",
-      "Letter 10, b, has acted; its arrows fade. (n = (0, 0, 0, 0, 0), j = 0)"] ∧
+      "After letter 10, b: the point has turned a fifth of a turn clockwise about the right " ++
+        "center 1, and in the moving frame the left center a fifth of a turn counterclockwise " ++
+        "about the right center. (n = (0, 0, 0, 0, 0), j = 0)"] ∧
     ({} : FramePairConfig).keyCount = 31 ∧ ({} : FramePairConfig).allArrive = true ∧
-    ({} : FramePairConfig).ringsPlaced = true ∧ ({} : FramePairConfig).arrowsPlaced = true := by
-  refine ⟨by unfold framePair; with_reducible rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl,
+    ({} : FramePairConfig).ringsPlaced = true ∧ ({} : FramePairConfig).arrowsPlaced = true ∧
+    turnsAreFifths = true ∧
+    (({} : FramePairConfig).frameSteps.filterMap (·.leftTurn.map (·.turns))) =
+      [-1 / 5, 1 / 5, -1 / 5, 1 / 5, 1 / 5, -1 / 5, 1 / 5, -1 / 5] ∧
+    (({} : FramePairConfig).frameSteps.filterMap (·.rightTurn.map (·.turns))) =
+      [1 / 5, -1 / 5, 1 / 5, -1 / 5, -1 / 5, 1 / 5, -1 / 5, 1 / 5] := by
+  refine ⟨by unfold framePair; with_reducible rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl,
     fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ _ _ _ => rfl, rfl, ?_⟩
   repeat' apply And.intro
   all_goals decide +kernel
