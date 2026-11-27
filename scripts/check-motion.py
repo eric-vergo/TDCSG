@@ -80,7 +80,8 @@ def page_checks(c, browser, base, url, expect, helpers):
     sizes = page.evaluate("""() => [...document.querySelectorAll('figure.pilean-figure')]
       .filter(f => f.querySelector('.pilean-motion')).map(f => {
         const col = f.closest('main').querySelector('p');
-        return [f.getBoundingClientRect().width, col ? col.getBoundingClientRect().width : 0]; })""")
+        return [f.getBoundingClientRect().width,
+                col ? col.getBoundingClientRect().width : 0]; })""")
     for fig, col in sizes:
         print(f"{url}: figure {fig:.0f} px in a text column of {col:.0f} px")
         c.check(f"{url}: the figure fits the text column", fig <= col + 0.5, f"{fig} {col}")

@@ -295,6 +295,7 @@ def wordLoop (i : Nat) : MotionPanels :=
                 the center of the last turn, and a dot each end that lies on a boundary circle, \
                 where the next letter's disk test holds with equality." }
     checks := .fail
+    poster := n
     width := figureWidth
     narrowWidth := some narrowWidth }
 

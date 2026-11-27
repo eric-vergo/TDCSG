@@ -35,9 +35,9 @@ stated vectors, and that motion is not part of any statement. What the key frame
 figure shown is made of exactly those key frames, declared moves and captions, and that each
 declared turn or slide carries one key frame onto the next exactly, is stated here as a plain
 theorem (`TDCSGFigures.wordLoop_keys`, `TDCSGFigures.Lift.framePair_keys`,
-`TDCSGFigures.generatorStep_keys` and the other `_keys` theorems, and for the two illustrations
-whose earlier figures had a theorem of that name, `TDCSGFigures.wordSteps_spec` and
-`TDCSGFigures.Confinement.walkToLeaf_spec`, which are not linked). Each actor an animation moves is
+`TDCSGFigures.generatorStep_keys` and the other `_keys` theorems, and for two illustrations
+`TDCSGFigures.wordSteps_spec` and `TDCSGFigures.Confinement.walkToLeaf_spec`, named `_spec`,
+though they are not linked). Each actor an animation moves is
 drawn at the exact anchors its arrival check reads. The captions are written out, or, where they
 are built from the data (the orbit on the chord, the walk), stated as functions of the data; the
 kernel does not reduce the string functions they are built with, so their words are pinned by
@@ -359,8 +359,8 @@ Zeta5.ofInt 12
 end TDCSGFigures
 ```
 
-{figref "disjoint-disks"}[]: the animation `TDCSGFigures.disjointDisks`, whose last key frame in
-both panels is the figure of the two turns, with its theorem `TDCSGFigures.disjointDisks_spec`;
+{figref "disjoint-disks"}[]: the animation `TDCSGFigures.disjointDisks`, whose last key frame is
+the figure of the two turns, with its theorem `TDCSGFigures.disjointDisks_spec`;
 the other key frames and the moves are stated in `TDCSGFigures.disjointDisks_keys`.
 
 ```Verso.Genre.Manual.InlineLean.lean
@@ -833,27 +833,28 @@ open PILean PILean.Plane PILean.Exact TDCSGFigures.Early
 
 /-- The animation `wordSteps` and the data its key frames are drawn from, written out; an
 illustration, to which this theorem is not linked. It has one panel whose keys are `stepKey k`,
-`k = 0, …, 4`, and whose steps are made from the declared moves `stepMoves`. Every key draws
-`stepBase` (the two disks of radius `2.1`, their lens, the centres recording where they stand, and
-the names), then the circle about the centre of the last turn (`stepPivot`), at key `4` the
-segment from `-1` to `z₃` (`stepReach`), the points left behind, faint and labelled (`stepTrail`,
-each recording exactly where it stands relative to the two disks and the lens), the point `z_k`
-(`stepMover`) and its name (`stepLabel`). The points are drawn at their anchors (`stepAnchors`),
-and the exact actors of the keys (`stepActors`) are those anchors. The points are
+`k = 0, …, 4`, and whose steps are made from the declared moves `stepMoves`; its poster, the still
+shown while it is pointed at or focused, under reduced motion and in print, is the last key. Every
+key draws `stepBase` (the two disks of radius `2.1`, their lens, the centres recording where they
+stand, and the names), then the circle about the centre of the last turn (`stepPivot`), at key `4`
+the segment from `-1` to `z₃` (`stepReach`), the points left behind, faint and labelled
+(`stepTrail`, each recording exactly where it stands relative to the two disks and the lens), the
+point `z_k` (`stepMover`) and its name (`stepLabel`). The points are drawn at their anchors
+(`stepAnchors`), and the exact actors of the keys (`stepActors`) are those anchors. The points are
 `z₀ = 0, z₁ = -1 + ζ⁴ = a(0), z₂ = b(z₁), z₃ = b(z₂), z₄ = a(z₃) = z₃`, written out in the basis
 `1, ζ, ζ², ζ³`; the letters `a, b, b` find their point in their closed disk of radius `2.1` and the
 last `a` does not (`|z₃ + 1|² > 441/100`), so it fixes `z₃`. Step `k` turns the point by
 `stepTurn k`, about the centre of letter `k + 1` by `-1/5` of a full turn, when that letter acts,
-and fades the circles, the names, the points left behind and the segment in and out; each
-declared move, applied exactly in `ℚ(ζ₅)` to the anchors of the actors of one key, gives those of
-the next (`stepsArrive`), so every turn carries `z_k` onto `z_{k+1}`. The captions are written
-out. Not stated: how the builders draw, the timing and the frames the browser draws between the
-key frames. -/
+and fades the circles, the names, the points left behind and the segment in and out; each declared
+move, applied exactly in `ℚ(ζ₅)` to the anchors of the actors of one key, gives those of the next
+(`stepsArrive`), so every turn carries `z_k` onto `z_{k+1}`. The captions are written out. Not
+stated: how the builders draw, the timing and the frames the browser draws between the key frames.
+-/
 theorem wordSteps_spec :
     wordSteps.panels = #[{ motion :=
       { keys := ((List.range 5).map stepKey).toArray,
         steps := ((List.range 4).map (exactStep ∘ stepMoves)).toArray } }] ∧
-    wordSteps.captions = stepCaptions ∧
+    wordSteps.captions = stepCaptions ∧ wordSteps.poster = 4 ∧
     stepWord = [.a, .b, .b, .a] ∧
     (stepCaptions = (
 #[
@@ -1182,7 +1183,9 @@ open PILean PILean.Plane PILean.Exact TDCSGFigures.Early
 
 /-- The three loops and the data their key frames are drawn from. The figures are `wordLoop 1`,
 `wordLoop 2`, `wordLoop 3`: one panel whose keys are `wordKey i k` and whose steps are
-`wordStep i k`, with the captions `wordCaption i k`. Key `k` draws, over the disks, their lens, the
+`wordStep i k`, with the captions `wordCaption i k`; the poster, the still shown while the picture
+is pointed at or focused, under reduced motion and in print, is the last key, where the image lies
+on the chord again. Key `k` draws, over the disks, their lens, the
 chord and the piece (`wordUnder`), the image `[w_k(p), w_k(q)]` of the piece `[p, q]` after `k`
 letters (`wordSegment`, read from `wordPath i`, here written out in the basis `1, ζ, ζ², ζ³`), the
 circle about the centre of the turn before it (`wordPivot`) and the ends lying on a boundary circle
@@ -1208,6 +1211,7 @@ theorem wordLoop_figures :
       ((List.range (wordPiece i).1.length).map (wordStep i)).toArray) ∧
     (∀ i, (wordLoop i).captions =
       ((List.range ((wordPiece i).1.length + 1)).map (wordCaption i)).toArray) ∧
+    (∀ i, (wordLoop i).poster = (wordPiece i).1.length) ∧
     (∀ i k, (wordKey i k).items =
       wordUnder i ++ (#[wordSegment i k] ++ wordPivot i k ++ wordContacts i k) ++ wordOver i) ∧
     (∀ i k, wordSegment i k =
@@ -1221,7 +1225,8 @@ theorem wordLoop_figures :
       ⟨ZetaFrac.ofZeta ((wordPiece i).1.getD k .a).centre, ((wordPiece i).1.getD k .a).turns⟩) := by
   exact ⟨by unfold wordLoop1; with_reducible rfl, by unfold wordLoop2; with_reducible rfl,
     by unfold wordLoop3; with_reducible rfl, fun _ => by unfold wordLoop; with_reducible rfl,
-    fun _ => rfl, fun _ => rfl, fun _ => by unfold wordLoop; with_reducible rfl, fun _ _ => rfl,
+    fun _ => rfl, fun _ => rfl, fun _ => by unfold wordLoop; with_reducible rfl,
+    fun _ => by unfold wordLoop; with_reducible rfl, fun _ _ => rfl,
     fun _ _ => rfl, fun _ _ => rfl, fun _ _ => by unfold wordTurn; with_reducible rfl⟩
 
 /-- The data of the key frames of the three loops (see `wordLoop_figures`). -/
@@ -2437,7 +2442,9 @@ open PILean PILean.Plane PILean.Exact TDCSGFigures
 
 /-- The animation `walkToLeaf` and the data its key frames are drawn from, written out; an
 illustration, to which this theorem is not linked. It has one panel whose keys are `walkKey k`,
-`k = 0, …, 16`, and whose steps are made from the declared moves `walkMoves`. Key `k` draws the
+`k = 0, …, 16`, and whose steps are made from the declared moves `walkMoves`; its poster, the still
+shown while it is pointed at or focused, under reduced motion and in print, is the last key, with
+the labels numbered. Key `k` draws the
 window, the edges and labels of the path `path` up to `path[k]` (`walkShown`), from key `15` on the
 candidates `n + eₖ` (`k ≠ 2`) of the leaf with their spokes, at key `16` the step back and the
 labels numbered in the order of the walk, and a circle about `P(walkAt k)`, the label where the walk
@@ -2459,7 +2466,7 @@ theorem walkToLeaf_spec :
       { keys := ((List.range walkKeyCount).map walkKey).toArray,
         steps := ((List.range (walkKeyCount - 1)).map fun k =>
           exactStep (walkMoves k)).toArray } }] ∧
-    walkKeyCount = 17 ∧
+    walkKeyCount = 17 ∧ walkToLeaf.poster = walkKeyCount - 1 ∧
     walkToLeaf.captions = ((List.range walkKeyCount).map walkCaption).toArray ∧
     (∀ (k : Nat), walkAt k = (
   if k ≤ path.length - 1 then path.getD k zeroLabel

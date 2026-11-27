@@ -301,4 +301,5 @@ one package at a time, and keep Mathlib's shared package revisions.
 
 GitHub Actions supplies `verification.json` after its Linux comparator run succeeds. A local
 render remains usable without that file. See the
-[standalone challenge](../Comparator/FiveDisk/Challenge.lean) and [solution](../Comparator/FiveDisk/Solution.lean).
+[standalone challenge](../Comparator/FiveDisk/Challenge.lean) and
+[solution](../Comparator/FiveDisk/Solution.lean).

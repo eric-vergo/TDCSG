@@ -361,6 +361,7 @@ def walkToLeaf : MotionPanels where
               into the label n at the window's edge; the other candidates of n appear outside \
               the window, and the walk steps back to n + e₂." }
   checks := .fail
+  poster := walkKeyCount - 1
   width := figureWidth
 
 /-! ### The facts the figures show -/

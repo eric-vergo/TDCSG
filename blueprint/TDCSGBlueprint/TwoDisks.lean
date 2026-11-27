@@ -44,8 +44,8 @@ many elements is
 The closed disks of radius $`1.5` about $`-1` (the left disk) and $`1` (the right disk), their
 lens, and one step of the left generator $`a`: the left disk turns a fifth of a turn clockwise
 about $`-1` and carries the points inside it, while the points just outside it stay where they are.
-The origin goes to $`a(0)=-1+\zeta^4` with $`\zeta=\exp(2\pi i/5)`, along the dashed arc of the last
-frame. The origin lies in both disks, so both generators move it; $`a(0)` lies in the left disk
+The origin goes to $`a(0)=-1+\zeta^4`, where $`\zeta=e^{2\pi i/5}`, along the dashed arc of the
+last frame. The origin lies in both disks, so both generators move it; $`a(0)` lies in the left disk
 only. The key frames are exact and the last one is the figure its theorem states
 (`TDCSGFigures.generatorStep_spec`; the samples and the turn in `TDCSGFigures.generatorStep_keys`,
 where `a` is applied to each of them); between them the browser turns the drawn points about $`-1`.

@@ -414,6 +414,7 @@ def wordSteps : MotionPanels where
               the point the last a meets lies outside the left disk and stays. A small circle \
               marks the center of the last turn, and the points left behind stay faint." }
   checks := .fail
+  poster := 4
   width := figureWidth
   narrowWidth := some narrowWidth
 

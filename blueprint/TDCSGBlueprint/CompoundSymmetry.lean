@@ -301,7 +301,8 @@ Two disjoint closed disks, $`B_1` of radius $`4/5` about $`-1` and $`B_2` of rad
 $`1`, each turned clockwise through $`72^\circ` by its own generator, in both orders on one clock:
 $`a` then $`b` in the copy on the left, $`b` then $`a` in the copy on the right. The turn $`a` of
 $`B_1` moves $`x` to $`a(x)` and fixes every point outside $`B_1`, such as $`y`; the turn $`b` of
-$`B_2` moves $`y` to $`b(y)` and fixes $`x`. Both orders end in the same picture, the last frame.
+$`B_2` moves $`y` to $`b(y)` and fixes $`x`. Both orders end in the same picture, shown at full
+size in the last frame.
 Since $`4/5+7/10<2` the dashed gap separates the disks, the turns move disjoint sets of points and
 commute, and the group they generate is $`C_5\times C_5`. The key frames are exact, and the last
 one is the figure its theorem states (`TDCSGFigures.disjointDisks_spec`, the other frames in
