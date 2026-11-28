@@ -46,7 +46,7 @@ drawn at the exact anchors its arrival check reads. The captions are written out
 are built from the data (the orbit on the chord, the walk, the component of zero), stated as functions of the data; the
 kernel does not reduce the string functions they are built with, so their words are pinned by
 `#guard` lines in `TDCSGTests.Motions`; the test driver requires that PILean's engine finds no
-error in any animation. Where an animation replaced a
+error in any animation. Where an animation stands in place of a
 figure with a linked theorem, its last key frame is that figure, and the theorem stays linked to
 the animation: it states that the last key frame is the figure and what the figure draws
 (`TDCSGFigures.generatorStep_spec`, `TDCSGFigures.extensionJump_spec`,
@@ -2736,7 +2736,7 @@ theorem terminalCrossing_spec :
         (some (neighbourPlace k).2) |>.role "right" |>.withId s!"neighbour-label-{k}")) ∧
     (∀ k, candidatePoint k = (Plane.Exact.point (proj (shift leaf k (-1))) |>.faint
       |>.marker .ring
-      |>.named s!"n + e₀ − e{sub k} = {labelText (shift leaf k (-1))}, weight 0, outside the window"
+      |>.named s!"n + e₀ − e{sub k} = {labelText (shift leaf k (-1))}, weight 0"
       |>.incident (windowSide (shift leaf k (-1))).incidence "the window"
       |>.withId s!"candidate-{k}")) ∧
     (∀ k p, candidateLabel k p =
@@ -2758,7 +2758,8 @@ theorem terminalCrossing_spec :
       Plane.Exact.segment (proj crossN) (proj leaf) |>.width 3.5
         |>.named "the edge from n to n + e₀: it raises n₀ from the good level 4 to 5"
         |>.declRef `TDCSG.Five.IsGoodLevel.leaf |>.withId "edge",
-      Plane.Exact.polygon zoomBox |>.width 1 |>.named "the square enlarged in the next figure"
+      Plane.Exact.polygon zoomBox |>.width 1
+        |>.named "a square about the leaf; the next figure and the lower panel enlarge its centre"
         |>.withId "zoom-box",
       neighbourPoint 1, neighbourLabel 1, neighbourPoint 2, neighbourLabel 2,
       neighbourPoint 3, neighbourLabel 3, neighbourPoint 4, neighbourLabel 4,
@@ -2785,22 +2786,11 @@ theorem terminalCrossing_spec :
     [1, 2, 3, 4].all (fun k => windowSide (shift leaf k (-1)) == .outside) = true ∧
     QSqrt.lt crossCut (proj leaf).realPart = true ∧
     ((proj crossN).realPart == ⟨5, -2⟩ && (proj crossN).conj == proj crossN &&
-      (proj leaf).realPart == ⟨6, -2⟩) = true := by
-  repeat' apply And.intro
-  all_goals first
-    | (intros; unfold terminalCrossing; with_reducible rfl)
-    | (intros; unfold crossMotion; with_reducible rfl)
-    | (intros; unfold crossKey; rfl)
-    | (intros; unfold terminalCrossingFinal; with_reducible rfl)
-    | (intros; unfold neighbourEdge; rfl)
-    | (intros; unfold rejectedStep; rfl)
-    | (intros; unfold neighbourPoint; rfl)
-    | (intros; unfold neighbourPlace; rfl)
-    | (intros; unfold neighbourLabel; rfl)
-    | (intros; unfold candidatePoint; rfl)
-    | (intros; unfold candidateLabel; rfl)
-    | rfl
-    | decide +kernel
+      (proj leaf).realPart == ⟨6, -2⟩) = true :=
+  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl,
+    fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ _ => rfl, rfl, by decide +kernel,
+    by decide +kernel, by decide +kernel, by decide +kernel, by decide +kernel, by decide +kernel,
+    by decide +kernel⟩
 
 figure_links terminalCrossing terminalCrossing_spec
 
@@ -2817,8 +2807,10 @@ The declared moves are written out; each slide, applied exactly to the circle's 
 gives its centre in the next, in `ℚ(ζ₅)` for the crossing and in `ℚ(√5)²` for the enlarged panel
 (`crossArrives`, `zoomArrives`), and the other actors come and go only by a declared appearance or
 disappearance. The point `boxEntry` drawn and slid to is real and lies on the edge, between
-`P(n) = 7 - 4φ` and the leaf `8 - 4φ`, both real, and inside the enlarged box, whose left edge is
-`1.51`; the enlarged panel draws it and the leaf at the same real parts. The captions are written
+`P(n) = 7 - 4φ` and the leaf `8 - 4φ`, both real; the circle about it and the circle about the leaf
+lie inside the region the enlarged panel shows, `zoomView`, made from `enlargedLeft`,
+`enlargedRight` and `enlargedHalf`, and that region lies inside the square `zoomBox` about the leaf
+drawn in the crossing; the enlarged panel draws the point and the leaf at the same real parts. The captions are written
 out. Not stated: how the builders draw, the layout, the timing and the frames the browser draws
 between the key frames. -/
 theorem terminalCrossing_keys :
@@ -2826,7 +2818,8 @@ theorem terminalCrossing_keys :
       "A crossing at a good level, at r = 2.12, x = 0.472: the label n = (4, −3, 1, 1, −3) has \
         weight zero and its coordinate n₀ = 4 is a good level. The circle starts at n; the thick \
         edge leads to n + e₀ and raises n₀ to 5.",
-      "The walk follows the thick edge to the small square, which the lower panel shows enlarged.",
+      "The walk follows the thick edge into the small square about the leaf, whose centre the \
+        lower panel shows enlarged.",
       "It reaches the leaf n + e₀: enlarged, the step ends between 0.0045 and 0.0046 beyond the \
         cut Re w = Re x + κ − η and between 0.0041 and 0.0042 inside the window's edge, both less \
         than a pixel in the upper panel.",
@@ -2891,35 +2884,27 @@ theorem terminalCrossing_keys :
       (crossFadeIds k).map fun id => ⟨id, []⟩) ∧
     (∀ k, zoomActors k = (if (zoomWalkAt k).isEmpty then [] else [⟨"walker", zoomWalkAt k⟩]) ++
       [⟨if k < 5 then "leaf-label-early" else "leaf-label", []⟩]) ∧
-    crossArrives = true ∧ zoomArrives = true ∧
-    (QSqrt.lt (proj crossN).realPart boxEntry.realPart &&
+    zoomView = ⟨Exact.toFloat enlargedLeft, Exact.toFloat (-enlargedHalf),
+      Exact.toFloat enlargedRight, Exact.toFloat enlargedHalf⟩ ∧
+    enlargedLeft = 151 / 100 ∧ enlargedRight = 1542 / 1000 ∧ enlargedHalf = 13 / 2000 ∧
+    zoomBox = (let a := proj leaf |>.realPart
+      let d := rat (1 / 20)
+      [(a - d, rat 0 - d), (a + d, rat 0 - d), (a + d, d), (a - d, d)]) ∧
+    (crossArrives && zoomArrives &&
+      QSqrt.lt (proj crossN).realPart boxEntry.realPart &&
       QSqrt.lt boxEntry.realPart (proj leaf).realPart && boxEntry.num.conj == boxEntry.num &&
       (proj leaf).conj == proj leaf && (proj crossN).conj == proj crossN &&
-      QSqrt.lt (rat (151 / 100)) boxEntry.realPart &&
-      leafQ.1 == leafZ.realPart) = true := by
-  repeat' apply And.intro
-  all_goals first
-    | (intros; unfold crossCaptions; with_reducible rfl)
-    | (intros; unfold terminalCrossing; with_reducible rfl)
-    | (intros; unfold crossMotion; with_reducible rfl)
-    | (intros; unfold zoomMotion; with_reducible rfl)
-    | (intros; unfold crossKey; with_reducible rfl)
-    | (intros; unfold crossKeyItems; with_reducible rfl)
-    | (intros; unfold crossShows; with_reducible rfl)
-    | (intros; unfold earlyName; rfl)
-    | (intros; unfold walkerItems; rfl)
-    | (intros; unfold zoomFinal; with_reducible rfl)
-    | (intros; unfold zoomEarlyName; rfl)
-    | (intros; unfold zoomKey; with_reducible rfl)
-    | (intros; unfold zoomKeyItems; with_reducible rfl)
-    | (intros; unfold zetaFracSub; with_reducible rfl)
-    | (intros; unfold crossFadeIds; with_reducible rfl)
-    | (intros; unfold crossActors; with_reducible rfl)
-    | (intros; unfold zoomActors; with_reducible rfl)
-    | rfl
-    | (simp only [crossMoves]; done)
-    | (simp only [zoomMoves]; done)
-    | decide +kernel
+      QSqrt.lt (rat enlargedLeft) (boxEntry.realPart - rat zoomWalkerRadius) &&
+      QSqrt.lt (leafZ.realPart + rat zoomWalkerRadius) (rat enlargedRight) &&
+      QSqrt.lt (rat zoomWalkerRadius) (rat enlargedHalf) &&
+      leafQ.1 == leafZ.realPart &&
+      QSqrt.lt ((proj leaf).realPart - rat (1 / 20)) (rat enlargedLeft) &&
+      QSqrt.lt (rat enlargedRight) ((proj leaf).realPart + rat (1 / 20)) &&
+      decide (enlargedHalf < 1 / 20)) = true :=
+  ⟨rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl, fun _ _ => rfl, rfl, fun _ _ => rfl, rfl,
+    rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl,
+    fun _ _ => rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl,
+    fun _ => rfl, rfl, rfl, rfl, rfl, rfl, by decide +kernel⟩
 
 end TDCSGFigures.Levels
 ```

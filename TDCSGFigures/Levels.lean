@@ -169,7 +169,9 @@ def windowSide (m : Label) : Side :=
     if w.normSq == crossRadiusSq * rat (((q * q : Int) : Rat) / 4) then .on else .inside
   else .outside
 
-/-- The square around the leaf that `terminalZoom` enlarges. -/
+/-- A square about the leaf, of side `1/10`; the region `terminalZoom` and the lower panel of
+`terminalCrossing` enlarge (`enlargedLeft`, `enlargedRight`, `enlargedHalf`) is a rectangle about
+its centre, too small to be drawn at the scale of the crossing. -/
 def zoomBox : List (QSqrt5 × QSqrt5) :=
   let a := proj leaf |>.realPart
   let d := rat (1 / 20)
@@ -205,7 +207,7 @@ def neighbourLabel (k : Nat) : Item :=
 /-- The candidate `n + e₀ - eₖ` of the leaf, recording where it stands relative to the window. -/
 def candidatePoint (k : Nat) : Item :=
   Plane.Exact.point (proj (shift leaf k (-1))) |>.faint |>.marker .ring
-    |>.named s!"n + e₀ − e{sub k} = {labelText (shift leaf k (-1))}, weight 0, outside the window"
+    |>.named s!"n + e₀ − e{sub k} = {labelText (shift leaf k (-1))}, weight 0"
     |>.incident (windowSide (shift leaf k (-1))).incidence "the window" |>.withId s!"candidate-{k}"
 
 /-- The label of the candidate `n + e₀ - eₖ`, placed `place`. -/
@@ -240,7 +242,8 @@ def terminalCrossingFinal : Plane.Figure where
     Plane.Exact.segment (proj crossN) (proj leaf) |>.width 3.5
       |>.named "the edge from n to n + e₀: it raises n₀ from the good level 4 to 5"
       |>.declRef `TDCSG.Five.IsGoodLevel.leaf |>.withId "edge",
-    Plane.Exact.polygon zoomBox |>.width 1 |>.named "the square enlarged in the next figure"
+    Plane.Exact.polygon zoomBox |>.width 1
+      |>.named "a square about the leaf; the next figure and the lower panel enlarge its centre"
       |>.withId "zoom-box",
     neighbourPoint 1, neighbourLabel 1, neighbourPoint 2, neighbourLabel 2,
     neighbourPoint 3, neighbourLabel 3, neighbourPoint 4, neighbourLabel 4,
@@ -265,8 +268,20 @@ def terminalCrossingFinal : Plane.Figure where
 
 /-! ### The enlargement near the leaf -/
 
-/-- The world box of `terminalZoom`: `[1.51, 1.542] × [-0.0065, 0.0065]`. -/
-def zoomView : Box := ⟨1.51, -0.0065, 1.542, 0.0065⟩
+/-- The left edge of the region `terminalZoom` enlarges, `1.51`. -/
+def enlargedLeft : Rat := 151 / 100
+
+/-- The right edge of the region `terminalZoom` enlarges, `1.542`. -/
+def enlargedRight : Rat := 1542 / 1000
+
+/-- Half the height of the region `terminalZoom` enlarges, `0.0065`. -/
+def enlargedHalf : Rat := 13 / 2000
+
+/-- The world box of `terminalZoom`: `[1.51, 1.542] × [-0.0065, 0.0065]`, from `enlargedLeft`,
+`enlargedRight` and `enlargedHalf`. -/
+def zoomView : Box :=
+  ⟨Exact.toFloat enlargedLeft, Exact.toFloat (-enlargedHalf), Exact.toFloat enlargedRight,
+    Exact.toFloat enlargedHalf⟩
 
 /-- The leaf `P(n + e₀) = 8 - 4φ` as a point of `ℚ(√5)²`. -/
 def leafQ : QSqrt5 × QSqrt5 := ((proj leaf).realPart, rat 0)
@@ -461,7 +476,8 @@ def crossCaptions : Array String := #[
   "A crossing at a good level, at r = 2.12, x = 0.472: the label n = (4, −3, 1, 1, −3) has weight \
     zero and its coordinate n₀ = 4 is a good level. The circle starts at n; the thick edge leads \
     to n + e₀ and raises n₀ to 5.",
-  "The walk follows the thick edge to the small square, which the lower panel shows enlarged.",
+  "The walk follows the thick edge into the small square about the leaf, whose centre the lower \
+    panel shows enlarged.",
   "It reaches the leaf n + e₀: enlarged, the step ends between 0.0045 and 0.0046 beyond the cut \
     Re w = Re x + κ − η and between 0.0041 and 0.0042 inside the window's edge, both less than a \
     pixel in the upper panel.",
