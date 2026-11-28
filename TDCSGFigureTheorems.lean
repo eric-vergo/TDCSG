@@ -2897,9 +2897,10 @@ theorem terminalCrossing_keys :
       QSqrt.lt (leafZ.realPart + rat zoomWalkerRadius) (rat enlargedRight) &&
       QSqrt.lt (rat zoomWalkerRadius) (rat enlargedHalf) &&
       leafQ.1 == leafZ.realPart &&
-      QSqrt.lt ((proj leaf).realPart - rat (1 / 20)) (rat enlargedLeft) &&
-      QSqrt.lt (rat enlargedRight) ((proj leaf).realPart + rat (1 / 20)) &&
-      decide (enlargedHalf < 1 / 20)) = true :=
+      QSqrt.lt (zoomBox.getD 0 (rat 0, rat 0)).1 (rat enlargedLeft) &&
+      QSqrt.lt (rat enlargedRight) (zoomBox.getD 1 (rat 0, rat 0)).1 &&
+      QSqrt.lt (zoomBox.getD 1 (rat 0, rat 0)).2 (rat (-enlargedHalf)) &&
+      QSqrt.lt (rat enlargedHalf) (zoomBox.getD 2 (rat 0, rat 0)).2) = true :=
   ⟨rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl, fun _ _ => rfl, rfl, fun _ _ => rfl, rfl,
     rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl,
     fun _ _ => rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl,
