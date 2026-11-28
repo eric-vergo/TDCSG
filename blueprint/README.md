@@ -107,8 +107,8 @@ replay; `lake build TDCSGBlueprint` checks them.
 name and gapless numbering, allows no other image in the pages, follows the Lean links and every
 link to a place in the same page, requires every animation to be recorded as checked strictly
 (`checks` `fail`, no error left), with its narrow rendition (except the walk of chapter 7, scaled
-down as a whole on a small screen), and as an illustration or, for an animation that replaced a
-figure with a linked theorem, with that theorem (`LINKED_MOTIONS` in the script), and calls
+down as a whole on a small screen), and as an illustration or, for an animation that stands in
+place of a figure with a linked theorem, with that theorem (`LINKED_MOTIONS` in the script), and calls
 PILean's site checks (`tools/site/` of the `pilean` package): `pilean-verify`, every inline
 picture, moving ones included, against its file (`inline_check.py`), nothing active in a figure
 or an animation (`markup_check.py`), each figure's page against the manifest, with an animation's
@@ -164,10 +164,10 @@ strictly. The animations share one timing, `TDCSGFigures.motionPacing` in
 frame pair shows each turn with an arrow about its centre, whose fades are steps of their own
 between short rests, so that the pause between two turns keeps the shared length.
 
-Where an animation replaced a figure with a linked theorem (`generatorStep`, `extensionJump`,
-`disjointDisks`, `exchangedIntervals`, `chordOrbit`, `terminalCrossing`), it keeps the figure's name, label and
-number, its last key frame is that figure (`<name>Final`) and its poster, the still the figure page,
-the reduced-motion view and print show first, and the theorem `<name>_spec` stays linked: it states
+Where an animation stands in place of a figure with a linked theorem (`generatorStep`,
+`extensionJump`, `disjointDisks`, `exchangedIntervals`, `chordOrbit`, `terminalCrossing`), it keeps
+the figure's name, label and number, its last key frame is that figure (`<name>Final`) and its
+poster, the still the figure page, the reduced-motion view and print show first, and the theorem `<name>_spec` stays linked: it states
 that the last key frame is the figure and what the figure draws. The other key frames, the moves
 and the captions are stated in a plain theorem `<name>_keys`. The other animations are
 illustrations (`@[figure illustration]`): no theorem is linked to them, and the data of their key
