@@ -71,7 +71,7 @@ def previews : Array (String × Entry) := #[
   ("levelPhases", .plot Levels.levelPhases),
   ("terminalCrossing", .motion Levels.terminalCrossing),
   ("terminalZoom", .plane Levels.terminalZoom),
-  ("componentOfZero", .plane Confinement.componentOfZero),
+  ("componentOfZero", .motion Confinement.componentOfZero),
   ("walkToLeaf", .motion Confinement.walkToLeaf)]
 
 /-- The pictures of one figure: name suffix and figure, light, dark, narrow and narrow dark. -/
