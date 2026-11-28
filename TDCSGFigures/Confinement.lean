@@ -15,7 +15,7 @@ import TDCSGFigures.Data.Moves
   with the edges of the graph and the window. For each coordinate `j` the good levels nearest the
   gap `|m| ≤ 2`, the candidates for the walls `lo` and `hi` of the confinement proof, are computed
   (`nearestWalls`) and stated with the figure, for its caption.
-* `componentOfZero`: an animation that finds the component layer by layer, by distance from `0`
+* `componentOfZero`: an animation that draws the component layer by layer, by distance from `0`
   (`compLayers`, checked to be the distances by `layersAreDistances`): each layer appears with the
   edges that reach it, tinted while it is the frontier; its last key is `componentOfZeroFinal`.
 * `walkToLeaf`: an animation of a walk along a path of the center graph at `r = 2.13`, `x = 1/5`,
@@ -174,14 +174,21 @@ def compNames : Array Item := #[
     |>.role windowRole |>.withId "legend-centre"]
 
 /-- The radius of the tint about a label of the frontier. -/
-def tintRadius : Rat := 1 / 16
+def tintRadius : Rat := 1 / 22
 
-/-- The tint about label `i` of `compLabels` while it is on the frontier: a disk of radius
-`tintRadius` in the colour of the lens, without an outline, drawn under the labels (actor
-`tint-i`). -/
+/-- The radius about the window centre within which the tints are drawn, `0.987`: a little more
+than the window's `r/2 = 0.975`, so that the edge of a tint stays clear of the labels on the
+window's circle, and small enough that the tints keep within the frame of `componentOfZeroFinal`
+(to within a few hundredths of a pixel). -/
+def tintClip : Rat := 987 / 1000
+
+/-- The tint about label `i` of `compLabels` while it is on the frontier: the part within
+`tintClip` of the window centre of the disk of radius `tintRadius` about it, in the colour of the
+lens, without an outline, drawn under the labels (actor `tint-i`). -/
 def compTint (i : Nat) : Item :=
-  Plane.Exact.disk (proj (compLabels.getD i zeroLabel)) tintRadius |>.role lensRole |>.noOutline
-    |>.fillOpacity 0.3 |>.named "a tint about a label of the frontier" |>.withId s!"tint-{i}"
+  Plane.Exact.lens (ZetaFrac.ofZeta (proj (compLabels.getD i zeroLabel))) ⟨Zeta5.ofInt 1, 2⟩
+      tintRadius tintClip |>.role lensRole |>.noOutline |>.fillOpacity 0.3
+    |>.named "a tint about a label of the frontier" |>.withId s!"tint-{i}"
 
 /-- The numbers of the labels of `compLabels` at distance `d`. -/
 def layerIndices (d : Nat) : List Nat :=
@@ -213,7 +220,7 @@ def componentOfZeroFinal : Plane.Figure where
   items := compItems lastLayer false
   info := { title := "The component of 0 in the center graph at r = 1.95, x = 1/2" }
 
-/-! #### The component found layer by layer -/
+/-! #### The component drawn layer by layer -/
 
 /-- Key `d` of `componentOfZero`: the component found up to distance `d`, the labels at distance
 `d` tinted, for `d ≤ lastLayer`; then `componentOfZeroFinal`. -/
@@ -258,21 +265,20 @@ def compMotion : Motion where
 def compCaption (d : Nat) : String :=
   let k := (compLayers.getD d []).length
   if d == 0 then
-    "The search for the component of 0 in the center graph at r = 1.95, x = 1/2 starts at the \
-      label 0, inside the window |w − x| ≤ r/2."
+    "The labels of the component of 0 in the center graph at r = 1.95, x = 1/2, by their distance \
+      from 0 in the graph. At distance 0: the label 0, inside the window |w − x| ≤ r/2."
   else if d ≤ lastLayer then
-    s!"Distance {d} from 0: {k} new {if k == 1 then "label" else "labels"}, each joined by an \
-      edge to a label at distance {d - 1}; {foundBy d} labels in all. The tints mark the \
-      frontier." ++
-    (if d == lastLayer then " The search finds no further label: the component has 18 \
-      labels." else "")
+    s!"The {k} {if k == 1 then "label" else "labels"} at distance {d} from 0, each joined by an \
+      edge to a label at distance {d - 1}, tinted; {foundBy d} labels at distance at most {d}." ++
+    (if d == lastLayer then s!" No label lies at distance {d + 1}: the component has 18 labels."
+      else "")
   else
     "The component of 0 in the center graph at r = 1.95, x = 1/2: 18 labels, at most 5 edges \
       from 0, each drawn at its projection P(n) inside the window, dots for weight 0, squares for \
       weight 1, with the 19 edges of the graph among them. Every coordinate of every label is \
       −1, 0 or 1."
 
-/-- The component of 0 in the center graph at r = 1.95, x = 1/2, found by distance from 0: each
+/-- The component of 0 in the center graph at r = 1.95, x = 1/2, drawn by distance from 0: each
 layer appears tinted with the edges that reach it, until the 18 labels and 19 edges of the
 component are drawn. The last key frame is the figure of the component, `componentOfZeroFinal`. -/
 @[figure]
@@ -283,7 +289,7 @@ def componentOfZero : MotionPanels where
   timing := ((List.range (lastLayer + 1)).map fun d => moveTiming (compMoves d)).toArray
   info := { title := "The component of 0 in the center graph at r = 1.95, x = 1/2"
             description := "The labels of the component of 0 in the center graph at r = 1.95, \
-              x = 1/2, found by distance from 0: each layer appears tinted with the edges that \
+              x = 1/2, drawn by distance from 0: each layer appears tinted with the edges that \
               reach it, until the 18 labels and 19 edges of the component are drawn. The key \
               frames are exact; between them the browser fades what comes and goes." }
   checks := .fail

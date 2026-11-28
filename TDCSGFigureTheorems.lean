@@ -43,10 +43,10 @@ theorem (`TDCSGFigures.wordLoop_keys`, `TDCSGFigures.Lift.framePair_keys`,
 `TDCSGFigures.wordSteps_spec` and `TDCSGFigures.Confinement.walkToLeaf_spec`, named `_spec`,
 though they are not linked). Each actor an animation moves is
 drawn at the exact anchors its arrival check reads. The captions are written out, or, where they
-are built from the data (the orbit on the chord, the walk, the component of zero), stated as functions of the data; the
-kernel does not reduce the string functions they are built with, so their words are pinned by
-`#guard` lines in `TDCSGTests.Motions`; the test driver requires that PILean's engine finds no
-error in any animation. Where an animation stands in place of a
+are built from the data (the orbit on the chord, the walk, the component of zero), stated as
+functions of the data; the kernel does not reduce the string functions they are built with, so
+their words are pinned by `#guard` lines in `TDCSGTests.Motions`; the test driver requires that
+PILean's engine finds no error in any animation. Where an animation stands in place of a
 figure with a linked theorem, its last key frame is that figure, and the theorem stays linked to
 the animation: it states that the last key frame is the figure and what the figure draws
 (`TDCSGFigures.generatorStep_spec`, `TDCSGFigures.extensionJump_spec`,
@@ -2810,9 +2810,9 @@ disappearance. The point `boxEntry` drawn and slid to is real and lies on the ed
 `P(n) = 7 - 4φ` and the leaf `8 - 4φ`, both real; the circle about it and the circle about the leaf
 lie inside the region the enlarged panel shows, `zoomView`, made from `enlargedLeft`,
 `enlargedRight` and `enlargedHalf`, and that region lies inside the square `zoomBox` about the leaf
-drawn in the crossing; the enlarged panel draws the point and the leaf at the same real parts. The captions are written
-out. Not stated: how the builders draw, the layout, the timing and the frames the browser draws
-between the key frames. -/
+drawn in the crossing; the enlarged panel draws the point and the leaf at the same real parts. The
+captions are written out. Not stated: how the builders draw, the layout, the timing and the frames
+the browser draws between the key frames. -/
 theorem terminalCrossing_keys :
     crossCaptions = #[
       "A crossing at a good level, at r = 2.12, x = 0.472: the label n = (4, −3, 1, 1, −3) has \
@@ -3103,24 +3103,9 @@ theorem componentOfZero_spec :
       | _ => false) &&
     (List.range compEdges.length).filter (edgeLayer · ≤ 5) == List.range 19 &&
     (List.range compLabels.length).filter (fun i => layerOf (compLabels.getD i zeroLabel) ≤ 5) ==
-      List.range 18) = true := by
-  refine ⟨fun _ _ => rfl, fun n _ _ => ?_, ?_⟩
-  · unfold labelPoint
-    split <;> rfl
-  repeat' apply And.intro
-  all_goals first
-    | (intros; unfold componentOfZero; with_reducible rfl)
-    | (intros; unfold compMotion; with_reducible rfl)
-    | (intros; unfold compKey; rfl)
-    | (intros; unfold componentOfZeroFinal; with_reducible rfl)
-    | (intros; unfold compItems; with_reducible rfl)
-    | (intros; unfold compWindow; rfl)
-    | (intros; unfold compEdge; rfl)
-    | (intros; unfold compLabel; rfl)
-    | (intros; unfold compCentre; rfl)
-    | (intros; unfold compNames; rfl)
-    | decide +kernel
-    | rfl
+      List.range 18) = true :=
+  ⟨fun _ _ => rfl, fun _ _ _ => rfl, rfl, rfl, rfl, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl,
+    fun _ => rfl, fun _ => rfl, fun _ => rfl, rfl, by decide +kernel⟩
 
 figure_links componentOfZero componentOfZero_spec
 
@@ -3129,10 +3114,14 @@ set_option maxHeartbeats 4000000 in
 `compLayers` are the labels of the component by their distance from `0` in the center graph: the
 first is `[0]`, they hold the labels of `compLabels`, each once, every edge of `compEdges` joins two
 consecutive layers, and every label of a layer after the first is joined to one of the layer before
-(`layersAreDistances`, decided exactly); so the layer of a label is its distance from `0`, by
-induction on the distance. Key `d ≤ 5` is `compItems d true`: the window, the edges with both ends
-at distance at most `d` (`edgeLayer`), for `d ≥ 1` a tint about each label at distance `d`
-(`compTint`), drawn under the labels, the labels at distance at most `d`, the window centre (on the
+(`layersAreDistances`, decided exactly). The edges of `compEdges` are all the edges of the center
+graph among the labels of `compLabels` (`edgesAmong`), and `compLabels` is the whole component,
+as the search that found it stops only when no label of the window is joined to one found
+(`componentOfZero_spec`); so the layer of a label is its distance from `0`, by induction on the
+distance, and no label lies at distance 6. Key `d ≤ 5` is `compItems d true`: the window, the edges
+with both ends at distance at most `d` (`edgeLayer`), for `d ≥ 1` a tint about each label at
+distance `d` (`compTint`, the part of a small disk about it within `tintClip` of the window
+centre), drawn under the labels, the labels at distance at most `d`, the window centre (on the
 edge from `0` to `e₀` from `d = 1`), the name `0`, the name `e₀` from `d = 2`, and the legend. The
 moves of each step are the actors of one key absent from the next, which vanish, and those of the
 next absent from the one, which appear (`compMoves`); each actor that comes and goes is listed with
@@ -3163,9 +3152,9 @@ theorem componentOfZero_keys :
       max (layerOf a) (layerOf b))) ∧
     (∀ d, layerIndices d =
       (List.range compLabels.length).filter fun i => layerOf (compLabels.getD i zeroLabel) == d) ∧
-    tintRadius = 1 / 16 ∧
-    (∀ i, compTint i = (Plane.Exact.disk (proj (compLabels.getD i zeroLabel)) tintRadius
-      |>.role "lens" |>.noOutline |>.fillOpacity 0.3
+    tintRadius = 1 / 22 ∧ tintClip = 987 / 1000 ∧
+    (∀ i, compTint i = (Plane.Exact.lens (ZetaFrac.ofZeta (proj (compLabels.getD i zeroLabel)))
+        ⟨Zeta5.ofInt 1, 2⟩ tintRadius tintClip |>.role "lens" |>.noOutline |>.fillOpacity 0.3
       |>.named "a tint about a label of the frontier" |>.withId s!"tint-{i}")) ∧
     (∀ d, compKey d = if d ≤ lastLayer then { componentOfZeroFinal with items := compItems d true }
       else componentOfZeroFinal) ∧
@@ -3188,25 +3177,13 @@ theorem componentOfZero_keys :
       (a.filter (fun x => !b.any (·.id == x.id))).map (·.id, .vanish) ++
         (b.filter (fun x => !a.any (·.id == x.id))).map (·.id, .appear))) ∧
     componentOfZero.captions = ((List.range 7).map compCaption).toArray ∧
+    compEdges = edgesAmong compLabels ∧
     (layersAreDistances && compArrives &&
       (List.range 6).map layerIndices ==
         [[0], [1, 2, 3], [4, 10, 11, 17], [5, 9, 12, 16], [6, 8, 13, 15], [7, 14]] &&
-      (List.range 6).map foundBy == [1, 4, 8, 12, 16, 18]) = true := by
-  repeat' apply And.intro
-  all_goals first
-    | (intros; unfold layerOf; with_reducible rfl)
-    | (intros; unfold joined; with_reducible rfl)
-    | (intros; unfold layersAreDistances; with_reducible rfl)
-    | (intros; unfold edgeLayer; with_reducible rfl)
-    | (intros; unfold layerIndices; with_reducible rfl)
-    | (intros; unfold compTint; rfl)
-    | (intros; unfold compKey; with_reducible rfl)
-    | (intros; unfold compMotion; with_reducible rfl)
-    | (intros; unfold compActors; with_reducible rfl)
-    | (intros; unfold compMoves; with_reducible rfl)
-    | (intros; unfold componentOfZero; with_reducible rfl)
-    | decide +kernel
-    | rfl
+      (List.range 6).map foundBy == [1, 4, 8, 12, 16, 18]) = true :=
+  ⟨rfl, fun _ => rfl, fun _ _ => rfl, rfl, fun _ => rfl, fun _ => rfl, rfl, rfl, fun _ => rfl,
+    fun _ => rfl, rfl, fun _ => rfl, fun _ => rfl, rfl, rfl, by decide +kernel⟩
 
 end TDCSGFigures.Confinement
 ```
