@@ -9,6 +9,9 @@ skipped and why:
 
 * Firefox, on the site: `tools/site/motion_browser.py SITE --expect EXPECT --engine firefox`;
 * Firefox, on the standalone files: `tools/motion-browser-check.py EXPECT --engine firefox`;
+* Firefox, on every page of the site: the site's own checks of its formulas (`formula_checks` of
+  `scripts/check-motion.py`: no sideways scrolling at 1440, 1024, 768, 560, 390 and 320 px,
+  every formula inside the block that holds it);
 * WebKit, on the standalone files: `tools/webkit/webkit_check.py EXPECT` (macOS only, with the
   system's `swiftc` and a logged-in session with a screen; it shows nothing and takes no focus).
 
@@ -37,6 +40,30 @@ def firefox_available():
         return True, ""
     except Exception as e:  # noqa: BLE001 (any failure to launch means the pass cannot run)
         return False, f"Playwright's Firefox does not launch ({str(e).splitlines()[0]})"
+
+
+def check_motion():
+    """The module `scripts/check-motion.py`, for its checks of the formulas of every page."""
+    sys.dont_write_bytecode = True  # no compiled cache beside the scripts
+    spec = importlib.util.spec_from_file_location("check_motion",
+                                                  repo_root / "scripts/check-motion.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def formulas(site, workers):
+    """The pass of the formulas of every page in Firefox, by its verdict; one that stops with an
+    error fails, and the passes after it still run."""
+    print("== Firefox, formulas", flush=True)
+    try:
+        held = check_motion().formula_pass(site, "firefox", int(workers[1]) if workers else 1)
+    except Exception as e:  # noqa: BLE001 (a pass that cannot run is a failed pass)
+        why = (str(e) or type(e).__name__).splitlines()[0]
+        print(f"Firefox, formulas: stopped with an error ({why})")
+        held = False
+    print(f"== Firefox, formulas: {'holds' if held else 'FAILS'}", flush=True)
+    return held
 
 
 def webkit_available():
@@ -77,8 +104,10 @@ def main(argv):
         results["Firefox, standalone"] = run("Firefox, standalone", [
             sys.executable, "-I", str(pilean / "tools/motion-browser-check.py"), expect,
             "--engine", "firefox"])
+        results["Firefox, formulas"] = formulas(site, workers)
     else:
-        skipped["Firefox, site"] = skipped["Firefox, standalone"] = why
+        for name in ("Firefox, site", "Firefox, standalone", "Firefox, formulas"):
+            skipped[name] = why
     ok, why = webkit_available()
     if ok:
         results["WebKit, standalone"] = run("WebKit, standalone", [

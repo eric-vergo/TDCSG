@@ -3144,7 +3144,9 @@ edge and every label is drawn (`compItems lastLayer false` lists all 19 edges an
 in order). The component of `0` found by the exact search (`component`, every window test decided
 in `ℚ(√5)`) is the list of 18 labels written out, and its edges are the 19 written out, each from a
 weight-zero label `n` to `n + eⱼ`; every label lies inside the window, so each point's record
-holds. Every coordinate of every label is `-1`, `0` or `1`, and in each coordinate `j` the good
+holds. The list is closed: every label of it has weight `0` or `1`, and each of its candidates
+`n + eⱼ` (weight `0`) or `n - eⱼ` (weight `1`) that lies in the window is in the list, so no label
+outside the list is joined to one in it and the 18 labels are the whole component. Every coordinate of every label is `-1`, `0` or `1`, and in each coordinate `j` the good
 levels nearest the gap `|m| ≤ 2` are those the caption states (`wallText`), with every label
 strictly inside the slab `lo < nⱼ ≤ hi` they bound. Not stated: how the builders and modifiers
 draw, the layout, the lettering, the style's colour values and the pixels. -/
@@ -3221,7 +3223,11 @@ theorem componentOfZero_spec :
       | _ => false) &&
     (List.range compEdges.length).filter (edgeLayer · ≤ 5) == List.range 19 &&
     (List.range compLabels.length).filter (fun i => layerOf (compLabels.getD i zeroLabel) ≤ 5) ==
-      List.range 18) = true :=
+      List.range 18 &&
+    compLabels.all fun n =>
+      (weight n == 0 || weight n == 1) && (List.range 5).all fun j =>
+        let m := shift n j (if weight n == 0 then 1 else -1)
+        !inWindow compRadiusSq compX m || compLabels.contains m) = true :=
   ⟨fun _ _ => rfl, fun _ _ _ => rfl, rfl, rfl, rfl, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl,
     fun _ => rfl, fun _ => rfl, fun _ => rfl, rfl, by decide +kernel⟩
 
@@ -3233,9 +3239,9 @@ set_option maxHeartbeats 4000000 in
 first is `[0]`, they hold the labels of `compLabels`, each once, every edge of `compEdges` joins two
 consecutive layers, and every label of a layer after the first is joined to one of the layer before
 (`layersAreDistances`, decided exactly). The edges of `compEdges` are all the edges of the center
-graph among the labels of `compLabels` (`edgesAmong`), and `compLabels` is the whole component,
-as the search that found it stops only when no label of the window is joined to one found
-(`componentOfZero_spec`); so the layer of a label is its distance from `0`, by induction on the
+graph among the labels of `compLabels` (`edgesAmong`), and `compLabels` is the whole component: it
+is closed, every candidate in the window of each of its labels being in it, as
+`componentOfZero_spec` decides on the drawn list; so the layer of a label is its distance from `0`, by induction on the
 distance, and no label lies at distance 6. Key `d ≤ 5` is `compItems d true`: the window, the edges
 with both ends at distance at most `d` (`edgeLayer`), for `d ≥ 1` a tint about each label at
 distance `d` (`compTint`, the part of a small disk about it within `tintClip` of the window
