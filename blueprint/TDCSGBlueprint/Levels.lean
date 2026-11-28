@@ -35,7 +35,7 @@ at the window's edge, in the shaded half-plane
 $`\operatorname{Re}w\ge\operatorname{Re}x+\kappa-\eta`, so by the lens estimate its four other
 candidates $`n+e_0-e_k` (open rings at the ends of dashed spokes) lie outside the window, while
 $`n` keeps its neighbors $`n+e_k` (squares inside the window). The only way to take another step is
-back along the same edge to level $`4`. The small square around the leaf is enlarged, with a scale
+back along the same edge to level $`4`. The centre of the small square around the leaf is enlarged, with a scale
 bar, in {figref "terminal-zoom"}[]. The key frames are exact and the last one is the figure its
 theorem states (`TDCSGFigures.Levels.terminalCrossing_spec`, the other frames in
 `TDCSGFigures.Levels.terminalCrossing_keys`); between them the browser slides the circle along the

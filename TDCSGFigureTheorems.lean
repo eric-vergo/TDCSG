@@ -47,10 +47,10 @@ circle the points are drawn at rounded phases and each turn is a rational within
 `φ - 1`, which `TDCSGFigures.Levels.levelWinding_keys` states. Each actor an animation moves is
 drawn at the exact anchors its arrival check reads. The captions are written out, or, where they
 are built from the data (the orbit on the chord, the walk, the component of zero, the phases
-winding round), stated as functions of the data; the
-kernel does not reduce the string functions they are built with, so their words are pinned by
-`#guard` lines in `TDCSGTests.Motions`; the test driver requires that PILean's engine finds no
-error in any animation. Where an animation replaced a
+winding round), stated as functions of the data; the kernel does not reduce the string functions
+they are built with, so their words are pinned by `#guard` lines in `TDCSGTests.Motions`; the test
+driver requires that PILean's engine finds no error in any animation. Where an animation stands in
+place of a
 figure with a linked theorem, its last key frame is that figure, and the theorem stays linked to
 the animation: it states that the last key frame is the figure and what the figure draws
 (`TDCSGFigures.generatorStep_spec`, `TDCSGFigures.extensionJump_spec`,
@@ -2741,7 +2741,7 @@ theorem terminalCrossing_spec :
         (some (neighbourPlace k).2) |>.role "right" |>.withId s!"neighbour-label-{k}")) ∧
     (∀ k, candidatePoint k = (Plane.Exact.point (proj (shift leaf k (-1))) |>.faint
       |>.marker .ring
-      |>.named s!"n + e₀ − e{sub k} = {labelText (shift leaf k (-1))}, weight 0, outside the window"
+      |>.named s!"n + e₀ − e{sub k} = {labelText (shift leaf k (-1))}, weight 0"
       |>.incident (windowSide (shift leaf k (-1))).incidence "the window"
       |>.withId s!"candidate-{k}")) ∧
     (∀ k p, candidateLabel k p =
@@ -2763,7 +2763,8 @@ theorem terminalCrossing_spec :
       Plane.Exact.segment (proj crossN) (proj leaf) |>.width 3.5
         |>.named "the edge from n to n + e₀: it raises n₀ from the good level 4 to 5"
         |>.declRef `TDCSG.Five.IsGoodLevel.leaf |>.withId "edge",
-      Plane.Exact.polygon zoomBox |>.width 1 |>.named "the square enlarged in the next figure"
+      Plane.Exact.polygon zoomBox |>.width 1
+        |>.named "a square about the leaf; the next figure and the lower panel enlarge its centre"
         |>.withId "zoom-box",
       neighbourPoint 1, neighbourLabel 1, neighbourPoint 2, neighbourLabel 2,
       neighbourPoint 3, neighbourLabel 3, neighbourPoint 4, neighbourLabel 4,
@@ -2790,22 +2791,11 @@ theorem terminalCrossing_spec :
     [1, 2, 3, 4].all (fun k => windowSide (shift leaf k (-1)) == .outside) = true ∧
     QSqrt.lt crossCut (proj leaf).realPart = true ∧
     ((proj crossN).realPart == ⟨5, -2⟩ && (proj crossN).conj == proj crossN &&
-      (proj leaf).realPart == ⟨6, -2⟩) = true := by
-  repeat' apply And.intro
-  all_goals first
-    | (intros; unfold terminalCrossing; with_reducible rfl)
-    | (intros; unfold crossMotion; with_reducible rfl)
-    | (intros; unfold crossKey; rfl)
-    | (intros; unfold terminalCrossingFinal; with_reducible rfl)
-    | (intros; unfold neighbourEdge; rfl)
-    | (intros; unfold rejectedStep; rfl)
-    | (intros; unfold neighbourPoint; rfl)
-    | (intros; unfold neighbourPlace; rfl)
-    | (intros; unfold neighbourLabel; rfl)
-    | (intros; unfold candidatePoint; rfl)
-    | (intros; unfold candidateLabel; rfl)
-    | rfl
-    | decide +kernel
+      (proj leaf).realPart == ⟨6, -2⟩) = true :=
+  ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl,
+    fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ _ => rfl, rfl, by decide +kernel,
+    by decide +kernel, by decide +kernel, by decide +kernel, by decide +kernel, by decide +kernel,
+    by decide +kernel⟩
 
 figure_links terminalCrossing terminalCrossing_spec
 
@@ -2822,16 +2812,19 @@ The declared moves are written out; each slide, applied exactly to the circle's 
 gives its centre in the next, in `ℚ(ζ₅)` for the crossing and in `ℚ(√5)²` for the enlarged panel
 (`crossArrives`, `zoomArrives`), and the other actors come and go only by a declared appearance or
 disappearance. The point `boxEntry` drawn and slid to is real and lies on the edge, between
-`P(n) = 7 - 4φ` and the leaf `8 - 4φ`, both real, and inside the enlarged box, whose left edge is
-`1.51`; the enlarged panel draws it and the leaf at the same real parts. The captions are written
-out. Not stated: how the builders draw, the layout, the timing and the frames the browser draws
-between the key frames. -/
+`P(n) = 7 - 4φ` and the leaf `8 - 4φ`, both real; the circle about it and the circle about the leaf
+lie inside the region the enlarged panel shows, `zoomView`, made from `enlargedLeft`,
+`enlargedRight` and `enlargedHalf`, and that region lies inside the square `zoomBox` about the leaf
+drawn in the crossing; the enlarged panel draws the point and the leaf at the same real parts. The
+captions are written out. Not stated: how the builders draw, the layout, the timing and the frames
+the browser draws between the key frames. -/
 theorem terminalCrossing_keys :
     crossCaptions = #[
       "A crossing at a good level, at r = 2.12, x = 0.472: the label n = (4, −3, 1, 1, −3) has \
         weight zero and its coordinate n₀ = 4 is a good level. The circle starts at n; the thick \
         edge leads to n + e₀ and raises n₀ to 5.",
-      "The walk follows the thick edge to the small square, which the lower panel shows enlarged.",
+      "The walk follows the thick edge into the small square about the leaf, whose centre the \
+        lower panel shows enlarged.",
       "It reaches the leaf n + e₀: enlarged, the step ends between 0.0045 and 0.0046 beyond the \
         cut Re w = Re x + κ − η and between 0.0041 and 0.0042 inside the window's edge, both less \
         than a pixel in the upper panel.",
@@ -2896,35 +2889,27 @@ theorem terminalCrossing_keys :
       (crossFadeIds k).map fun id => ⟨id, []⟩) ∧
     (∀ k, zoomActors k = (if (zoomWalkAt k).isEmpty then [] else [⟨"walker", zoomWalkAt k⟩]) ++
       [⟨if k < 5 then "leaf-label-early" else "leaf-label", []⟩]) ∧
-    crossArrives = true ∧ zoomArrives = true ∧
-    (QSqrt.lt (proj crossN).realPart boxEntry.realPart &&
+    zoomView = ⟨Exact.toFloat enlargedLeft, Exact.toFloat (-enlargedHalf),
+      Exact.toFloat enlargedRight, Exact.toFloat enlargedHalf⟩ ∧
+    enlargedLeft = 151 / 100 ∧ enlargedRight = 1542 / 1000 ∧ enlargedHalf = 13 / 2000 ∧
+    zoomBox = (let a := proj leaf |>.realPart
+      let d := rat (1 / 20)
+      [(a - d, rat 0 - d), (a + d, rat 0 - d), (a + d, d), (a - d, d)]) ∧
+    (crossArrives && zoomArrives &&
+      QSqrt.lt (proj crossN).realPart boxEntry.realPart &&
       QSqrt.lt boxEntry.realPart (proj leaf).realPart && boxEntry.num.conj == boxEntry.num &&
       (proj leaf).conj == proj leaf && (proj crossN).conj == proj crossN &&
-      QSqrt.lt (rat (151 / 100)) boxEntry.realPart &&
-      leafQ.1 == leafZ.realPart) = true := by
-  repeat' apply And.intro
-  all_goals first
-    | (intros; unfold crossCaptions; with_reducible rfl)
-    | (intros; unfold terminalCrossing; with_reducible rfl)
-    | (intros; unfold crossMotion; with_reducible rfl)
-    | (intros; unfold zoomMotion; with_reducible rfl)
-    | (intros; unfold crossKey; with_reducible rfl)
-    | (intros; unfold crossKeyItems; with_reducible rfl)
-    | (intros; unfold crossShows; with_reducible rfl)
-    | (intros; unfold earlyName; rfl)
-    | (intros; unfold walkerItems; rfl)
-    | (intros; unfold zoomFinal; with_reducible rfl)
-    | (intros; unfold zoomEarlyName; rfl)
-    | (intros; unfold zoomKey; with_reducible rfl)
-    | (intros; unfold zoomKeyItems; with_reducible rfl)
-    | (intros; unfold zetaFracSub; with_reducible rfl)
-    | (intros; unfold crossFadeIds; with_reducible rfl)
-    | (intros; unfold crossActors; with_reducible rfl)
-    | (intros; unfold zoomActors; with_reducible rfl)
-    | rfl
-    | (simp only [crossMoves]; done)
-    | (simp only [zoomMoves]; done)
-    | decide +kernel
+      QSqrt.lt (rat enlargedLeft) (boxEntry.realPart - rat zoomWalkerRadius) &&
+      QSqrt.lt (leafZ.realPart + rat zoomWalkerRadius) (rat enlargedRight) &&
+      QSqrt.lt (rat zoomWalkerRadius) (rat enlargedHalf) &&
+      leafQ.1 == leafZ.realPart &&
+      QSqrt.lt ((proj leaf).realPart - rat (1 / 20)) (rat enlargedLeft) &&
+      QSqrt.lt (rat enlargedRight) ((proj leaf).realPart + rat (1 / 20)) &&
+      decide (enlargedHalf < 1 / 20)) = true :=
+  ⟨rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl, fun _ _ => rfl, rfl, fun _ _ => rfl, rfl,
+    rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl,
+    fun _ _ => rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl,
+    fun _ => rfl, rfl, rfl, rfl, rfl, rfl, by decide +kernel⟩
 
 end TDCSGFigures.Levels
 ```
@@ -3225,24 +3210,9 @@ theorem componentOfZero_spec :
       | _ => false) &&
     (List.range compEdges.length).filter (edgeLayer · ≤ 5) == List.range 19 &&
     (List.range compLabels.length).filter (fun i => layerOf (compLabels.getD i zeroLabel) ≤ 5) ==
-      List.range 18) = true := by
-  refine ⟨fun _ _ => rfl, fun n _ _ => ?_, ?_⟩
-  · unfold labelPoint
-    split <;> rfl
-  repeat' apply And.intro
-  all_goals first
-    | (intros; unfold componentOfZero; with_reducible rfl)
-    | (intros; unfold compMotion; with_reducible rfl)
-    | (intros; unfold compKey; rfl)
-    | (intros; unfold componentOfZeroFinal; with_reducible rfl)
-    | (intros; unfold compItems; with_reducible rfl)
-    | (intros; unfold compWindow; rfl)
-    | (intros; unfold compEdge; rfl)
-    | (intros; unfold compLabel; rfl)
-    | (intros; unfold compCentre; rfl)
-    | (intros; unfold compNames; rfl)
-    | decide +kernel
-    | rfl
+      List.range 18) = true :=
+  ⟨fun _ _ => rfl, fun _ _ _ => rfl, rfl, rfl, rfl, rfl, rfl, rfl, fun _ _ => rfl, rfl, rfl,
+    fun _ => rfl, fun _ => rfl, fun _ => rfl, rfl, by decide +kernel⟩
 
 figure_links componentOfZero componentOfZero_spec
 
@@ -3251,10 +3221,14 @@ set_option maxHeartbeats 4000000 in
 `compLayers` are the labels of the component by their distance from `0` in the center graph: the
 first is `[0]`, they hold the labels of `compLabels`, each once, every edge of `compEdges` joins two
 consecutive layers, and every label of a layer after the first is joined to one of the layer before
-(`layersAreDistances`, decided exactly); so the layer of a label is its distance from `0`, by
-induction on the distance. Key `d ≤ 5` is `compItems d true`: the window, the edges with both ends
-at distance at most `d` (`edgeLayer`), for `d ≥ 1` a tint about each label at distance `d`
-(`compTint`), drawn under the labels, the labels at distance at most `d`, the window centre (on the
+(`layersAreDistances`, decided exactly). The edges of `compEdges` are all the edges of the center
+graph among the labels of `compLabels` (`edgesAmong`), and `compLabels` is the whole component,
+as the search that found it stops only when no label of the window is joined to one found
+(`componentOfZero_spec`); so the layer of a label is its distance from `0`, by induction on the
+distance, and no label lies at distance 6. Key `d ≤ 5` is `compItems d true`: the window, the edges
+with both ends at distance at most `d` (`edgeLayer`), for `d ≥ 1` a tint about each label at
+distance `d` (`compTint`, the part of a small disk about it within `tintClip` of the window
+centre), drawn under the labels, the labels at distance at most `d`, the window centre (on the
 edge from `0` to `e₀` from `d = 1`), the name `0`, the name `e₀` from `d = 2`, and the legend. The
 moves of each step are the actors of one key absent from the next, which vanish, and those of the
 next absent from the one, which appear (`compMoves`); each actor that comes and goes is listed with
@@ -3285,9 +3259,9 @@ theorem componentOfZero_keys :
       max (layerOf a) (layerOf b))) ∧
     (∀ d, layerIndices d =
       (List.range compLabels.length).filter fun i => layerOf (compLabels.getD i zeroLabel) == d) ∧
-    tintRadius = 1 / 16 ∧
-    (∀ i, compTint i = (Plane.Exact.disk (proj (compLabels.getD i zeroLabel)) tintRadius
-      |>.role "lens" |>.noOutline |>.fillOpacity 0.3
+    tintRadius = 1 / 22 ∧ tintClip = 987 / 1000 ∧
+    (∀ i, compTint i = (Plane.Exact.lens (ZetaFrac.ofZeta (proj (compLabels.getD i zeroLabel)))
+        ⟨Zeta5.ofInt 1, 2⟩ tintRadius tintClip |>.role "lens" |>.noOutline |>.fillOpacity 0.3
       |>.named "a tint about a label of the frontier" |>.withId s!"tint-{i}")) ∧
     (∀ d, compKey d = if d ≤ lastLayer then { componentOfZeroFinal with items := compItems d true }
       else componentOfZeroFinal) ∧
@@ -3310,25 +3284,13 @@ theorem componentOfZero_keys :
       (a.filter (fun x => !b.any (·.id == x.id))).map (·.id, .vanish) ++
         (b.filter (fun x => !a.any (·.id == x.id))).map (·.id, .appear))) ∧
     componentOfZero.captions = ((List.range 7).map compCaption).toArray ∧
+    compEdges = edgesAmong compLabels ∧
     (layersAreDistances && compArrives &&
       (List.range 6).map layerIndices ==
         [[0], [1, 2, 3], [4, 10, 11, 17], [5, 9, 12, 16], [6, 8, 13, 15], [7, 14]] &&
-      (List.range 6).map foundBy == [1, 4, 8, 12, 16, 18]) = true := by
-  repeat' apply And.intro
-  all_goals first
-    | (intros; unfold layerOf; with_reducible rfl)
-    | (intros; unfold joined; with_reducible rfl)
-    | (intros; unfold layersAreDistances; with_reducible rfl)
-    | (intros; unfold edgeLayer; with_reducible rfl)
-    | (intros; unfold layerIndices; with_reducible rfl)
-    | (intros; unfold compTint; rfl)
-    | (intros; unfold compKey; with_reducible rfl)
-    | (intros; unfold compMotion; with_reducible rfl)
-    | (intros; unfold compActors; with_reducible rfl)
-    | (intros; unfold compMoves; with_reducible rfl)
-    | (intros; unfold componentOfZero; with_reducible rfl)
-    | decide +kernel
-    | rfl
+      (List.range 6).map foundBy == [1, 4, 8, 12, 16, 18]) = true :=
+  ⟨rfl, fun _ => rfl, fun _ _ => rfl, rfl, fun _ => rfl, fun _ => rfl, rfl, rfl, fun _ => rfl,
+    fun _ => rfl, rfl, fun _ => rfl, fun _ => rfl, rfl, rfl, by decide +kernel⟩
 
 end TDCSGFigures.Confinement
 ```

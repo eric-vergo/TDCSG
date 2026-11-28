@@ -283,19 +283,18 @@ end OrbitRadius
     and n."]
 
 #guard Confinement.componentOfZero.captions == #[
-  "The search for the component of 0 in the center graph at r = 1.95, x = 1/2 starts at the label \
-    0, inside the window |w − x| ≤ r/2.",
-  "Distance 1 from 0: 3 new labels, each joined by an edge to a label at distance 0; 4 labels in \
-    all. The tints mark the frontier.",
-  "Distance 2 from 0: 4 new labels, each joined by an edge to a label at distance 1; 8 labels in \
-    all. The tints mark the frontier.",
-  "Distance 3 from 0: 4 new labels, each joined by an edge to a label at distance 2; 12 labels in \
-    all. The tints mark the frontier.",
-  "Distance 4 from 0: 4 new labels, each joined by an edge to a label at distance 3; 16 labels in \
-    all. The tints mark the frontier.",
-  "Distance 5 from 0: 2 new labels, each joined by an edge to a label at distance 4; 18 labels in \
-    all. The tints mark the frontier. The search finds no further label: the component has 18 \
-    labels.",
+  "The labels of the component of 0 in the center graph at r = 1.95, x = 1/2, by their distance \
+    from 0 in the graph. At distance 0: the label 0, inside the window |w − x| ≤ r/2.",
+  "The 3 labels at distance 1 from 0, each joined by an edge to a label at distance 0, tinted; 4 \
+    labels at distance at most 1.",
+  "The 4 labels at distance 2 from 0, each joined by an edge to a label at distance 1, tinted; 8 \
+    labels at distance at most 2.",
+  "The 4 labels at distance 3 from 0, each joined by an edge to a label at distance 2, tinted; 12 \
+    labels at distance at most 3.",
+  "The 4 labels at distance 4 from 0, each joined by an edge to a label at distance 3, tinted; 16 \
+    labels at distance at most 4.",
+  "The 2 labels at distance 5 from 0, each joined by an edge to a label at distance 4, tinted; 18 \
+    labels at distance at most 5. No label lies at distance 6: the component has 18 labels.",
   "The component of 0 in the center graph at r = 1.95, x = 1/2: 18 labels, at most 5 edges from \
     0, each drawn at its projection P(n) inside the window, dots for weight 0, squares for weight \
     1, with the 19 edges of the graph among them. Every coordinate of every label is −1, 0 or 1."]
