@@ -119,8 +119,8 @@ figures compared with the site's folder.
 (`tools/motion-browser-check.py`) and on the site's pages (`tools/site/motion_browser.py`), with
 the exact expectations `lake exe tdcsg-motion-out` writes from Lean, and adds the positions in the
 dark theme, the width against the text column, that the site has no script of its own for a
-figure, and that no page scrolls sideways at 1440, 768, 390 and 320 px and every formula is drawn
-inside the block that holds it. It needs Playwright for Python with its Chromium:
+figure, and that no page scrolls sideways at 1440, 1024, 768, 560, 390 and 320 px and every
+formula is drawn inside the block that holds it. It needs Playwright for Python with its Chromium:
 
 ```sh
 lake exe tdcsg-motion-out /tmp/motion-out

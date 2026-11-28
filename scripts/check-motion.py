@@ -22,11 +22,12 @@ The checks are PILean's, called on this site:
   error and no content-policy report.
 
 Its own checks, of this site: the positions again in the dark theme, each figure no wider than the
-text column, every page at 1440, 768, 390 and 320 px without sideways scrolling and with every
-formula inside the block that holds it (`formula_checks`, which `scripts/check-engines.py` also
-runs in Firefox), no script of the site's own for a figure (the site's scripts are Verso's, Verso
-Blueprint's and PILean's explorer script, which PILean's adapter adds to every page with a figure),
-and no explorer on any page, so that the explorer script has nothing to run on.
+text column, every page at 1440, 1024, 768, 560, 390 and 320 px without sideways scrolling and
+with every formula inside the block that holds it (`formula_checks`, a width per worker, which
+`scripts/check-engines.py` also runs in Firefox), no script of the site's own for a figure (the
+site's scripts are Verso's, Verso Blueprint's and PILean's explorer script, which PILean's adapter
+adds to every page with a figure), and no explorer on any page, so that the explorer script has
+nothing to run on.
 """
 import json
 import os
@@ -98,12 +99,13 @@ def page_checks(c, browser, base, url, expect, helpers):
 
 
 # The widths at which every page is checked for its formulas.
-FORMULA_WIDTHS = [1440, 768, 390, 320]
-# The page's sideways overflow, and the formulas drawn outside the block that holds them (by more
-# than 2 px): a
-# formula's picture, or a formula's own box where it scrolls sideways (a display formula); with
-# the formulas whose picture or hidden MathML copy reaches past the window, which name the cause
-# when a page scrolls sideways.
+FORMULA_WIDTHS = [1440, 1024, 768, 560, 390, 320]
+# The page's sideways overflow; the formulas drawn more than 2 px outside the block that holds
+# them (a formula's picture, or the formula's own box where it scrolls sideways, as a display
+# formula does); and, to name the cause when a page scrolls sideways, the formulas whose picture
+# or hidden MathML copy reaches past the window. A formula whose picture is not shown (in a closed
+# panel or popover) is skipped: it takes no room on the page, and it is checked where it is shown,
+# since a hidden formula still counts towards the sideways overflow of the page.
 FORMULAS = """() => {
   const vw = document.documentElement.clientWidth, outside = [], past = [];
   for (const f of document.querySelectorAll('.bp_math')) {
@@ -135,32 +137,58 @@ def site_pages(site):
     return out
 
 
-def formula_checks(c, browser, site, base, helpers):
-    """Every page of the site at `FORMULA_WIDTHS`: no sideways scrolling, and every formula drawn
-    inside the block that holds it."""
-    for width in FORMULA_WIDTHS:
-        ctx, page = helpers["new_page"](browser, viewport={"width": width, "height": 900})
-        for url in site_pages(site):
-            helpers["goto"](page, base + url)
-            r = page.evaluate(FORMULAS)
-            c.check(f"{url or '/'} {width} px: no sideways scrolling", r["wide"] <= 0,
-                    f"{r['wide']} px; formulas reaching past the window: {r['past'][:3]}")
-            c.check(f"{url or '/'} {width} px: every formula inside its block", not r["outside"],
-                    str(r["outside"][:3]))
-        ctx.close()
+def formula_checks(c, browser, site, base, width):
+    """Every page of the site at `width`: no sideways scrolling, and every formula drawn inside
+    the block that holds it."""
+    ctx, page = site_browser.new_page(browser, viewport={"width": width, "height": 900})
+    for url in site_pages(site):
+        site_browser.goto(page, base + url)
+        r = page.evaluate(FORMULAS)
+        c.check(f"{url or '/'} {width} px: no sideways scrolling", r["wide"] <= 0,
+                f"{r['wide']} px; formulas reaching past the window: {r['past'][:3]}")
+        c.check(f"{url or '/'} {width} px: every formula inside its block", not r["outside"],
+                str(r["outside"][:3]))
+    ctx.close()
 
 
-def formula_pass(site, engine):
-    """`formula_checks` in the engine `engine` of Playwright; whether every check holds."""
+def formula_width(site, base, engine, width):
+    """`formula_checks` at one width, in a browser of its own; the verdicts kept, not printed."""
+    c = site_browser.Checks(keep=True)
+
+    def checks():
+        with sync_playwright() as p:
+            browser = getattr(p, engine).launch()
+            try:
+                formula_checks(c, browser, site, base, width)
+            finally:
+                browser.close()
+    c.section(f"formulas of every page at {width} px ({engine})", checks)
+    return c
+
+
+def formula_sections(c, site, base, engine, workers):
+    """`formula_checks` at every width of `FORMULA_WIDTHS`, `workers` widths at a time (a thread
+    each, with its own Playwright and browser), the verdicts printed in the widths' order and
+    counted in `c`."""
+    import concurrent.futures
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
+        parts = pool.map(lambda w: formula_width(site, base, engine, w), FORMULA_WIDTHS)
+        for part in parts:
+            for line in part.lines:
+                c.say(line)
+            c.count += part.count
+            c.failed += part.failed
+
+
+def formula_pass(site, engine, workers=1):
+    """The checks of the formulas of every page in the engine `engine` of Playwright, on their
+    own; whether every check holds."""
     c = site_browser.Checks()
-    helpers = {"new_page": site_browser.new_page, "goto": site_browser.goto}
     server, base = site_browser.serve(str(site))
-    with sync_playwright() as p:
-        browser = getattr(p, engine).launch()
-        c.section(f"formulas of every page ({engine})", formula_checks, c, browser, site, base,
-                  helpers)
-        browser.close()
-    server.shutdown()
+    try:
+        formula_sections(c, Path(site), base, engine, workers)
+    finally:
+        server.shutdown()
     print(f"{c.count - c.failed} of {c.count} checks of the formulas hold ({engine})")
     return c.failed == 0
 
@@ -195,8 +223,8 @@ def main(argv):
             if not url.startswith("Figures/"):
                 c.section(f"{url} dark and column", page_checks, c, browser, base, url,
                           str(expect), helpers)
-        c.section("formulas of every page", formula_checks, c, browser, site, base, helpers)
         browser.close()
+    formula_sections(c, site, base, "chromium", int(workers))
     server.shutdown()
     print(f"{c.count - c.failed} of {c.count} checks hold")
     return 1 if c.failed else 0

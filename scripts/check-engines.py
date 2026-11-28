@@ -10,8 +10,8 @@ skipped and why:
 * Firefox, on the site: `tools/site/motion_browser.py SITE --expect EXPECT --engine firefox`;
 * Firefox, on the standalone files: `tools/motion-browser-check.py EXPECT --engine firefox`;
 * Firefox, on every page of the site: the site's own checks of its formulas (`formula_checks` of
-  `scripts/check-motion.py`: no sideways scrolling at 1440, 768, 390 and 320 px, every formula
-  inside the block that holds it);
+  `scripts/check-motion.py`: no sideways scrolling at 1440, 1024, 768, 560, 390 and 320 px,
+  every formula inside the block that holds it);
 * WebKit, on the standalone files: `tools/webkit/webkit_check.py EXPECT` (macOS only, with the
   system's `swiftc` and a logged-in session with a screen; it shows nothing and takes no focus).
 
@@ -52,6 +52,20 @@ def check_motion():
     return module
 
 
+def formulas(site, workers):
+    """The pass of the formulas of every page in Firefox, by its verdict; one that stops with an
+    error fails, and the passes after it still run."""
+    print("== Firefox, formulas", flush=True)
+    try:
+        held = check_motion().formula_pass(site, "firefox", int(workers[1]) if workers else 1)
+    except Exception as e:  # noqa: BLE001 (a pass that cannot run is a failed pass)
+        why = (str(e) or type(e).__name__).splitlines()[0]
+        print(f"Firefox, formulas: stopped with an error ({why})")
+        held = False
+    print(f"== Firefox, formulas: {'holds' if held else 'FAILS'}", flush=True)
+    return held
+
+
 def webkit_available():
     """Whether the WebKit check can run here."""
     if platform.system() != "Darwin":
@@ -90,8 +104,7 @@ def main(argv):
         results["Firefox, standalone"] = run("Firefox, standalone", [
             sys.executable, "-I", str(pilean / "tools/motion-browser-check.py"), expect,
             "--engine", "firefox"])
-        print("== Firefox, formulas", flush=True)
-        results["Firefox, formulas"] = check_motion().formula_pass(site, "firefox")
+        results["Firefox, formulas"] = formulas(site, workers)
     else:
         for name in ("Firefox, site", "Firefox, standalone", "Firefox, formulas"):
             skipped[name] = why
