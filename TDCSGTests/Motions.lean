@@ -300,53 +300,34 @@ end OrbitRadius
     1, with the 19 edges of the graph among them. Every coordinate of every label is −1, 0 or 1."]
 
 #guard Levels.levelWinding.captions == #[
-  "The phase of each level m of coordinate 0 at r = 1.8, x = 0.87, reduced modulo L = φ − 1/2, \
-    on a circle of circumference L (phase 0 at the bottom, ±L/2 at the top) and along the levels \
-    in units of L. A level is good when its phase lies in the shaded part, farther than L/2 − η \
-    from L ℤ; this is decided exactly. On the circle each point is drawn at its phase rounded to \
-    a rational, within 2⁻⁶²; along the levels at its exact phase. Level −13: not good.",
-  "Level −12: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of \
-    φ − 1 of a turn; not good.",
-  "Level −11: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of \
-    φ − 1 of a turn; not good.",
-  "Level −10: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of \
-    φ − 1 of a turn; good: its phase lies in the shaded part, and it is the wall lo.",
-  "Level −9: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of \
-    φ − 1 of a turn; not good.",
-  "Level −8: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of \
-    φ − 1 of a turn; not good.",
-  "Level −7: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of \
-    φ − 1 of a turn; not good.",
-  "Level −6: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of \
-    φ − 1 of a turn; not good.",
-  "Level −5: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of \
-    φ − 1 of a turn; not good.",
-  "Level −4: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of \
-    φ − 1 of a turn; not good.",
-  "Level −3: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of \
-    φ − 1 of a turn; not good.",
-  "Level −2: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of \
-    φ − 1 of a turn; good, in the gap |m| ≤ 2 between the two search ranges.",
-  "Level −1: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of \
-    φ − 1 of a turn; not good.",
-  "Level 0: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of φ \
-    − 1 of a turn; not good.",
-  "Level 1: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of φ \
-    − 1 of a turn; not good.",
-  "Level 2: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of φ \
-    − 1 of a turn; not good.",
-  "Level 3: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of φ \
-    − 1 of a turn; good: its phase lies in the shaded part, and it is the wall hi.",
-  "Level 4: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of φ \
-    − 1 of a turn; not good.",
-  "Level 5: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of φ \
-    − 1 of a turn; not good.",
-  "Level 6: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of φ \
-    − 1 of a turn; not good.",
-  "Level 7: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of φ \
-    − 1 of a turn; not good.",
-  "Level 8: the phase grows by φ L, φ periods, and the hand turns by a rational within 2⁻⁶² of φ \
-    − 1 of a turn; not good.",
+  "The phase of each level m of coordinate 0 at r = 1.8, x = 0.87, reduced modulo L = φ − 1/2, on \
+    a circle of circumference L (phase 0 at the bottom, ±L/2 at the top) and along the levels in \
+    units of L. A level is good when its phase lies in the shaded part, farther than L/2 − η from \
+    L ℤ; this is decided exactly. On the circle each point is placed, in floating point, from a \
+    rational within 2⁻⁶² of its exact phase, and from one level to the next the hand turns by the \
+    difference of two such rationals, within 2⁻⁶² of φ − 1 of a turn; along the levels each point \
+    is at its exact phase. Level −13: not good.",
+  "Level −12: not good.",
+  "Level −11: not good.",
+  "Level −10: good: its phase lies in the shaded part, and it is the wall lo.",
+  "Level −9: not good.",
+  "Level −8: not good.",
+  "Level −7: not good.",
+  "Level −6: not good.",
+  "Level −5: not good.",
+  "Level −4: not good.",
+  "Level −3: not good.",
+  "Level −2: good, in the gap |m| ≤ 2 between the two search ranges.",
+  "Level −1: not good.",
+  "Level 0: not good.",
+  "Level 1: not good.",
+  "Level 2: not good.",
+  "Level 3: good: its phase lies in the shaded part, and it is the wall hi.",
+  "Level 4: not good.",
+  "Level 5: not good.",
+  "Level 6: not good.",
+  "Level 7: not good.",
+  "Level 8: not good.",
   "Level 9: not good. Of the levels −13 to 9 the good ones are −10, −2 and 3; the walls are lo = \
     −10 and hi = 3, and −2 lies in the gap between the search ranges."]
 

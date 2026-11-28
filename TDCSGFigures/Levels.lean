@@ -16,8 +16,10 @@ import TDCSGFigures.Data.Moves
   (`TDCSGFigures.isGoodLevel`), the walls `lo = -10` and `hi = 3` the confinement proof can use
   and the gap `|m| ≤ 2` between its two search ranges.
 * `levelWinding`: an illustration beside `levelPhases`, two panels on one clock: the reduced phases
-  of the same levels as points of a circle of circumference `L`, a hand turning from each level to
-  the next by a rational within `2⁻⁶²` of `φ - 1` of a turn, and along the levels at their exact
+  of the same levels as points of a circle of circumference `L`, placed in floating point from
+  rationals within `2⁻⁶²` of the exact phases (`circleTurns`), a hand turning from each level to
+  the next by the difference of two such rationals, within `2⁻⁶²` of `φ - 1` of a turn
+  (`turnOf`), and along the levels at their exact
   phases (`stripAt`), a ring sliding exactly from each to the next (`stripArrives`).
 * `terminalCrossingFinal`: the crossing at `r = 2.12`, `x = 0.472`, `n = (4, -3, 1, 1, -3)`: the
   window, the edge from `n` to the leaf `n + e₀` across the good level `n₀ = 4`, the other
@@ -557,8 +559,8 @@ def phaseStepsArePhi : Bool :=
 phase rounded to a rational (`phaseAt`). -/
 def circleTurns (m : Int) : Rat := phaseAt m
 
-/-- Whether every point drawn on the circle is within `2⁻⁶²` of a turn of its exact reduced
-phase, exactly in `ℚ(√5)`. -/
+/-- Whether the rational turn `circleTurns m` from which each point on the circle is placed is
+within `2⁻⁶²` of its exact reduced phase, exactly in `ℚ(√5)`. -/
 def circleNearPhase : Bool :=
   levels.all fun m =>
     let e := rat (circleTurns m) - phaseQ m
@@ -638,15 +640,15 @@ def circlePoint (m : Int) : Item :=
     |>.withId s!"level-{m}"
 
 /-- The name of level `m` on the circle, outside it (actor `name-m`): a good level's above and to
-the side of the circle its point is on, in the colour of the good phases; another's, smaller and
-faint, straight out from its point. -/
+the side of the circle its point is on, in the colour of the good phases; another's, faint,
+straight out from its point. -/
 def circleName (m : Int) : Item :=
   let p := onCircle (levelAngle m) 1
   if good m then
-    Plane.label (goodName m) p (if p.x ≥ 0 then .aboveRight else .aboveLeft) |>.size 13
+    Plane.label (goodName m) p (if p.x ≥ 0 then .aboveRight else .aboveLeft) |>.size 16
       |>.role goodRole |>.withId s!"name-{m}"
   else
-    Plane.label (intText m) p (.toward (levelAngle m)) (some 6) |>.size 11 |>.faint
+    Plane.label (intText m) p (.toward (levelAngle m)) (some 6) |>.size 15 |>.faint
       |>.withId s!"name-{m}"
 
 /-- The shaded arc of the good phases and the circle, drawn at every key. -/
@@ -655,18 +657,20 @@ def circleBase : Array Item := #[
     |>.role goodRole |>.noOutline |>.fillOpacity 0.18 |>.named arcTitle,
   Plane.circle ⟨0, 0⟩ 1 |>.faint |>.width 1.5 |>.named circleTitle]
 
-/-- Key `k` of the circle: the base, the points of the levels up to `levelAt k` with their names,
-and the hand at `levelAt k` with its sense. -/
+/-- The items of key `k` of the circle: the base, the points of the levels up to `levelAt k`, the
+hand at `levelAt k` with its sense, and the names of the levels up to `levelAt k`. -/
+def circleItems (k : Nat) : Array Item :=
+  circleBase ++ ((levels.take (k + 1)).map circlePoint).toArray ++
+    #[hand (levelAt k), handSense (levelAt k)] ++ ((levels.take (k + 1)).map circleName).toArray
+
+/-- Key `k` of the circle: `circleItems k`. -/
 def circleKey (k : Nat) : Plane.Figure :=
-  let ms := levels.take (k + 1)
-  let m := levelAt k
   { width := figureWidth
-    view := some ⟨-1.35, -1.3, 1.35, 1.35⟩
+    view := some ⟨-1.4, -1.3, 1.4, 1.35⟩
     padding := 1
     style := partTwoStyle
     checks := .fail
-    items := circleBase ++ (ms.map circlePoint).toArray ++ #[hand m, handSense m] ++
-      (ms.map circleName).toArray
+    items := circleItems k
     info := { title := "The phases of the levels on a circle of circumference L" } }
 
 /-- The moves of step `k` of the circle: the hand and its mark turn by `turnOf k` of a full turn
@@ -734,12 +738,14 @@ def tracerItems (ps : List (QSqrt5 × QSqrt5)) : Array Item :=
   (ps.map fun c => Plane.Exact.circle c tracerRadius |>.width 2 |>.role leftRole
     |>.named "a ring about the level last reached" |>.withId "tracer").toArray
 
-/-- The label at `(x, y)` along the levels. -/
-def stripLabel (s : String) (x y : Rat) (place : Placement := .center) : Item :=
-  Plane.Exact.label s ((rat x, rat y) : QSqrt5 × QSqrt5) place
+/-- The label at `(x, y)` along the levels, `offset` pixels from it in the direction `place`. -/
+def stripLabel (s : String) (x : Rat) (y : QSqrt5) (place : Placement := .center)
+    (offset : Option Float := none) : Item :=
+  Plane.Exact.label s ((rat x, y) : QSqrt5 × QSqrt5) place offset
 
 /-- The items every key along the levels draws: the good bands, the gap `|m| ≤ 2`, the strip, the
-walls `lo = -10` and `hi = 3` with their names, and the marks of the phases and of the levels. -/
+walls `lo = -10` and `hi = 3` with their names above the strip, the marks `L/2`, `0` and `−L/2` of
+the phases at the strip's top, middle and bottom, and the marks of the levels below it. -/
 def stripBase : Array Item := #[
   Plane.Exact.polygon (rect stripLeft bandTop stripRight stripTop) |>.role goodRole |>.filled
     |>.noOutline |>.fillOpacity 0.18 |>.named "the upper good band",
@@ -753,16 +759,16 @@ def stripBase : Array Item := #[
     |>.role goodRole |>.width 1.5 |>.dashed |>.named "the wall lo = −10",
   Plane.Exact.segment ((rat 3, stripBottom) : QSqrt5 × QSqrt5) (rat 3, stripTop)
     |>.role goodRole |>.width 1.5 |>.dashed |>.named "the wall hi = 3",
-  stripLabel "lo = −10" (-10) (13 / 2) |>.role goodRole,
-  stripLabel "hi = 3" 3 (13 / 2) |>.role goodRole,
-  stripLabel "L/2" (-27 / 2) 4 .left,
-  stripLabel "0" (-27 / 2) 0 .left,
-  stripLabel "−L/2" (-27 / 2) (-4) .left,
-  stripLabel "−13" (-13) (-9 / 2) .below,
-  stripLabel "−5" (-5) (-9 / 2) .below,
-  stripLabel "0" 0 (-9 / 2) .below,
-  stripLabel "5" 5 (-9 / 2) .below,
-  stripLabel "9" 9 (-9 / 2) .below]
+  stripLabel "lo = −10" (-10) stripTop .above (some 14) |>.role goodRole,
+  stripLabel "hi = 3" 3 stripTop .above (some 14) |>.role goodRole,
+  stripLabel "L/2" (-27 / 2) stripTop .left,
+  stripLabel "0" (-27 / 2) (rat 0) .left,
+  stripLabel "−L/2" (-27 / 2) stripBottom .left,
+  stripLabel "−13" (-13) stripBottom .below,
+  stripLabel "−5" (-5) stripBottom .below,
+  stripLabel "0" 0 stripBottom .below,
+  stripLabel "5" 5 stripBottom .below,
+  stripLabel "9" 9 stripBottom .below]
 
 /-- Where the ring is at key `k` along the levels: the point of `levelAt k`. -/
 def tracerAt (k : Nat) : List (QSqrt5 × QSqrt5) := [stripAt (levelAt k)]
@@ -814,15 +820,14 @@ def windingCaption (k : Nat) : String :=
     s!"The phase of each level m of coordinate 0 at r = 1.8, x = 0.87, reduced modulo \
       L = φ − 1/2, on a circle of circumference L (phase 0 at the bottom, ±L/2 at the top) and \
       along the levels in units of L. A level is good when its phase lies in the shaded part, \
-      farther than L/2 − η from L ℤ; this is decided exactly. On the circle each point is drawn \
-      at its phase rounded to a rational, within 2⁻⁶²; along the levels at its exact phase. \
-      Level {intText m}: {standing m}."
+      farther than L/2 − η from L ℤ; this is decided exactly. On the circle each point is placed, \
+      in floating point, from a rational within 2⁻⁶² of its exact phase, and from one level to the \
+      next the hand turns by the difference of two such rationals, within 2⁻⁶² of φ − 1 of a \
+      turn; along the levels each point is at its exact phase. Level {intText m}: {standing m}."
   else if k + 1 == levelCount then
     s!"Level {intText m}: {standing m}. Of the levels −13 to 9 the good ones are −10, −2 and 3; \
       the walls are lo = −10 and hi = 3, and −2 lies in the gap between the search ranges."
-  else
-    s!"Level {intText m}: the phase grows by φ L, φ periods, and the hand turns by a rational \
-      within 2⁻⁶² of φ − 1 of a turn; {standing m}."
+  else s!"Level {intText m}: {standing m}."
 
 /-- The phases of the levels −13 to 9 of coordinate 0 at r = 1.8, x = 0.87, reduced modulo L, on
 a circle of circumference L and along the levels, arriving in order on one clock: a hand turns by
@@ -839,18 +844,19 @@ def levelWinding : MotionPanels where
   info := { title := "The phases of the levels wind round"
             description := "The phases of the levels −13 to 9 of coordinate 0 at r = 1.8, \
               x = 0.87, reduced modulo L, on a circle of circumference L and along the levels, \
-              arriving in order on one clock. On the circle a hand turns from each level's point \
-              to the next one's by a rational within 2⁻⁶² of φ − 1 of a turn; the points are drawn \
-              at their phases rounded to rationals. Along the levels the points are at their exact \
-              phases and a ring slides exactly from each to the next. Which levels are good is \
+              arriving in order on one clock. On the circle the points are placed, in floating \
+              point, from rationals within 2⁻⁶² of the exact phases, and a hand turns from each \
+              level's point to the next one's by the difference of two such rationals, within \
+              2⁻⁶² of φ − 1 of a turn. Along the levels the points are at their exact phases and \
+              a ring slides exactly from each to the next. Which levels are good is \
               decided exactly; between the key frames the browser turns the hand and slides the \
               ring." }
   checks := .fail
   poster := levelCount - 1
   scale := .independent
+  arrangement := .stacked
   width := figureWidth
   narrowWidth := some narrowWidth
-  shares := #[1, 1]
 
 /-! ### The facts the figures show -/
 

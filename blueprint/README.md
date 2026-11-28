@@ -150,7 +150,7 @@ interval exchange and the orbit on the chord of chapter 3 (`wordLoop1`, `wordLoo
 `TDCSGFigures/ProofDiagrams.lean`), the frame pair of chapter 4 (`TDCSGFigures.Lift.framePair` in
 `TDCSGFigures/FramePairMotion.lean`), the crossing at a good level and the phases winding round of
 chapter 6 (`TDCSGFigures.Levels.terminalCrossing`, with the end of its edge enlarged in a second
-panel, and `levelWinding`, a circle beside the plot of the phases) and the
+panel, and `levelWinding`, a circle above the plot of the phases) and the
 walk and the component of zero found layer by layer of chapter 7
 (`TDCSGFigures.Confinement.walkToLeaf`, `componentOfZero`). Each key is a `Plane.Figure` of exact data, and each step
 between two keys declares its moves: a turn of named items by a fifth of a full turn about an
@@ -175,8 +175,9 @@ that the last key frame is the figure and what the figure draws. The other key f
 and the captions are stated in a plain theorem `<name>_keys`. The other animations are
 illustrations (`@[figure illustration]`): no theorem is linked to them, and the data of their key
 frames are stated in `wordLoop_keys`, `wordSteps_spec`, `framePair_keys`, `walkToLeaf_spec` and
-`levelWinding_keys`; the circle of `levelWinding` is drawn at rounded phases, each turn a rational
-within `2⁻⁶²` of `φ - 1`, as its statement and captions say.
+`levelWinding_keys`; the points on the circle of `levelWinding` are placed, in floating point,
+from rationals within `2⁻⁶²` of the exact phases, and each turn of its hand is a rational within
+`2⁻⁶²` of `φ - 1`, as its statement and captions say.
 Each actor that moves is drawn at the exact anchors that its arrival check reads, and the theorems
 state those anchors.
 The exact arrival check works modulo a full turn, so the sense and the size of every declared turn
