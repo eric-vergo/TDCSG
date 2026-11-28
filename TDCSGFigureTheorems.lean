@@ -2982,8 +2982,9 @@ above `stripMotion`, of 23 keys each, one per level `levelAt k = -13 + k`; its p
 key and its checks are strict. Key `k` of the circle draws `circleItems k`: the shaded arc of the
 good phases and the circle (`circleBase`), the points of the levels up to `levelAt k`, the hand and
 the mark of its sense at `levelAt k`, and the names of the levels up to `levelAt k` (`circleName`,
-`goodName`). Level `m`'s point, its name and, when it is the level reached, the hand are placed at
-the angle `angleOf (circleTurns m)` (`levelAngle`), in floating point, from the rational
+`goodName`; a name farther out when an earlier level's point lies within `14°`, `crowded`). Level
+`m`'s point, its name and, when it is the level reached, the hand are placed at the angle
+`angleOf (circleTurns m)` (`levelAngle`, `π = 180°`), in floating point, from the rational
 `circleTurns m = phaseAt m`, the reduced phase rounded; step `k` turns the hand and its mark by
 `turnOf k`, the difference of the turns of the two levels taken modulo one. Key `k` along the levels
 draws `stripBase` (the bands, the gap, the strip and the walls, the names of the walls above the
@@ -3037,11 +3038,15 @@ theorem levelWinding_keys :
       |>.incident (if good m then .on else .outside) arcTitle |>.withId s!"level-{m}")) ∧
     (∀ m, circleName m = (let p := onCircle (levelAngle m) 1
       if good m then
-        Plane.label (goodName m) p (if p.x ≥ 0 then .aboveRight else .aboveLeft) |>.size 16
-          |>.role "good" |>.withId s!"name-{m}"
+        Plane.label (goodName m) p (if p.x ≥ 0 then .aboveRight else .aboveLeft) (some 12)
+          |>.size 16 |>.role "good" |>.withId s!"name-{m}"
       else
-        Plane.label (intText m) p (.toward (levelAngle m)) (some 6) |>.size 15 |>.faint
-          |>.withId s!"name-{m}")) ∧
+        Plane.label (intText m) p (.toward (levelAngle m)) (some (if crowded m then 24 else 6))
+          |>.size 15 |>.faint |>.withId s!"name-{m}")) ∧
+    (∀ m, crowded m = (levels.filter (· < m)).any fun m' =>
+      let d := Float.abs (Exact.toFloat (circleTurns m - circleTurns m'))
+      min d (1 - d) < crowded.nameSpread) ∧ crowded.nameSpread = 14 / 360 ∧
+    pi = Plane.deg 180 ∧
     (∀ m, goodName m =
       if m == -10 then "lo = −10" else if m == 3 then "hi = 3" else intText m) ∧
     (∀ m, intText m = if m < 0 then s!"−{-m}" else toString m) ∧
@@ -3080,11 +3085,10 @@ theorem levelWinding_keys :
       stripLabel "L/2" (-27 / 2) stripTop .left,
       stripLabel "0" (-27 / 2) (rat 0) .left,
       stripLabel "−L/2" (-27 / 2) stripBottom .left,
-      stripLabel "−13" (-13) stripBottom .below,
+      stripLabel "−10" (-10) stripBottom .below,
       stripLabel "−5" (-5) stripBottom .below,
       stripLabel "0" 0 stripBottom .below,
-      stripLabel "5" 5 stripBottom .below,
-      stripLabel "9" 9 stripBottom .below] ∧
+      stripLabel "5" 5 stripBottom .below] ∧
     (∀ m, stripPoint m = (
       let y := (stripAt m).2
       let it := levelMark m (Plane.Exact.point (stripAt m)) |>.named s!"level {intText m}"
@@ -3102,12 +3106,12 @@ theorem levelWinding_keys :
       (levels.take (k + 1)).map fun m => ⟨s!"level-{m}", [stripAt m]⟩) ∧
     (levelCount == 23 && phaseStepsArePhi && circleNearPhase && turnsNearPhi && stripArrives &&
       levels.filter good == [-10, -2, 3]) = true :=
-  ⟨rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl, rfl, rfl, rfl, fun _ => rfl,
-    fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ _ => rfl, fun _ => rfl,
-    fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl,
+  ⟨rfl, rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl, rfl, rfl, rfl, fun _ => rfl, fun _ => rfl,
+    fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ _ => rfl, fun _ => rfl, fun _ => rfl,
+    fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ => rfl, rfl, rfl, fun _ => rfl, fun _ => rfl,
     fun _ _ => rfl, rfl, rfl, fun _ => rfl, rfl, rfl, rfl, rfl, rfl, rfl, fun _ => rfl,
-    fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ _ _ _ _ => rfl, rfl, fun _ => rfl,
-    fun _ => rfl, fun _ => rfl, by decide +kernel⟩
+    fun _ => rfl, fun _ => rfl, fun _ => rfl, fun _ _ _ _ _ => rfl, rfl, fun _ => rfl, fun _ => rfl,
+    fun _ => rfl, by decide +kernel⟩
 
 end TDCSGFigures.Levels
 ```

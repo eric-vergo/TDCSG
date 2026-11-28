@@ -168,6 +168,30 @@ def engineErrors : List String :=
     all.flatMap fun (suffix, Q) =>
       Q.report.errors.toList.map fun e => s!"{name}{suffix}: {e}"
 
+/-- The least room, in pixels, between two labels of the loops of chapters 6 and 7 in any key, wide
+or narrow: two names closer than this can read as one (`−13` beside `8` reads as `−138`). -/
+def labelGap : Float := 3
+
+/-- The labels of the keys of the crossing, the component of zero and the phases winding round,
+wide and narrow, that come closer to another label than `labelGap`, each with the animation's
+name, rendition, panel and key: PILean's layout check with its label tolerance set to
+`-labelGap`, so that two labels' boxes must stand that far apart. The test driver runs this
+compiled and fails when it is not empty. -/
+def labelGapErrors : List String :=
+  let loops : List (String × PILean.Plane.MotionPanels) := [
+    ("terminalCrossing", Levels.terminalCrossing), ("componentOfZero", Confinement.componentOfZero),
+    ("levelWinding", Levels.levelWinding)]
+  loops.flatMap fun (name, P) =>
+    let all := [("", P)] ++ (P.narrow.map fun n => [("-narrow", n)]).getD []
+    all.flatMap fun (suffix, Q) =>
+      Q.report.panels.toList.zipIdx.flatMap fun (pr, i) =>
+        pr.keys.figs.toList.zipIdx.flatMap fun (f, k) =>
+          (f.problems { labelTolerance := -labelGap }).toList.filterMap fun p =>
+            if p.kind == .labelOverlap then
+              some s!"{name}{suffix}: panel {i + 1}, key {k}: {p.message}, closer than \
+                {labelGap} px"
+            else none
+
 -- Every caption, title and panel title of the animations of the site has all its characters in
 -- PILean's lettering, which draws them on the contact sheets and in print.
 #guard siteMotions.all fun (_, P) =>

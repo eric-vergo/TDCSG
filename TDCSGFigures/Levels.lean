@@ -639,17 +639,28 @@ def circlePoint (m : Int) : Item :=
     |>.incident .on circleTitle |>.incident (if good m then .on else .outside) arcTitle
     |>.withId s!"level-{m}"
 
+/-- Whether level `m`'s point lies within `nameSpread` of a turn of an earlier level's point on the
+circle. -/
+def crowded (m : Int) : Bool :=
+  (levels.filter (· < m)).any fun m' =>
+    let d := Float.abs (Exact.toFloat (circleTurns m - circleTurns m'))
+    min d (1 - d) < nameSpread
+where
+  /-- `14°`, as a fraction of a full turn. -/
+  nameSpread : Float := 14 / 360
+
 /-- The name of level `m` on the circle, outside it (actor `name-m`): a good level's above and to
 the side of the circle its point is on, in the colour of the good phases; another's, faint,
-straight out from its point. -/
+straight out from its point, farther out when an earlier level's point is close (`crowded`), so
+that the two names stand apart. -/
 def circleName (m : Int) : Item :=
   let p := onCircle (levelAngle m) 1
   if good m then
-    Plane.label (goodName m) p (if p.x ≥ 0 then .aboveRight else .aboveLeft) |>.size 16
+    Plane.label (goodName m) p (if p.x ≥ 0 then .aboveRight else .aboveLeft) (some 12) |>.size 16
       |>.role goodRole |>.withId s!"name-{m}"
   else
-    Plane.label (intText m) p (.toward (levelAngle m)) (some 6) |>.size 15 |>.faint
-      |>.withId s!"name-{m}"
+    Plane.label (intText m) p (.toward (levelAngle m)) (some (if crowded m then 24 else 6))
+      |>.size 15 |>.faint |>.withId s!"name-{m}"
 
 /-- The shaded arc of the good phases and the circle, drawn at every key. -/
 def circleBase : Array Item := #[
@@ -666,7 +677,7 @@ def circleItems (k : Nat) : Array Item :=
 /-- Key `k` of the circle: `circleItems k`. -/
 def circleKey (k : Nat) : Plane.Figure :=
   { width := figureWidth
-    view := some ⟨-1.4, -1.3, 1.4, 1.35⟩
+    view := some ⟨-1.4, -1.42, 1.4, 1.38⟩
     padding := 1
     style := partTwoStyle
     checks := .fail
@@ -764,11 +775,10 @@ def stripBase : Array Item := #[
   stripLabel "L/2" (-27 / 2) stripTop .left,
   stripLabel "0" (-27 / 2) (rat 0) .left,
   stripLabel "−L/2" (-27 / 2) stripBottom .left,
-  stripLabel "−13" (-13) stripBottom .below,
+  stripLabel "−10" (-10) stripBottom .below,
   stripLabel "−5" (-5) stripBottom .below,
   stripLabel "0" 0 stripBottom .below,
-  stripLabel "5" 5 stripBottom .below,
-  stripLabel "9" 9 stripBottom .below]
+  stripLabel "5" 5 stripBottom .below]
 
 /-- Where the ring is at key `k` along the levels: the point of `levelAt k`. -/
 def tracerAt (k : Nat) : List (QSqrt5 × QSqrt5) := [stripAt (levelAt k)]
