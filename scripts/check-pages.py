@@ -339,6 +339,7 @@ LINKED_MOTIONS = {
     "TDCSGFigures.exchangedIntervals": "TDCSGFigures.exchangedIntervals_spec",
     "TDCSGFigures.chordOrbit": "TDCSGFigures.chordOrbit_spec",
     "TDCSGFigures.Lens.lensRadius": "TDCSGFigures.Lens.lensRadius_spec",
+    "TDCSGFigures.Levels.terminalCrossing": "TDCSGFigures.Levels.terminalCrossing_spec",
 }
 NO_NARROW = {"TDCSGFigures.Confinement.walkToLeaf", "TDCSGFigures.orbitRadius"}
 motions = {}

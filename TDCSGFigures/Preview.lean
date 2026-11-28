@@ -69,7 +69,7 @@ def previews : Array (String × Entry) := #[
   ("lensEstimate", .plane Lens.lensEstimate),
   ("lensRadius", .motion Lens.lensRadius),
   ("levelPhases", .plot Levels.levelPhases),
-  ("terminalCrossing", .plane Levels.terminalCrossing),
+  ("terminalCrossing", .motion Levels.terminalCrossing),
   ("terminalZoom", .plane Levels.terminalZoom),
   ("componentOfZero", .plane Confinement.componentOfZero),
   ("walkToLeaf", .motion Confinement.walkToLeaf)]

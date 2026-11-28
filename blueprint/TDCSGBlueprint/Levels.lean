@@ -25,16 +25,21 @@ no other neighbor. Good levels recur within a bounded distance, uniformly in the
 window, and Chapter 7 uses one good level below and one above the starting labels, in every
 coordinate, to confine the walks.
 
-:::figure TDCSGFigures.Levels.terminalCrossing (label := "terminal-crossing") (inline := true) (links := TDCSGFigures.Levels.terminalCrossing_spec) (alt := "A label n inside a circular window, its edge to n plus e zero on the window's right edge, four other neighbors of n inside the window, and four open rings outside it joined to n plus e zero by dashed lines. A shaded half-plane on the right holds n plus e zero.")
+:::figure TDCSGFigures.Levels.terminalCrossing (label := "terminal-crossing") (links := TDCSGFigures.Levels.terminalCrossing_spec) (alt := "Two panels. Above, a label n inside a circular window with four neighbors inside it and a thick edge to n plus e zero on the window's right edge, in a shaded half-plane; a circle walks from n along the thick edge to n plus e zero, four open rings appear outside the window joined to n plus e zero by dashed lines, and the circle walks back to n. Below, the end of the edge enlarged: the circle crosses the edge of the shaded half-plane and stops at n plus e zero, just inside the window's edge.")
 A crossing at a good level, at $`r=2.12`, $`x=0.472` and coordinate $`j=0`. The label
 $`n=(4,-3,1,1,-3)` (a dot) has weight zero, projects to $`P(n)=7-4\varphi`, and its coordinate
 $`n_0=4` is a good level; the thick edge from $`n` to $`n+e_0` raises $`n_0` from $`4` to $`5`.
-Follow the thick edge from level $`4` to level $`5`. The only way to take another step is back
-along the same edge to level $`4`. The leaf $`n+e_0` (a square: weight one) sits at the window's edge, in the shaded half-plane
+A circle follows the thick edge from level $`4` to level $`5`; the lower panel shows the end of
+the edge enlarged, where the step crosses the cut. The leaf $`n+e_0` (a square: weight one) sits
+at the window's edge, in the shaded half-plane
 $`\operatorname{Re}w\ge\operatorname{Re}x+\kappa-\eta`, so by the lens estimate its four other
 candidates $`n+e_0-e_k` (open rings at the ends of dashed spokes) lie outside the window, while
-$`n` keeps its neighbors $`n+e_k` (squares inside the window). The small square around the
-leaf is enlarged in {figref "terminal-zoom"}[].
+$`n` keeps its neighbors $`n+e_k` (squares inside the window). The only way to take another step is
+back along the same edge to level $`4`. The centre of the small square around the leaf is enlarged, with a scale
+bar, in {figref "terminal-zoom"}[]. The key frames are exact and the last one is the figure its
+theorem states (`TDCSGFigures.Levels.terminalCrossing_spec`, the other frames in
+`TDCSGFigures.Levels.terminalCrossing_keys`); between them the browser slides the circle along the
+edge.
 :::
 
 :::figure TDCSGFigures.Levels.terminalZoom (label := "terminal-zoom") (inline := true) (links := TDCSGFigures.Levels.terminalZoom_spec) (alt := "An enlargement near the leaf: the edge from n ends at the leaf, which lies right of the cut and left of the window's edge, with a scale bar of length 0.005.")

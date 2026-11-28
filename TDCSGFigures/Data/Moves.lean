@@ -8,7 +8,7 @@ import TDCSGFigures.Style
 /-!
 # Exact moves of the animations
 
-The animations of chapters 1, 2, 3 and 7 declare their moves exactly and check them exactly: an
+The animations of chapters 1, 2, 3, 6 and 7 declare their moves exactly and check them exactly: an
 actor of a key frame is an id with the exact points that fix its drawing (`ExactActor`), and a
 step lists, for some ids, an exact move (`ExactMove`): a turn about an exact centre by an exact
 fraction of a full turn (`ExactTurn`), a slide along an exact vector, an appearance or a
