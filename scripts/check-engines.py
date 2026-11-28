@@ -44,6 +44,7 @@ def firefox_available():
 
 def check_motion():
     """The module `scripts/check-motion.py`, for its checks of the formulas of every page."""
+    sys.dont_write_bytecode = True  # no compiled cache beside the scripts
     spec = importlib.util.spec_from_file_location("check_motion",
                                                   repo_root / "scripts/check-motion.py")
     module = importlib.util.module_from_spec(spec)

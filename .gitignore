@@ -7,3 +7,6 @@
 
 # Rendered Verso blueprint
 /_out/
+
+# Python bytecode caches
+__pycache__/
