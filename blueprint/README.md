@@ -118,8 +118,9 @@ figures compared with the site's folder.
 `scripts/check-motion.py` calls PILean's browser checks of animations, on standalone files
 (`tools/motion-browser-check.py`) and on the site's pages (`tools/site/motion_browser.py`), with
 the exact expectations `lake exe tdcsg-motion-out` writes from Lean, and adds the positions in the
-dark theme, the width against the text column and that the site has no script of its own for a
-figure. It needs Playwright for Python with its Chromium:
+dark theme, the width against the text column, that the site has no script of its own for a
+figure, and that no page scrolls sideways at 1440, 768, 390 and 320 px and every formula is drawn
+inside the block that holds it. It needs Playwright for Python with its Chromium:
 
 ```sh
 lake exe tdcsg-motion-out /tmp/motion-out
@@ -130,10 +131,11 @@ python3 scripts/check-motion.py _out/site/html-multi /tmp/motion-out [SHOTS] [--
 The release workflow runs both after the build, the browser checks with four workers (`--workers`,
 pages checked at a time, each in its own Chromium).
 
-`scripts/check-engines.py`, run by hand on a Mac, adds the same checks in Firefox (on the site and
-on the standalone files) and in WebKit, the engine of Safari (on the standalone files, through
-PILean's `tools/webkit/webkit_check.py`, which needs a logged-in session with a screen and shows
-nothing). It runs each pass only where it can and says what it skipped; it installs nothing:
+`scripts/check-engines.py`, run by hand on a Mac, adds the same checks in Firefox (on the site, on
+the standalone files, and the formulas of every page) and in WebKit, the engine of Safari (on the
+standalone files, through PILean's `tools/webkit/webkit_check.py`, which needs a logged-in session
+with a screen and shows nothing). It runs each pass only where it can and says what it skipped; it
+installs nothing:
 
 ```sh
 python3 scripts/check-engines.py _out/site/html-multi /tmp/motion-out [--workers N]
