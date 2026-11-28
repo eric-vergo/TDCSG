@@ -143,15 +143,16 @@ python3 scripts/check-engines.py _out/site/html-multi /tmp/motion-out [--workers
 
 ### Animations
 
-Fifteen figures are animations drawn by PILean from exact key frames: the turn of one disk and
+Sixteen figures are animations drawn by PILean from exact key frames: the turn of one disk and
 two disjoint disks of chapter 1 (`TDCSGFigures.extensionJump`, `disjointDisks` in
 `TDCSGFigures/Compound.lean`), one step of the left generator and a word letter by letter of
 chapter 2 (`generatorStep`, `wordSteps` in `TDCSGFigures/TwoDisks.lean`), the three words, the
 interval exchange and the orbit on the chord of chapter 3 (`wordLoop1`, `wordLoop2`, `wordLoop3`,
 `chordOrbit` in `TDCSGFigures/Chord.lean`, `exchangedIntervals` in
 `TDCSGFigures/ProofDiagrams.lean`), the frame pair of chapter 4 (`TDCSGFigures.Lift.framePair` in
-`TDCSGFigures/FramePairMotion.lean`), the crossing at a good level of chapter 6
-(`TDCSGFigures.Levels.terminalCrossing`, with the end of its edge enlarged in a second panel) and the
+`TDCSGFigures/FramePairMotion.lean`), the crossing at a good level and the phases winding round of
+chapter 6 (`TDCSGFigures.Levels.terminalCrossing`, with the end of its edge enlarged in a second
+panel, and `levelWinding`, a circle above the plot of the phases) and the
 walk and the component of zero found layer by layer of chapter 7
 (`TDCSGFigures.Confinement.walkToLeaf`, `componentOfZero`). Each key is a `Plane.Figure` of exact data, and each step
 between two keys declares its moves: a turn of named items by a fifth of a full turn about an
@@ -175,7 +176,10 @@ first, and the theorem `<name>_spec` stays linked: it states
 that the last key frame is the figure and what the figure draws. The other key frames, the moves
 and the captions are stated in a plain theorem `<name>_keys`. The other animations are
 illustrations (`@[figure illustration]`): no theorem is linked to them, and the data of their key
-frames are stated in `wordLoop_keys`, `wordSteps_spec`, `framePair_keys` and `walkToLeaf_spec`.
+frames are stated in `wordLoop_keys`, `wordSteps_spec`, `framePair_keys`, `walkToLeaf_spec` and
+`levelWinding_keys`; the points on the circle of `levelWinding` are placed, in floating point,
+from rationals within `2⁻⁶²` of the exact phases, and each turn of its hand is a rational within
+`2⁻⁶²` of `φ - 1`, as its statement and captions say.
 Each actor that moves is drawn at the exact anchors that its arrival check reads, and the theorems
 state those anchors.
 The exact arrival check works modulo a full turn, so the sense and the size of every declared turn

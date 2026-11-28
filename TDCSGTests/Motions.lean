@@ -128,6 +128,13 @@ theorem component_missingAppearance :
       Confinement.compActors = false := by
   decide +kernel
 
+/-- The ring of the phases slid from level `-13` to level `-12` along `(1, 0)` misses its key. -/
+theorem winding_wrongSlide :
+    allArrive (Levels.levelCount - 1) (fun k => if k == 0 then
+      [("tracer", .slide (rat 1, rat 0)), ("level--12", .appear)] else Levels.stripMoves k)
+      Levels.stripActors = false := by
+  decide +kernel
+
 /-! ### The engine finds no error in any animation of the site -/
 
 /-- The animations of the site, with the names of their files in the site: the declaration's name,
@@ -148,7 +155,8 @@ def siteMotions : Array (String × PILean.Plane.MotionPanels) := #[
   ("TDCSGFigures.orbitRadius", orbitRadius),
   ("lensRadius", Lens.lensRadius),
   ("terminalCrossing", Levels.terminalCrossing),
-  ("componentOfZero", Confinement.componentOfZero)]
+  ("componentOfZero", Confinement.componentOfZero),
+  ("levelWinding", Levels.levelWinding)]
 
 /-- The errors PILean's engine reports for the animations of the site and their narrow renditions,
 each with the animation's name: every move drawn must land on its next key, every rest show its
@@ -159,6 +167,30 @@ def engineErrors : List String :=
     let all := [("", P)] ++ (P.narrow.map fun n => [("-narrow", n)]).getD []
     all.flatMap fun (suffix, Q) =>
       Q.report.errors.toList.map fun e => s!"{name}{suffix}: {e}"
+
+/-- The least room, in pixels, between two labels of the loops of chapters 6 and 7 in any key, wide
+or narrow: two names closer than this can read as one (`−13` beside `8` reads as `−138`). -/
+def labelGap : Float := 3
+
+/-- The labels of the keys of the crossing, the component of zero and the phases winding round,
+wide and narrow, that come closer to another label than `labelGap`, each with the animation's
+name, rendition, panel and key: PILean's layout check with its label tolerance set to
+`-labelGap`, so that two labels' boxes must stand that far apart. The test driver runs this
+compiled and fails when it is not empty. -/
+def labelGapErrors : List String :=
+  let loops : List (String × PILean.Plane.MotionPanels) := [
+    ("terminalCrossing", Levels.terminalCrossing), ("componentOfZero", Confinement.componentOfZero),
+    ("levelWinding", Levels.levelWinding)]
+  loops.flatMap fun (name, P) =>
+    let all := [("", P)] ++ (P.narrow.map fun n => [("-narrow", n)]).getD []
+    all.flatMap fun (suffix, Q) =>
+      Q.report.panels.toList.zipIdx.flatMap fun (pr, i) =>
+        pr.keys.figs.toList.zipIdx.flatMap fun (f, k) =>
+          (f.problems { labelTolerance := -labelGap }).toList.filterMap fun p =>
+            if p.kind == .labelOverlap then
+              some s!"{name}{suffix}: panel {i + 1}, key {k}: {p.message}, closer than \
+                {labelGap} px"
+            else none
 
 -- Every caption, title and panel title of the animations of the site has all its characters in
 -- PILean's lettering, which draws them on the contact sheets and in print.
@@ -290,5 +322,37 @@ end OrbitRadius
   "The component of 0 in the center graph at r = 1.95, x = 1/2: 18 labels, at most 5 edges from \
     0, each drawn at its projection P(n) inside the window, dots for weight 0, squares for weight \
     1, with the 19 edges of the graph among them. Every coordinate of every label is −1, 0 or 1."]
+
+#guard Levels.levelWinding.captions == #[
+  "The phase of each level m of coordinate 0 at r = 1.8, x = 0.87, reduced modulo L = φ − 1/2, on \
+    a circle of circumference L (phase 0 at the bottom, ±L/2 at the top) and along the levels in \
+    units of L. A level is good when its phase lies in the shaded part, farther than L/2 − η from \
+    L ℤ; this is decided exactly. On the circle each point is placed, in floating point, from a \
+    rational within 2⁻⁶² of its exact phase, and from one level to the next the hand turns by the \
+    difference of two such rationals, within 2⁻⁶² of φ − 1 of a turn; along the levels each point \
+    is at its exact phase. Level −13: not good.",
+  "Level −12: not good.",
+  "Level −11: not good.",
+  "Level −10: good: its phase lies in the shaded part, and it is the wall lo.",
+  "Level −9: not good.",
+  "Level −8: not good.",
+  "Level −7: not good.",
+  "Level −6: not good.",
+  "Level −5: not good.",
+  "Level −4: not good.",
+  "Level −3: not good.",
+  "Level −2: good, in the gap |m| ≤ 2 between the two search ranges.",
+  "Level −1: not good.",
+  "Level 0: not good.",
+  "Level 1: not good.",
+  "Level 2: not good.",
+  "Level 3: good: its phase lies in the shaded part, and it is the wall hi.",
+  "Level 4: not good.",
+  "Level 5: not good.",
+  "Level 6: not good.",
+  "Level 7: not good.",
+  "Level 8: not good.",
+  "Level 9: not good. Of the levels −13 to 9 the good ones are −10, −2 and 3; the walls are lo = \
+    −10 and hi = 3, and −2 lies in the gap between the search ranges."]
 
 end TDCSGTests.Motions

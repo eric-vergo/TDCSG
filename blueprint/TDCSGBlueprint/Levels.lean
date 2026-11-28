@@ -92,6 +92,22 @@ shaded bands are the good phases, and the levels $`-10`, $`-2` and $`3` land the
 takes one good level at most $`-3` and one at least $`3`, here $`-10` and $`3`, so that the
 starting labels and their neighbors lie strictly between them. The theorem at the end of this
 chapter finds such levels within a bounded distance, uniformly in the window.
+:::figure TDCSGFigures.Levels.levelWinding (label := "level-winding") (alt := "Two panels. Above, a circle with a shaded arc at the top; a hand at its center turns counterclockwise by a little more than half a turn from each level to the next, and a point lands on the circle for each level from minus 13 to 9; the levels minus 10, minus 2 and 3 land in the shaded arc and are named. Below, the plot of the phases of the same levels filling in level by level, a ring sliding from each point to the next.")
+The levels of {figref "level-phases"}[] arriving one at a time, $`m=-13,\dots,9`. Above, the
+phase, reduced modulo $`L`, is a point of a circle of circumference $`L`, with phase $`0` at the
+bottom and $`\pm L/2` at the top, in the shaded arc of the good phases. From one level to the next
+the phase grows by $`1+\varphi/2=\varphi L`, that is by $`\varphi` periods, so the reduced phase
+winds round by $`\varphi-1` of a turn; the hand turns by that much. Below, the same levels fill in
+the plot. Which levels are good is decided exactly, and the points below are at their exact
+phases; above, each point is placed, in floating point, from a rational within $`2^{-62}` of its
+exact phase, and each turn of the hand is the difference of two such rationals, within
+$`2^{-62}` of $`\varphi-1`. Between the key frames the browser turns the hand and slides the
+ring.
+:::
+
+Because $`\varphi` is irrational, the reduced phases of the levels never repeat and come back
+within any distance of every phase, which is why good levels recur; {figref "level-winding"}[]
+shows the first 23 of them winding round.
 
 :::definition "good_level" (lean := "TDCSG.Five.IsGoodLevel") (uses := "center_projection")
 Fix the radius $`r`, the window center $`x` and a coordinate $`j`. Put $`L=\varphi-1/2` and
