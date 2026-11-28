@@ -51,9 +51,9 @@ figure with a linked theorem, its last key frame is that figure, and the theorem
 the animation: it states that the last key frame is the figure and what the figure draws
 (`TDCSGFigures.generatorStep_spec`, `TDCSGFigures.extensionJump_spec`,
 `TDCSGFigures.disjointDisks_spec`, `TDCSGFigures.exchangedIntervals_spec`,
-`TDCSGFigures.chordOrbit_spec`, `TDCSGFigures.Levels.terminalCrossing_spec`); the lens of chapter 5 is linked to its theorem
-`TDCSGFigures.Lens.lensRadius_spec`, which states its key frames and the pictures between them.
-The other animations (the
+`TDCSGFigures.chordOrbit_spec`, `TDCSGFigures.Levels.terminalCrossing_spec`); the lens of chapter 5
+is linked to its theorem `TDCSGFigures.Lens.lensRadius_spec`, which states its key frames and the
+pictures between them. The other animations (the
 orbit of zero on the front page, the word followed letter by letter and the three words of
 chapters 2 and 3, the frame pair of chapter 4 and the walk of chapter 7) are illustrations: no
 theorem is linked to them. The orbits of zero are computed by the exact orbit engine, which the
@@ -2809,9 +2809,9 @@ disappearance. The point `boxEntry` drawn and slid to is real and lies on the ed
 `P(n) = 7 - 4φ` and the leaf `8 - 4φ`, both real; the circle about it and the circle about the leaf
 lie inside the region the enlarged panel shows, `zoomView`, made from `enlargedLeft`,
 `enlargedRight` and `enlargedHalf`, and that region lies inside the square `zoomBox` about the leaf
-drawn in the crossing; the enlarged panel draws the point and the leaf at the same real parts. The captions are written
-out. Not stated: how the builders draw, the layout, the timing and the frames the browser draws
-between the key frames. -/
+drawn in the crossing; the enlarged panel draws the point and the leaf at the same real parts. The
+captions are written out. Not stated: how the builders draw, the layout, the timing and the frames
+the browser draws between the key frames. -/
 theorem terminalCrossing_keys :
     crossCaptions = #[
       "A crossing at a good level, at r = 2.12, x = 0.472: the label n = (4, −3, 1, 1, −3) has \
