@@ -1,6 +1,6 @@
-/* Styles of the prose around the figures: the front page's lists and metadata, long names and
-   licence notes on narrow screens. The figures drawn by PILean carry their own styles and dark
-   theme. */
+/* Styles of the prose around the figures: the front page's lists and metadata, long names,
+   formulas and licence notes on narrow screens. The figures drawn by PILean carry their own styles
+   and dark theme. */
 
 /* Lists on the front page take the text face of its paragraphs, as in the chapters. */
 .authors ~ :is(ul, ol) {
@@ -27,6 +27,16 @@
 :is(p, li) > code:not([class]),
 :is(p, li) > a > code:not([class]) {
   overflow-wrap: anywhere;
+}
+
+/* Each formula is drawn as a picture and keeps a MathML copy for assistive technology, hidden in
+   a one-pixel box with `overflow: hidden`. Firefox does not clip a `math` element's contents for
+   `overflow: hidden`, so the copy, laid out on one line from where the formula starts, still
+   counts towards the width of the page, and a long formula near the end of a line makes a narrow
+   screen scroll sideways. Both engines clip it for `overflow: clip`; the copy stays in the
+   accessibility tree. */
+.bp_math.bp_math_static > math.bp_math_mathml {
+  overflow: clip;
 }
 
 /* The figures' own pages are titled with their declarations' names; in the list of those pages
